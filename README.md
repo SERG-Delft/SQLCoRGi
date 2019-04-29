@@ -2,8 +2,8 @@
 <!--- 
 e.g. https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/CS/CP19-CS-01/cool-project/badges/master/pipeline.svg 
 --->
-[![build status](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/<context>/<group>/<project>/badges/master/pipeline.svg)](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/<context>/<group>/<project>/commits/master)
-[![coverage report](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/<context>/<group>/<project>/badges/master/coverage.svg)](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/<context>/<group>/<project>/commits/master)
+[![build status](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/ST/cp19-st-01/st-01/badges/master/pipeline.svg)](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/ST/cp19-st-01/st-01/commits/master)
+[![coverage report](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/ST/cp19-st-01/st-01/badges/master/coverage.svg)](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/ST/cp19-st-01/st-01/commits/master)
 
 Project description
 
