@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>nl.tudelft.st01</groupId>
-  <artifactId>Branch coverage SQL tool</artifactId>
+  <artifactId>branch-coverage-sql-tool</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <name>Branch coverage SQL tool</name>
