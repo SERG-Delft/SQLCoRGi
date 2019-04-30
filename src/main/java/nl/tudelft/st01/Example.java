@@ -64,26 +64,62 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.RegExpMatchOperator;
 import net.sf.jsqlparser.expression.operators.relational.RegExpMySQLOperator;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectVisitor;
 import net.sf.jsqlparser.statement.select.SetOperationList;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.statement.values.ValuesStatement;
+import net.sf.jsqlparser.util.SelectUtils;
 
-public class VisitorFactory {
+public class Example {
+
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+        try {
+            Statement stmt = CCJSqlParserUtil.parse("SELECT Name FROM Employees WHERE Salary < 40000");
+            System.out.println("before change: Statement = \t\t\t" + stmt.toString());
+            Select select = (Select) stmt;
+
+            // with selectUtils you can add all kinds of things to a query. Try for yourself!
+            SelectUtils.addExpression(select, new Column("Address"));
+
+            select.getSelectBody().accept(getSelectVisitor());
+
+
+            System.out.println("After change: Statement = \t\t\t" + stmt.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     static SelectVisitor getSelectVisitor() {
         return new SelectVisitor() {
             @Override
             public void visit(PlainSelect plainSelect) {
-                Alias a  = new Alias("hihi", true);
-                System.out.println("plainSelect from 1: " + plainSelect.getFromItem());
-                plainSelect.getFromItem().setAlias(a);
-                System.out.println("plainSelect from 2: " + plainSelect.getFromItem().getAlias());
 
+                // adding an alias for the table
+                System.out.println("Before Alias: \t\t\t\t\t\t" + plainSelect.getFromItem());
+                Alias a  = new Alias("Workers", true); // useAs means: put in the word 'AS' in the query or not
+                plainSelect.getFromItem().setAlias(a);
+                System.out.println("After alias: \t\t\t\t\t\t" + plainSelect.getFromItem());
+
+                // unleashing a visitor that changes the values of the WHERE clause
                 Expression where = plainSelect.getWhere();
+                where.accept(getExpressionVisitor());
+                System.out.println("Where clause after visitor: \t\t" + where.toString());
+
+
+                // changing the expression from < to >
+
+                // you first have to initialize a new Expression object, then
+                //      set the left and right expression of the object, then
+                //      update the where attribute of the select object
                 MinorThan mt = (MinorThan) where;
                 GreaterThan gt = new GreaterThan();
 
@@ -91,10 +127,7 @@ public class VisitorFactory {
                 gt.setRightExpression(mt.getRightExpression());
 
                 plainSelect.setWhere(gt);
-
-                System.out.println("plainSelect.where: " + where.toString());
-                where.accept(VisitorFactory.getExpressionVisitor());
-                System.out.println("plainSelect.where: " + where.toString());
+                System.out.println("Where after changing conditon: \t\t" + plainSelect.getWhere());
             }
 
             @Override
@@ -259,11 +292,23 @@ public class VisitorFactory {
 
             @Override
             public void visit(MinorThan minorThan) {
-                System.out.println("minor than: " + minorThan.getStringExpression());
-                minorThan.setNot();
-                minorThan.setLeftExpression(new Column("b"));
+                // in the visitor pattern you can define what you want to do for every
+                // different instance of an Expression. Here, we edit the data of the salary
 
-                minorThan.setRightExpression(new DoubleValue("20"));
+                // Note: We CANNOT change the < to a > here. This has to be done
+                // on a higher level
+                System.out.println("Left expression of MinorThan: \t\t" + minorThan.getLeftExpression());
+                System.out.println("String expression of MinorThan: \t" + minorThan.getStringExpression());
+                System.out.println("Right expression of MinorThan: \t\t" + minorThan.getRightExpression());
+                // you can also toggle the NOT operator
+                minorThan.setNot();
+                System.out.println("with NOT: \t\t\t\t\t\t\t" + minorThan);
+                minorThan.removeNot();
+                System.out.println("without NOT: \t\t\t\t\t\t" + minorThan);
+
+                minorThan.setLeftExpression(new Column("DragonBallZScore"));
+
+                minorThan.setRightExpression(new DoubleValue("9000"));
             }
 
             @Override

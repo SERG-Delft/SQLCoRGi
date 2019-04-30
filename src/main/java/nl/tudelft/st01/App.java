@@ -25,37 +25,5 @@ import net.sf.jsqlparser.util.SelectUtils;
 public class App {
     public static void main(String[] args) {
         System.out.println("Hello World!");
-        try {
-            Statement stmt = CCJSqlParserUtil.parse("SELECT someColumn FROM tab1 WHERE a < 10");
-            System.out.println("before change: Statement = " + stmt.toString());
-            Select select = (Select) stmt;
-            SelectUtils.addExpression(select, new Column("otherColumn"));
-
-            MinorThan mt = new MinorThan();
-            mt.setLeftExpression(new Column("yetAnotherColumn"));
-            mt.setRightExpression(new DoubleValue("727"));
-            SelectUtils.addExpression(select, mt);
-
-            stmt = changeCondition(stmt, VisitorFactory.getSelectVisitor());
-            System.out.println("before change: Statement = " + stmt.toString());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    /**
-     * The idea of this method is to change the '>' to a '<'
-     * I did not yet get it working, but this beginning may help to get things going in the right direction
-     *
-     * @param st
-     * @param visitor
-     * @return
-     */
-    public static Statement changeCondition(Statement st, SelectVisitor visitor) {
-        Select select = (Select) st;
-        select.getSelectBody().accept(visitor);
-        return st;
     }
 }
