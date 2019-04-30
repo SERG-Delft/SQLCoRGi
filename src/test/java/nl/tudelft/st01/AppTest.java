@@ -1,8 +1,10 @@
 package nl.tudelft.st01;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit test for simple App.
@@ -14,5 +16,14 @@ public class AppTest {
     @Test
     public void shouldAnswerWithTrue() {
         assertTrue(true);
+    }
+
+    /**
+     * Test if Mockito can run.
+     */
+    @Test
+    public void mockitoTest() {
+        Object mock = Mockito.mock(Object.class);
+        assertTrue(Mockito.mockingDetails(mock).isMock());
     }
 }
