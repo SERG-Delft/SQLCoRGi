@@ -1,6 +1,9 @@
 package nl.tudelft.st01;
 
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
@@ -19,10 +22,12 @@ public class App {
             Statement stmt = CCJSqlParserUtil.parse("SELECT * FROM tab1 WHERE a > 10");
             System.out.println("before change: Statement = " + stmt.toString());
 
-            SelectVisitor visitor = new SelectVisitor() {
+            SelectVisitor selectVisitor = new SelectVisitor() {
                 @Override
                 public void visit(PlainSelect plainSelect) {
-                    plainSelect.getWhere().accept(exprVisitor);
+                    System.out.println("plainSelect: " + plainSelect.toString());
+                    System.out.println("plainSelect.where: " + plainSelect.getWhere().toString());
+
                 }
 
                 @Override
@@ -40,14 +45,24 @@ public class App {
                     System.out.println("valStmt: "+ valuesStatement.toString());
 
                 }
-            }
-            stmt = changeCondition(stmt);
+            };
+            stmt = changeCondition(stmt, selectVisitor);
             System.out.println("before change: Statement = " + stmt.toString());
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
+    /**
+     * The idea of this method is to change the '>' to a '<'
+     * I did not yet get it working, but this beginning may help to get things going in the right direction              
+     *
+     * @param st
+     * @param visitor
+     * @return
+     */
     public static Statement changeCondition(Statement st, SelectVisitor visitor) {
         Select select = (Select) st;
         select.getSelectBody().accept(visitor);
