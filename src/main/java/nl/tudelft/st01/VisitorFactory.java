@@ -1,5 +1,6 @@
 package nl.tudelft.st01;
 
+import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnalyticExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
@@ -63,13 +64,58 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.RegExpMatchOperator;
 import net.sf.jsqlparser.expression.operators.relational.RegExpMySQLOperator;
-import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectVisitor;
+import net.sf.jsqlparser.statement.select.SetOperationList;
 import net.sf.jsqlparser.statement.select.SubSelect;
+import net.sf.jsqlparser.statement.select.WithItem;
+import net.sf.jsqlparser.statement.values.ValuesStatement;
 
-public class CustomExprVisitor {
+public class VisitorFactory {
 
-    static ExpressionVisitor getVisitor() {
+    static SelectVisitor getSelectVisitor() {
+        return new SelectVisitor() {
+            @Override
+            public void visit(PlainSelect plainSelect) {
+                Alias a  = new Alias("hihi", true);
+                System.out.println("plainSelect from 1: " + plainSelect.getFromItem());
+                plainSelect.getFromItem().setAlias(a);
+                System.out.println("plainSelect from 2: " + plainSelect.getFromItem().getAlias());
+
+                Expression where = plainSelect.getWhere();
+                MinorThan mt = (MinorThan) where;
+                GreaterThan gt = new GreaterThan();
+
+                gt.setLeftExpression(mt.getLeftExpression());
+                gt.setRightExpression(mt.getRightExpression());
+
+                plainSelect.setWhere(gt);
+
+                System.out.println("plainSelect.where: " + where.toString());
+                where.accept(VisitorFactory.getExpressionVisitor());
+                System.out.println("plainSelect.where: " + where.toString());
+            }
+
+            @Override
+            public void visit(SetOperationList setOperationList) {
+                System.out.println("setOpList: "+ setOperationList.toString());
+            }
+
+            @Override
+            public void visit(WithItem withItem) {
+                System.out.println("withItem: "+ withItem.toString());
+            }
+
+            @Override
+            public void visit(ValuesStatement valuesStatement) {
+                System.out.println("valStmt: "+ valuesStatement.toString());
+
+            }
+        };
+    }
+
+    static ExpressionVisitor getExpressionVisitor() {
         return new ExpressionVisitor() {
             @Override
             public void visit(BitwiseRightShift bitwiseRightShift) {
@@ -216,6 +262,7 @@ public class CustomExprVisitor {
                 System.out.println("minor than: " + minorThan.getStringExpression());
                 minorThan.setNot();
                 minorThan.setLeftExpression(new Column("b"));
+
                 minorThan.setRightExpression(new DoubleValue("20"));
             }
 

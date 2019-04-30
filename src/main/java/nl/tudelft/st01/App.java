@@ -1,8 +1,11 @@
 package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.Alias;
+import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
+import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.parser.Token;
@@ -28,37 +31,12 @@ public class App {
             Select select = (Select) stmt;
             SelectUtils.addExpression(select, new Column("otherColumn"));
 
+            MinorThan mt = new MinorThan();
+            mt.setLeftExpression(new Column("yetAnotherColumn"));
+            mt.setRightExpression(new DoubleValue("727"));
+            SelectUtils.addExpression(select, mt);
 
-            SelectVisitor selectVisitor = new SelectVisitor() {
-                @Override
-                public void visit(PlainSelect plainSelect) {
-                    Alias a  = new Alias("hihi", true);
-                    System.out.println("plainSelect from 1: " + plainSelect.getFromItem());
-                    plainSelect.getFromItem().setAlias(a);
-                    System.out.println("plainSelect from 2: " + plainSelect.getFromItem().getAlias());
-                    Expression where = plainSelect.getWhere();
-                    where.accept(CustomExprVisitor.getVisitor());
-                    System.out.println("plainSelect.where: " + where.toString());
-
-                }
-
-                @Override
-                public void visit(SetOperationList setOperationList) {
-                    System.out.println("setOpList: "+ setOperationList.toString());
-                }
-
-                @Override
-                public void visit(WithItem withItem) {
-                    System.out.println("withItem: "+ withItem.toString());
-                }
-
-                @Override
-                public void visit(ValuesStatement valuesStatement) {
-                    System.out.println("valStmt: "+ valuesStatement.toString());
-
-                }
-            };
-            stmt = changeCondition(stmt, selectVisitor);
+            stmt = changeCondition(stmt, VisitorFactory.getSelectVisitor());
             System.out.println("before change: Statement = " + stmt.toString());
 
         } catch (Exception e) {
