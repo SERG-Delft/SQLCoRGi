@@ -33,7 +33,7 @@
 
     <clover.version>4.3.1</clover.version>
 
-    <jsqlparser.version>1.4</jsqlparser.version>
+    <jsqlparser.version>2.0</jsqlparser.version>
 
     <junit.jupiter.version>5.4.2</junit.jupiter.version>
 
