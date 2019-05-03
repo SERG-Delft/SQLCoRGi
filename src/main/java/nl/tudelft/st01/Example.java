@@ -11,6 +11,7 @@ import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
+import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.ExtractExpression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.HexValue;
@@ -149,7 +150,7 @@ public class Example {
     }
 
     static ExpressionVisitor getExpressionVisitor() {
-        return new ExpressionVisitor() {
+        return new ExpressionVisitorAdapter() {
             @Override
             public void visit(BitwiseRightShift bitwiseRightShift) {
 
