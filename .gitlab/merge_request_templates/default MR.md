@@ -10,7 +10,9 @@ Closes #i
 ## Points of attention
 
 ### Current Coverage
+<!-- Replace <branch-to-merge> with the branch that is the subject of this MR -->
 |Branch|Coverage|
-|--|--|
-|master|![Coverage-Master](https://gitlab.ewi.tudelft.nl/TI2206/2018-2019/naval-battle/naval-battle-5/naval-battle-5/badges/master/coverage.svg)|
-|dev|![Coverage-Master](https://gitlab.ewi.tudelft.nl/TI2206/2018-2019/naval-battle/naval-battle-5/naval-battle-5/badges/dev/coverage.svg)|
+|--|--| 
+|<branch-to-merge>|![coverage-mr-branch](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/ST/cp19-st-01/st-01/badges/<branch-to-merge>/coverage.svg)|
+|dev|![coverage-dev](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/ST/cp19-st-01/st-01/badges/dev/coverage.svg)|
+|master|![coverage-master](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/ST/cp19-st-01/st-01/badges/master/coverage.svg)|
