@@ -1,3 +1,6 @@
+<!-- Change #i to the corresponding issue e.g. #1 -->
+Closes #i
+
 ## Why we need this
 
 ## List of features
@@ -5,9 +8,6 @@
 ## (How) Has this been tested?
 
 ## Points of attention
-
-## Close issues
-implements ... 
 
 ### Current Coverage
 |Branch|Coverage|
