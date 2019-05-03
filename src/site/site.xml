@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 http://maven.apache.org/xsd/decoration-1.8.0.xsd"
+         name="SQL Coverage Target Generator">
+
+    <publishDate position="right" format="yyyy-MM-dd" />
+    <version position="right" />
+
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.7</version>
+    </skin>
+
+    <body>
+        <breadcrumbs>
+            <item name="SQL Coverage Target Generator" href="." />
+        </breadcrumbs>
+
+        <menu ref="reports" />
+    </body>
+
+    <poweredBy>
+        <logo name="Maven" href="https://maven.apache.org/"
+              img="images/logos/maven-feather.png" />
+    </poweredBy>
+
+    <custom>
+        <fluidoSkin>
+            <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
+        </fluidoSkin>
+    </custom>
+</project>
