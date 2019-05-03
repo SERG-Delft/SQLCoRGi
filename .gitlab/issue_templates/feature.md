@@ -8,11 +8,14 @@
 
 <!-- possible provide suggestions on solutions. If multiple solutions are possible consider listing them all -->
 
-<!-- list definition of done -->
 
 ### Action plan
 
 <!-- Suggest next steps -->
+
+### Definition of done
+
+<!-- Describe when the issue can be closed -->
 
 <!---
 LINES BELOW WILL SET GITLAB ISSUE PROPERTIES
