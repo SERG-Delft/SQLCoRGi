@@ -1,30 +1,21 @@
-### Context / Problem to solve
+## Description
 
 <!-- Describe the reason the issue was created. Describe the conditions/situation what made you think something could be improved. What problem do we solve? -->
 
-### Feature
+## Why we need it
 
-<!-- what do you propose needs to be done/created -->
+<!-- Describe why this issue is necessary -->
 
-<!-- possible provide suggestions on solutions. If multiple solutions are possible consider listing them all -->
-
-
-### Action plan
-
-<!-- Suggest next steps -->
-
-### Definition of done
+## Definition of done
 
 <!-- Describe when the issue can be closed -->
 
-<!---
-LINES BELOW WILL SET GITLAB ISSUE PROPERTIES
---->
-/label ~feature
-<!-- Assign the team members working on the feature -->
+## Assignees
 /assign @team-member1 @team-member2
-<!-- Estimate the amount of hours needed to complete the feature -->
-/estimate 1h
+
+<!-- Estimate the amount of hours needed for the issue -->
+/estimate ...
+
 <!-- Set the correct milestone -->
 /milestone %sprint_1
 

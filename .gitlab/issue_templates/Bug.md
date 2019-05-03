@@ -4,30 +4,30 @@ Please read this!
 Before opening a new issue, make sure to search for keywords in the issues and verify the issue you're about to submit isn't a duplicate.
 --->
 
-### Summary
+## Summary
 
 <!-- Summarize the bug encountered concisely -->
 
-### Expected *correct* behavior
+## Expected *correct* behavior
 
 <!-- Describe what you intended to get/see -->
 
-### Current *bug* behavior
+## Current *bug* behavior
 
 <!-- Describe what you actually got/saw -->
 
-### Relevant logs and/or screenshots
+## Relevant logs and/or screenshots
 
 <!-- Paste any relevant logs - please use code blocks (```) to format console output,
 logs, and code as it's very hard to read otherwise. -->
 
-### Steps to reproduce
+## Steps to reproduce
 
 <!-- List the platform, software version, etc, you are on. -->
 
 <!-- List the steps you took to get/see the unexpected behavior -->
 
-### Possible solution
+## Possible solution
 
 <!-- List possible solutions for further investigations -->
 

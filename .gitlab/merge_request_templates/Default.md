@@ -3,11 +3,15 @@ Closes #i
 
 ## Why we need this
 
+
 ## List of features
+
 
 ## (How) Has this been tested?
 
+
 ## Points of attention
+
 
 ### Current Coverage
 <!-- Replace <branch-to-merge> with the branch that is the subject of this MR -->
