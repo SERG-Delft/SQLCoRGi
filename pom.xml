@@ -28,8 +28,8 @@
     <site.plugin.version>3.7.1</site.plugin.version>
     <surefire.plugin.version>3.0.0-M3</surefire.plugin.version>
 
-    <!--<checkstyle.plugin.version>3.0.0</checkstyle.plugin.version>
-    <checkstyle.version>8.14</checkstyle.version>-->
+    <checkstyle.version>8.20</checkstyle.version>
+    <checkstyle.plugin.version>3.0.0</checkstyle.plugin.version>
 
     <clover.version>4.3.1</clover.version>
 
