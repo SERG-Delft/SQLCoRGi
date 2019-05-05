@@ -11,6 +11,7 @@ cache:
   paths:
     - .m2/repository
   key: "$CI_COMMIT_REF_SLUG"
+  policy: pull
 
   
 # Stages
