@@ -36,7 +36,7 @@ logs, and code as it's very hard to read otherwise. -->
 <!---
 LINES BELOW WILL SET GITLAB ISSUE PROPERTIES
 --->
-/label ~bug
+/label ~Bug
 
 <!-- Estimate the amount of hours needed to fix the bug -->
 /estimate ...
