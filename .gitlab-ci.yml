@@ -1,5 +1,5 @@
 # Use Docker image with Java 8 (Update 101) and Maven (3.3.9) running on Ubuntu 16.04
-image: maven:3.3.9-jdk-8
+image: maven:3.3.9-jdk-8-slim
 
 # Maven CLI flags
 variables:  
