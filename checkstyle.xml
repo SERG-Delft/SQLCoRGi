@@ -75,6 +75,7 @@
             <property name="option" value="nospace"/>
         </module>
         <module name="EmptyForIteratorPad"/>
+        <module name="EmptyLineSeparator"/>
         <module name="EmptyStatement"/>
         <module name="EqualsAvoidNull"/>
         <module name="EqualsHashCode"/>
