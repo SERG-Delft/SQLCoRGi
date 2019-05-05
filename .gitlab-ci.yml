@@ -7,8 +7,9 @@ variables:
 # Cache the compiled project & libraries between jobs
 cache:
   paths:
-    - .m2/
+    - .m2/repository
     - target/
+  key: "$CI_BUILD_REF_NAME"
 
 # Stages
 stages:
