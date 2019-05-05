@@ -6,10 +6,37 @@
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
 
     <description>
-        My custom rules
+        Custom rules for the SQL coverage target generator project.
     </description>
 
 
-    <rule ref="category/java/errorprone.xml/EmptyCatchBlock" />
+    <!-- Best Practices -->
+    <rule ref="category/java/bestpractices.xml">
+        <exclude name="AccessorMethodGeneration"/>
+        <exclude name="AvoidPrintStackTrace"/>
+        <exclude name="AvoidReassigningLoopVariables"/>
+        <exclude name="AvoidReassigningParameters"/>
+        <exclude name="ForLoopCanBeForeach"/>
+        <exclude name="JUnit4SuitesShouldUseSuiteAnnotation"/>
+        <exclude name="JUnit4TestShouldUseAfterAnnotation"/>
+        <exclude name="JUnit4TestShouldUseBeforeAnnotation"/>
+        <exclude name="JUnit4TestShouldUseTestAnnotation"/>
+        <exclude name="JUnitAssertionsShouldIncludeMessage"/>
+        <exclude name="JUnitTestContainsTooManyAsserts"/>
+        <exclude name="JUnitUseExpected"/>
+        <exclude name="SystemPrintln"/>
+        <exclude name="UseVarargs" />
+    </rule>
+    <rule ref="category/java/bestpractices.xml/JUnitTestContainsTooManyAsserts">
+        <properties>
+            <property name="maximumAsserts" value="3" />
+        </properties>
+    </rule>
+
+    <!-- Performance -->
+    <rule ref="category/java/performance.xml"/>
+
+    <!-- Security -->
+    <rule ref="category/java/security.xml"/>
 
 </ruleset>
