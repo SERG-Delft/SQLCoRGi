@@ -1,6 +1,7 @@
 # Use Docker image with Java 8 (Update 101) and Maven (3.3.9) running on Ubuntu 16.04
 image: kaiwinter/docker-java8-maven
 
+# Maven CLI flags
 variables:  
   MAVEN_CLI_OPTS: "-B -Dmaven.repo.local=./.m2/repository"
   
@@ -8,9 +9,9 @@ variables:
 cache:
   paths:
     - ./.m2/repository
-    - target/
   key: "$CI_BUILD_REF_NAME"
 
+  
 # Stages
 stages:
   - Build
@@ -24,6 +25,9 @@ build:
   stage: Build
   script:
     - "mvn $MAVEN_CLI_OPTS compile"
+  artifacts:
+    paths:
+      - target/
 
 
 # Test stage
@@ -32,6 +36,8 @@ junit-tests:
   script:
     - "mvn $MAVEN_CLI_OPTS test"
   artifacts:
+    paths:
+      - target/
     reports:
       junit:
         - target/surefire-reports/TEST-*.xml
@@ -42,22 +48,31 @@ checkstyle:
     stage: Static-analysis
     script:
       - "mvn $MAVEN_CLI_OPTS checkstyle:check"
-
+    artifacts:
+      paths:
+        - target/
+      
 spotbugs:
     stage: Static-analysis
     script:
       - "mvn $MAVEN_CLI_OPTS spotbugs:check"
-
+    artifacts:
+      paths:
+        - target/
 pmd:
     stage: Static-analysis
     script:
       - "mvn $MAVEN_CLI_OPTS pmd:check"
-
+    artifacts:
+      paths:
+        - target/
 cpd:
     stage: Static-analysis
     script:
       - "mvn $MAVEN_CLI_OPTS pmd:cpd-check"
-
+    artifacts:
+      paths:
+        - target/
 
 # Coverage stage      
 clover:
