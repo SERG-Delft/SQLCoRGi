@@ -23,7 +23,6 @@ stages:
 build:
   stage: Build
   script:
-    - "cd target/ && ls"
     - "mvn $MAVEN_CLI_OPTS compile"
 
 
@@ -31,6 +30,7 @@ build:
 junit-tests:
   stage: Test
   script:
+    - "ls target/ && ls ./.m2/repository/"
     - "mvn $MAVEN_CLI_OPTS test"
   artifacts:
     reports:
