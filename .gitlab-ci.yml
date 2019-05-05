@@ -13,14 +13,14 @@ cache:
   key: "$CI_COMMIT_REF_SLUG"
   policy: pull
 
-  
+
 # Stages
 stages:
   - Build
   - Test
   - Static-analysis
   - Coverage
-  
+
 
 # Build stage
 build:
@@ -37,6 +37,8 @@ junit-tests:
   stage: Test
   script:
     - "mvn $MAVEN_CLI_OPTS test"
+  dependencies:
+    - build
   artifacts:
     reports:
       junit:
@@ -48,7 +50,7 @@ checkstyle:
     stage: Static-analysis
     script:
       - "mvn $MAVEN_CLI_OPTS checkstyle:check"
-      
+
 spotbugs:
     stage: Static-analysis
     script:
