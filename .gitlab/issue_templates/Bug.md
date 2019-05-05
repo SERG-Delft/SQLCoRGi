@@ -36,10 +36,7 @@ logs, and code as it's very hard to read otherwise. -->
 <!---
 LINES BELOW WILL SET GITLAB ISSUE PROPERTIES
 --->
-/label ~bug
-
-<!-- Assign the team members working on the bug -->
-/assign @team-member1 @team-member2
+/label ~Bug
 
 <!-- Estimate the amount of hours needed to fix the bug -->
 /estimate ...
