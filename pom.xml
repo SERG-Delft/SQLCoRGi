@@ -40,7 +40,7 @@
         <mockito.version>2.27.0</mockito.version>
         <mockito.junit.jupiter.version>2.27.0</mockito.junit.jupiter.version>
 
-        <!--<pmd.plugin.version>3.10.0</pmd.plugin.version>-->
+        <pmd.plugin.version>3.12.0</pmd.plugin.version>
 
         <spotbugs.version>3.1.12</spotbugs.version>
         <spotbugs.annotations.version>3.1.12</spotbugs.annotations.version>
@@ -210,6 +210,22 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>${pmd.plugin.version}</version>
+                <configuration>
+                    <analysisCache>true</analysisCache>
+                    <skipEmptyReport>false</skipEmptyReport>
+                    <includeTests>true</includeTests>
+                    <failOnViolation>true</failOnViolation>
+                    <printFailingErrors>true</printFailingErrors>
+                    <rulesets>
+                        <ruleset>pmd-rules.xml</ruleset>
+                    </rulesets>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${resources.plugin.version}</version>
             </plugin>
@@ -285,6 +301,20 @@
                 <version>${jxr.plugin.version}</version>
                 <configuration>
                     <linkJavadoc>true</linkJavadoc>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>${pmd.plugin.version}</version>
+                <configuration>
+                    <analysisCache>true</analysisCache>
+                    <skipEmptyReport>false</skipEmptyReport>
+                    <includeTests>true</includeTests>
+                    <rulesets>
+                        <ruleset>pmd-rules.xml</ruleset>
+                    </rulesets>
                 </configuration>
             </plugin>
 
