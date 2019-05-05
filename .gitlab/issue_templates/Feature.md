@@ -10,12 +10,10 @@
 
 <!-- Describe when the issue can be closed -->
 
-## Assignees
-/assign @team-member1 @team-member2
+<!---
+LINES BELOW WILL SET GITLAB ISSUE PROPERTIES
+--->
+label ~feature
 
 <!-- Estimate the amount of hours needed for the issue -->
 /estimate ...
-
-<!-- Set the correct milestone -->
-/milestone %sprint_1
-
