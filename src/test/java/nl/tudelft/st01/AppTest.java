@@ -27,10 +27,12 @@ public class AppTest {
     }
 
     /**
-     * Test for coverage
+     * Test for coverage and PMD warning suppression.
      */
     @Test
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     public void coverageTest() {
-        Example.main(null);
+        String[] args = {"Test"};
+        Example.main(args);
     }
 }
