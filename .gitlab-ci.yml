@@ -3,12 +3,12 @@ image: kaiwinter/docker-java8-maven
 
 # Maven CLI flags
 variables:  
-  MAVEN_CLI_OPTS: "-B -Dmaven.repo.local=./.m2/repository"
+  MAVEN_CLI_OPTS: "-B -Dmaven.repo.local=.m2/repository"
   
 # Cache the compiled project & libraries between jobs
 cache:
   paths:
-    - ./.m2/repository
+    - .m2/repository
   key: "$CI_BUILD_REF_NAME"
 
   
