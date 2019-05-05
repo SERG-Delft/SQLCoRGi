@@ -1,5 +1,6 @@
 package nl.tudelft.st01;
 
+import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnalyticExpression;
@@ -77,12 +78,28 @@ import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.statement.values.ValuesStatement;
 import net.sf.jsqlparser.util.SelectUtils;
 
-public class Example {
+/**
+ * Awesome documentation.
+ */
+public final class Example {
 
+    /**
+     * Unused.
+     */
+    private Example() {
+
+    }
+
+    /**
+     * This is a main function.
+     * @param args some unused stuff.
+     */
     public static void main(String[] args) {
         System.out.println("Hello World!");
         try {
-            Statement stmt = CCJSqlParserUtil.parse("SELECT Name FROM Employees WHERE Salary < 40000");
+            Statement stmt = CCJSqlParserUtil.parse(
+                    "SELECT Name FROM Employees WHERE Salary < 40000"
+            );
             System.out.println("before change: Statement = \t\t\t" + stmt.toString());
             Select select = (Select) stmt;
 
@@ -94,11 +111,15 @@ public class Example {
 
             System.out.println("After change: Statement = \t\t\t" + stmt.toString());
 
-        } catch (Exception e) {
+        } catch (JSQLParserException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * We don't want any Checkstyle violations in our code now, do we?
+     * @return a SelectVisitor instance, surprise!
+     */
     static SelectVisitor getSelectVisitor() {
         return new SelectVisitor() {
             @Override
@@ -106,7 +127,8 @@ public class Example {
 
                 // adding an alias for the table
                 System.out.println("Before Alias: \t\t\t\t\t\t" + plainSelect.getFromItem());
-                Alias a  = new Alias("Workers", true); // useAs means: put in the word 'AS' in the query or not
+                // useAs means: put in the word 'AS' in the query or not
+                Alias a  = new Alias("Workers", true);
                 plainSelect.getFromItem().setAlias(a);
                 System.out.println("After alias: \t\t\t\t\t\t" + plainSelect.getFromItem());
 
@@ -133,22 +155,27 @@ public class Example {
 
             @Override
             public void visit(SetOperationList setOperationList) {
-                System.out.println("setOpList: "+ setOperationList.toString());
+                System.out.println("setOpList: " + setOperationList.toString());
             }
 
             @Override
             public void visit(WithItem withItem) {
-                System.out.println("withItem: "+ withItem.toString());
+                System.out.println("withItem: " + withItem.toString());
             }
 
             @Override
             public void visit(ValuesStatement valuesStatement) {
-                System.out.println("valStmt: "+ valuesStatement.toString());
+                System.out.println("valStmt: " + valuesStatement.toString());
 
             }
         };
     }
 
+    /**
+     * A brand new sentence.
+     * @return something, I don't know.
+     */
+    @SuppressWarnings("checkstyle:methodLength")
     static ExpressionVisitor getExpressionVisitor() {
         return new ExpressionVisitorAdapter() {
             @Override
@@ -298,9 +325,12 @@ public class Example {
 
                 // Note: We CANNOT change the < to a > here. This has to be done
                 // on a higher level
-                System.out.println("Left expression of MinorThan: \t\t" + minorThan.getLeftExpression());
-                System.out.println("String expression of MinorThan: \t" + minorThan.getStringExpression());
-                System.out.println("Right expression of MinorThan: \t\t" + minorThan.getRightExpression());
+                System.out.println("Left expression of MinorThan: \t\t"
+                        + minorThan.getLeftExpression());
+                System.out.println("String expression of MinorThan: \t"
+                        + minorThan.getStringExpression());
+                System.out.println("Right expression of MinorThan: \t\t"
+                        + minorThan.getRightExpression());
                 // you can also toggle the NOT operator
                 minorThan.setNot();
                 System.out.println("with NOT: \t\t\t\t\t\t\t" + minorThan);

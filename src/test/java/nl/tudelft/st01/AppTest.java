@@ -3,7 +3,6 @@ package nl.tudelft.st01;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -11,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class AppTest {
     /**
-     * Rigorous Test :-)
+     * Rigorous test.
      */
     @Test
     public void shouldAnswerWithTrue() {
