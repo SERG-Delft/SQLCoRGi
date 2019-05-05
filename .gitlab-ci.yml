@@ -1,11 +1,5 @@
-# Reference: https://docs.gitlab.com/ee/ci/yaml/
 # Use Docker image with Java 8 (Update 101) and Maven (3.3.9) running on Ubuntu 16.04
 image: kaiwinter/docker-java8-maven
-
-# Variables
-# Allows you to define custom variables
-# //TODO: look into variables
-variables:
 
 # Cache the compiled project & libraries between jobs
 cache:
