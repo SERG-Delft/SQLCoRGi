@@ -26,4 +26,12 @@ public class AppTest {
         Object mock = Mockito.mock(Object.class);
         assertTrue(Mockito.mockingDetails(mock).isMock());
     }
+
+    /**
+     * Test for coverage
+     */
+    @Test
+    public void coverageTest() {
+        Example.main(null);
+    }
 }
