@@ -1,15 +1,16 @@
-# Use Docker image with Java 8 (Update 101) and Maven (3.3.9) running on Ubuntu 16.04
+# Docker image obtained from https://hub.docker.com/_/maven/
 image: maven:3.6.1-jdk-8-slim
 
 # Maven CLI flags
-variables:  
-  MAVEN_CLI_OPTS: "-B -Dmaven.repo.local=.m2/repository"
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "-B"
   
-# Cache the compiled project & libraries between jobs
+# Cache downloaded dependencies and plugins
 cache:
   paths:
     - .m2/repository
-  key: "$CI_BUILD_REF_NAME"
+  key: "$CI_COMMIT_REF_SLUG"
 
   
 # Stages
