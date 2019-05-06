@@ -1,85 +1,79 @@
-# Reference: https://docs.gitlab.com/ee/ci/yaml/
-# Examples for different languages can be found in doc/CI. Other examples can be found at: https://gitlab.com/gitlab-org/gitlb-ce/tree/master/lib/gitlb/ci/templates
+# Docker image obtained from https://hub.docker.com/_/maven/
+image: maven:3.6.1-jdk-8-slim
 
-# Docker image
-# Change to your platform
-image: busybox:latest
-
-# Variables
-# Allows you to define custom variables
+# Maven CLI flags
 variables:
-
-# Cache libraries in between jobs
-# https://docs.gitlab.com/ee/ci/caching/index.html
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "-B"
+  
+# Cache downloaded dependencies and plugins
 cache:
   paths:
+    - .m2/repository
+  key: "$CI_COMMIT_REF_SLUG"
+  policy: pull
 
-# Displays time before each script
-before_script:
-  - date
-
-# Displays time after each script
-after_script:
-  - date
 
 # Stages
 stages:
-  - build
-  - test
+  - Build
+  - Test
+  - Static-analysis
+  - Coverage
 
-# Jobs
+
+# Build stage
 build:
-  stage: build
-
-  # Build steps
+  stage: Build
   script:
-    - echo 'Add something here'
-
+    - "mvn $MAVEN_CLI_OPTS compile"
   artifacts:
-    # Define which files/directories should be kept as artifacts e.g. jars
     paths:
+      - target/
 
-test:
-  stage: test
 
-  # Test steps
+# Test stage
+junit-tests:
+  stage: Test
   script:
-    - echo 'Add something here'
-    - echo 'metric_name metric_value' >> metrics.txt
-
+    - "mvn $MAVEN_CLI_OPTS test"
+  dependencies:
+    - build
   artifacts:
-    # Define which files/directories should be kept as artifacts e.g. jars
-    paths:
-
     reports:
-      # Show differences in unit tests results in Gitlab GUI
-      # https://docs.gitlab.com/ee/ci/junit_test_reports.html
       junit:
+        - target/surefire-reports/TEST-*.xml
 
-      # Shows metrics in your GitLab Merge Request GUI
-      # https://docs.gitlab.com/ee/ci/metrics_reports.html
-      metrics: metrics.txt
-  
-# Optional security and license checks
-include:
-  # Static Application Security Testing (SAST)
-  # works with most languages
-  # https://docs.gitlab.com/ee/user/application_security/sast/index.html
-  template: SAST.gitlab-ci.yml
+ 
+# Static analysis stage 
+checkstyle:
+    stage: Static-analysis
+    script:
+      - "mvn $MAVEN_CLI_OPTS checkstyle:check"
+    dependencies: []
 
-  # Dynamic Application Security Testing (DAST)
-  # tests security of web facing applications
-  # Needs DAST_WEBSITE variable e.g. DAST_WEBSITE: https://example.com
-  # https://docs.gitlab.com/ee/user/application_security/dast/index.html
-  #template: DAST.gitlab-ci.yml
+spotbugs:
+    stage: Static-analysis
+    script:
+      - "mvn $MAVEN_CLI_OPTS spotbugs:check"
+    dependencies: []
 
-  # Dependency Scanning
-  # works with most languages
-  # https://docs.gitlab.com/ee/user/application_security/dependency_scanning/index.html
-  template: Dependency-Scanning.gitlab-ci.yml
+pmd:
+    stage: Static-analysis
+    script:
+      - "mvn $MAVEN_CLI_OPTS pmd:check"
+    dependencies: []
 
-  # License Management
-  # works with most languages
-  # https://docs.gitlab.com/ee/user/application_security/license_management/index.html
-  template: License-Management.gitlab-ci.yml
+cpd:
+    stage: Static-analysis
+    script:
+      - "mvn $MAVEN_CLI_OPTS pmd:cpd-check"
+    dependencies: []
 
+
+# Coverage stage      
+clover:
+    stage: Coverage
+    script:
+        - "mvn $MAVEN_CLI_OPTS clover:instrument clover:log"
+    dependencies: []

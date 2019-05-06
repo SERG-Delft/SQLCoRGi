@@ -58,11 +58,3 @@ Every project has their own set of best practices and conventions. In this secti
 ## Useful Links / Resources
 
 [SQLFpc Web Tool](https://in2test.lsi.uniovi.es/sqlfpc/SQLFpcWeb.aspx)
-
-## Licensing
-
-<!---
-
-Describe and specify your license which should be located in LICENSE.md
-
---->
