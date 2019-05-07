@@ -5,6 +5,7 @@ import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnalyticExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
+import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
 import net.sf.jsqlparser.expression.CastExpression;
 import net.sf.jsqlparser.expression.DateTimeLiteralExpression;
@@ -77,395 +78,51 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.statement.values.ValuesStatement;
 import net.sf.jsqlparser.util.SelectUtils;
+import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Awesome documentation.
  */
-public final class Interpreter {
+public class Interpreter {
 
-    /**
-     * Unused.
-     */
-    private Interpreter() {
+    public Interpreter() {
 
     }
 
-    /**
-     * This is a main function.
-     * @param args some unused stuff.
-     */
-    public static void main(String[] args) {
-        String input = "SELECT Name FROM Employees WHERE Salary < 40000";
+    public List<String> interpret(String query) {
+        List<String> result = new ArrayList<String>();
 
         try {
-            Statement stmt = CCJSqlParserUtil.parse(input);
-
-            System.out.println("before change: Statement = \t\t\t" + stmt.toString());
+            Statement stmt = CCJSqlParserUtil.parse(query);
             Select select = (Select) stmt;
 
-            select.getSelectBody().accept(getSelectVisitor());
+            // convert to =
+            select.getSelectBody().accept(SelectVisitors.getSelectNeutralVisitor());
+            result.add(select.toString());
 
-            System.out.println("After change: Statement = \t\t\t" + stmt.toString());
+            // plus 1
+            select.getSelectBody().accept(SelectVisitors.getSelectPlusVisitor());
+            result.add(select.toString());
+
+            // minus - (needs to be done twice because 1 - 1 = 0, 0 - 1 = -1
+            select.getSelectBody().accept(SelectVisitors.getSelectMinusVisitor());
+            select.getSelectBody().accept(SelectVisitors.getSelectMinusVisitor());
+            result.add(select.toString());
+
+            // IS NULL
+            select.getSelectBody().accept(SelectVisitors.getSelectNullVisitor());
+            result.add(select.toString());
 
         } catch (JSQLParserException e) {
             e.printStackTrace();
         }
-    }
 
-    public List<String> interpret
-
-    /**
-     * We don't want any Checkstyle violations in our code now, do we?
-     * @return a SelectVisitor instance, surprise!
-     */
-    static SelectVisitor getSelectVisitor() {
-        return new SelectVisitor() {
-            @Override
-            public void visit(PlainSelect plainSelect) {
-                System.out.println("plainSelect: " + plainSelect);
-            }
-
-            @Override
-            public void visit(SetOperationList setOperationList) {
-                System.out.println("setOpList: " + setOperationList.toString());
-            }
-
-            @Override
-            public void visit(WithItem withItem) {
-                System.out.println("withItem: " + withItem.toString());
-            }
-
-            @Override
-            public void visit(ValuesStatement valuesStatement) {
-                System.out.println("valStmt: " + valuesStatement.toString());
-
-            }
-        };
-    }
-
-    /**
-     * A brand new sentence.
-     * @return something, I don't know.
-     */
-    @SuppressWarnings("checkstyle:methodLength")
-    static ExpressionVisitor getExpressionVisitor() {
-        return new ExpressionVisitorAdapter() {
-            @Override
-            public void visit(BitwiseRightShift bitwiseRightShift) {
-
-            }
-
-            @Override
-            public void visit(BitwiseLeftShift bitwiseLeftShift) {
-
-            }
-
-            @Override
-            public void visit(NullValue nullValue) {
-
-            }
-
-            @Override
-            public void visit(Function function) {
-
-            }
-
-            @Override
-            public void visit(SignedExpression signedExpression) {
-
-            }
-
-            @Override
-            public void visit(JdbcParameter jdbcParameter) {
-
-            }
-
-            @Override
-            public void visit(JdbcNamedParameter jdbcNamedParameter) {
-
-            }
-
-            @Override
-            public void visit(DoubleValue doubleValue) {
-
-            }
-
-            @Override
-            public void visit(LongValue longValue) {
-
-            }
-
-            @Override
-            public void visit(HexValue hexValue) {
-
-            }
-
-            @Override
-            public void visit(DateValue dateValue) {
-
-            }
-
-            @Override
-            public void visit(TimeValue timeValue) {
-
-            }
-
-            @Override
-            public void visit(TimestampValue timestampValue) {
-
-            }
-
-            @Override
-            public void visit(Parenthesis parenthesis) {
-
-            }
-
-            @Override
-            public void visit(StringValue stringValue) {
-
-            }
-
-            @Override
-            public void visit(Addition addition) {
-
-            }
-
-            @Override
-            public void visit(Division division) {
-
-            }
-
-            @Override
-            public void visit(Multiplication multiplication) {
-
-            }
-
-            @Override
-            public void visit(Subtraction subtraction) {
-
-            }
-
-            @Override
-            public void visit(AndExpression andExpression) {
-
-            }
-
-            @Override
-            public void visit(OrExpression orExpression) {
-
-            }
-
-            @Override
-            public void visit(Between between) {
-
-            }
-
-            @Override
-            public void visit(EqualsTo equalsTo) {
-
-            }
-
-            @Override
-            public void visit(GreaterThan greaterThan) {
-
-            }
-
-            @Override
-            public void visit(GreaterThanEquals greaterThanEquals) {
-
-            }
-
-            @Override
-            public void visit(InExpression inExpression) {
-
-            }
-
-            @Override
-            public void visit(IsNullExpression isNullExpression) {
-
-            }
-
-            @Override
-            public void visit(LikeExpression likeExpression) {
-
-            }
-
-            @Override
-            public void visit(MinorThan minorThan) {
-
-            }
-
-            @Override
-            public void visit(MinorThanEquals minorThanEquals) {
-
-            }
-
-            @Override
-            public void visit(NotEqualsTo notEqualsTo) {
-
-            }
-
-            @Override
-            public void visit(Column column) {
-
-            }
-
-            @Override
-            public void visit(SubSelect subSelect) {
-
-            }
-
-            @Override
-            public void visit(CaseExpression caseExpression) {
-
-            }
-
-            @Override
-            public void visit(WhenClause whenClause) {
-
-            }
-
-            @Override
-            public void visit(ExistsExpression existsExpression) {
-
-            }
-
-            @Override
-            public void visit(AllComparisonExpression allComparisonExpression) {
-
-            }
-
-            @Override
-            public void visit(AnyComparisonExpression anyComparisonExpression) {
-
-            }
-
-            @Override
-            public void visit(Concat concat) {
-
-            }
-
-            @Override
-            public void visit(Matches matches) {
-
-            }
-
-            @Override
-            public void visit(BitwiseAnd bitwiseAnd) {
-
-            }
-
-            @Override
-            public void visit(BitwiseOr bitwiseOr) {
-
-            }
-
-            @Override
-            public void visit(BitwiseXor bitwiseXor) {
-
-            }
-
-            @Override
-            public void visit(CastExpression castExpression) {
-
-            }
-
-            @Override
-            public void visit(Modulo modulo) {
-
-            }
-
-            @Override
-            public void visit(AnalyticExpression analyticExpression) {
-
-            }
-
-            @Override
-            public void visit(ExtractExpression extractExpression) {
-
-            }
-
-            @Override
-            public void visit(IntervalExpression intervalExpression) {
-
-            }
-
-            @Override
-            public void visit(OracleHierarchicalExpression oracleHierarchicalExpression) {
-
-            }
-
-            @Override
-            public void visit(RegExpMatchOperator regExpMatchOperator) {
-
-            }
-
-            @Override
-            public void visit(JsonExpression jsonExpression) {
-
-            }
-
-            @Override
-            public void visit(JsonOperator jsonOperator) {
-
-            }
-
-            @Override
-            public void visit(RegExpMySQLOperator regExpMySQLOperator) {
-
-            }
-
-            @Override
-            public void visit(UserVariable userVariable) {
-
-            }
-
-            @Override
-            public void visit(NumericBind numericBind) {
-
-            }
-
-            @Override
-            public void visit(KeepExpression keepExpression) {
-
-            }
-
-            @Override
-            public void visit(MySQLGroupConcat mySQLGroupConcat) {
-
-            }
-
-            @Override
-            public void visit(ValueListExpression valueListExpression) {
-
-            }
-
-            @Override
-            public void visit(RowConstructor rowConstructor) {
-
-            }
-
-            @Override
-            public void visit(OracleHint oracleHint) {
-
-            }
-
-            @Override
-            public void visit(TimeKeyExpression timeKeyExpression) {
-
-            }
-
-            @Override
-            public void visit(DateTimeLiteralExpression dateTimeLiteralExpression) {
-
-            }
-
-            @Override
-            public void visit(NotExpression notExpression) {
-
-            }
-        };
+        Collections.sort(result);
+        return result;
     }
 }
