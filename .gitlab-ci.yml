@@ -10,7 +10,6 @@ variables:
 cache:
   paths:
     - .m2/repository
-  key: "$CI_COMMIT_REF_SLUG"
   policy: pull
 
 
@@ -27,6 +26,8 @@ build:
   stage: Build
   script:
     - "mvn $MAVEN_CLI_OPTS compile"
+  cache:
+    policy: pull-push
   artifacts:
     paths:
       - target/
