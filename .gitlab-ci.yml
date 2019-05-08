@@ -26,7 +26,8 @@ build:
   stage: Build
   script:
     - "mvn $MAVEN_CLI_OPTS compile"
-  policy: pull-push
+  cache:
+    policy: pull-push
   artifacts:
     paths:
       - target/
