@@ -25,6 +25,7 @@ build:
   script:
     - "mvn $MAVEN_CLI_OPTS compile"
   artifacts:
+    expire_in: 1 day
     paths:
       - target/
 
