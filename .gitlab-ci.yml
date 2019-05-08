@@ -10,8 +10,6 @@ variables:
 cache:
   paths:
     - .m2/repository
-  policy: pull
-
 
 # Stages
 stages:
@@ -26,8 +24,6 @@ build:
   stage: Build
   script:
     - "mvn $MAVEN_CLI_OPTS compile"
-  cache:
-    policy: pull-push
   artifacts:
     paths:
       - target/
