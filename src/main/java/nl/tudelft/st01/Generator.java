@@ -62,7 +62,8 @@ public final class Generator {
      */
     public static void main(String[] args) {
 
-        String query = "SELECT * FROM Table1 WHERE a1=100";
+//        String query = "SELECT * FROM Movies WHERE year = 2003";
+        String query = "SELECT * FROM Movies WHERE title = 'Cars'";
         Set<String> result = generateRules(query);
 
         System.out.println("Result: " + result.toString());
