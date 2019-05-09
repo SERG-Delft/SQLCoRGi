@@ -63,4 +63,19 @@ public class GeneratorTest {
         assertEquals(expected, result);
     }
 
+    /**
+     * A test case for a simple query with IS NULL.
+     */
+    @Test
+    public void testIsNull() {
+        String query = "SELECT * FROM table WHERE a IS NOT NULL";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM table WHERE a IS NOT NULL");
+        expected.add("SELECT * FROM table WHERE a IS NULL");
+
+        assertEquals(expected, result);
+    }
+
 }

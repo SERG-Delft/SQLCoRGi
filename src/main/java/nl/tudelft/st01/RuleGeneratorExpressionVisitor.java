@@ -6,6 +6,7 @@ import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
@@ -49,6 +50,20 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
         generateSimpleComparison(greaterThanEquals);
+    }
+
+    @Override
+    public void visit(IsNullExpression isNullExpression) {
+
+        IsNullExpression isNullExpressionOut = new IsNullExpression();
+        isNullExpressionOut.setLeftExpression(isNullExpression.getLeftExpression());
+        isNullExpressionOut.setNot(isNullExpression.isNot());
+        output.add(isNullExpressionOut);
+
+        IsNullExpression isNullExpressionToggled = new IsNullExpression();
+        isNullExpressionToggled.setLeftExpression(isNullExpression.getLeftExpression());
+        isNullExpressionToggled.setNot(!isNullExpression.isNot());
+        output.add(isNullExpressionToggled);
     }
 
     @Override
