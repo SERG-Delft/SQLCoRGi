@@ -2,15 +2,16 @@ package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
-import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
+import net.sf.jsqlparser.schema.Column;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,27 +25,15 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
      * Generates modified conditions from a simple comparison.
      * @param comparisonOperator the comparison operator to generate the conditions from.
      */
-    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void generateSimpleComparison(ComparisonOperator comparisonOperator) {
 
-        Expression rightExpression = comparisonOperator.getRightExpression();
-        if (rightExpression instanceof LongValue) {
+        RuleGeneratorValueVisitor valueVisitor = new RuleGeneratorValueVisitor();
+        ArrayList<Expression> cases = new ArrayList<>();
+        valueVisitor.setColumn((Column) comparisonOperator.getLeftExpression());
+        valueVisitor.setOutput(cases);
+        comparisonOperator.getRightExpression().accept(valueVisitor);
 
-            // TODO: Add support for other data types than integers
-            LongValue longValue = (LongValue) rightExpression;
-            for (int i = -1; i < 2; ++i) {
-                EqualsTo equalsTo = new EqualsTo();
-                equalsTo.setLeftExpression(comparisonOperator.getLeftExpression());
-                equalsTo.setRightExpression(new LongValue(longValue.getValue() + i));
-                output.add(equalsTo);
-            }
-
-
-            // TODO: Add some way to pass along information about nullable attributes, and check for it.
-            IsNullExpression isNullExpression = new IsNullExpression();
-            isNullExpression.setLeftExpression(comparisonOperator.getLeftExpression());
-            output.add(isNullExpression);
-        }
+        output.addAll(cases);
     }
 
     @Override
@@ -70,6 +59,11 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
         generateSimpleComparison(minorThanEquals);
+    }
+
+    @Override
+    public void visit(NotEqualsTo notEqualsTo) {
+        generateSimpleComparison(notEqualsTo);
     }
 
     public void setOutput(List<Expression> output) {
