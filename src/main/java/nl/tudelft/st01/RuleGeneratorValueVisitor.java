@@ -4,8 +4,10 @@ import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
+import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 
 import java.util.List;
@@ -46,6 +48,23 @@ public class RuleGeneratorValueVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(LongValue longValue) {
         generateNumericCases(new GenLongValue(longValue.toString()));
+    }
+
+    @Override
+    public void visit(StringValue stringValue) {
+        EqualsTo equalsTo = new EqualsTo();
+        equalsTo.setLeftExpression(column);
+        equalsTo.setRightExpression(stringValue);
+        output.add(equalsTo);
+
+        NotEqualsTo notEqualTo = new NotEqualsTo();
+        notEqualTo.setLeftExpression(column);
+        notEqualTo.setRightExpression(stringValue);
+        output.add(notEqualTo);
+
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(column);
+        output.add(isNullExpression);
     }
 
     public void setColumn(Column column) {

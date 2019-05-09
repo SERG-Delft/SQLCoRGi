@@ -47,20 +47,20 @@ public class GeneratorTest {
         assertEquals(expected, result);
     }
 
-    //    /**
-    //     * A test case for a simple query testing for string equality.
-    //     */
-    //    @Test
-    //    public void testEqualToString() {
-    //        String query = "SELECT * FROM table WHERE a = 'qwerty'";
-    //        Set<String> result = Generator.generateRules(query);
-    //
-    //        Set<String> expected = new TreeSet<>();
-    //        expected.add("SELECT * FROM table WHERE a = 'qwerty'");
-    //        expected.add("SELECT * FROM table WHERE NOT(a = 'qwerty')");
-    //        expected.add("SELECT * FROM table WHERE a IS NULL");
-    //
-    //        assertEquals(expected, result);
-    //    }
+    /**
+     * A test case for a simple query testing for string equality.
+     */
+    @Test
+    public void testEqualToString() {
+        String query = "SELECT * FROM table WHERE a = 'qwerty'";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM table WHERE a = 'qwerty'");
+        expected.add("SELECT * FROM table WHERE a <> 'qwerty'");
+        expected.add("SELECT * FROM table WHERE a IS NULL");
+
+        assertEquals(expected, result);
+    }
 
 }
