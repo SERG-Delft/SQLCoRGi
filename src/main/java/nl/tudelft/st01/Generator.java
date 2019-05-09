@@ -62,9 +62,9 @@ public final class Generator {
      */
     public static void main(String[] args) {
 
-//        String query = "SELECT * FROM Movies WHERE year = 2003";
-//        String query = "SELECT * FROM Movies WHERE title = 'Cars'";
-        String query = "SELECT * FROM Movies WHERE year > 1950 AND year < 2000";
+        // String query = "SELECT * FROM Movies WHERE year = 2003";
+        String query = "SELECT * FROM Movies WHERE title = 'Cars'";
+        // String query = "SELECT * FROM Movies WHERE year > 1950 AND year < 2000";
         Set<String> result = generateRules(query);
 
         System.out.println("Result: " + result.toString());
