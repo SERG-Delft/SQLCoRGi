@@ -27,7 +27,6 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
      */
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void generateSimpleComparison(ComparisonOperator comparisonOperator) {
-
         Expression rightExpression = comparisonOperator.getRightExpression();
         System.out.println(comparisonOperator.getRightExpression().getClass().getName().split("\\.")[4]);
 
