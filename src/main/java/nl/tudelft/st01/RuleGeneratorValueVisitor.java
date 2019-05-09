@@ -25,7 +25,7 @@ public class RuleGeneratorValueVisitor extends ExpressionVisitorAdapter {
      * Generates modified conditions for numeric values.
      * @param numericExpression the numeric value taken from the original expression.
      */
-    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
+    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.UnusedPrivateMethod"})
     private void generateNumericCases(NumericExpression numericExpression) {
         for (int i = -1; i <= 1; ++i) {
             EqualsTo equalsTo = new EqualsTo();
