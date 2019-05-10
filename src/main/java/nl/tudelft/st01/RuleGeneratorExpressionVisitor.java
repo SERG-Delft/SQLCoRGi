@@ -1,7 +1,12 @@
 package nl.tudelft.st01;
 
+import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
+import net.sf.jsqlparser.expression.NotExpression;
+import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
@@ -35,6 +40,63 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         comparisonOperator.getRightExpression().accept(valueVisitor);
 
         output.addAll(cases);
+    }
+
+    /**
+     * Generates subexpressions and their combinations for {@link OrExpression}s and {@link AndExpression}d.
+     * @param expression an {@link OrExpression} or {@link AndExpression}.
+     */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+    private void generateSubExpressions(BinaryExpression expression) {
+
+        Expression left = expression.getLeftExpression();
+        Expression right = expression.getRightExpression();
+
+        List<Expression> leftOut = new ArrayList<>();
+        List<Expression> rightOut = new ArrayList<>();
+        List<Expression> temp = this.output;
+
+        this.output = leftOut;
+        left.accept(this);
+
+        this.output = rightOut;
+        right.accept(this);
+
+        this.output = temp;
+
+        Expression neutralExpression = right instanceof Parenthesis ? right : new Parenthesis(right);
+        if (expression instanceof OrExpression) {
+            neutralExpression = new NotExpression(neutralExpression);
+        }
+        for (Expression decisionExpression : leftOut) {
+            this.output.add(new AndExpression(new Parenthesis(decisionExpression), neutralExpression));
+        }
+
+        neutralExpression = left instanceof Parenthesis ? left : new Parenthesis(left);
+        if (expression instanceof OrExpression) {
+            neutralExpression = new NotExpression(neutralExpression);
+        }
+        for (Expression decisionExpression : rightOut) {
+            this.output.add(new AndExpression(neutralExpression, new Parenthesis(decisionExpression)));
+        }
+
+        /* TODO: Use strings to create new objects instead of doing this manually, which is prone to errors
+            and requires consistency and invariants (here: don't ever change (parts of) the original expression). */
+        /*try {
+            System.out.println(CCJSqlParserUtil.parseCondExpression("a2 = 30"));
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+        }*/
+    }
+
+    @Override
+    public void visit(AndExpression andExpression) {
+        generateSubExpressions(andExpression);
+    }
+
+    @Override
+    public void visit(OrExpression orExpression) {
+        generateSubExpressions(orExpression);
     }
 
     @Override
