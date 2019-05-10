@@ -58,3 +58,5 @@ Every project has their own set of best practices and conventions. In this secti
 ## Useful Links / Resources
 
 [SQLFpc Web Tool](https://in2test.lsi.uniovi.es/sqlfpc/SQLFpcWeb.aspx)
+[Link to the spreadsheet](https://docs.google.com/spreadsheets/d/1MvCkE1jT9OSuqwx1zA13ZczDIyj6YJizuWKqK0SITdY/edit#gid=0)
+[Link to the Spanish tool](https://in2test.lsi.uniovi.es/sqlfpc/SQLFpcWeb.aspx)
