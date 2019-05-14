@@ -2,6 +2,9 @@ package nl.tudelft.st01;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -112,9 +115,10 @@ public class GeneratorTest {
         Set<String> result = Generator.generateRules(query);
 
         Set<String> expected = new TreeSet<>();
-        expected.add("SELECT COUNT(*) FROM Movies HAVING count(distinct Director)>1");
-        expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING count(*)>1");
-        expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING count(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
+
+        expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1");
+        expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1");
+        expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
         expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
 
         assertEquals(expected, result);
