@@ -102,4 +102,22 @@ public class GeneratorTest {
         assertEquals(expected, result);
     }
 
+
+    /**
+     * A test case with an aggregator, in this case AVG.
+     */
+    @Test
+    public void testAVGAggregator() {
+        String query = "SELECT Director, AVG(Length) FROM Movies GROUP BY Director";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT COUNT(*) FROM Movies HAVING count(distinct Director)>1");
+        expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING count(*)>1");
+        expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING count(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
+        expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
+
+        assertEquals(expected, result);
+    }
+
 }
