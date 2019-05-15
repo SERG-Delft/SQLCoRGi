@@ -150,16 +150,16 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
     public void visit(Between between) {
         output.add(between);
 
-        Between betweenOut = new Between();
-        betweenOut.setLeftExpression(between.getLeftExpression());
-        betweenOut.setBetweenExpressionStart(between.getBetweenExpressionStart());
-        betweenOut.setBetweenExpressionEnd(between.getBetweenExpressionEnd());
-        betweenOut.setNot(!between.isNot());
-        output.add(betweenOut);
+        Between betweenFlipped= new Between();
+        betweenFlipped.setLeftExpression(between.getLeftExpression());
+        betweenFlipped.setBetweenExpressionStart(between.getBetweenExpressionStart());
+        betweenFlipped.setBetweenExpressionEnd(between.getBetweenExpressionEnd());
+        betweenFlipped.setNot(!between.isNot());
+        output.add(betweenFlipped);
 
-        IsNullExpression isNullExpressionOut = new IsNullExpression();
-        isNullExpressionOut.setLeftExpression(between.getLeftExpression());
-        output.add(isNullExpressionOut);
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(between.getLeftExpression());
+        output.add(isNullExpression);
     }
 
     @Override
@@ -167,15 +167,15 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
 
         output.add(inExpression);
 
-        InExpression inExpressionOut = new InExpression();
-        inExpressionOut.setLeftExpression(inExpression.getLeftExpression());
-        inExpressionOut.setRightItemsList(inExpression.getRightItemsList());
-        inExpressionOut.setNot(!inExpression.isNot());
-        output.add(inExpressionOut);
+        InExpression inExpressionFlipped = new InExpression();
+        inExpressionFlipped.setLeftExpression(inExpression.getLeftExpression());
+        inExpressionFlipped.setRightItemsList(inExpression.getRightItemsList());
+        inExpressionFlipped.setNot(!inExpression.isNot());
+        output.add(inExpressionFlipped);
 
-        IsNullExpression isNullExpressionOut = new IsNullExpression();
-        isNullExpressionOut.setLeftExpression(inExpression.getLeftExpression());
-        output.add(isNullExpressionOut);
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(inExpression.getLeftExpression());
+        output.add(isNullExpression);
     }
 
     @Override
@@ -183,15 +183,15 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
 
         output.add(likeExpression);
 
-        LikeExpression likeExpressionOut = new LikeExpression();
-        likeExpressionOut.setLeftExpression(likeExpression.getLeftExpression());
-        likeExpressionOut.setRightExpression(likeExpression.getRightExpression());
+        LikeExpression likeExpressionFlipped = new LikeExpression();
+        likeExpressionFlipped.setLeftExpression(likeExpression.getLeftExpression());
+        likeExpressionFlipped.setRightExpression(likeExpression.getRightExpression());
 
         if (!likeExpression.isNot()) {
-            likeExpressionOut.setNot();
+            likeExpressionFlipped.setNot();
         }
 
-        output.add(likeExpressionOut);
+        output.add(likeExpressionFlipped);
 
         IsNullExpression isNullExpressionOut = new IsNullExpression();
         isNullExpressionOut.setLeftExpression(likeExpression.getLeftExpression());
