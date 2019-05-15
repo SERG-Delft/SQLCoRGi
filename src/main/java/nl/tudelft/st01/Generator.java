@@ -62,7 +62,7 @@ public final class Generator {
      */
     public static void main(String[] args) {
 
-        String query = "SELECT * FROM Table1 WHERE a1=111 AND (a2>222 OR a3<>333)";
+        String query = "SELECT director FROM Movies GROUP BY director HAVING count(*)>1";
         Set<String> result = generateRules(query);
 
         System.out.println("Result: " + result.toString());
