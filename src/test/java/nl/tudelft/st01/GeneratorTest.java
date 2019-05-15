@@ -6,12 +6,24 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Contains tests for {@link Generator}.
  */
 @SuppressWarnings("checkstyle:multipleStringLiterals")
 public class GeneratorTest {
+
+    /**
+     * A test case to check if a non-select query throws the proper exception.
+     */
+    @Test
+    public void testNonSelectQuery() {
+        String query = "ALTER TABLE Customers ADD Email varchar(255);";
+        assertThrows(IllegalArgumentException.class, () ->
+                Generator.generateRules(query)
+        );
+    }
 
     /**
      * A test case for a simple query containing only one condition with < as operator.
@@ -29,6 +41,58 @@ public class GeneratorTest {
 
         assertEquals(expected, result);
     }
+
+    /**
+     * A test case for a simple query containing only one condition with <= as operator.
+     */
+    @Test
+    public void testLessThanEqualsInteger() {
+        String query = "SELECT * FROM table WHERE a <= 100";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM table WHERE a = 99");
+        expected.add("SELECT * FROM table WHERE a = 100");
+        expected.add("SELECT * FROM table WHERE a = 101");
+        expected.add("SELECT * FROM table WHERE a IS NULL");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A test simple test case for the > (GreaterThan) operator.
+     */
+    @Test
+    public void testGreaterThanInteger() {
+        String query = "SELECT * FROM Table WHERE x > 28";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM Table WHERE x = 27");
+        expected.add("SELECT * FROM Table WHERE x = 28");
+        expected.add("SELECT * FROM Table WHERE x = 29");
+        expected.add("SELECT * FROM Table WHERE x IS NULL");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A test simple test case for the > (GreaterThan) operator.
+     */
+    @Test
+    public void testGreaterThanEqualsInteger() {
+        String query = "SELECT * FROM Table WHERE x >= 28";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM Table WHERE x = 27");
+        expected.add("SELECT * FROM Table WHERE x = 28");
+        expected.add("SELECT * FROM Table WHERE x = 29");
+        expected.add("SELECT * FROM Table WHERE x IS NULL");
+
+        assertEquals(expected, result);
+    }
+
 
     /**
      * A test case for a simple query containing only one condition with != as operator.
