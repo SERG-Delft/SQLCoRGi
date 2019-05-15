@@ -1,5 +1,6 @@
 package nl.tudelft.st01;
 
+import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -19,38 +20,29 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(AndExpression andExpression) {
-        Expression l = andExpression.getLeftExpression();
-        Expression r = andExpression.getRightExpression();
+        generateRules(andExpression);
 
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        Expression l = orExpression.getLeftExpression();
-        Expression r = orExpression.getRightExpression();
-        System.out.println("HERE OR " + l.toString() + r.toString());
+        generateRules(orExpression);
 
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        Expression l = equalsTo.getLeftExpression();
-        Expression r = equalsTo.getRightExpression();
-        generateRules(l, r);
-        System.out.println("HERE " + l.toString() + r.toString());
-
+        generateRules(equalsTo);
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        Expression l = greaterThan.getLeftExpression();
-        Expression r = greaterThan.getRightExpression();
+        generateRules(greaterThan);
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        Expression l = greaterThanEquals.getLeftExpression();
-        Expression r = greaterThanEquals.getRightExpression();
+        generateRules(greaterThanEquals);
     }
 
     @Override
@@ -60,25 +52,25 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(MinorThan minorThan) {
-        Expression l = minorThan.getLeftExpression();
-        Expression r = minorThan.getRightExpression();
+        generateRules(minorThan);
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        Expression l = minorThanEquals.getLeftExpression();
-        Expression r = minorThanEquals.getRightExpression();
+        generateRules(minorThanEquals);
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        Expression l = notEqualsTo.getLeftExpression();
-        Expression r = notEqualsTo.getRightExpression();
+        generateRules(notEqualsTo);
     }
 
 
 
-    private void generateRules(Expression left, Expression right) {
+    private void generateRules(BinaryExpression binaryExpression) {
+        Expression left = binaryExpression.getLeftExpression();
+        Expression right = binaryExpression.getRightExpression();
+
         System.out.println(left.getClass().toString());
         if (!(left instanceof  Expression)) {
             System.out.println("HERE COLUMN");
