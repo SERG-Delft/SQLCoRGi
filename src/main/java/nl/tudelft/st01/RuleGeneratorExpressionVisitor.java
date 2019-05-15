@@ -150,7 +150,7 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
     public void visit(Between between) {
         output.add(between);
 
-        Between betweenFlipped= new Between();
+        Between betweenFlipped = new Between();
         betweenFlipped.setLeftExpression(between.getLeftExpression());
         betweenFlipped.setBetweenExpressionStart(between.getBetweenExpressionStart());
         betweenFlipped.setBetweenExpressionEnd(between.getBetweenExpressionEnd());
