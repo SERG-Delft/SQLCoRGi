@@ -107,12 +107,12 @@ public class GeneratorTest {
      */
     @Test
     public void testBetweenCondition(){
-        String query = "SELECT * FROM Table1 WHERE x BETWEEN 28 and 37";
+        String query = "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37";
         Set<String> result =  Generator.generateRules(query);
 
         Set<String> expected = new TreeSet<>();
         expected.add(query);
-        expected.add("SELECT * FROM Table1 WHERE x NOT BETWEEN 28 and 37");
+        expected.add("SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37");
         expected.add("SELECT * FROM Table1 WHERE x IS NULL");
 
         assertEquals(expected, result);
