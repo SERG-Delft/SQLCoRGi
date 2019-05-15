@@ -147,6 +147,22 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
     }
 
     @Override
+    public void visit(Between between) {
+        output.add(between);
+
+        Between betweenOut = new Between();
+        betweenOut.setLeftExpression(between.getLeftExpression());
+        betweenOut.setBetweenExpressionStart(between.getBetweenExpressionStart());
+        betweenOut.setBetweenExpressionEnd(between.getBetweenExpressionEnd());
+        betweenOut.setNot(!between.isNot());
+        output.add(betweenOut);
+
+        IsNullExpression isNullExpressionOut = new IsNullExpression();
+        isNullExpressionOut.setLeftExpression(between.getLeftExpression());
+        output.add(isNullExpressionOut);
+    }
+
+    @Override
     public void visit(InExpression inExpression) {
 
         output.add(inExpression);
