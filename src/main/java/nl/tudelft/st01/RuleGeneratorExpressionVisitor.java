@@ -178,6 +178,26 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         output.add(isNullExpressionOut);
     }
 
+    @Override
+    public void visit(LikeExpression likeExpression) {
+
+        output.add(likeExpression);
+
+        LikeExpression likeExpressionOut = new LikeExpression();
+        likeExpressionOut.setLeftExpression(likeExpression.getLeftExpression());
+        likeExpressionOut.setRightExpression(likeExpression.getRightExpression());
+
+        if (!likeExpression.isNot()) {
+            likeExpressionOut.setNot();
+        }
+
+        output.add(likeExpressionOut);
+
+        IsNullExpression isNullExpressionOut = new IsNullExpression();
+        isNullExpressionOut.setLeftExpression(likeExpression.getLeftExpression());
+        output.add(isNullExpressionOut);
+    }
+
     public void setOutput(List<Expression> output) {
         this.output = output;
     }

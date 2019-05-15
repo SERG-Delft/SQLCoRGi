@@ -144,7 +144,9 @@ public class GeneratorTest {
 
         Set<String> expected = new TreeSet<>();
         expected.add(query);
-        expected.add("SELECT * FROM Table1 WHERE name NOT LIKE 'John%'");
+        // JSQLParser generates "NOT name LIKE" instead of "name NOT LIKE", they are however identical in behavior,
+        // therefore we stick with the behavior used in JSQLParser
+        expected.add("SELECT * FROM Table1 WHERE NOT name LIKE 'John%'");
         expected.add("SELECT * FROM Table1 WHERE name IS NULL");
 
         assertEquals(expected, result);
