@@ -16,10 +16,10 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 
-import java.util.Set;
+import java.util.List;
 
 public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
-    private Set<Expression> output;
+    private List<Expression> output;
 
     @Override
     public void visit(AndExpression andExpression) {
@@ -69,7 +69,10 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
     }
 
 
-
+    /**
+     * Generate rules for binary expressions.
+     * @param binaryExpression binary expression.
+     */
     private void generateRules(BinaryExpression binaryExpression) {
         Expression left = binaryExpression.getLeftExpression();
         Expression right = binaryExpression.getRightExpression();
@@ -78,13 +81,18 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
         System.out.println(binaryExpression.toString());
 
         if (left instanceof Column | left instanceof LongValue | left instanceof DoubleValue) {
-            output.add(left);
+            if (!contains(output, left)) {
+                output.add(left);
+            }
+
         } else {
             left.accept(this);
         }
 
         if (right instanceof Column | right instanceof LongValue | right instanceof DoubleValue) {
-            output.add(right);
+            if (!contains(output, right)) {
+                output.add(right);
+            }
         } else {
             right.accept(this);
         }
@@ -93,8 +101,30 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     }
 
-    public void setOutput(Set list) {
+    public void setOutput(List list) {
         this.output = list;
+    }
+
+
+    /**
+     * Ensures that the list of columns used in the on expression contains no duplicate column names.
+     * NOTE: Suppose the column name "id" in "Movies" and the column name is unique.
+     * Yet, the function considers Movies.id to be different from id.
+     * NEED REPLACEMENT BY SET. Customization equals method needed.
+     * @param list list
+     * @param expression e
+     * @return boolean
+     */
+    private static boolean contains(List<Expression> list, Expression expression) {
+        if (list == null) {
+            return false;
+        }
+        for (Expression e : list) {
+            if (e.toString().toLowerCase().equals(expression.toString().toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

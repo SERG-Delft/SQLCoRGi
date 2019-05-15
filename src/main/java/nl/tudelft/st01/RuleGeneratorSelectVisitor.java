@@ -10,10 +10,13 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 
 import java.lang.reflect.Array;
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Custom Visitor for SELECT statements.
@@ -82,12 +85,12 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         Expression on = joins.get(0).getOnExpression();
 
         RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
-        Set<Expression> output = new HashSet<>();
+        List<Expression> output = new ArrayList<>();
         ruleGeneratorOnExpressionVisitor.setOutput(output);
 
 
         on.accept(ruleGeneratorOnExpressionVisitor);
-        System.out.println("Out: " + output);
+        System.out.println(output);
     }
 
 
