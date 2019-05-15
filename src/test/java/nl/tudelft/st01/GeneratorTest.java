@@ -106,7 +106,7 @@ public class GeneratorTest {
      * A test case with a BETWEEN condition
      */
     @Test
-    public void testBetweenCondition(){
+    public void testBetweenCondition() {
         String query = "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37";
         Set<String> result =  Generator.generateRules(query);
 
@@ -122,7 +122,7 @@ public class GeneratorTest {
      * A test case with an IN condition
      */
     @Test
-    public void testInCondition(){
+    public void testInCondition() {
         String query = "SELECT * FROM Table1 WHERE x IN (28, 37)";
         Set<String> result =  Generator.generateRules(query);
 
@@ -138,7 +138,7 @@ public class GeneratorTest {
      * A test case with an LIKE condition
      */
     @Test
-    public void testLikeCondition(){
+    public void testLikeCondition() {
         String query = "SELECT * FROM Table1 WHERE name LIKE 'John%'";
         Set<String> result =  Generator.generateRules(query);
 
