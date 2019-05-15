@@ -103,7 +103,7 @@ public class GeneratorTest {
     }
 
     /**
-     * A test case with a BETWEEN condition
+     * A test case with a BETWEEN condition.
      */
     @Test
     public void testBetweenCondition() {
@@ -119,7 +119,7 @@ public class GeneratorTest {
     }
 
     /**
-     * A test case with an IN condition
+     * A test case with an IN condition.
      */
     @Test
     public void testInCondition() {
@@ -135,7 +135,7 @@ public class GeneratorTest {
     }
 
     /**
-     * A test case with an LIKE condition
+     * A test case with an LIKE condition.
      */
     @Test
     public void testLikeCondition() {
