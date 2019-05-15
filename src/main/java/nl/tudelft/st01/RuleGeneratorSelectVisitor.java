@@ -9,8 +9,11 @@ import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Custom Visitor for SELECT statements.
@@ -74,15 +77,17 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
        // AndExpression andExpression = new AndExpression(joins.get(0).getOnExpression()};
         for (Join j : joins) {
             j.getRightItem().accept(ruleGeneratorFromVisitor);
-            System.out.println(j.getOnExpression().toString());
-
         }
 
         Expression on = joins.get(0).getOnExpression();
 
         RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
-        on.accept(ruleGeneratorOnExpressionVisitor);
+        Set<Expression> output = new HashSet<>();
+        ruleGeneratorOnExpressionVisitor.setOutput(output);
 
+
+        on.accept(ruleGeneratorOnExpressionVisitor);
+        System.out.println("Out: " + output);
     }
 
 

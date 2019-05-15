@@ -1,8 +1,10 @@
 package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.BinaryExpression;
+import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
+import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
@@ -12,11 +14,12 @@ import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
+import net.sf.jsqlparser.schema.Column;
 
-import java.util.List;
+import java.util.Set;
 
 public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
-    private List<Expression> output;
+    private Set<Expression> output;
 
     @Override
     public void visit(AndExpression andExpression) {
@@ -71,21 +74,27 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
         Expression left = binaryExpression.getLeftExpression();
         Expression right = binaryExpression.getRightExpression();
 
-        System.out.println(left.getClass().toString());
-        if (!(left instanceof  Expression)) {
-            System.out.println("HERE COLUMN");
 
+        System.out.println(binaryExpression.toString());
+
+        if (left instanceof Column | left instanceof LongValue | left instanceof DoubleValue) {
+            output.add(left);
         } else {
             left.accept(this);
         }
 
-        if (!(right instanceof  Expression)) {
-            System.out.println("HERE COLUMN");
+        if (right instanceof Column | right instanceof LongValue | right instanceof DoubleValue) {
+            output.add(right);
         } else {
             right.accept(this);
         }
 
+        //output = null;
 
+    }
+
+    public void setOutput(Set list) {
+        this.output = list;
     }
 
 }
