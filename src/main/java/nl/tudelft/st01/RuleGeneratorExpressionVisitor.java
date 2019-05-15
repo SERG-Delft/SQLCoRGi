@@ -15,6 +15,9 @@ import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.InExpression;
+import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
+import net.sf.jsqlparser.expression.operators.relational.Between;
 import net.sf.jsqlparser.schema.Column;
 
 import java.util.ArrayList;
@@ -141,6 +144,22 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
         generateSimpleComparison(notEqualsTo);
+    }
+
+    @Override
+    public void visit(InExpression inExpression) {
+
+        output.add(inExpression);
+
+        InExpression inExpressionOut = new InExpression();
+        inExpressionOut.setLeftExpression(inExpression.getLeftExpression());
+        inExpressionOut.setRightItemsList(inExpression.getRightItemsList());
+        inExpressionOut.setNot(!inExpression.isNot());
+        output.add(inExpressionOut);
+
+        IsNullExpression isNullExpressionOut = new IsNullExpression();
+        isNullExpressionOut.setLeftExpression(inExpression.getLeftExpression());
+        output.add(isNullExpressionOut);
     }
 
     public void setOutput(List<Expression> output) {
