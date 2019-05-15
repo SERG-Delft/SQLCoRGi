@@ -44,6 +44,7 @@ public final class Generator {
         }
 
         SelectBody selectBody = ((Select) statement).getSelectBody();
+
         RuleGeneratorSelectVisitor ruleGeneratorSelectVisitor = new RuleGeneratorSelectVisitor();
         ArrayList<PlainSelect> plainSelects = new ArrayList<>();
         ruleGeneratorSelectVisitor.setOutput(plainSelects);
