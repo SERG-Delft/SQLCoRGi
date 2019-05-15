@@ -146,8 +146,13 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         generateSimpleComparison(notEqualsTo);
     }
 
+    /**
+     * Generates test queries for 'BETWEEN' expressions.
+     * @param between a 'BETWEEN' expression.
+     */
     @Override
     public void visit(Between between) {
+
         output.add(between);
 
         Between betweenFlipped = new Between();
@@ -162,6 +167,10 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         output.add(isNullExpression);
     }
 
+    /**
+     * Generates test queries for 'IN' expressions.
+     * @param inExpression an 'IN' expression.
+     */
     @Override
     public void visit(InExpression inExpression) {
 
@@ -178,6 +187,10 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         output.add(isNullExpression);
     }
 
+    /**
+     * Generates test queries for 'LIKE' expressions.
+     * @param likeExpression a LIKE expression.
+     */
     @Override
     public void visit(LikeExpression likeExpression) {
 
@@ -187,6 +200,8 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         likeExpressionFlipped.setLeftExpression(likeExpression.getLeftExpression());
         likeExpressionFlipped.setRightExpression(likeExpression.getRightExpression());
 
+        // The LikeExpression class' setNot function does not accept any parameters, unlike others.
+        // Therefore an if statement is used to check wether to create a NOT expression.
         if (!likeExpression.isNot()) {
             likeExpressionFlipped.setNot();
         }
