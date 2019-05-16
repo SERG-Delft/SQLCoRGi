@@ -85,7 +85,8 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
         if (left instanceof Column | left instanceof LongValue | left instanceof DoubleValue) {
             if (left instanceof Column) {
-                Table table = ((Column) left).getTable();
+
+                String table = ((Column) left).getTable().toString();
 
             }
 
