@@ -5,14 +5,24 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Contains tests for {@link Generator}.
  */
 @SuppressWarnings("checkstyle:multipleStringLiterals")
 public class GeneratorTest {
+
+//    /**
+//     * A test case to check if an invalid query throws the proper exception.
+//     */
+//    @Test
+//    public void testInvalidQuery() {
+//        String query = "ELECT * ROM invalid WERE statement = 5";
+//        assertThrows(JSQLParserException.class, () ->
+//                Generator.generateRules(query)
+//        );
+//    }
 
     /**
      * A test case to check if a non-select query throws the proper exception.
@@ -172,14 +182,20 @@ public class GeneratorTest {
     @Test
     public void testBetweenCondition() {
         String query = "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37";
-        Set<String> result =  Generator.generateRules(query);
+        String queryFlipped = "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37";
+
+        Set<String> result1 = Generator.generateRules(query);
+        Set<String> result2 =   Generator.generateRules(queryFlipped);
 
         Set<String> expected = new TreeSet<>();
         expected.add(query);
-        expected.add("SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37");
+        expected.add(queryFlipped);
         expected.add("SELECT * FROM Table1 WHERE x IS NULL");
 
-        assertEquals(expected, result);
+        assertAll(
+                () -> assertEquals(expected, result1),
+                () -> assertEquals(expected, result2)
+        );
     }
 
     /**
@@ -188,14 +204,20 @@ public class GeneratorTest {
     @Test
     public void testInCondition() {
         String query = "SELECT * FROM Table1 WHERE x IN (28, 37)";
-        Set<String> result =  Generator.generateRules(query);
+        String queryFlipped = "SELECT * FROM Table1 WHERE x NOT IN (28, 37)";
+
+        Set<String> result1 = Generator.generateRules(query);
+        Set<String> result2 =   Generator.generateRules(queryFlipped);
 
         Set<String> expected = new TreeSet<>();
         expected.add(query);
-        expected.add("SELECT * FROM Table1 WHERE x NOT IN (28, 37)");
+        expected.add(queryFlipped);
         expected.add("SELECT * FROM Table1 WHERE x IS NULL");
 
-        assertEquals(expected, result);
+        assertAll(
+                () -> assertEquals(expected, result1),
+                () -> assertEquals(expected, result2)
+        );
     }
 
     /**
@@ -204,7 +226,10 @@ public class GeneratorTest {
     @Test
     public void testLikeCondition() {
         String query = "SELECT * FROM Table1 WHERE name LIKE 'John%'";
-        Set<String> result =  Generator.generateRules(query);
+        String queryFlipped = "SELECT * FROM Table1 WHERE name NOT LIKE 'John%'";
+
+        Set<String> result1 = Generator.generateRules(query);
+        Set<String> result2 =   Generator.generateRules(queryFlipped);
 
         Set<String> expected = new TreeSet<>();
         expected.add(query);
@@ -213,7 +238,10 @@ public class GeneratorTest {
         expected.add("SELECT * FROM Table1 WHERE NOT name LIKE 'John%'");
         expected.add("SELECT * FROM Table1 WHERE name IS NULL");
 
-        assertEquals(expected, result);
+        assertAll(
+                () -> assertEquals(expected, result1),
+                () -> assertEquals(expected, result2)
+        );
     }
 
 }
