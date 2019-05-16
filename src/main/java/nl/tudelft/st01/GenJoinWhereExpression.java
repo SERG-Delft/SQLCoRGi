@@ -13,6 +13,7 @@ import java.util.Map;
 public class GenJoinWhereExpression {
     private Map<String, Expression> output;
     private FromItem fromItem;
+
     public void generateJoinWhereExpressions(PlainSelect plainSelect) {
         this.fromItem = plainSelect.getFromItem();
         List<Join> joins = plainSelect.getJoins();
@@ -26,17 +27,17 @@ public class GenJoinWhereExpression {
         ruleGeneratorOnExpressionVisitor.setOutput(output);
         joins.get(0).getOnExpression().accept(ruleGeneratorOnExpressionVisitor);
 
-        generateExpressions(joins.get(0), fromItem);
-        System.out.println(output);
-        output = null;
+        generateExpressions(joins.get(0));
 
+        output = null;
+        fromItem = null;
     }
 
     /**
      * Generates the WHERE conditions that should be appended to the original statement.
      * Note that the context of the statement must be known in order to identify the keys.
      */
-    private List<Expression> generateExpressions(Join join, FromItem fromItem) {
+    private List<Expression> generateExpressions(Join join) {
         createInnerJoinExpression(join);
         createLeftJoinExpression(join);
         createRightJoinExpression(join);
@@ -49,6 +50,11 @@ public class GenJoinWhereExpression {
     }
 
     private Expression createLeftJoinExpression(Join join) {
+        Join outJoin = new Join();
+        outJoin.setLeft(true);
+        outJoin.setRightItem(join.getRightItem());
+        outJoin.setOnExpression(join.getOnExpression());
+
         return null;
     }
 
@@ -56,6 +62,6 @@ public class GenJoinWhereExpression {
         return null;
     }
 
-
+    //private getJoinType()
 
 }
