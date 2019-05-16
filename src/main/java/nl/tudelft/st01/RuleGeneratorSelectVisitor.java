@@ -79,11 +79,6 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         ruleGeneratorOnExpressionVisitor.setOutput(output);
 
         on.accept(ruleGeneratorOnExpressionVisitor);
-        //ruleGeneratorOnExpressionVisitor.generateExpressions();
+        ruleGeneratorOnExpressionVisitor.generateExpressions(fromItem);
     }
-
-
-    /**
-     *
-     */
 }

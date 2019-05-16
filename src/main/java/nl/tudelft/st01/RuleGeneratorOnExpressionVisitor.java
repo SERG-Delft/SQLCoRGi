@@ -15,6 +15,7 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
 import java.util.ArrayList;
@@ -83,38 +84,42 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
         Expression left = binaryExpression.getLeftExpression();
         Expression right = binaryExpression.getRightExpression();
 
-        if (left instanceof Column | left instanceof LongValue | left instanceof DoubleValue) {
-            if (left instanceof Column) {
-
-                String table = ((Column) left).getTable().toString();
-
-            }
-
-            //if (!contains(terminals, left)) {
-                terminals.add(left);
-           // }
-        } else {
+        if (left instanceof Column) {
+            updateColumnList(left);
+        } else if (!(left instanceof LongValue | left instanceof DoubleValue)) {
             left.accept(this);
         }
 
-        if (right instanceof Column | right instanceof LongValue | right instanceof DoubleValue) {
-            //if (!contains(terminals, right)) {
-                terminals.add(right);
-           // }
-        } else {
+        if (right instanceof Column) {
+            updateColumnList(right);
+        } else if (!(right instanceof LongValue | right instanceof DoubleValue)) {
             right.accept(this);
         }
 
-        //terminals = null;
+    }
 
+    // TODO: Replace by object that contains the context of the tables.
+    private void updateColumnList(Expression e) {
+        String table = ((Column) e).getTable().toString().toLowerCase();
+
+        if (!hashMap.containsKey(table)) {
+            List<Expression> list = new ArrayList<>();
+            list.add(e);
+            hashMap.put(table, list);
+        } else if (!contains(hashMap.get(table), e)) {
+            hashMap.get(table).add(e);
+        }
     }
 
     /**
      * Generates the WHERE conditions that should be appended to the original statement.
      * Note that the context of the statement must be known in order to identify the keys.
      */
-    public void generateExpressions(PlainSelect plainSelect) {
+    public List<Expression> generateExpressions(FromItem fromItem) {
 
+
+
+        return null;
     }
 
     private Expression createInnerJoinExpression(Expression e) {
@@ -131,6 +136,10 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     public void setOutput(List list) {
         this.output = list;
+    }
+
+    public Map<String, List<Expression>> getColumns() {
+        return hashMap;
     }
 
 
