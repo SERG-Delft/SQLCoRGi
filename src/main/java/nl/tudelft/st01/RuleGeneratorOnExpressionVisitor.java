@@ -15,13 +15,17 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.PlainSelect;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
     private List<Expression> output;
     private List<Expression> terminals = new ArrayList<>();
+    private Map<String, List<Expression>> hashMap = new HashMap();
 
     @Override
     public void visit(AndExpression andExpression) {
@@ -80,17 +84,22 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
         Expression right = binaryExpression.getRightExpression();
 
         if (left instanceof Column | left instanceof LongValue | left instanceof DoubleValue) {
-            if (!contains(terminals, left)) {
-                terminals.add(left);
+            if (left instanceof Column) {
+                Table table = ((Column) left).getTable();
+
             }
+
+            //if (!contains(terminals, left)) {
+                terminals.add(left);
+           // }
         } else {
             left.accept(this);
         }
 
         if (right instanceof Column | right instanceof LongValue | right instanceof DoubleValue) {
-            if (!contains(terminals, right)) {
+            //if (!contains(terminals, right)) {
                 terminals.add(right);
-            }
+           // }
         } else {
             right.accept(this);
         }
@@ -99,10 +108,24 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     }
 
-    public void generateExpressions() {
-        for (int i = 0; i < Math.pow(2, terminals.size()); i++) {
+    /**
+     * Generates the WHERE conditions that should be appended to the original statement.
+     * Note that the context of the statement must be known in order to identify the keys.
+     */
+    public void generateExpressions(PlainSelect plainSelect) {
 
-        }
+    }
+
+    private Expression createInnerJoinExpression(Expression e) {
+        return e;
+    }
+
+    private Expression createLeftJoinExpression(Expression e) {
+        return e;
+    }
+
+    private Expression createRightJoinExpression(Expression e) {
+        return e;
     }
 
     public void setOutput(List list) {
