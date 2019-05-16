@@ -102,6 +102,56 @@ public class GeneratorTest {
         assertEquals(expected, result);
     }
 
+    /**
+     * A test case with a BETWEEN condition.
+     */
+    @Test
+    public void testBetweenCondition() {
+        String query = "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37";
+        Set<String> result =  Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add(query);
+        expected.add("SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37");
+        expected.add("SELECT * FROM Table1 WHERE x IS NULL");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A test case with an IN condition.
+     */
+    @Test
+    public void testInCondition() {
+        String query = "SELECT * FROM Table1 WHERE x IN (28, 37)";
+        Set<String> result =  Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add(query);
+        expected.add("SELECT * FROM Table1 WHERE x NOT IN (28, 37)");
+        expected.add("SELECT * FROM Table1 WHERE x IS NULL");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A test case with an LIKE condition.
+     */
+    @Test
+    public void testLikeCondition() {
+        String query = "SELECT * FROM Table1 WHERE name LIKE 'John%'";
+        Set<String> result =  Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add(query);
+        // JSQLParser generates "NOT name LIKE" instead of "name NOT LIKE", they are however identical in behavior,
+        // therefore we stick with the behavior used in JSQLParser
+        expected.add("SELECT * FROM Table1 WHERE NOT name LIKE 'John%'");
+        expected.add("SELECT * FROM Table1 WHERE name IS NULL");
+
+        assertEquals(expected, result);
+    }
+
 
     /**
      * A test case with 1 column and 1 aggregator, in this case AVG.
@@ -117,16 +167,18 @@ public class GeneratorTest {
         expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1");
 
         expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
-                    + "HAVING COUNT(*) > 1");
+                + "HAVING COUNT(*) > 1");
 
         expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
-                    + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
+                + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
 
         expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
-                    + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
+                + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
 
         assertEquals(expected, result);
     }
+
+
 
     /**
      * A test case with 1 column and 2 aggregators, in this case AVG and Sum.
@@ -158,6 +210,7 @@ public class GeneratorTest {
         assertEquals(expected, result);
     }
 
+
     /**
      * A test case with 2 columns and 1 aggregator, in this case MAX.
      */
@@ -181,5 +234,7 @@ public class GeneratorTest {
 
         assertEquals(expected, result);
     }
+
+
 
 }

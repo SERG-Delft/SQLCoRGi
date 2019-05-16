@@ -15,6 +15,9 @@ import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.InExpression;
+import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
+import net.sf.jsqlparser.expression.operators.relational.Between;
 import net.sf.jsqlparser.schema.Column;
 
 import java.util.ArrayList;
@@ -141,6 +144,73 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
         generateSimpleComparison(notEqualsTo);
+    }
+
+    /**
+     * Generates test queries for 'BETWEEN' expressions.
+     * @param between a 'BETWEEN' expression.
+     */
+    @Override
+    public void visit(Between between) {
+
+        output.add(between);
+
+        Between betweenFlipped = new Between();
+        betweenFlipped.setLeftExpression(between.getLeftExpression());
+        betweenFlipped.setBetweenExpressionStart(between.getBetweenExpressionStart());
+        betweenFlipped.setBetweenExpressionEnd(between.getBetweenExpressionEnd());
+        betweenFlipped.setNot(!between.isNot());
+        output.add(betweenFlipped);
+
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(between.getLeftExpression());
+        output.add(isNullExpression);
+    }
+
+    /**
+     * Generates test queries for 'IN' expressions.
+     * @param inExpression an 'IN' expression.
+     */
+    @Override
+    public void visit(InExpression inExpression) {
+
+        output.add(inExpression);
+
+        InExpression inExpressionFlipped = new InExpression();
+        inExpressionFlipped.setLeftExpression(inExpression.getLeftExpression());
+        inExpressionFlipped.setRightItemsList(inExpression.getRightItemsList());
+        inExpressionFlipped.setNot(!inExpression.isNot());
+        output.add(inExpressionFlipped);
+
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(inExpression.getLeftExpression());
+        output.add(isNullExpression);
+    }
+
+    /**
+     * Generates test queries for 'LIKE' expressions.
+     * @param likeExpression a LIKE expression.
+     */
+    @Override
+    public void visit(LikeExpression likeExpression) {
+
+        output.add(likeExpression);
+
+        LikeExpression likeExpressionFlipped = new LikeExpression();
+        likeExpressionFlipped.setLeftExpression(likeExpression.getLeftExpression());
+        likeExpressionFlipped.setRightExpression(likeExpression.getRightExpression());
+
+        // The LikeExpression class' setNot function does not accept any parameters, unlike others.
+        // Therefore an if statement is used to check wether to create a NOT expression.
+        if (!likeExpression.isNot()) {
+            likeExpressionFlipped.setNot();
+        }
+
+        output.add(likeExpressionFlipped);
+
+        IsNullExpression isNullExpressionOut = new IsNullExpression();
+        isNullExpressionOut.setLeftExpression(likeExpression.getLeftExpression());
+        output.add(isNullExpressionOut);
     }
 
     public void setOutput(List<Expression> output) {
