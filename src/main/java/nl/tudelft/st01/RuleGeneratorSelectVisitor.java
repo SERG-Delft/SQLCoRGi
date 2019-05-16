@@ -7,6 +7,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -31,8 +32,8 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
         FromItem from = plainSelect.getFromItem();
         List<Join> joins = plainSelect.getJoins();
-
-
+        GenJoinWhereExpression gj = new GenJoinWhereExpression();
+        gj.generateJoinWhereExpressions(plainSelect);
         if (from != null) {
             handleJoins(from, joins);
             RuleGeneratorFromVisitor ruleGeneratorFromVisitor = new RuleGeneratorFromVisitor();
@@ -63,7 +64,11 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         this.output = output;
     }
 
-
+    /**
+     * Handles joins.
+     * @param fromItem fromitem
+     * @param joins joins list
+     */
     public void handleJoins(FromItem fromItem, List<Join> joins) {
         RuleGeneratorFromVisitor ruleGeneratorFromVisitor = new RuleGeneratorFromVisitor();
         fromItem.accept(ruleGeneratorFromVisitor);
@@ -75,10 +80,10 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         Expression on = joins.get(0).getOnExpression();
 
         RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
-        List<Expression> output = new ArrayList<>();
+        HashMap<String, Expression> output = new HashMap<>();
         ruleGeneratorOnExpressionVisitor.setOutput(output);
 
         on.accept(ruleGeneratorOnExpressionVisitor);
-        ruleGeneratorOnExpressionVisitor.generateExpressions(fromItem);
+        //ruleGeneratorOnExpressionVisitor.generateExpressions(fromItem);
     }
 }

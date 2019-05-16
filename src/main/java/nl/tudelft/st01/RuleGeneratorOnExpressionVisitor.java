@@ -24,20 +24,18 @@ import java.util.List;
 import java.util.Map;
 
 public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
-    private List<Expression> output;
+  //  private List<Expression> output;
     private List<Expression> terminals = new ArrayList<>();
-    private Map<String, List<Expression>> hashMap = new HashMap();
+    private Map<String, List<Expression>> output = new HashMap();
 
     @Override
     public void visit(AndExpression andExpression) {
         getTerminalsOnCondition(andExpression);
-
     }
 
     @Override
     public void visit(OrExpression orExpression) {
         getTerminalsOnCondition(orExpression);
-
     }
 
     @Override
@@ -100,48 +98,23 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     // TODO: Replace by object that contains the context of the tables.
     private void updateColumnList(Expression e) {
+
         String table = ((Column) e).getTable().toString().toLowerCase();
 
-        if (!hashMap.containsKey(table)) {
+        if (!output.containsKey(table)) {
             List<Expression> list = new ArrayList<>();
             list.add(e);
-            hashMap.put(table, list);
-        } else if (!contains(hashMap.get(table), e)) {
-            hashMap.get(table).add(e);
+            output.put(table, list);
+        } else if (!contains(output.get(table), e)) {
+            output.get(table).add(e);
         }
     }
 
-    /**
-     * Generates the WHERE conditions that should be appended to the original statement.
-     * Note that the context of the statement must be known in order to identify the keys.
-     */
-    public List<Expression> generateExpressions(FromItem fromItem) {
 
 
-
-        return null;
+    public void setOutput(Map map) {
+        this.output = map;
     }
-
-    private Expression createInnerJoinExpression(Expression e) {
-        return e;
-    }
-
-    private Expression createLeftJoinExpression(Expression e) {
-        return e;
-    }
-
-    private Expression createRightJoinExpression(Expression e) {
-        return e;
-    }
-
-    public void setOutput(List list) {
-        this.output = list;
-    }
-
-    public Map<String, List<Expression>> getColumns() {
-        return hashMap;
-    }
-
 
     /**
      * Ensures that the list of columns used in the on expression contains no duplicate column names.
