@@ -13,17 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("checkstyle:multipleStringLiterals")
 public class GeneratorTest {
 
-//    /**
-//     * A test case to check if an invalid query throws the proper exception.
-//     */
-//    @Test
-//    public void testInvalidQuery() {
-//        String query = "ELECT * ROM invalid WERE statement = 5";
-//        assertThrows(JSQLParserException.class, () ->
-//                Generator.generateRules(query)
-//        );
-//    }
-
     /**
      * A test case to check if a non-select query throws the proper exception.
      */
@@ -193,8 +182,8 @@ public class GeneratorTest {
         expected.add("SELECT * FROM Table1 WHERE x IS NULL");
 
         assertAll(
-                () -> assertEquals(expected, result1),
-                () -> assertEquals(expected, result2)
+            () -> assertEquals(expected, result1),
+            () -> assertEquals(expected, result2)
         );
     }
 
@@ -215,8 +204,8 @@ public class GeneratorTest {
         expected.add("SELECT * FROM Table1 WHERE x IS NULL");
 
         assertAll(
-                () -> assertEquals(expected, result1),
-                () -> assertEquals(expected, result2)
+            () -> assertEquals(expected, result1),
+            () -> assertEquals(expected, result2)
         );
     }
 
@@ -239,8 +228,8 @@ public class GeneratorTest {
         expected.add("SELECT * FROM Table1 WHERE name IS NULL");
 
         assertAll(
-                () -> assertEquals(expected, result1),
-                () -> assertEquals(expected, result2)
+            () -> assertEquals(expected, result1),
+            () -> assertEquals(expected, result2)
         );
     }
 
