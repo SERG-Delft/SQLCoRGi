@@ -20,12 +20,8 @@ public class RuleGeneratorFromVisitor extends FromItemVisitorAdapter {
     private List<Table> output = new ArrayList<>();
 
     public void visit(Table table) {
-        System.out.println("Table: " + table.toString());
         output.add(table);
 
-        for (Table s : output) {
-            System.out.println(s.toString());
-        }
     }
 
     public void visit(SubJoin subJoin) {

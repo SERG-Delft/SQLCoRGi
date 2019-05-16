@@ -16,36 +16,38 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
     private List<Expression> output;
+    private List<Expression> terminals = new ArrayList<>();
 
     @Override
     public void visit(AndExpression andExpression) {
-        generateRules(andExpression);
+        getTerminalsOnCondition(andExpression);
 
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        generateRules(orExpression);
+        getTerminalsOnCondition(orExpression);
 
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        generateRules(equalsTo);
+        getTerminalsOnCondition(equalsTo);
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        generateRules(greaterThan);
+        getTerminalsOnCondition(greaterThan);
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        generateRules(greaterThanEquals);
+        getTerminalsOnCondition(greaterThanEquals);
     }
 
     @Override
@@ -55,50 +57,52 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(MinorThan minorThan) {
-        generateRules(minorThan);
+        getTerminalsOnCondition(minorThan);
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        generateRules(minorThanEquals);
+        getTerminalsOnCondition(minorThanEquals);
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        generateRules(notEqualsTo);
+        getTerminalsOnCondition(notEqualsTo);
     }
 
 
     /**
-     * Generate rules for binary expressions.
+     * Retrieves the columns and values used in the on expressions.
      * @param binaryExpression binary expression.
      */
-    private void generateRules(BinaryExpression binaryExpression) {
+    private void getTerminalsOnCondition(BinaryExpression binaryExpression) {
         Expression left = binaryExpression.getLeftExpression();
         Expression right = binaryExpression.getRightExpression();
 
-
-        System.out.println(binaryExpression.toString());
-
         if (left instanceof Column | left instanceof LongValue | left instanceof DoubleValue) {
-            if (!contains(output, left)) {
-                output.add(left);
+            if (!contains(terminals, left)) {
+                terminals.add(left);
             }
-
         } else {
             left.accept(this);
         }
 
         if (right instanceof Column | right instanceof LongValue | right instanceof DoubleValue) {
-            if (!contains(output, right)) {
-                output.add(right);
+            if (!contains(terminals, right)) {
+                terminals.add(right);
             }
         } else {
             right.accept(this);
         }
 
-        //output = null;
+        //terminals = null;
 
+    }
+
+    public void generateExpressions() {
+        for (int i = 0; i < Math.pow(2, terminals.size()); i++) {
+
+        }
     }
 
     public void setOutput(List list) {

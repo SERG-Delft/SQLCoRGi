@@ -1,22 +1,13 @@
 package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.NotExpression;
-import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 
-import java.lang.reflect.Array;
-import java.util.AbstractSet;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Custom Visitor for SELECT statements.
@@ -41,7 +32,6 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         FromItem from = plainSelect.getFromItem();
         List<Join> joins = plainSelect.getJoins();
 
-        System.out.println(joins.toString());
 
         if (from != null) {
             handleJoins(from, joins);
@@ -88,9 +78,8 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         List<Expression> output = new ArrayList<>();
         ruleGeneratorOnExpressionVisitor.setOutput(output);
 
-
         on.accept(ruleGeneratorOnExpressionVisitor);
-        System.out.println(output);
+        ruleGeneratorOnExpressionVisitor.generateExpressions();
     }
 
 
