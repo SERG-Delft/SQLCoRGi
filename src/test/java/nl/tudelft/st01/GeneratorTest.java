@@ -107,10 +107,10 @@ public class GeneratorTest {
 
 
     /**
-     * A test case with an aggregator, in this case AVG.
+     * A test case with 2 columns and one aggregator, in this case AVG.
      */
     @Test
-    public void testAVGAggregator() {
+    public void testAVGAggregator2columns1Aggr() {
         String query = "SELECT Director, AVG(Length) FROM Movies GROUP BY Director";
         Set<String> result = Generator.generateRules(query);
 
@@ -120,6 +120,30 @@ public class GeneratorTest {
         expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1");
         expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
         expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A test case with 3 columns and 2 aggregators, in this case AVG and Sum.
+     */
+    @Test
+    public void testSUMAggregator3columns2Aggr() {
+        String query = "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director";
+        Set<String> result = Generator.generateRules(query);
+
+        System.out.println(result);
+
+        Set<String> expected = new TreeSet<>();
+
+        expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1");
+        expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1");
+
+        expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1");
+        expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
+
+        expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1");
+        expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
 
         assertEquals(expected, result);
     }
