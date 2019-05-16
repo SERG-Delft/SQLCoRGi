@@ -29,7 +29,6 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         GenAggregateFunctions genAggregateFunctions = new GenAggregateFunctions();
         outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
 
-
         Expression where = plainSelect.getWhere();
         if (where != null) {
             RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
@@ -37,9 +36,9 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
             ruleGeneratorExpressionVisitor.setOutput(expressions);
             where.accept(ruleGeneratorExpressionVisitor);
 
-            for (PlainSelect plainSelectDupe : outputAfterAggregator) {
+            for (PlainSelect plainSelectAfterAggregator : outputAfterAggregator) {
                 for (Expression expression : expressions) {
-                    PlainSelect plainSelectOut = deepCopy(plainSelectDupe);
+                    PlainSelect plainSelectOut = deepCopy(plainSelectAfterAggregator);
                     plainSelectOut.setWhere(expression);
 
                     output.add(plainSelectOut);
@@ -78,7 +77,6 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         newPlainSelect.setWhere(plainSelect.getWhere());
         newPlainSelect.setJoins(plainSelect.getJoins());
         newPlainSelect.setGroupByElement(plainSelect.getGroupBy());
-
 
         return newPlainSelect;
     }

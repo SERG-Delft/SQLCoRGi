@@ -163,7 +163,6 @@ public class GeneratorTest {
 
         Set<String> expected = new TreeSet<>();
 
-        // Newlines needed to not excess line length
         expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1");
 
         expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
@@ -190,7 +189,6 @@ public class GeneratorTest {
 
         Set<String> expected = new TreeSet<>();
 
-        // Newlines needed to not excess line length
         expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1");
         expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies "
                     + "GROUP BY Director HAVING COUNT(*) > 1");

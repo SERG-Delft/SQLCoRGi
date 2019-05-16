@@ -36,8 +36,8 @@ public class GenAggregateFunctions {
                     // Here we know the selectItem is a function (AVG, SUM, MAX etc.)
                     //      so we can start adding the rules for it.
                     noFunction = false;
-                    outputAfterAggregator.add(secondRule(plainSelect));
                     outputAfterAggregator.add(firstRule(plainSelect));
+                    outputAfterAggregator.add(secondRule(plainSelect));
                     Function func = (Function) selectExpressionItem.getExpression();
                     outputAfterAggregator.add(thirdRule(plainSelect, func));
                     outputAfterAggregator.add(fourthRule(plainSelect, func));
@@ -51,7 +51,8 @@ public class GenAggregateFunctions {
         return outputAfterAggregator;
     }
 
-    /** Creates the aggregator statement that checks for at least one entry
+    /**
+     * Creates the aggregator statement that checks for at least one entry
      *  having a certain column. Example result:
      *
      *  `SELECT COUNT(*) FROM Movies HAVING count(distinct Director) > 1`
@@ -91,7 +92,8 @@ public class GenAggregateFunctions {
         return plainSelectOut;
     }
 
-    /** Adds "HAVING count(*)>1" to a plainSelect item.
+    /**
+     * Adds "HAVING count(*)>1" to a plainSelect item.
      *  This is needed for handling aggregate operators.
      *
      * @param plainSelect - select to add the part to
@@ -112,7 +114,8 @@ public class GenAggregateFunctions {
         return plainSelectOut;
     }
 
-    /** Generates the third rule for the aggregator.
+    /**
+     * Generates the third rule for the aggregator.
      *
      * @param plainSelect - query object to generate the rule for
      * @param function - function object that resides in the query
@@ -143,7 +146,8 @@ public class GenAggregateFunctions {
         return plainSelectOut;
     }
 
-    /** Generates the fourth rule for the aggregator.
+    /**
+     * Generates the fourth rule for the aggregator.
      *
      * @param plainSelect - query object to generate the rule for
      * @param function - function object that resides in the query
@@ -171,7 +175,8 @@ public class GenAggregateFunctions {
         return plainSelectOut;
     }
 
-    /** Returns a deep copy of a plainSelect. The idea here is that you use this
+    /**
+     * Returns a deep copy of a plainSelect. The idea here is that you use this
      *  to get a copy of the object, then again add the attributes that you wanted
      *  to change in the first place.
      *
@@ -195,7 +200,8 @@ public class GenAggregateFunctions {
         return newPlainSelect;
     }
 
-    /** Generates a `__ > 1` expression.
+    /**
+     * Generates a `__ > 1` expression.
      *
      * @param expr - expression to fill in the __
      * @return `expr > 1` object
@@ -208,7 +214,8 @@ public class GenAggregateFunctions {
         return greaterThan;
     }
 
-    /** Generates a COUNT(*) object.
+    /**
+     * Generates a COUNT(*) object.
      *
      * @return a COUNT(*) object
      */
@@ -220,7 +227,8 @@ public class GenAggregateFunctions {
         return count;
     }
 
-    /** Generates a COUNT(DISTINCT __) object.
+    /**
+     * Generates a COUNT(DISTINCT __) object.
      *
      * @param expression expression to fill in the __
      * @param distinct toggles whether or not you want to include DISTINCT
@@ -236,7 +244,8 @@ public class GenAggregateFunctions {
         return countColumn;
     }
 
-    /** Generates a SelectItem but with a certain expression as content.
+    /**
+     * Generates a SelectItem but with a certain expression as content.
      *  This is a bit cumbersome, so this method eases that task.
      *
      * @param expression - expression to put in the SelectItem
