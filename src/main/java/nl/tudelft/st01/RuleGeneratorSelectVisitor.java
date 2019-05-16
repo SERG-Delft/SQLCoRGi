@@ -1,15 +1,7 @@
 package nl.tudelft.st01;
 
-import net.sf.jsqlparser.expression.BinaryExpression;
-import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 
 import java.util.ArrayList;
@@ -21,6 +13,7 @@ import java.util.List;
 public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
     private List<PlainSelect> outputAfterAggregator;
+
     private List<PlainSelect> output;
 
     @Override
@@ -44,7 +37,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
             ruleGeneratorExpressionVisitor.setOutput(expressions);
             where.accept(ruleGeneratorExpressionVisitor);
 
-            for(PlainSelect plainSelectDupe : outputAfterAggregator) {
+            for (PlainSelect plainSelectDupe : outputAfterAggregator) {
                 for (Expression expression : expressions) {
                     PlainSelect plainSelectOut = deepCopy(plainSelectDupe);
                     plainSelectOut.setWhere(expression);
@@ -56,7 +49,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
             // since there is no where, we don't need that part.
             // we do want the result of the output from the aggregator part,
             //      so we add those plainSelects to the output list
-            for(PlainSelect p : outputAfterAggregator) {
+            for (PlainSelect p : outputAfterAggregator) {
                 output.add(p);
             }
         }

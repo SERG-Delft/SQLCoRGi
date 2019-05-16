@@ -56,16 +56,16 @@ public final class Generator {
         return result;
     }
 
-    /**
-     * Example query to try out the generator.
-     * @param args unused.
-     */
-    public static void main(String[] args) {
-
-        String query = "SELECT Director, AVG(Length) FROM Movies WHERE a > 1 GROUP BY Director";
-        Set<String> result = generateRules(query);
-
-        System.out.println("Result: " + result.toString());
-    }
+    //    /**
+    //     * Example query to try out the generator.
+    //     * @param args unused.
+    //     */
+    //    public static void main(String[] args) {
+    //
+    //        String query = "SELECT Director, AVG(Length) FROM Movies WHERE a > 1 GROUP BY Director";
+    //        Set<String> result = generateRules(query);
+    //
+    //        System.out.println("Result: " + result.toString());
+    //    }
 
 }

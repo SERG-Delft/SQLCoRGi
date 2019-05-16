@@ -14,27 +14,38 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class that generates rules for the Aggregate functions such as MAX, AVG etc.
+ */
 public class GenAggregateFunctions {
+    private final String countString = "COUNT";
 
+    /** Main, public method that generates the rules for the aggregate functions.
+     *
+     * @param plainSelect - query object to generate rules for
+     * @return list of query objects which represent the rules for the aggregator function
+     */
     public List<PlainSelect> generate(PlainSelect plainSelect) {
         // check if there is a Function in one of the columns
         // for now assuming there is at most 1 function in the selectitems list
         boolean noFunction = true;
         List<PlainSelect> outputAfterAggregator = new ArrayList<>();
-        for(SelectItem selectItem : plainSelect.getSelectItems()) {
-            if(selectItem instanceof SelectExpressionItem) {
+        for (SelectItem selectItem : plainSelect.getSelectItems()) {
+            if (selectItem instanceof SelectExpressionItem) {
                 SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
-                if(selectExpressionItem.getExpression() instanceof Function) {
-                    // here we know the selectItem is a function (AVG, SUM, MAX etc.) so we can start adding the rules for it
+                if (selectExpressionItem.getExpression() instanceof Function) {
+                    // here we know the selectItem is a function (AVG, SUM, MAX etc.)
+                    //      so we can start adding the rules for it
                     noFunction = false;
                     outputAfterAggregator.add(secondRule(plainSelect));
                     outputAfterAggregator.add(firstRule(plainSelect));
-                    outputAfterAggregator.add(thirdRule(plainSelect, (Function) selectExpressionItem.getExpression()));
-                    outputAfterAggregator.add(fourthRule(plainSelect, (Function) selectExpressionItem.getExpression()));
+                    Function func = (Function) selectExpressionItem.getExpression();
+                    outputAfterAggregator.add(thirdRule(plainSelect, func));
+                    outputAfterAggregator.add(fourthRule(plainSelect, func));
                 }
             }
         }
-        if(noFunction) {
+        if (noFunction) {
             outputAfterAggregator.add(plainSelect);
         }
 
@@ -81,8 +92,8 @@ public class GenAggregateFunctions {
         return plainSelectOut;
     }
 
-    /** Adds "HAVING count(*)>1" to a plainSelect item
-     *  This is needed for handling aggregate operators
+    /** Adds "HAVING count(*)>1" to a plainSelect item.
+     *  This is needed for handling aggregate operators.
      *
      * @param plainSelect - select to add the part to
      * @return - select item with the having part added
@@ -102,8 +113,12 @@ public class GenAggregateFunctions {
         return plainSelectOut;
     }
 
-
-
+    /** Generates the third rule for the aggregator.
+     *
+     * @param plainSelect - query object to generate the rule for
+     * @param function - function object that resides in the query
+     * @return - query object representing the third rule for the aggregator
+     */
     private PlainSelect thirdRule(PlainSelect plainSelect, Function function) {
         PlainSelect plainSelectOut = deepCopy(plainSelect, true);
 
@@ -129,6 +144,12 @@ public class GenAggregateFunctions {
         return plainSelectOut;
     }
 
+    /** Generates the fourth rule for the aggregator.
+     *
+     * @param plainSelect - query object to generate the rule for
+     * @param function - function object that resides in the query
+     * @return - query object representing the fourth rule for the aggregator
+     */
     private PlainSelect fourthRule(PlainSelect plainSelect, Function function) {
         PlainSelect plainSelectOut = deepCopy(plainSelect, true);
 
@@ -156,6 +177,8 @@ public class GenAggregateFunctions {
      *  to change in the first place.
      *
      * @param plainSelect - object to copy
+     * @param copyGroupBy - boolean to determine whether or not you want to also include the
+     *                    GroupBy clause in the deep copy
      * @return deep copy of object
      */
     private PlainSelect deepCopy(PlainSelect plainSelect, boolean copyGroupBy) {
@@ -166,13 +189,18 @@ public class GenAggregateFunctions {
         newPlainSelect.setHaving(plainSelect.getHaving());
         newPlainSelect.setWhere(plainSelect.getWhere());
         newPlainSelect.setJoins(plainSelect.getJoins());
-        if(copyGroupBy) {
+        if (copyGroupBy) {
             newPlainSelect.setGroupByElement(plainSelect.getGroupBy());
         }
 
         return newPlainSelect;
     }
 
+    /** Generates a `__ > 1` expression.
+     *
+     * @param expr - expression to fill in the __
+     * @return `expr > 1` object
+     */
     private GreaterThan getGreaterThan1(Expression expr) {
         GreaterThan greaterThan = new GreaterThan();
         greaterThan.setLeftExpression(expr);
@@ -181,17 +209,27 @@ public class GenAggregateFunctions {
         return greaterThan;
     }
 
+    /** Generates a COUNT(*) object.
+     *
+     * @return a COUNT(*) object
+     */
     private Function getCountAllColumns() {
         Function count = new Function();
-        count.setName("COUNT");
+        count.setName(countString);
         count.setAllColumns(true);
 
         return count;
     }
 
+    /** Generates a COUNT(DISTINCT __) object.
+     *
+     * @param expression expression to fill in the __
+     * @param distinct toggles whether or not you want to include DISTINCT
+     * @return a COUNT(DISTINCT __) object
+     */
     private Function getCountDistinctColumn(Expression expression, boolean distinct) {
         Function countColumn = new Function();
-        countColumn.setName("COUNT");
+        countColumn.setName(countString);
         ExpressionList parameters = new ExpressionList(expression);
         countColumn.setParameters(parameters);
         countColumn.setDistinct(distinct);
@@ -199,6 +237,12 @@ public class GenAggregateFunctions {
         return countColumn;
     }
 
+    /** Generates a SelectItem but with a certain expression as content.
+     *  This is a bit cumbersome, so this method eases that task.
+     *
+     * @param expression - expression to put in the SelectItem
+     * @return a SelectItem with the expression inside
+     */
     private SelectItem getSelectItemWithObject(Expression expression) {
         SelectExpressionItem selectExpressionItem = new SelectExpressionItem();
         selectExpressionItem.setExpression(expression);
