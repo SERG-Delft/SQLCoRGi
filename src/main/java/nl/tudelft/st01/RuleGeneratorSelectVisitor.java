@@ -46,8 +46,8 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
                 }
             }
         } else {
-            // since there is no where, we don't need that part.
-            // we do want the result of the output from the aggregator part,
+            // Since there is no where, we don't need that part.
+            // We do want the result of the output from the aggregator part,
             //      so we add those plainSelects to the output list
             for (PlainSelect p : outputAfterAggregator) {
                 output.add(p);

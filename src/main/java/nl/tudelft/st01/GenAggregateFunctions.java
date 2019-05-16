@@ -26,16 +26,15 @@ public class GenAggregateFunctions {
      * @return list of query objects which represent the rules for the aggregator function
      */
     public List<PlainSelect> generate(PlainSelect plainSelect) {
-        // check if there is a Function in one of the columns
-        // for now assuming there is at most 1 function in the selectitems list
+        // Check if there is a Function in one of the columns. If so, generate rules for it.
         boolean noFunction = true;
         List<PlainSelect> outputAfterAggregator = new ArrayList<>();
         for (SelectItem selectItem : plainSelect.getSelectItems()) {
             if (selectItem instanceof SelectExpressionItem) {
                 SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
                 if (selectExpressionItem.getExpression() instanceof Function) {
-                    // here we know the selectItem is a function (AVG, SUM, MAX etc.)
-                    //      so we can start adding the rules for it
+                    // Here we know the selectItem is a function (AVG, SUM, MAX etc.)
+                    //      so we can start adding the rules for it.
                     noFunction = false;
                     outputAfterAggregator.add(secondRule(plainSelect));
                     outputAfterAggregator.add(firstRule(plainSelect));
@@ -55,40 +54,40 @@ public class GenAggregateFunctions {
     /** Creates the aggregator statement that checks for at least one entry
      *  having a certain column. Example result:
      *
-     *  `SELECT COUNT(*) FROM Movies HAVING count(distinct Director)>1`
+     *  `SELECT COUNT(*) FROM Movies HAVING count(distinct Director) > 1`
      *
      * @param plainSelect - select to add the part to
      * @return - select item in the above specified form
      */
     private PlainSelect firstRule(PlainSelect plainSelect) {
-        // get a deep copy of the plainSelect
+        // Get a deep copy of the plainSelect
         PlainSelect plainSelectOut = deepCopy(plainSelect, false);
 
-        // create COUNT(*) object
+        // Create COUNT(*) object
         Function count = getCountAllColumns();
 
-        // create selectItem object with the count in it
+        // Create selectItem object with the count in it
         SelectItem si = getSelectItemWithObject(count);
 
         List<SelectItem> selectItemList = new ArrayList<>();
         selectItemList.add(si);
 
-        // set selectItemList of plainSelectOut to be only the count object, overwriting the others
+        // Set selectItemList of plainSelectOut to be only the count object, overwriting the others
         plainSelectOut.setSelectItems(selectItemList);
 
-        // get selectItem inside the Group By clause
+        // Get selectItem inside the Group By clause
         Expression groupBy = plainSelect.getGroupBy().getGroupByExpressions().get(0);
 
-        // create COUNT(distinct groupByColumn) object
+        // Create COUNT(distinct groupByColumn) object
         Function countColumn = getCountDistinctColumn(groupBy, true);
 
         // Create count > 1
         GreaterThan greaterThan = getGreaterThan1(countColumn);
 
-        // add to plainselect
+        // Add to plainselect
         plainSelectOut.setHaving(greaterThan);
 
-        // you may guess what this line does by yourself
+        // You may guess what this line does by yourself
         return plainSelectOut;
     }
 
@@ -101,13 +100,13 @@ public class GenAggregateFunctions {
     private PlainSelect secondRule(PlainSelect plainSelect) {
         PlainSelect plainSelectOut = deepCopy(plainSelect, true);
 
-        // create COUNT(*) object
+        // Create COUNT(*) object
         Function count = getCountAllColumns();
 
         // Create COUNT(*) > 1
         GreaterThan greaterThan = getGreaterThan1(count);
 
-        // add to plainselect
+        // Add to plainselect
         plainSelectOut.setHaving(greaterThan);
 
         return plainSelectOut;
@@ -122,21 +121,21 @@ public class GenAggregateFunctions {
     private PlainSelect thirdRule(PlainSelect plainSelect, Function function) {
         PlainSelect plainSelectOut = deepCopy(plainSelect, true);
 
-        // create COUNT(*) object
+        // Create COUNT(*) object
         Function count = getCountAllColumns();
 
-        // retrieve column in function
+        // Retrieve column in function
         Expression expr = function.getParameters().getExpressions().get(0);
 
-        // create count(*) > column in function
+        // Create count(*) > column in function
         GreaterThan leftGreaterThan = new GreaterThan();
         leftGreaterThan.setLeftExpression(count);
         leftGreaterThan.setRightExpression(getCountDistinctColumn(expr, false));
 
-        // create count(distinct FunctionColumn) > 1
+        // Create count(distinct FunctionColumn) > 1
         GreaterThan rightGreaterThan = getGreaterThan1(getCountDistinctColumn(expr, true));
 
-        // create AND
+        // Create AND
         BinaryExpression binaryExpression = new AndExpression(leftGreaterThan, rightGreaterThan);
 
         plainSelectOut.setHaving(binaryExpression);
@@ -153,18 +152,18 @@ public class GenAggregateFunctions {
     private PlainSelect fourthRule(PlainSelect plainSelect, Function function) {
         PlainSelect plainSelectOut = deepCopy(plainSelect, true);
 
-        // retrieve column in function
+        // Retrieve column in function
         Expression expr = function.getParameters().getExpressions().get(0);
 
-        // create left condition
+        // Create left condition
         GreaterThan leftGreaterThan = new GreaterThan();
         leftGreaterThan.setLeftExpression(getCountDistinctColumn(expr, false));
         leftGreaterThan.setRightExpression(getCountDistinctColumn(expr, true));
 
-        // create right condition
+        // Create right condition
         GreaterThan rightGreaterThan = getGreaterThan1(getCountDistinctColumn(expr, true));
 
-        // create AND
+        // Create AND
         BinaryExpression binaryExpression = new AndExpression(leftGreaterThan, rightGreaterThan);
 
         plainSelectOut.setHaving(binaryExpression);
