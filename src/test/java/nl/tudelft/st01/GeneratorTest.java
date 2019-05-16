@@ -14,6 +14,18 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GeneratorTest {
 
     /**
+     * A test case to check if an invalid query return nothing.
+     */
+    @Test
+    public void testInvalidQuery() {
+        String query = "ELECT * ROM invalid WERE statement = 5";
+        Set<String> result = Generator.generateRules(query);
+        Set<String> expected = new TreeSet<>();
+
+        assertEquals(expected, result);
+    }
+
+    /**
      * A test case to check if a non-select query throws the proper exception.
      */
     @Test
