@@ -20,8 +20,7 @@ import java.util.TreeSet;
 
 public class GenJoinWhereExpression {
     private Map<String, List<Column>> output;
-    private FromItem fromItem;
-    private Expression whereCondition;
+
 
     /**
      * Takes in a statement and
@@ -36,8 +35,9 @@ public class GenJoinWhereExpression {
             return result;
         }
 
-        this.fromItem = plainSelect.getFromItem();
-        this.whereCondition = plainSelect.getWhere();
+        FromItem fromItem = plainSelect.getFromItem();
+        Expression whereCondition = plainSelect.getWhere();
+
         RuleGeneratorFromVisitor fromVisitor = new RuleGeneratorFromVisitor();
         RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
 
@@ -73,12 +73,10 @@ public class GenJoinWhereExpression {
                     result.add(out.toString());
                    // System.out.println(out);
                 }
-
-
                 result.add(out.toString());
             }
-            output.clear();
 
+            output.clear();
         }
         output = null;
         fromItem = null;
