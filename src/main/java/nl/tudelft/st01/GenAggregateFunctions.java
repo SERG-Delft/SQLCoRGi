@@ -196,7 +196,7 @@ public class GenAggregateFunctions {
      */
     private Function getCountAllColumns() {
         Function count = new Function();
-        count.setName(countString);
+        count.setName(COUNT_STRING);
         count.setAllColumns(true);
 
         return count;
@@ -211,7 +211,7 @@ public class GenAggregateFunctions {
      */
     private Function getCountDistinctColumn(Expression expression, boolean distinct) {
         Function countColumn = new Function();
-        countColumn.setName(countString);
+        countColumn.setName(COUNT_STRING);
         ExpressionList parameters = new ExpressionList(expression);
         countColumn.setParameters(parameters);
         countColumn.setDistinct(distinct);
