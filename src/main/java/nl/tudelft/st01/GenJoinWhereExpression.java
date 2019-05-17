@@ -182,6 +182,6 @@ public class GenJoinWhereExpression {
             return binaryExpression;
         }
 
-        return null;
+        throw new IllegalArgumentException("The columns list cannot be empty.");
     }
 }
