@@ -62,8 +62,8 @@ public final class Generator {
      * @param args unused.
      */
     public static void main(String[] args) {
-
-        String query = "SELECT * FROM Movies INNER JOIN Boxoffice ON (Movies.id = Boxoffice.movie_id OR BoxOffice.movie_id < Movies.id) AND (Movies.id = Boxoffice.rating)";
+        String query = "SELECT * FROM Movies  INNER JOIN Boxoffice ON (Movies.id = Boxoffice.movie_id) "
+                + "INNER JOIN Boxoffice ON (Boxoffice.rating < Movies.length) WHERE Movies.id > 4";
         Set<String> result = generateRules(query);
 
         System.out.println("Result: " + result.toString());

@@ -29,11 +29,11 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
         Expression where = plainSelect.getWhere();
 
-
         FromItem from = plainSelect.getFromItem();
         List<Join> joins = plainSelect.getJoins();
         GenJoinWhereExpression gj = new GenJoinWhereExpression();
         gj.generateJoinWhereExpressions(plainSelect);
+
         if (!(joins == null || joins.isEmpty())) {
             handleJoins(from, joins);
             RuleGeneratorFromVisitor ruleGeneratorFromVisitor = new RuleGeneratorFromVisitor();

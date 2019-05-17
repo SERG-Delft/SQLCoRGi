@@ -15,17 +15,17 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.FromItem;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This Visitor allows for extracting the column used in the given expression.
+ */
 public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
-  //  private List<Expression> output;
-    private List<Expression> terminals = new ArrayList<>();
+
     private Map<String, List<Expression>> output = new HashMap();
 
     @Override
@@ -55,7 +55,7 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
-        Expression l = isNullExpression.getLeftExpression();
+        isNullExpression.getLeftExpression();
     }
 
     @Override
@@ -96,7 +96,10 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     }
 
-    // TODO: Replace by object that contains the context of the tables.
+    /**
+     * Stores each column corresponding to its table.
+     * @param e The column that should be added.
+     */
     private void updateColumnList(Expression e) {
 
         String table = ((Column) e).getTable().toString().toLowerCase();

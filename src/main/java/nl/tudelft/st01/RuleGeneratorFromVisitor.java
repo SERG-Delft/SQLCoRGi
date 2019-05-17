@@ -13,21 +13,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Custom Visitor for FROM statements and joins.
+ * Custom Visitor for FromItems.
  */
 public class RuleGeneratorFromVisitor extends FromItemVisitorAdapter {
 
     private List<Table> output = new ArrayList<>();
 
+    @Override
     public void visit(Table table) {
         output.add(table);
 
     }
 
+    @Override
     public void visit(SubJoin subJoin) {
 
     }
 
+    @Override
     public void visit(SubSelect subSelect) {
 
     }
