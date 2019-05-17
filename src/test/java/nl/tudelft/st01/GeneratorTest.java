@@ -92,13 +92,13 @@ public class GeneratorTest {
      */
     @Test
     public void testGreaterThanEqualsInteger() {
-        String query = "SELECT * FROM Table WHERE x >= 28";
+        String query = "SELECT * FROM Table WHERE x >= 37";
         Set<String> result = Generator.generateRules(query);
 
         Set<String> expected = new TreeSet<>();
-        expected.add("SELECT * FROM Table WHERE x = 27");
-        expected.add("SELECT * FROM Table WHERE x = 28");
-        expected.add("SELECT * FROM Table WHERE x = 29");
+        expected.add("SELECT * FROM Table WHERE x = 36");
+        expected.add("SELECT * FROM Table WHERE x = 37");
+        expected.add("SELECT * FROM Table WHERE x = 38");
         expected.add("SELECT * FROM Table WHERE x IS NULL");
 
         assertEquals(expected, result);
@@ -204,8 +204,8 @@ public class GeneratorTest {
      */
     @Test
     public void testInCondition() {
-        String query = "SELECT * FROM Table1 WHERE x IN (28, 37)";
-        String negatedQuery = "SELECT * FROM Table1 WHERE x NOT IN (28, 37)";
+        String query = "SELECT * FROM Table1 WHERE x IN (30, 38)";
+        String negatedQuery = "SELECT * FROM Table1 WHERE x NOT IN (30, 38)";
 
         Set<String> result1 = Generator.generateRules(query);
         Set<String> result2 = Generator.generateRules(negatedQuery);
