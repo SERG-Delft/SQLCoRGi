@@ -5,13 +5,36 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Contains tests for {@link Generator}.
  */
 @SuppressWarnings("checkstyle:multipleStringLiterals")
 public class GeneratorTest {
+
+    /**
+     * A test case to check if an invalid query return nothing.
+     */
+    @Test
+    public void testInvalidQuery() {
+        String query = "ELECT * ROM invalid WERE statement = 5";
+        Set<String> result = Generator.generateRules(query);
+        Set<String> expected = new TreeSet<>();
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A test case to check if a non-select query throws the proper exception.
+     */
+    @Test
+    public void testNonSelectQuery() {
+        String query = "ALTER TABLE Customers ADD Email varchar(255);";
+        assertThrows(IllegalArgumentException.class, () ->
+                Generator.generateRules(query)
+        );
+    }
 
     /**
      * A test case for a simple query containing only one condition with < as operator.
@@ -29,6 +52,58 @@ public class GeneratorTest {
 
         assertEquals(expected, result);
     }
+
+    /**
+     * A test case for a simple query containing only one condition with <= as operator.
+     */
+    @Test
+    public void testLessThanEqualsInteger() {
+        String query = "SELECT * FROM table WHERE a <= 100";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM table WHERE a = 99");
+        expected.add("SELECT * FROM table WHERE a = 100");
+        expected.add("SELECT * FROM table WHERE a = 101");
+        expected.add("SELECT * FROM table WHERE a IS NULL");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A test simple test case for the > (GreaterThan) operator.
+     */
+    @Test
+    public void testGreaterThanInteger() {
+        String query = "SELECT * FROM Table WHERE x > 28";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM Table WHERE x = 27");
+        expected.add("SELECT * FROM Table WHERE x = 28");
+        expected.add("SELECT * FROM Table WHERE x = 29");
+        expected.add("SELECT * FROM Table WHERE x IS NULL");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A test simple test case for the > (GreaterThan) operator.
+     */
+    @Test
+    public void testGreaterThanEqualsInteger() {
+        String query = "SELECT * FROM Table WHERE x >= 37";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM Table WHERE x = 36");
+        expected.add("SELECT * FROM Table WHERE x = 37");
+        expected.add("SELECT * FROM Table WHERE x = 38");
+        expected.add("SELECT * FROM Table WHERE x IS NULL");
+
+        assertEquals(expected, result);
+    }
+
 
     /**
      * A test case for a simple query containing only one condition with != as operator.
@@ -108,14 +183,20 @@ public class GeneratorTest {
     @Test
     public void testBetweenCondition() {
         String query = "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37";
-        Set<String> result =  Generator.generateRules(query);
+        String negatedQuery = "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37";
+
+        Set<String> result1 = Generator.generateRules(query);
+        Set<String> result2 =   Generator.generateRules(negatedQuery);
 
         Set<String> expected = new TreeSet<>();
         expected.add(query);
-        expected.add("SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37");
+        expected.add(negatedQuery);
         expected.add("SELECT * FROM Table1 WHERE x IS NULL");
 
-        assertEquals(expected, result);
+        assertAll(
+            () -> assertEquals(expected, result1),
+            () -> assertEquals(expected, result2)
+        );
     }
 
     /**
@@ -123,15 +204,21 @@ public class GeneratorTest {
      */
     @Test
     public void testInCondition() {
-        String query = "SELECT * FROM Table1 WHERE x IN (28, 37)";
-        Set<String> result =  Generator.generateRules(query);
+        String query = "SELECT * FROM Table1 WHERE x IN (30, 38)";
+        String negatedQuery = "SELECT * FROM Table1 WHERE x NOT IN (30, 38)";
+
+        Set<String> result1 = Generator.generateRules(query);
+        Set<String> result2 = Generator.generateRules(negatedQuery);
 
         Set<String> expected = new TreeSet<>();
         expected.add(query);
-        expected.add("SELECT * FROM Table1 WHERE x NOT IN (28, 37)");
+        expected.add(negatedQuery);
         expected.add("SELECT * FROM Table1 WHERE x IS NULL");
 
-        assertEquals(expected, result);
+        assertAll(
+            () -> assertEquals(expected, result1),
+            () -> assertEquals(expected, result2)
+        );
     }
 
     /**
@@ -140,7 +227,10 @@ public class GeneratorTest {
     @Test
     public void testLikeCondition() {
         String query = "SELECT * FROM Table1 WHERE name LIKE 'John%'";
-        Set<String> result =  Generator.generateRules(query);
+        String negatedQuery = "SELECT * FROM Table1 WHERE name NOT LIKE 'John%'";
+
+        Set<String> result1 = Generator.generateRules(query);
+        Set<String> result2 = Generator.generateRules(negatedQuery);
 
         Set<String> expected = new TreeSet<>();
         expected.add(query);
@@ -149,7 +239,10 @@ public class GeneratorTest {
         expected.add("SELECT * FROM Table1 WHERE NOT name LIKE 'John%'");
         expected.add("SELECT * FROM Table1 WHERE name IS NULL");
 
-        assertEquals(expected, result);
+        assertAll(
+            () -> assertEquals(expected, result1),
+            () -> assertEquals(expected, result2)
+        );
     }
 
 

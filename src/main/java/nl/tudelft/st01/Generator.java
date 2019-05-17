@@ -37,6 +37,7 @@ public final class Generator {
             statement = CCJSqlParserUtil.parse(query);
         } catch (JSQLParserException e) {
             System.out.println("Input query could not be parsed.");
+            return result;
         }
 
         if (!(statement instanceof Select)) {
