@@ -30,15 +30,22 @@ public class GenJoinWhereExpression {
         fromItem.accept(fromVisitor);
         output = new HashMap<>();
         ruleGeneratorOnExpressionVisitor.setOutput(output);
-        joins.get(0).getOnExpression().accept(ruleGeneratorOnExpressionVisitor);
+        List<JoinWhereItem> joinWhereItems = new ArrayList<>();
 
-        List<JoinWhereItem> joinWhereItems = generateExpressions(joins.get(0));
+        for (int i = 0; i < joins.size(); i++) {
+            Join join = joins.get(i);
+            join.getOnExpression().accept(ruleGeneratorOnExpressionVisitor);
 
-        List<PlainSelect> result = new ArrayList<>();
+            joinWhereItems = generateExpressions(join);
+            List<Join> temp = new ArrayList<>();
+            temp.addAll(joins);
+            PlainSelect out = new PlainSelect();
+            for (JoinWhereItem joinWhereItem : joinWhereItems) {
+                temp.set(i, joinWhereItem.getJoin());
+                
+            }
 
-        for (JoinWhereItem joinWhereItem : joinWhereItems) {
-            joinWhereItem.getJoin();
-            joinWhereItem.getJoinWhere();
+            temp.clear();
         }
 
 
@@ -92,7 +99,7 @@ public class GenJoinWhereExpression {
                 rightJoinExpressionIsNotNull.setLeftExpression(isNotNulls);
             }
         }
-
+        result.add(new JoinWhereItem(innerJoin, null));
         result.add(new JoinWhereItem(leftJoin, leftJoinExpressionIsNull));
         result.add(new JoinWhereItem(leftJoin, leftJoinExpressionIsNotNull));
         result.add(new JoinWhereItem(rightJoin, rightJoinExpressionIsNull));
