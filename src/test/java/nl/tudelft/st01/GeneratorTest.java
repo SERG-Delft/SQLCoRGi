@@ -183,14 +183,14 @@ public class GeneratorTest {
     @Test
     public void testBetweenCondition() {
         String query = "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37";
-        String queryFlipped = "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37";
+        String negatedQuery = "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37";
 
         Set<String> result1 = Generator.generateRules(query);
-        Set<String> result2 =   Generator.generateRules(queryFlipped);
+        Set<String> result2 =   Generator.generateRules(negatedQuery);
 
         Set<String> expected = new TreeSet<>();
         expected.add(query);
-        expected.add(queryFlipped);
+        expected.add(negatedQuery);
         expected.add("SELECT * FROM Table1 WHERE x IS NULL");
 
         assertAll(
@@ -205,14 +205,14 @@ public class GeneratorTest {
     @Test
     public void testInCondition() {
         String query = "SELECT * FROM Table1 WHERE x IN (28, 37)";
-        String queryFlipped = "SELECT * FROM Table1 WHERE x NOT IN (28, 37)";
+        String negatedQuery = "SELECT * FROM Table1 WHERE x NOT IN (28, 37)";
 
         Set<String> result1 = Generator.generateRules(query);
-        Set<String> result2 =   Generator.generateRules(queryFlipped);
+        Set<String> result2 = Generator.generateRules(negatedQuery);
 
         Set<String> expected = new TreeSet<>();
         expected.add(query);
-        expected.add(queryFlipped);
+        expected.add(negatedQuery);
         expected.add("SELECT * FROM Table1 WHERE x IS NULL");
 
         assertAll(
@@ -227,10 +227,10 @@ public class GeneratorTest {
     @Test
     public void testLikeCondition() {
         String query = "SELECT * FROM Table1 WHERE name LIKE 'John%'";
-        String queryFlipped = "SELECT * FROM Table1 WHERE name NOT LIKE 'John%'";
+        String negatedQuery = "SELECT * FROM Table1 WHERE name NOT LIKE 'John%'";
 
         Set<String> result1 = Generator.generateRules(query);
-        Set<String> result2 =   Generator.generateRules(queryFlipped);
+        Set<String> result2 = Generator.generateRules(negatedQuery);
 
         Set<String> expected = new TreeSet<>();
         expected.add(query);
