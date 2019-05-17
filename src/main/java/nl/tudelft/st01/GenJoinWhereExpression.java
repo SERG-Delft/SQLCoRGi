@@ -6,7 +6,6 @@ import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
@@ -18,69 +17,77 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
+/**
+ * This class allows for mutating a given query such that a set of mutated queries is returned.
+ */
 public class GenJoinWhereExpression {
     private Map<String, List<Column>> output;
 
-
     /**
-     * Takes in a statement and
-     * @param plainSelect
+     * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
+     * @param plainSelect The statement for which the joins have to be mutated.
+     * @return A set of mutated queries in string format.
      */
     public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
+        output = new HashMap<>();
+
+        Set<String> result = new TreeSet<>();
 
         List<Join> joins = plainSelect.getJoins();
-        Set<String> result = new TreeSet<>();
+        List<JoinWhereItem> joinWhereItems;
+        Join join;
+
+        PlainSelect out = plainSelect;
 
         if (joins == null || joins.isEmpty()) {
             return result;
         }
 
-        FromItem fromItem = plainSelect.getFromItem();
         Expression whereCondition = plainSelect.getWhere();
 
-        RuleGeneratorFromVisitor fromVisitor = new RuleGeneratorFromVisitor();
         RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
-
-        fromItem.accept(fromVisitor);
-        output = new HashMap<>();
-
         ruleGeneratorOnExpressionVisitor.setOutput(output);
-        List<JoinWhereItem> joinWhereItems;
-        boolean hasWhere = !(plainSelect.getWhere() == null);
-        PlainSelect out = plainSelect;
 
+        List<Join> temp = new ArrayList<>();
         for (int i = 0; i < joins.size(); i++) {
-            Join join = joins.get(i);
+            join = joins.get(i);
             join.getOnExpression().accept(ruleGeneratorOnExpressionVisitor);
-
             joinWhereItems = generateJoinMutations(join);
-
             for (JoinWhereItem joinWhereItem : joinWhereItems) {
-                List<Join> temp = new ArrayList<>();
                 temp.addAll(joins);
                 temp.set(i, joinWhereItem.getJoin());
+
                 out.setJoins(temp);
+                out.setWhere(determineWhereExpression(joinWhereItem.getJoinWhere(), whereCondition));
 
-                if (!hasWhere) {
-                    out.setWhere(joinWhereItem.getJoinWhere());
-                } else if (!(joinWhereItem.getJoinWhere() == null)) {
-                    Parenthesis parenthesis = new Parenthesis();
-                    parenthesis.setExpression(whereCondition);
-                    out.setWhere(new AndExpression(parenthesis, joinWhereItem.getJoinWhere()));
-
-                } else {
-                    out.setWhere(null);
-                    result.add(out.toString());
-                   // System.out.println(out);
-                }
                 result.add(out.toString());
+                temp.clear();
             }
-
             output.clear();
         }
         output = null;
-        fromItem = null;
         return result;
+    }
+
+    /**
+     * Depending on whether the original statement has a where expression,
+     * determines what the where condition of the mutated statement should be.
+     * @param joinWhereExpression The where expression corresponding to the mutated join.
+     * @param originalWhereCondition The where expression corresponding to the original query.
+     * @return The where condition to be used in the mutated statement.
+     */
+    private Expression determineWhereExpression(Expression joinWhereExpression, Expression originalWhereCondition) {
+        Parenthesis parenthesis = new Parenthesis();
+        Expression out;
+        if (originalWhereCondition == null) {
+            out = joinWhereExpression;
+        } else if (!(joinWhereExpression == null)) {
+            parenthesis.setExpression(originalWhereCondition);
+            out = new AndExpression(parenthesis, joinWhereExpression);
+        } else {
+            out = null;
+        }
+        return out;
     }
 
     /**
@@ -88,6 +95,7 @@ public class GenJoinWhereExpression {
      * @param join The join that should be mutated.
      * @return A list of mutated joins and their corresponding where expressions.
      */
+    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
     private List<JoinWhereItem> generateJoinMutations(Join join) {
         Join leftJoin = createGenericCopyOfJoin(join);
         leftJoin.setLeft(true);
@@ -105,10 +113,11 @@ public class GenJoinWhereExpression {
         BinaryExpression rightJoinExpressionIsNotNull = new AndExpression(null, null);
 
         List<JoinWhereItem> result = new ArrayList<>();
+        List<Column> values;
+        Stack<Column> columns = new Stack<>();
 
         for (String s : output.keySet()) {
-            List<Column> values = output.get(s);
-            Stack<Column> columns = new Stack<>();
+            values = output.get(s);
             columns.addAll(values);
             isNulls = createIsNullExpressions(columns, new AndExpression(null, null), true);
 
@@ -153,13 +162,15 @@ public class GenJoinWhereExpression {
     }
 
     /**
-     * Creates an expression that concatenates {@link IsNullExpression}s containing a {@link Column} using a {@link BinaryExpression}.
+     * Creates an expression that concatenates {@link IsNullExpression}s
+     * containing a {@link Column} using a {@link BinaryExpression}.
      * @param columns The columns that should be used in the concatenation.
      * @param binaryExpression The type of binary expression that should be used in the concatenation.
      * @param isNull Determines whether the column should be checked for IS NULL or IS NOT NULL.
      * @return A concatenation of IsNull expressions that contains each of the given columns.
      */
-    private Expression createIsNullExpressions(Stack<Column> columns, BinaryExpression binaryExpression, boolean isNull) {
+    private Expression createIsNullExpressions(Stack<Column> columns,
+                                               BinaryExpression binaryExpression, boolean isNull) {
         IsNullExpression isNullExpression = new IsNullExpression();
         isNullExpression.setNot(!isNull);
         Parenthesis parenthesis = new Parenthesis();
@@ -169,7 +180,6 @@ public class GenJoinWhereExpression {
             parenthesis.setExpression(isNullExpression);
 
             return parenthesis;
-
         } else if (!columns.isEmpty()) {
             isNullExpression.setLeftExpression(columns.pop());
             parenthesis.setExpression(isNullExpression);
