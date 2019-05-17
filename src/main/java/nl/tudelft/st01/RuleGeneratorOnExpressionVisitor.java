@@ -10,7 +10,6 @@ import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
-import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
@@ -53,10 +52,10 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
         getTerminalsOnCondition(greaterThanEquals);
     }
 
-    @Override
-    public void visit(IsNullExpression isNullExpression) {
-        isNullExpression.getLeftExpression();
-    }
+//    @Override
+//    public void visit(IsNullExpression isNullExpression) {
+//        isNullExpression.getLeftExpression();
+//    }
 
     @Override
     public void visit(MinorThan minorThan) {

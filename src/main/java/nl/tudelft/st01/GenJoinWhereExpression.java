@@ -116,15 +116,15 @@ public class GenJoinWhereExpression {
         List<Column> values;
         Stack<Column> columns = new Stack<>();
 
-        for (String s : output.keySet()) {
-            values = output.get(s);
+        for (Map.Entry<String, List<Column>> s : output.entrySet()) {
+            values = output.get(s.getKey());
             columns.addAll(values);
             isNulls = createIsNullExpressions(columns, new AndExpression(null, null), true);
 
             columns.addAll(values);
             isNotNulls = createIsNullExpressions(columns, new AndExpression(null, null), false);
 
-            if (!s.equals(join.getRightItem().toString().toLowerCase())) {
+            if (!s.getKey().equals(join.getRightItem().toString().toLowerCase())) {
                 leftJoinExpressionIsNull.setLeftExpression(isNulls);
                 leftJoinExpressionIsNotNull.setLeftExpression(isNulls);
 
