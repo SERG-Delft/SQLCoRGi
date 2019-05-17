@@ -108,6 +108,8 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
         } else if (!contains(output.get(table), e)) {
             output.get(table).add(e);
         }
+
+
     }
 
 

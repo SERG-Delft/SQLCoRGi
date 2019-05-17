@@ -4,19 +4,11 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.Join;
 
 public class JoinWhereItem {
-    Join join;
-    Expression joinWhere;
+    private Join join;
+    private Expression joinWhere;
 
     public JoinWhereItem(Join join, Expression joinWhere) {
         this.join = join;
-        this.joinWhere = joinWhere;
-    }
-
-    public void setJoin(Join join) {
-        this.join = join;
-    }
-
-    public void setJoinWhere(Expression joinWhere) {
         this.joinWhere = joinWhere;
     }
 
