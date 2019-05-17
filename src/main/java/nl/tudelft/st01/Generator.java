@@ -37,6 +37,7 @@ public final class Generator {
             statement = CCJSqlParserUtil.parse(query);
         } catch (JSQLParserException e) {
             System.out.println("Input query could not be parsed.");
+            return result;
         }
 
         if (!(statement instanceof Select)) {
@@ -61,8 +62,7 @@ public final class Generator {
      * @param args unused.
      */
     public static void main(String[] args) {
-
-        String query = "SELECT director FROM Movies GROUP BY director HAVING count(*)>1";
+        String query = "SELECT director FROM Movies GROUP BY director";
         Set<String> result = generateRules(query);
 
         System.out.println("Result: " + result.toString());
