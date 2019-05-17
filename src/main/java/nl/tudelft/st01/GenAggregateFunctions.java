@@ -18,7 +18,7 @@ import java.util.List;
  * Class that generates rules for the Aggregate functions such as MAX, AVG etc.
  */
 public class GenAggregateFunctions {
-    private static final String countString = "COUNT";
+    private static final String COUNT_STRING = "COUNT";
 
     /** Main, public method that generates the rules for the aggregate functions.
      *
