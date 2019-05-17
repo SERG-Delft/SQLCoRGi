@@ -176,31 +176,6 @@ public class GenAggregateFunctions {
     }
 
     /**
-     * Returns a deep copy of a plainSelect. The idea here is that you use this
-     *  to get a copy of the object, then again add the attributes that you wanted
-     *  to change in the first place.
-     *
-     * @param plainSelect - object to copy
-     * @param copyGroupBy - boolean to determine whether or not you want to also include the
-     *                    GroupBy clause in the deep copy
-     * @return deep copy of object
-     */
-    private PlainSelect deepCopy(PlainSelect plainSelect, boolean copyGroupBy) {
-        PlainSelect newPlainSelect = new PlainSelect();
-
-        newPlainSelect.setSelectItems(plainSelect.getSelectItems());
-        newPlainSelect.setFromItem(plainSelect.getFromItem());
-        newPlainSelect.setHaving(plainSelect.getHaving());
-        newPlainSelect.setWhere(plainSelect.getWhere());
-        newPlainSelect.setJoins(plainSelect.getJoins());
-        if (copyGroupBy) {
-            newPlainSelect.setGroupByElement(plainSelect.getGroupBy());
-        }
-
-        return newPlainSelect;
-    }
-
-    /**
      * Generates a `__ > 1` expression.
      *
      * @param expr - expression to fill in the __
@@ -256,5 +231,30 @@ public class GenAggregateFunctions {
         selectExpressionItem.setExpression(expression);
 
         return selectExpressionItem;
+    }
+
+    /**
+     * Returns a deep copy of a plainSelect. The idea here is that you use this
+     *  to get a copy of the object, then again add the attributes that you wanted
+     *  to change in the first place.
+     *
+     * @param plainSelect - object to copy
+     * @param copyGroupBy - boolean to determine whether or not you want to also include the
+     *                    GroupBy clause in the deep copy
+     * @return deep copy of object
+     */
+    public static PlainSelect deepCopy(PlainSelect plainSelect, boolean copyGroupBy) {
+        PlainSelect newPlainSelect = new PlainSelect();
+
+        newPlainSelect.setSelectItems(plainSelect.getSelectItems());
+        newPlainSelect.setFromItem(plainSelect.getFromItem());
+        newPlainSelect.setHaving(plainSelect.getHaving());
+        newPlainSelect.setWhere(plainSelect.getWhere());
+        newPlainSelect.setJoins(plainSelect.getJoins());
+        if (copyGroupBy) {
+            newPlainSelect.setGroupByElement(plainSelect.getGroupBy());
+        }
+
+        return newPlainSelect;
     }
 }

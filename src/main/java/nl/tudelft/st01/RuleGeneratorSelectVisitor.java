@@ -12,8 +12,6 @@ import java.util.List;
  */
 public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
-    private List<PlainSelect> outputAfterAggregator;
-
     private List<PlainSelect> output;
 
     @Override
@@ -27,7 +25,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         }
 
         GenAggregateFunctions genAggregateFunctions = new GenAggregateFunctions();
-        outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
+        List<PlainSelect> outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
 
         Expression where = plainSelect.getWhere();
         if (where != null) {
@@ -38,7 +36,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
             for (PlainSelect plainSelectAfterAggregator : outputAfterAggregator) {
                 for (Expression expression : expressions) {
-                    PlainSelect plainSelectOut = deepCopy(plainSelectAfterAggregator);
+                    PlainSelect plainSelectOut = GenAggregateFunctions.deepCopy(plainSelectAfterAggregator, true);
                     plainSelectOut.setWhere(expression);
 
                     output.add(plainSelectOut);
@@ -48,9 +46,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
             // Since there is no where, we don't need that part.
             // We do want the result of the output from the aggregator part,
             //      so we add those plainSelects to the output list
-            for (PlainSelect p : outputAfterAggregator) {
-                output.add(p);
-            }
+            output.addAll(outputAfterAggregator);
         }
 
         output = null;
@@ -58,26 +54,5 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
     public void setOutput(List<PlainSelect> output) {
         this.output = output;
-    }
-
-
-    /** Returns a deep copy of a plainSelect. The idea here is that you use this
-     *  to get a copy of the object, then again add the attributes that you wanted
-     *  to change in the first place.
-     *
-     * @param plainSelect - object to copy
-     * @return deep copy of object
-     */
-    private PlainSelect deepCopy(PlainSelect plainSelect) {
-        PlainSelect newPlainSelect = new PlainSelect();
-
-        newPlainSelect.setSelectItems(plainSelect.getSelectItems());
-        newPlainSelect.setFromItem(plainSelect.getFromItem());
-        newPlainSelect.setHaving(plainSelect.getHaving());
-        newPlainSelect.setWhere(plainSelect.getWhere());
-        newPlainSelect.setJoins(plainSelect.getJoins());
-        newPlainSelect.setGroupByElement(plainSelect.getGroupBy());
-
-        return newPlainSelect;
     }
 }
