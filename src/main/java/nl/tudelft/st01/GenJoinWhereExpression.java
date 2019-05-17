@@ -54,8 +54,9 @@ public class GenJoinWhereExpression {
     }
 
     /**
-     * Generates the WHERE conditions that should be appended to the original statement.
-     * Note that the context of the statement must be known in order to identify the keys.
+     * Mutates the given {@link Join} such that it returns a list of {@link JoinWhereItem}s.
+     * @param join The join that should be mutated.
+     * @return A list of mutated joins and their corresponding where expressions.
      */
     private List<JoinWhereItem> generateExpressions(Join join) {
         Join leftJoin = createGenericCopyOfJoin(join);
@@ -108,35 +109,48 @@ public class GenJoinWhereExpression {
         return result;
     }
 
-
-
+    /**
+     * Creates a generic shallow copy of the given join.
+     * The join type is set to the default: JOIN.
+     * @param join The join that should be copied.
+     * @return A generic shallow copy of join.
+     */
     private Join createGenericCopyOfJoin(Join join) {
         Join outJoin = new Join();
         outJoin.setRightItem(join.getRightItem());
         outJoin.setOnExpression(join.getOnExpression());
+
         return outJoin;
     }
 
+    /**
+     * Creates an expression that concatenates {@link IsNullExpression}s containing a {@link Column} using a {@link BinaryExpression}.
+     * @param columns The columns that should be used in the concatenation.
+     * @param binaryExpression The type of binary expression that should be used in the concatenation.
+     * @param isNull Determines whether the column should be checked for IS NULL or IS NOT NULL.
+     * @return A concatenation of IsNull expressions that contains each of the given columns.
+     */
     private Expression createIsNullExpressions(Stack<Column> columns, BinaryExpression binaryExpression, boolean isNull) {
         IsNullExpression isNullExpression = new IsNullExpression();
         isNullExpression.setNot(!isNull);
         Parenthesis parenthesis = new Parenthesis();
 
         if (columns.size() == 1) {
-
             isNullExpression.setLeftExpression(columns.pop());
             parenthesis.setExpression(isNullExpression);
-            return parenthesis;
-        } else if (!columns.isEmpty()) {
 
+            return parenthesis;
+
+        } else if (!columns.isEmpty()) {
             isNullExpression.setLeftExpression(columns.pop());
             parenthesis.setExpression(isNullExpression);
 
             binaryExpression.setLeftExpression(parenthesis);
             binaryExpression.setRightExpression(createIsNullExpressions(columns, binaryExpression, isNull));
+
             return binaryExpression;
         }
-        // TODO: Throw exception.
-        return binaryExpression;
+
+        return null;
     }
 }
