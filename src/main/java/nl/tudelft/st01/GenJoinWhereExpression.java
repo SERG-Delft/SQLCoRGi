@@ -14,43 +14,75 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 
 public class GenJoinWhereExpression {
     private Map<String, List<Column>> output;
     private FromItem fromItem;
+    private Expression whereCondition;
 
-    public void generateJoinWhereExpressions(PlainSelect plainSelect) {
-        this.fromItem = plainSelect.getFromItem();
+    /**
+     * Takes in a statement and
+     * @param plainSelect
+     */
+    public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
+
         List<Join> joins = plainSelect.getJoins();
+        Set<String> result = new TreeSet<>();
 
+        if (joins == null || joins.isEmpty()) {
+            return result;
+        }
+
+        this.fromItem = plainSelect.getFromItem();
+        this.whereCondition = plainSelect.getWhere();
         RuleGeneratorFromVisitor fromVisitor = new RuleGeneratorFromVisitor();
         RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
 
         fromItem.accept(fromVisitor);
         output = new HashMap<>();
+
         ruleGeneratorOnExpressionVisitor.setOutput(output);
-        List<JoinWhereItem> joinWhereItems = new ArrayList<>();
+        List<JoinWhereItem> joinWhereItems;
+        boolean hasWhere = !(plainSelect.getWhere() == null);
+        PlainSelect out = plainSelect;
 
         for (int i = 0; i < joins.size(); i++) {
             Join join = joins.get(i);
             join.getOnExpression().accept(ruleGeneratorOnExpressionVisitor);
 
-            joinWhereItems = generateExpressions(join);
-            List<Join> temp = new ArrayList<>();
-            temp.addAll(joins);
-            PlainSelect out = new PlainSelect();
+            joinWhereItems = generateJoinMutations(join);
+
             for (JoinWhereItem joinWhereItem : joinWhereItems) {
+                List<Join> temp = new ArrayList<>();
+                temp.addAll(joins);
                 temp.set(i, joinWhereItem.getJoin());
-                
+                out.setJoins(temp);
+
+                if (!hasWhere) {
+                    out.setWhere(joinWhereItem.getJoinWhere());
+                } else if (!(joinWhereItem.getJoinWhere() == null)) {
+                    Parenthesis parenthesis = new Parenthesis();
+                    parenthesis.setExpression(whereCondition);
+                    out.setWhere(new AndExpression(parenthesis, joinWhereItem.getJoinWhere()));
+
+                    System.out.println(out);
+                } else {
+                    out.setWhere(null);
+                    System.out.println(out);
+                }
+
+
+                result.add(out.toString());
             }
+            output.clear();
 
-            temp.clear();
         }
-
-
         output = null;
         fromItem = null;
+        return result;
     }
 
     /**
@@ -58,7 +90,7 @@ public class GenJoinWhereExpression {
      * @param join The join that should be mutated.
      * @return A list of mutated joins and their corresponding where expressions.
      */
-    private List<JoinWhereItem> generateExpressions(Join join) {
+    private List<JoinWhereItem> generateJoinMutations(Join join) {
         Join leftJoin = createGenericCopyOfJoin(join);
         leftJoin.setLeft(true);
         Join rightJoin = createGenericCopyOfJoin(join);
@@ -77,7 +109,6 @@ public class GenJoinWhereExpression {
         List<JoinWhereItem> result = new ArrayList<>();
 
         for (String s : output.keySet()) {
-
             List<Column> values = output.get(s);
             Stack<Column> columns = new Stack<>();
             columns.addAll(values);
@@ -97,7 +128,7 @@ public class GenJoinWhereExpression {
                 leftJoinExpressionIsNotNull.setRightExpression(isNotNulls);
 
                 rightJoinExpressionIsNull.setLeftExpression(isNulls);
-                rightJoinExpressionIsNotNull.setLeftExpression(isNotNulls);
+                rightJoinExpressionIsNotNull.setLeftExpression(isNulls);
             }
         }
         result.add(new JoinWhereItem(innerJoin, null));
