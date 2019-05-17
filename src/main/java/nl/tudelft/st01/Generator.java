@@ -8,6 +8,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public final class Generator {
         try {
             statement = CCJSqlParserUtil.parse(query);
         } catch (JSQLParserException e) {
-            System.out.println("Input query could not be parsed.");
+            System.err.println("Input query could not be parsed.");
             return result;
         }
 
@@ -66,7 +67,13 @@ public final class Generator {
         String query = "SELECT Director, AVG(Length) FROM Movies WHERE a > 1 GROUP BY Director";
         Set<String> result = generateRules(query);
 
-        System.out.println("Result: " + result.toString());
+
+        String[] a = result.toArray(new String[0]);
+        Arrays.sort(a);
+
+        for (int i = 0; i < a.length; i++) {
+            System.out.println(i + ":\t" + a[i]);
+        }
     }
 
 }
