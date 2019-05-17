@@ -68,10 +68,10 @@ public class GenJoinWhereExpression {
                     parenthesis.setExpression(whereCondition);
                     out.setWhere(new AndExpression(parenthesis, joinWhereItem.getJoinWhere()));
 
-                    System.out.println(out);
                 } else {
                     out.setWhere(null);
-                    System.out.println(out);
+                    result.add(out.toString());
+                   // System.out.println(out);
                 }
 
 
