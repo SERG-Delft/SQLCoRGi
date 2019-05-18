@@ -41,8 +41,6 @@ public class GenJoinWhereExpression {
         PlainSelect out = plainSelect;
 
         if (!(joins == null || joins.isEmpty())) {
-
-
             Expression whereCondition = plainSelect.getWhere();
 
             RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
@@ -191,6 +189,6 @@ public class GenJoinWhereExpression {
             return binaryExpression;
         }
 
-        throw new IllegalArgumentException("The columns list cannot be empty.");
+        throw new IllegalStateException("The columns list cannot be empty.");
     }
 }
