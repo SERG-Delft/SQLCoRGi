@@ -39,10 +39,9 @@ public class GenJoinWhereExpression {
         Join join;
 
         PlainSelect out = plainSelect;
-
+        Expression whereCondition = plainSelect.getWhere();
+        
         if (!(joins == null || joins.isEmpty())) {
-            Expression whereCondition = plainSelect.getWhere();
-
             RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
             ruleGeneratorOnExpressionVisitor.setOutput(map);
 
@@ -59,12 +58,15 @@ public class GenJoinWhereExpression {
                     out.setWhere(determineWhereExpression(joinWhereItem.getJoinWhere(), whereCondition));
 
                     result.add(out.toString());
+
                     temp.clear();
                 }
                 map.clear();
             }
         }
 
+        out.setWhere(whereCondition);
+        out.setJoins(joins);
         return result;
     }
 
