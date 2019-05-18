@@ -1,21 +1,22 @@
 package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Custom Visitor for SELECT statements.
  */
 public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
-    private List<PlainSelect> output;
+    //private List<PlainSelect> output;
+    private Set<String> output;
 
     @Override
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
@@ -29,17 +30,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
         Expression where = plainSelect.getWhere();
 
-        FromItem from = plainSelect.getFromItem();
-        List<Join> joins = plainSelect.getJoins();
-        GenJoinWhereExpression gj = new GenJoinWhereExpression();
-        gj.generateJoinWhereExpressions(plainSelect);
-
-        if (!(joins == null || joins.isEmpty())) {
-            handleJoins(from, joins);
-            RuleGeneratorFromVisitor ruleGeneratorFromVisitor = new RuleGeneratorFromVisitor();
-            from.accept(ruleGeneratorFromVisitor);
-
-        }
+        handleJoins(plainSelect);
 
         if (where != null) {
             RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
@@ -53,37 +44,52 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
                 plainSelectOut.setFromItem(plainSelect.getFromItem());
                 plainSelectOut.setWhere(expression);
 
-                output.add(plainSelectOut);
+                output.add(plainSelectOut.toString());
             }
         }
 
-        output = null;
+      // output = null;
     }
 
-    public void setOutput(List<PlainSelect> output) {
+    public void setOutput(Set<String> output) {
         this.output = output;
     }
 
-    /**
-     * Handles joins.
-     * @param fromItem fromitem
-     * @param joins joins list
-     */
-    public void handleJoins(FromItem fromItem, List<Join> joins) {
-        RuleGeneratorFromVisitor ruleGeneratorFromVisitor = new RuleGeneratorFromVisitor();
-        fromItem.accept(ruleGeneratorFromVisitor);
+    //public void setOutputStrings(Set<String> outputStrings) { this.outputStrings = outputStrings; }
 
-        for (Join j : joins) {
-            j.getRightItem().accept(ruleGeneratorFromVisitor);
+    /**
+     *
+     * @param plainSelect
+     */
+    public void handleJoins(PlainSelect plainSelect) {
+        List<Join> joins = plainSelect.getJoins();
+     //   Set<String> outJoins = new TreeSet<>();
+        if (!(joins == null || joins.isEmpty())) {
+            GenJoinWhereExpression genJoinWhereExpression = new GenJoinWhereExpression();
+            Set<String> out = genJoinWhereExpression.generateJoinWhereExpressions(plainSelect);
+
+            output.addAll(out);
         }
 
-        Expression on = joins.get(0).getOnExpression();
 
-        RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
-        HashMap<String, Expression> output = new HashMap<>();
-        ruleGeneratorOnExpressionVisitor.setOutput(output);
+       // System.out.println(genJoinWhereExpression.generateJoinWhereExpressions(plainSelect));
+        //return out;
 
-        on.accept(ruleGeneratorOnExpressionVisitor);
+       // return result;
+//        RuleGeneratorFromVisitor ruleGeneratorFromVisitor = new RuleGeneratorFromVisitor();
+//        fromItem.accept(ruleGeneratorFromVisitor);
+//
+//        for (Join j : joins) {
+//            j.getRightItem().accept(ruleGeneratorFromVisitor);
+//        }
+//
+//        Expression on = joins.get(0).getOnExpression();
+//
+//        RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
+//        HashMap<String, Expression> output = new HashMap<>();
+//        ruleGeneratorOnExpressionVisitor.setOutput(output);
+//
+//        on.accept(ruleGeneratorOnExpressionVisitor);
 
     }
 }
