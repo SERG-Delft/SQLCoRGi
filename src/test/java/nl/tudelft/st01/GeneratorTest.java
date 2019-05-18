@@ -109,7 +109,7 @@ public class GeneratorTest {
      * nullable columns. All of which should result in the same expected output set.
      */
     @ParameterizedTest
-    @CsvSource({"", "INNER", "RIGHT", "LEFT", "FULL"})
+    @CsvSource({"INNER", "RIGHT", "LEFT", "FULL"})
     public void testJoinsOnOneEqualityConditionWithNullableColumns(String joinType) {
         String query = "SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull";
         Set<String> result = Generator.generateRules(query);
@@ -133,7 +133,7 @@ public class GeneratorTest {
      * nullable columns. All of which should result in the same expected output set.
      */
     @ParameterizedTest
-    @CsvSource({"", "INNER", "RIGHT", "LEFT", "FULL"})
+    @CsvSource({"INNER", "RIGHT", "LEFT", "FULL"})
     public void testJoinsOnTwoDisjointConditionsWithNullableColumns(String joinType) {
         String query = "SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull" +
                 " OR TableA.CanBeNull2 = TableB.CanBeNull2";
@@ -163,7 +163,7 @@ public class GeneratorTest {
      * nullable columns and a WHERE clause. All of which should result in the same expected output set.
      */
     @ParameterizedTest
-    @CsvSource({"", "INNER", "RIGHT", "LEFT", "FULL"})
+    @CsvSource({"INNER", "RIGHT", "LEFT", "FULL"})
     public void testJoinsOnOneEqualityConditionWithNullableColumnsAndWHEREClause(String joinType) {
         String query = "SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull " +
                 "WHERE TableA.Value > 1";
