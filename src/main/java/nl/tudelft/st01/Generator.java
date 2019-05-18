@@ -10,6 +10,7 @@ import net.sf.jsqlparser.statement.select.SelectBody;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Utility class for coverage target generation.
@@ -47,9 +48,12 @@ public final class Generator {
 
         RuleGeneratorSelectVisitor ruleGeneratorSelectVisitor = new RuleGeneratorSelectVisitor();
         ArrayList<PlainSelect> plainSelects = new ArrayList<>();
-        ruleGeneratorSelectVisitor.setOutput(plainSelects);
+
+        Set<String> out = new TreeSet<>();
+        ruleGeneratorSelectVisitor.setOutput(out);
         selectBody.accept(ruleGeneratorSelectVisitor);
 
+        result.addAll(out);
         for (PlainSelect plainSelect : plainSelects) {
             result.add(plainSelect.toString());
         }
@@ -61,12 +65,15 @@ public final class Generator {
 //     * Example query to try out the generator.
 //     * @param args unused.
 //     */
-//    public static void main(String[] args) {
-//        String query = "SELECT * FROM Movies  INNER JOIN Boxoffice ON (Movies.id = Boxoffice.movie_id) "
-//                + "INNER JOIN Boxoffice ON (Boxoffice.rating < Movies.length) WHERE Movies.id > 4";
-//        Set<String> result = generateRules(query);
-//
-//        System.out.println("Result: " + result.toString());
-//    }
+    public static void main(String[] args) {
+        String query = "SELECT * FROM Movies INNER JOIN Boxoffice ON (Movies.id = Boxoffice.movie_id) "
+                + "INNER JOIN Boxoffice ON (Boxoffice.rating < Movies.length) WHERE movies.id > 4";
+        Set<String> result = generateRules(query);
+
+        for (String s : result) {
+            System.out.println(s);
+        }
+       // System.out.println("Result: " + result.toString());
+    }
 
 }
