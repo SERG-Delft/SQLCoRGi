@@ -105,9 +105,12 @@ public class GeneratorTest {
     }
 
     /**
-     * A parametrized test for a simple query with different join types with a single join condition which involves
+     * Parametrized test for a simple query with different join types with a single join condition which involves
      * nullable columns. All of which should result in the same expected output set.
+     *
+     * @param joinType Type of join.
      */
+
     @ParameterizedTest
     @CsvSource({"INNER", "RIGHT", "LEFT", "FULL"})
     public void testJoinsOnOneEqualityConditionWithNullableColumns(String joinType) {
@@ -116,14 +119,14 @@ public class GeneratorTest {
 
         Set<String> expected = new TreeSet<>();
         expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull");
-        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull " +
-                "WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NOT NULL)");
-        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull " +
-                "WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NULL)");
-        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull " +
-                "WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NOT NULL)");
-        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull " +
-                "WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NULL)");
+        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull "
+                + "WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NOT NULL)");
+        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull "
+                + "WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NULL)");
+        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull "
+                + "WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NOT NULL)");
+        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull "
+                + "WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NULL)");
 
         assertEquals(expected, result);
     }
@@ -131,29 +134,31 @@ public class GeneratorTest {
     /**
      * A parametrized test for a  query with different join types with a two disjoint join conditions which involves
      * nullable columns. All of which should result in the same expected output set.
+     *
+     * @param joinType Type of join.
      */
     @ParameterizedTest
     @CsvSource({"INNER", "RIGHT", "LEFT", "FULL"})
     public void testJoinsOnTwoDisjointConditionsWithNullableColumns(String joinType) {
-        String query = "SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull" +
-                " OR TableA.CanBeNull2 = TableB.CanBeNull2";
+        String query = "SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull"
+                + " OR TableA.CanBeNull2 = TableB.CanBeNull2";
         Set<String> result = Generator.generateRules(query);
 
         Set<String> expected = new TreeSet<>();
-        expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR " +
-                "TableA.CanBeNull2 = TableB.CanBeNull2");
-        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR " +
-                "TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND " +
-                "(TableB.CanBeNull2 IS NULL) AND (TableA.CanBeNull IS NOT NULL) AND (TableA.CanBeNull2 IS NOT NULL)");
-        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR " +
-                "TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND " +
-                "(TableB.CanBeNull2 IS NULL) AND (TableA.CanBeNull IS NULL) AND (TableA.CanBeNull2 IS NULL)");
-        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR " +
-                "TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableA.CanBeNull IS NULL) AND " +
-                "(TableA.CanBeNull2 IS NULL) AND (TableB.CanBeNull IS NOT NULL) AND (TableB.CanBeNull2 IS NOT NULL)");
-        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR " +
-                "TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableA.CanBeNull IS NULL) AND " +
-                "(TableA.CanBeNull2 IS NULL) AND (TableB.CanBeNull IS NULL) AND (TableB.CanBeNull2 IS NULL)");
+        expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR "
+                + "TableA.CanBeNull2 = TableB.CanBeNull2");
+        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR "
+                + "TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND "
+                + "(TableB.CanBeNull2 IS NULL) AND (TableA.CanBeNull IS NOT NULL) AND (TableA.CanBeNull2 IS NOT NULL)");
+        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR "
+                + "TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND "
+                + "(TableB.CanBeNull2 IS NULL) AND (TableA.CanBeNull IS NULL) AND (TableA.CanBeNull2 IS NULL)");
+        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR "
+                + "TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableA.CanBeNull IS NULL) AND "
+                + "(TableA.CanBeNull2 IS NULL) AND (TableB.CanBeNull IS NOT NULL) AND (TableB.CanBeNull2 IS NOT NULL)");
+        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR "
+                + "TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableA.CanBeNull IS NULL) AND "
+                + "(TableA.CanBeNull2 IS NULL) AND (TableB.CanBeNull IS NULL) AND (TableB.CanBeNull2 IS NULL)");
 
         assertEquals(expected, result);
     }
@@ -162,31 +167,31 @@ public class GeneratorTest {
     // THIS TEST REQUIRES FULL COMPATIBILITY WITH WHERE AND JOIN. This is not yet implemented,
     // hence why the test is commented.
 
-//    /**
-//     * A parametrized test for a query with different join types with a single join condition which involves
-//     * nullable columns and a WHERE clause. All of which should result in the same expected output set.
-//     */
-//    @ParameterizedTest
-//    @CsvSource({"INNER", "RIGHT", "LEFT", "FULL"})
-//    public void testJoinsOnOneEqualityConditionWithNullableColumnsAndWHEREClause(String joinType) {
-//        String query = "SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull " +
-//                "WHERE TableA.Value > 1";
-//        Set<String> result = Generator.generateRules(query);
-//
-//        Set<String> expected = new TreeSet<>();
-//        expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Value = 2)");
-//        expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Value = 1)");
-//        expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Value = 0)");
-//        expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Value IS NULL)");
-//        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableB.Var IS NULL) " +
-//                "AND (TableA.Var IS NOT NULL)) AND (TableA.Value > 1)");
-//        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableB.Var IS NULL) " +
-//                "AND (TableA.Var IS NULL)) AND (TableA.Value > 1)");
-//        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) " +
-//                "AND (TableB.Var IS NOT NULL)");
-//        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) " +
-//                "AND (TableB.Var IS NULL)");
-//
-//        assertEquals(expected, result);
-//    }
+    ///**
+    // * A parametrized test for a query with different join types with a single join condition which involves
+    // * nullable columns and a WHERE clause. All of which should result in the same expected output set.
+    // */
+    //@ParameterizedTest
+    //@CsvSource({"INNER", "RIGHT", "LEFT", "FULL"})
+    //public void testJoinsOnOneEqualityConditionWithNullableColumnsAndWHEREClause(String joinType) {
+    //    String query = "SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull " +
+    //            "WHERE TableA.Value > 1";
+    //    Set<String> result = Generator.generateRules(query);
+    //
+    //    Set<String> expected = new TreeSet<>();
+    //    expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Value = 2)");
+    //    expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Value = 1)");
+    //    expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Value = 0)");
+    //   expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Value IS NULL)");
+    //    expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableB.Var IS NULL) " +
+    //            "AND (TableA.Var IS NOT NULL)) AND (TableA.Value > 1)");
+    //    expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableB.Var IS NULL) " +
+    //            "AND (TableA.Var IS NULL)) AND (TableA.Value > 1)");
+    //    expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) " +
+    //            "AND (TableB.Var IS NOT NULL)");
+    //    expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) " +
+    //            "AND (TableB.Var IS NULL)");
+    //
+    //    assertEquals(expected, result);
+    //}
 }

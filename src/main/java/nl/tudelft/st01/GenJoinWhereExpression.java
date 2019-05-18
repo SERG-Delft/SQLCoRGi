@@ -193,8 +193,4 @@ public class GenJoinWhereExpression {
 
         throw new IllegalArgumentException("The columns list cannot be empty.");
     }
-
-//    public void setOutput(Set<String> output) {
-//        this.output = output;
-//    }
 }

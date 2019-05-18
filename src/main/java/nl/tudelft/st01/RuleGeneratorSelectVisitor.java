@@ -14,7 +14,6 @@ import java.util.Set;
  */
 public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
-    //private List<PlainSelect> output;
     private Set<String> output;
 
     @Override
@@ -48,48 +47,24 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
         handleJoins(plainSelect);
 
-      // output = null;
+        output = null;
     }
 
     public void setOutput(Set<String> output) {
         this.output = output;
     }
 
-    //public void setOutputStrings(Set<String> outputStrings) { this.outputStrings = outputStrings; }
-
     /**
-     *
-     * @param plainSelect
+     * Handles the joins given the plainselect.
+     * @param plainSelect The input query for which the mutations have to be generated.
      */
     public void handleJoins(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
-     //   Set<String> outJoins = new TreeSet<>();
         if (!(joins == null || joins.isEmpty())) {
             GenJoinWhereExpression genJoinWhereExpression = new GenJoinWhereExpression();
             Set<String> out = genJoinWhereExpression.generateJoinWhereExpressions(plainSelect);
 
             output.addAll(out);
         }
-
-
-       // System.out.println(genJoinWhereExpression.generateJoinWhereExpressions(plainSelect));
-        //return out;
-
-       // return result;
-//        RuleGeneratorFromVisitor ruleGeneratorFromVisitor = new RuleGeneratorFromVisitor();
-//        fromItem.accept(ruleGeneratorFromVisitor);
-//
-//        for (Join j : joins) {
-//            j.getRightItem().accept(ruleGeneratorFromVisitor);
-//        }
-//
-//        Expression on = joins.get(0).getOnExpression();
-//
-//        RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
-//        HashMap<String, Expression> output = new HashMap<>();
-//        ruleGeneratorOnExpressionVisitor.setOutput(output);
-//
-//        on.accept(ruleGeneratorOnExpressionVisitor);
-
     }
 }

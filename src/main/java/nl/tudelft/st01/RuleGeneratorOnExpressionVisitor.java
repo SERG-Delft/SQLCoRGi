@@ -52,10 +52,10 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
         getTerminalsOnCondition(greaterThanEquals);
     }
 
-//    @Override
-//    public void visit(IsNullExpression isNullExpression) {
-//        isNullExpression.getLeftExpression();
-//    }
+    //    @Override
+    //    public void visit(IsNullExpression isNullExpression) {
+    //        isNullExpression.getLeftExpression();
+    //    }
 
     @Override
     public void visit(MinorThan minorThan) {
