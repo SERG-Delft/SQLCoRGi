@@ -40,7 +40,7 @@ public class GenJoinWhereExpression {
 
         PlainSelect out = plainSelect;
         Expression whereCondition = plainSelect.getWhere();
-        
+
         if (!(joins == null || joins.isEmpty())) {
             RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
             ruleGeneratorOnExpressionVisitor.setOutput(map);
@@ -92,15 +92,6 @@ public class GenJoinWhereExpression {
             out = parenthesis;
         }
         return out;
-    }
-
-    /**
-     * Handles the joins given the plainselect.
-     * @param plainSelect The input query for which the mutations have to be generated.
-     */
-    public boolean hasJoins(PlainSelect plainSelect) {
-        List<Join> joins = plainSelect.getJoins();
-        return (!(joins == null || joins.isEmpty()));
     }
 
     /**

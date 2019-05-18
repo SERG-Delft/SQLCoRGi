@@ -1,7 +1,6 @@
 package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 
@@ -32,7 +31,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         List<PlainSelect> outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
 
         Expression where = plainSelect.getWhere();
-        
+
         if (where != null) {
             RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
             ArrayList<Expression> expressions = new ArrayList<>();
