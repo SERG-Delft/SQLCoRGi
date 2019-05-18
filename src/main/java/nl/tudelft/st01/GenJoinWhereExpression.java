@@ -21,7 +21,8 @@ import java.util.TreeSet;
  * This class allows for mutating a given query such that a set of mutated queries is returned.
  */
 public class GenJoinWhereExpression {
-    private Map<String, List<Column>> output;
+    private Map<String, List<Column>> map;
+    private Set<String> output;
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
@@ -29,7 +30,7 @@ public class GenJoinWhereExpression {
      * @return A set of mutated queries in string format.
      */
     public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
-        output = new HashMap<>();
+        map = new HashMap<>();
 
         Set<String> result = new TreeSet<>();
 
@@ -39,33 +40,32 @@ public class GenJoinWhereExpression {
 
         PlainSelect out = plainSelect;
 
-        if (joins == null || joins.isEmpty()) {
-            return result;
-        }
+        if (!(joins == null || joins.isEmpty())) {
 
-        Expression whereCondition = plainSelect.getWhere();
 
-        RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
-        ruleGeneratorOnExpressionVisitor.setOutput(output);
+            Expression whereCondition = plainSelect.getWhere();
 
-        List<Join> temp = new ArrayList<>();
-        for (int i = 0; i < joins.size(); i++) {
-            join = joins.get(i);
-            join.getOnExpression().accept(ruleGeneratorOnExpressionVisitor);
-            joinWhereItems = generateJoinMutations(join);
-            for (JoinWhereItem joinWhereItem : joinWhereItems) {
-                temp.addAll(joins);
-                temp.set(i, joinWhereItem.getJoin());
+            RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
+            ruleGeneratorOnExpressionVisitor.setOutput(map);
 
-                out.setJoins(temp);
-                out.setWhere(determineWhereExpression(joinWhereItem.getJoinWhere(), whereCondition));
+            List<Join> temp = new ArrayList<>();
+            for (int i = 0; i < joins.size(); i++) {
+                join = joins.get(i);
+                join.getOnExpression().accept(ruleGeneratorOnExpressionVisitor);
+                joinWhereItems = generateJoinMutations(join);
+                for (JoinWhereItem joinWhereItem : joinWhereItems) {
+                    temp.addAll(joins);
+                    temp.set(i, joinWhereItem.getJoin());
 
-                result.add(out.toString());
-                temp.clear();
+                    out.setJoins(temp);
+                    out.setWhere(determineWhereExpression(joinWhereItem.getJoinWhere(), whereCondition));
+
+                    result.add(out.toString());
+                    temp.clear();
+                }
+                map.clear();
             }
-            output.clear();
         }
-        output = null;
         return result;
     }
 
@@ -116,8 +116,8 @@ public class GenJoinWhereExpression {
         List<Column> values;
         Stack<Column> columns = new Stack<>();
 
-        for (Map.Entry<String, List<Column>> s : output.entrySet()) {
-            values = output.get(s.getKey());
+        for (Map.Entry<String, List<Column>> s : map.entrySet()) {
+            values = map.get(s.getKey());
             columns.addAll(values);
             isNulls = createIsNullExpressions(columns, new AndExpression(null, null), true);
 
@@ -192,4 +192,8 @@ public class GenJoinWhereExpression {
 
         throw new IllegalArgumentException("The columns list cannot be empty.");
     }
+
+//    public void setOutput(Set<String> output) {
+//        this.output = output;
+//    }
 }
