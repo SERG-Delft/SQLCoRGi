@@ -29,7 +29,6 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
         Expression where = plainSelect.getWhere();
 
-        handleJoins(plainSelect);
 
         if (where != null) {
             RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
@@ -46,6 +45,8 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
                 output.add(plainSelectOut.toString());
             }
         }
+
+        handleJoins(plainSelect);
 
       // output = null;
     }

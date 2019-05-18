@@ -185,8 +185,8 @@ public class GenJoinWhereExpression {
             isNullExpression.setLeftExpression(columns.pop());
             parenthesis.setExpression(isNullExpression);
 
-            binaryExpression.setLeftExpression(parenthesis);
-            binaryExpression.setRightExpression(createIsNullExpressions(columns, binaryExpression, isNull));
+            binaryExpression.setRightExpression(parenthesis);
+            binaryExpression.setLeftExpression(createIsNullExpressions(columns, binaryExpression, isNull));
 
             return binaryExpression;
         }
