@@ -163,6 +163,9 @@ public class GeneratorTest {
         assertEquals(expected, result);
     }
 
+    /**
+     * Tests the most basic query, for which case no mutations should be generated.
+     */
     @Test
     public void testSimpleQueryNoWhere() {
         String query = "SELECT * FROM TableA";
@@ -196,10 +199,10 @@ public class GeneratorTest {
                 "AND (TableA.Var IS NOT NULL)) AND (TableA.Value > 1)");
         expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableB.Var IS NULL) " +
                 "AND (TableA.Var IS NULL)) AND (TableA.Value > 1)");
-        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableA.Var IS NULL) " +
-                "AND (TableB.Var IS NOT NULL)) AND (TableA.Value > 1)");
-        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableA.Var IS NULL) " +
-                "AND (TableB.Var IS NULL)) AND (TableA.Value > 1)");
+        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) " +
+                "AND (TableB.Var IS NOT NULL)");
+        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) " +
+                "AND (TableB.Var IS NULL)");
 
         assertEquals(expected, result);
     }
