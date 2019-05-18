@@ -26,6 +26,9 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
             );
         }
 
+        GenAggregateFunctions genAggregateFunctions = new GenAggregateFunctions();
+        List<PlainSelect> outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
+
         Expression where = plainSelect.getWhere();
 
         if (where != null) {
@@ -34,15 +37,19 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
             ruleGeneratorExpressionVisitor.setOutput(expressions);
             where.accept(ruleGeneratorExpressionVisitor);
 
-            for (Expression expression : expressions) {
-                PlainSelect plainSelectOut = new PlainSelect();
-                plainSelectOut.setSelectItems(plainSelect.getSelectItems());
-                plainSelectOut.setFromItem(plainSelect.getFromItem());
-                plainSelectOut.setWhere(expression);
-                plainSelectOut.setJoins(plainSelect.getJoins());
+            for (PlainSelect plainSelectAfterAggregator : outputAfterAggregator) {
+                for (Expression expression : expressions) {
+                    PlainSelect plainSelectOut = GenAggregateFunctions.deepCopy(plainSelectAfterAggregator, true);
+                    plainSelectOut.setWhere(expression);
 
-                output.add(plainSelectOut.toString());
+                    output.add(plainSelectOut);
+                }
             }
+        } else {
+            // Since there is no where, we don't need that part.
+            // We do want the result of the output from the aggregator part,
+            //      so we add those plainSelects to the output list
+            output.addAll(outputAfterAggregator);
         }
 
         handleJoins(plainSelect);
