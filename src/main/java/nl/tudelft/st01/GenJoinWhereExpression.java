@@ -95,6 +95,15 @@ public class GenJoinWhereExpression {
     }
 
     /**
+     * Handles the joins given the plainselect.
+     * @param plainSelect The input query for which the mutations have to be generated.
+     */
+    public boolean hasJoins(PlainSelect plainSelect) {
+        List<Join> joins = plainSelect.getJoins();
+        return (!(joins == null || joins.isEmpty()));
+    }
+
+    /**
      * Mutates the given {@link Join} such that it returns a list of {@link JoinWhereItem}s.
      * @param join The join that should be mutated.
      * @return A list of mutated joins and their corresponding where expressions.

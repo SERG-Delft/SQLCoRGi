@@ -25,13 +25,14 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
                 "To use this visitor, you must first give it an empty list so it can pass along the generated queries."
             );
         }
+
         handleJoins(plainSelect);
+
         GenAggregateFunctions genAggregateFunctions = new GenAggregateFunctions();
         List<PlainSelect> outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
 
         Expression where = plainSelect.getWhere();
-
-
+        
         if (where != null) {
             RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
             ArrayList<Expression> expressions = new ArrayList<>();
@@ -72,12 +73,9 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
      * @param plainSelect The input query for which the mutations have to be generated.
      */
     public void handleJoins(PlainSelect plainSelect) {
-        List<Join> joins = plainSelect.getJoins();
-        if (!(joins == null || joins.isEmpty())) {
-            GenJoinWhereExpression genJoinWhereExpression = new GenJoinWhereExpression();
-            Set<String> out = genJoinWhereExpression.generateJoinWhereExpressions(plainSelect);
+        GenJoinWhereExpression genJoinWhereExpression = new GenJoinWhereExpression();
+        Set<String> out = genJoinWhereExpression.generateJoinWhereExpressions(plainSelect);
 
-            output.addAll(out);
-        }
+        output.addAll(out);
     }
 }
