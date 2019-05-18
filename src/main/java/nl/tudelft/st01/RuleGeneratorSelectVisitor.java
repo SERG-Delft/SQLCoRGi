@@ -8,7 +8,6 @@ import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Custom Visitor for SELECT statements.

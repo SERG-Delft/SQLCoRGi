@@ -8,7 +8,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -31,7 +31,7 @@ public final class Generator {
      */
     public static Set<String> generateRules(String query) {
 
-        Set<String> result = new HashSet<>();
+        Set<String> result = new LinkedHashSet<>();
 
         Statement statement = null;
         try {

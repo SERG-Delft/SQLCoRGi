@@ -22,7 +22,7 @@ import java.util.TreeSet;
  */
 public class GenJoinWhereExpression {
     private Map<String, List<Column>> map;
-    private Set<String> output;
+
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
@@ -66,6 +66,7 @@ public class GenJoinWhereExpression {
                 map.clear();
             }
         }
+
         return result;
     }
 
@@ -125,17 +126,17 @@ public class GenJoinWhereExpression {
             isNotNulls = createIsNullExpressions(columns, new AndExpression(null, null), false);
 
             if (!s.getKey().equals(join.getRightItem().toString().toLowerCase())) {
-                leftJoinExpressionIsNull.setLeftExpression(isNulls);
-                leftJoinExpressionIsNotNull.setLeftExpression(isNulls);
-
-                rightJoinExpressionIsNull.setRightExpression(isNulls);
-                rightJoinExpressionIsNotNull.setRightExpression(isNotNulls);
-            } else {
-                leftJoinExpressionIsNull.setRightExpression(isNulls);
-                leftJoinExpressionIsNotNull.setRightExpression(isNotNulls);
-
                 rightJoinExpressionIsNull.setLeftExpression(isNulls);
                 rightJoinExpressionIsNotNull.setLeftExpression(isNulls);
+
+                leftJoinExpressionIsNull.setRightExpression(isNulls);
+                leftJoinExpressionIsNotNull.setRightExpression(isNotNulls);
+            } else {
+                rightJoinExpressionIsNull.setRightExpression(isNulls);
+                rightJoinExpressionIsNotNull.setRightExpression(isNotNulls);
+
+                leftJoinExpressionIsNull.setLeftExpression(isNulls);
+                leftJoinExpressionIsNotNull.setLeftExpression(isNulls);
             }
         }
         result.add(new JoinWhereItem(innerJoin, null));
