@@ -30,7 +30,6 @@ public final class Generator {
      * @return the generated queries.
      */
     public static Set<String> generateRules(String query) {
-
         Set<String> result = new LinkedHashSet<>();
 
         Statement statement = null;

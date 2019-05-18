@@ -28,7 +28,6 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
         Expression where = plainSelect.getWhere();
 
-
         if (where != null) {
             RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
             ArrayList<Expression> expressions = new ArrayList<>();

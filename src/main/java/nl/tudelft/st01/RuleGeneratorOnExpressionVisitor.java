@@ -92,7 +92,6 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
         } else if (!(right instanceof LongValue | right instanceof DoubleValue)) {
             right.accept(this);
         }
-
     }
 
     /**
@@ -100,7 +99,6 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
      * @param e The column that should be added.
      */
     private void updateColumnList(Expression e) {
-
         String table = ((Column) e).getTable().toString().toLowerCase();
 
         if (!output.containsKey(table)) {
@@ -110,8 +108,6 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
         } else if (!contains(output.get(table), e)) {
             output.get(table).add(e);
         }
-
-
     }
 
 
