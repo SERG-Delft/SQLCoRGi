@@ -39,6 +39,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
                 plainSelectOut.setSelectItems(plainSelect.getSelectItems());
                 plainSelectOut.setFromItem(plainSelect.getFromItem());
                 plainSelectOut.setWhere(expression);
+                plainSelectOut.setJoins(plainSelect.getJoins());
 
                 output.add(plainSelectOut.toString());
             }

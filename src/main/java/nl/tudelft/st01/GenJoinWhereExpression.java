@@ -77,14 +77,17 @@ public class GenJoinWhereExpression {
      */
     private Expression determineWhereExpression(Expression joinWhereExpression, Expression originalWhereCondition) {
         Parenthesis parenthesis = new Parenthesis();
+        Parenthesis parenthesisJoinWhere = new Parenthesis();
+
         Expression out;
+        parenthesis.setExpression(originalWhereCondition);
+        parenthesisJoinWhere.setExpression(joinWhereExpression);
         if (originalWhereCondition == null) {
             out = joinWhereExpression;
         } else if (!(joinWhereExpression == null)) {
-            parenthesis.setExpression(originalWhereCondition);
-            out = new AndExpression(parenthesis, joinWhereExpression);
+            out = new AndExpression(parenthesisJoinWhere, parenthesis);
         } else {
-            out = null;
+            out = parenthesis;
         }
         return out;
     }
