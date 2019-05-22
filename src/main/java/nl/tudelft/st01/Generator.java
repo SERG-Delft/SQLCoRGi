@@ -1,7 +1,6 @@
 package nl.tudelft.st01;
 
 import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
