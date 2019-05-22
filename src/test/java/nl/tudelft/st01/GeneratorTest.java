@@ -245,7 +245,7 @@ public class GeneratorTest {
     public void testSimpleQueryNoWhere() {
         String query = "SELECT * FROM TableA";
         Set<String> result = Generator.generateRules(query);
-        assertEquals(result, new TreeSet<String>());
+        assertEquals(new TreeSet<String>(), result);
 
     }
 
