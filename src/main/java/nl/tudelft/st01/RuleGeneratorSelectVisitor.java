@@ -54,7 +54,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
             where.accept(ruleGeneratorExpressionVisitor);
 
         }
-
+        // TODO: convert to ps and set where for each case.
         return expressions;
     }
 
@@ -70,7 +70,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
 
         for (PlainSelect ps : outputAfterAggregator) {
-            if (expressions.isEmpty()) {
+            if (expressions == null || expressions.isEmpty()) {
                 output.add(ps.toString());
             } else {
                 for (Expression e : expressions) {
@@ -79,6 +79,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
                 }
             }
         }
+        // TODO: No cartesian product for ps and the expression, just take original.
     }
 
     public void setOutput(Set<String> output) {
