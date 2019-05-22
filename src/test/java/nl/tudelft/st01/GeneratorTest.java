@@ -252,7 +252,7 @@ public class GeneratorTest {
     // THIS TEST REQUIRES COMPATIBILITY WITH WHERE AND JOIN. This is not yet implemented,
     // hence why the test is commented.
 
-    /*
+
     /**
      * A parametrized test for a query with different join types with a single join condition which involves
      * nullable columns and a WHERE clause. All of which should result in the same expected output set.
@@ -282,7 +282,7 @@ public class GeneratorTest {
 
         assertEquals(expected, result);
     }
-    */
+
     /**
      * A test case with a BETWEEN condition.
      */
@@ -354,86 +354,86 @@ public class GeneratorTest {
     // * INCOMPATIBLE WITH AGGREGATOR FUNCTIONS.  *
     // * ======================================== *
 
-    //
-    //    /**
-    //     * A test case with 1 column and 1 aggregator, in this case AVG.
-    //     */
-    //    @Test
-    //    public void testAVGAggregator1column1Aggr() {
-    //        String query = "SELECT Director, AVG(Length) FROM Movies GROUP BY Director";
-    //        Set<String> result = Generator.generateRules(query);
-    //
-    //        Set<String> expected = new TreeSet<>();
-    //
-    //        expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1");
-    //
-    //        expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
-    //                + "HAVING COUNT(*) > 1");
-    //
-    //        expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
-    //                + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
-    //
-    //        expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
-    //                + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
-    //
-    //        assertEquals(expected, result);
-    //    }
+
+        /**
+         * A test case with 1 column and 1 aggregator, in this case AVG.
+         */
+        @Test
+        public void testAVGAggregator1column1Aggr() {
+            String query = "SELECT Director, AVG(Length) FROM Movies GROUP BY Director";
+            Set<String> result = Generator.generateRules(query);
+
+            Set<String> expected = new TreeSet<>();
+
+            expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1");
+
+            expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
+                    + "HAVING COUNT(*) > 1");
+
+            expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
+                    + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
+
+            expected.add("SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
+                    + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
+
+            assertEquals(expected, result);
+        }
 
 
-    //
-    //    /**
-    //     * A test case with 1 column and 2 aggregators, in this case AVG and Sum.
-    //     */
-    //    @Test
-    //    public void testSUMAVGAggregator1column2Aggr() {
-    //        String query = "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director";
-    //        Set<String> result = Generator.generateRules(query);
-    //
-    //        Set<String> expected = new TreeSet<>();
-    //
-    //        expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1");
-    //        expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies "
-    //                    + "GROUP BY Director HAVING COUNT(*) > 1");
-    //
-    //        expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies "
-    //                    + "GROUP BY Director HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1");
-    //
-    //        expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
-    //                    + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
-    //
-    //        expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
-    //                    + "HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1");
-    //
-    //        expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
-    //                    + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
-    //
-    //        assertEquals(expected, result);
-    //    }
-    //
-    //
-    //    /**
-    //     * A test case with 2 columns and 1 aggregator, in this case MAX.
-    //     */
-    //    @Test
-    //    public void testMAXAggregator2columns1Aggr() {
-    //        String query = "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name";
-    //        Set<String> result = Generator.generateRules(query);
-    //
-    //        Set<String> expected = new TreeSet<>();
-    //
-    //        expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Name) > 1");
-    //
-    //        expected.add("SELECT Director, Name, MAX(Length) FROM Movies "
-    //                + "GROUP BY Name HAVING COUNT(*) > 1");
-    //
-    //        expected.add("SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name "
-    //                + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
-    //
-    //        expected.add("SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name "
-    //                + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
-    //
-    //        assertEquals(expected, result);
-    //    }
+
+        /**
+         * A test case with 1 column and 2 aggregators, in this case AVG and Sum.
+         */
+        @Test
+        public void testSUMAVGAggregator1column2Aggr() {
+            String query = "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director";
+            Set<String> result = Generator.generateRules(query);
+
+            Set<String> expected = new TreeSet<>();
+
+            expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1");
+            expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies "
+                        + "GROUP BY Director HAVING COUNT(*) > 1");
+
+            expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies "
+                        + "GROUP BY Director HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1");
+
+            expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
+                        + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
+
+            expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
+                        + "HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1");
+
+            expected.add("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
+                        + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
+
+            assertEquals(expected, result);
+        }
+
+
+        /**
+         * A test case with 2 columns and 1 aggregator, in this case MAX.
+         */
+        @Test
+        public void testMAXAggregator2columns1Aggr() {
+            String query = "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name";
+            Set<String> result = Generator.generateRules(query);
+
+            Set<String> expected = new TreeSet<>();
+
+            expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Name) > 1");
+
+            expected.add("SELECT Director, Name, MAX(Length) FROM Movies "
+                    + "GROUP BY Name HAVING COUNT(*) > 1");
+
+            expected.add("SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name "
+                    + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1");
+
+            expected.add("SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name "
+                    + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
+
+            assertEquals(expected, result);
+        }
 
 
 
