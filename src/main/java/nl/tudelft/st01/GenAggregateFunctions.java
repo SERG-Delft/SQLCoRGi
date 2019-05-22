@@ -44,7 +44,7 @@ public class GenAggregateFunctions {
                 }
             }
         }
-        if (noFunction) {
+        if (noFunction && plainSelect.getWhere() != null) {
             outputAfterAggregator.add(plainSelect);
         }
 
