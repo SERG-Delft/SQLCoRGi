@@ -24,43 +24,50 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
                 "To use this visitor, you must first give it an empty list so it can pass along the generated queries."
             );
         }
-
         handleJoins(plainSelect);
 
-        GenAggregateFunctions genAggregateFunctions = new GenAggregateFunctions();
-        List<PlainSelect> outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
+        Expression expression = plainSelect.getWhere();
+        List<Expression> expressions;
 
+        expressions = handleWhere(plainSelect);
+        handleAggregators(plainSelect, expressions);
+
+
+        plainSelect.setWhere(expression);
+
+        output = null;
+    }
+
+    private List<Expression> handleWhere(PlainSelect plainSelect) {
         Expression where = plainSelect.getWhere();
+        ArrayList<Expression> expressions = new ArrayList<>();
 
         if (where != null) {
             RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
-            ArrayList<Expression> expressions = new ArrayList<>();
+
             ruleGeneratorExpressionVisitor.setOutput(expressions);
             where.accept(ruleGeneratorExpressionVisitor);
 
-            for (PlainSelect plainSelectAfterAggregator : outputAfterAggregator) {
-                for (Expression expression : expressions) {
-                    PlainSelect plainSelectOut = GenAggregateFunctions.deepCopy(plainSelectAfterAggregator, true);
-                    plainSelectOut.setWhere(expression);
+        }
 
-                    output.add(plainSelectOut.toString());
+        return expressions;
+    }
+
+    private void handleAggregators(PlainSelect plainSelect, List<Expression> expressions) {
+        GenAggregateFunctions genAggregateFunctions = new GenAggregateFunctions();
+        List<PlainSelect> outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
+
+
+        for (PlainSelect ps : outputAfterAggregator) {
+            if (expressions.isEmpty()) {
+                output.add(ps.toString());
+            } else {
+                for (Expression e : expressions) {
+                    ps.setWhere(e);
+                    output.add(ps.toString());
                 }
             }
         }
-        //        else if(!(plainSelect.getWhere() == null)) {
-        //            // Since there is no where, we don't need that part.
-        //            // We do want the result of the output from the aggregator part,
-        //            // so we add those plainSelects to the output list
-        //            for (PlainSelect ps : outputAfterAggregator) {
-        //                output.add(ps.toString());
-        //            }
-        //
-        //            //output.addAll(outputAfterAggregator.toString());
-        //        }
-
-
-
-        output = null;
     }
 
     public void setOutput(Set<String> output) {
