@@ -26,17 +26,6 @@ public class GeneratorTest {
     }
 
     /**
-     * A test case to check if a non-select query throws the proper exception.
-     */
-    @Test
-    public void testNonSelectQuery() {
-        String query = "ALTER TABLE Customers ADD Email varchar(255);";
-        assertThrows(IllegalArgumentException.class, () ->
-                Generator.generateRules(query)
-        );
-    }
-
-    /**
      * A test case for a simple query containing only one condition with < as operator.
      */
     @Test
