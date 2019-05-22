@@ -1,6 +1,7 @@
 package nl.tudelft.st01;
 
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
@@ -77,10 +78,14 @@ public final class Generator {
                 + "Once the queries have been generated, you can move on by pressing <RETURN> again.");
 
             String[] queries = {
-                "invalid",
-                "SELECT * FROM Movies",
                 "SELECT * FROM Movies WHERE year < 2000",
+                "SELECT * FROM Movies WHERE year < 2000 AND id <> 30 OR title = 'Generic Movie Title'",
+                "SELECT * FROM Movies WHERE title NOT LIKE '%generic%'",
+                "SELECT * FROM Movies WHERE year BETWEEN 1980 AND 1987",
+                "SELECT * FROM Movies WHERE year IS NULL",
+                "SELECT MAX(duration) FROM Movies GROUP BY year",
                 "UPDATE Account SET balance = 999999999 WHERE id = 123",
+                "CAN'T PARSE THIS",
             };
 
             for (String query : queries) {
@@ -91,6 +96,9 @@ public final class Generator {
                 printResults(generateRules(query));
                 scanner.nextLine();
             }
+
+            System.out.println("That's all folks!");
+
         } else if ("sandbox".equals(choice)) {
             System.out.println("Sandbox: Enter any query for which you would like to generate coverage targets.\n"
                 + "Enter \"quit\" instead to leave.");
