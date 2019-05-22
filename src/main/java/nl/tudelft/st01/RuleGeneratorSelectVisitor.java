@@ -38,6 +38,11 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         output = null;
     }
 
+    /**
+     * Handles the where part of the query.
+     * @param plainSelect Input plainselect from which the expression have to be derived.
+     * @return List of mutated where expressions.
+     */
     private List<Expression> handleWhere(PlainSelect plainSelect) {
         Expression where = plainSelect.getWhere();
         ArrayList<Expression> expressions = new ArrayList<>();
@@ -53,6 +58,12 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         return expressions;
     }
 
+    /**
+     * Handles the aggregators part of the query. Bases its results on the expression generated in the where handler.
+     * Adds the results to the output.
+     * @param plainSelect Input plainselect from which the cases have to be derived.
+     * @param expressions The expressions generated in the where handler.
+     */
     private void handleAggregators(PlainSelect plainSelect, List<Expression> expressions) {
         GenAggregateFunctions genAggregateFunctions = new GenAggregateFunctions();
         List<PlainSelect> outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
