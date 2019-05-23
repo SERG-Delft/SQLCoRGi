@@ -351,11 +351,6 @@ public class GeneratorTest {
         );
     }
 
-    // * ======================================== *
-    // * INCOMPATIBLE WITH AGGREGATOR FUNCTIONS.  *
-    // * ======================================== *
-
-
     /**
      * A test case with 1 column and 1 aggregator, in this case AVG.
      */
@@ -379,8 +374,6 @@ public class GeneratorTest {
 
         assertEquals(expected, result);
     }
-
-
 
     /**
      * A test case with 1 column and 2 aggregators, in this case AVG and Sum.
@@ -410,7 +403,6 @@ public class GeneratorTest {
 
         assertEquals(expected, result);
     }
-
 
     /**
      * A test case with 2 columns and 1 aggregator, in this case MAX.
