@@ -1,10 +1,6 @@
 package nl.tudelft.st01;
 
-import net.sf.jsqlparser.expression.BinaryExpression;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.NotExpression;
-import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
@@ -166,15 +162,51 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         betweenFlipped.setNot(!between.isNot());
         output.add(betweenFlipped);
 
-        EqualsTo leftBoundaryTest = new EqualsTo();
-        leftBoundaryTest.setLeftExpression(left);
-        leftBoundaryTest.setRightExpression(start);
-        output.add(leftBoundaryTest);
+        EqualsTo leftBoundaryOffTest = new EqualsTo();
+        leftBoundaryOffTest.setLeftExpression(left);
+        leftBoundaryOffTest.setRightExpression(start);
+        output.add(leftBoundaryOffTest);
 
-        EqualsTo rightBoundaryTest = new EqualsTo();
-        rightBoundaryTest.setLeftExpression(left);
-        rightBoundaryTest.setRightExpression(end);
-        output.add(rightBoundaryTest);
+        if (start instanceof LongValue) {
+
+            EqualsTo leftBoundaryOnTest = new EqualsTo();
+            leftBoundaryOnTest.setLeftExpression(left);
+            GenLongValue longValue = new GenLongValue(start.toString());
+            leftBoundaryOnTest.setRightExpression(longValue.add(-1));
+            output.add(leftBoundaryOnTest);
+
+        } else if (start instanceof DoubleValue) {
+
+            EqualsTo leftBoundaryOnTest = new EqualsTo();
+            leftBoundaryOnTest.setLeftExpression(left);
+            GenDoubleValue doubleValue = new GenDoubleValue(start.toString());
+            leftBoundaryOnTest.setRightExpression(doubleValue.add(-1));
+            output.add(leftBoundaryOnTest);
+
+        }
+
+        EqualsTo rightBoundaryOffTest = new EqualsTo();
+        rightBoundaryOffTest.setLeftExpression(left);
+        rightBoundaryOffTest.setRightExpression(end);
+        output.add(rightBoundaryOffTest);
+
+        if (end instanceof LongValue) {
+
+            EqualsTo rightBoundaryOnTest = new EqualsTo();
+            rightBoundaryOnTest.setLeftExpression(left);
+            GenLongValue longValue = new GenLongValue(((LongValue) end).getStringValue());
+            rightBoundaryOnTest.setRightExpression(longValue.add(1));
+            output.add(rightBoundaryOnTest);
+
+        } else if (end instanceof DoubleValue) {
+
+            EqualsTo rightBoundaryOnTest = new EqualsTo();
+            rightBoundaryOnTest.setLeftExpression(left);
+            GenDoubleValue doubleValue = new GenDoubleValue((end).toString());
+            rightBoundaryOnTest.setRightExpression(doubleValue.add(1));
+            output.add(rightBoundaryOnTest);
+
+        }
 
         IsNullExpression isNullExpression = new IsNullExpression();
         isNullExpression.setLeftExpression(left);
