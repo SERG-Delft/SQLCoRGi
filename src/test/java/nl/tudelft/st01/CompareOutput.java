@@ -22,9 +22,10 @@ public class CompareOutput {
 
             Set<String> result = Generator.generateRules(query);
 
-            for(String s : result) {
-                System.out.println("\t" + s);
-            }
+            System.out.println("-----------------");
+            System.out.println(result.size());
+            System.out.println("-----------------");
+
         }
     }
 }
