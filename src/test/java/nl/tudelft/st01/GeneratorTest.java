@@ -326,6 +326,19 @@ public class GeneratorTest {
         assertEquals(expected, result);
     }
 
+    /**
+     * A test case with 2 columns and 1 aggregator, in this case MAX.
+     */
+    @Test
+    public void testAggrNoGroupBy() {
+        String query = "SELECT COUNT(id) FROM role";
+        Set<String> result = Generator.generateRules(query);
 
+        Set<String> expected = new TreeSet<>();
+
+        expected.add("SELECT COUNT(id) FROM role HAVING COUNT(id) > COUNT(DISTINCT id) AND COUNT(DISTINCT id) > 1");
+
+        assertEquals(expected, result);
+    }
 
 }
