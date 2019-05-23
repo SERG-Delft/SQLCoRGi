@@ -255,6 +255,7 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
      * Generates an `EqualsTo` expression.
      * @param leftExpression the left side of the expression
      * @param rightExpression the right side of the expression
+     * @return the generated `EqualsTo` expression.
      */
     private EqualsTo generateEqualsTo(Expression leftExpression, Expression rightExpression) {
 
