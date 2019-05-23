@@ -236,4 +236,20 @@ public class GenJoinWhereExpression {
 
         throw new IllegalStateException("The columns list cannot be empty.");
     }
+
+    /**
+     * If an expression is nested in parentheses or in a not expression, retrieve the innermost expression that is
+     * not either of these.
+     * @param expression The expression to evaluate.
+     * @return The innermost expression that is not nested in parenthesis or in a not.
+     */
+    private Expression getCoreExpression(Expression expression) {
+        if (expression instanceof Parenthesis) {
+            return getCoreExpression(((Parenthesis) expression).getExpression());
+        } else if (expression instanceof NotExpression) {
+            return getCoreExpression(((NotExpression) expression).getExpression());
+        } else {
+            return expression;
+        }
+    }
 }
