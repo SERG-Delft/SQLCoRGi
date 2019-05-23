@@ -37,11 +37,15 @@ public class GenAggregateFunctions {
                 if (selectExpressionItem.getExpression() instanceof Function) {
                     // Here we know the selectItem is a function (AVG, SUM, MAX etc.)
                     //      so we can start adding the rules for it.
-                    noFunction = false;
-                    outputAfterAggregator.add(firstRule(plainSelect).toString());
-                    outputAfterAggregator.add(secondRule(plainSelect).toString());
+                   
                     Function func = (Function) selectExpressionItem.getExpression();
-                    outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
+
+                    if (plainSelect.getGroupBy() != null) {
+                        outputAfterAggregator.add(firstRule(plainSelect).toString());
+                        outputAfterAggregator.add(secondRule(plainSelect).toString());
+                        outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
+                    }
+
                     outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
                 }
             }
