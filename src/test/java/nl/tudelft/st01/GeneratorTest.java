@@ -181,7 +181,7 @@ public class GeneratorTest {
      * A test case with a BETWEEN condition.
      */
     @Test
-    public void testBetweenCondition() {
+    public void testLongBetweenCondition() {
         String query = "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37";
         String negatedQuery = "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37";
 
@@ -200,6 +200,29 @@ public class GeneratorTest {
         assertAll(
             () -> assertEquals(expected, result1),
             () -> assertEquals(expected, result2)
+        );
+    }
+
+    @Test
+    public void testDoubleBetweenCondition() {
+        String query = "SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2";
+        String negatedQuery = "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2";
+
+        Set<String> result1 = Generator.generateRules(query);
+        Set<String> result2 =   Generator.generateRules(negatedQuery);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add(query);
+        expected.add(negatedQuery);
+        expected.add("SELECT * FROM Table1 WHERE x = 13.3");
+        expected.add("SELECT * FROM Table1 WHERE x = 14.3");
+        expected.add("SELECT * FROM Table1 WHERE x = 32.2");
+        expected.add("SELECT * FROM Table1 WHERE x = 33.2");
+        expected.add("SELECT * FROM Table1 WHERE x IS NULL");
+
+        assertAll(
+                () -> assertEquals(expected, result1),
+                () -> assertEquals(expected, result2)
         );
     }
 
