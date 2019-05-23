@@ -162,6 +162,16 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         betweenFlipped.setNot(!between.isNot());
         output.add(betweenFlipped);
 
+        EqualsTo leftBoundaryTest = new EqualsTo();
+        leftBoundaryTest.setLeftExpression(between.getLeftExpression());
+        leftBoundaryTest.setRightExpression(between.getBetweenExpressionStart());
+        output.add(leftBoundaryTest);
+
+        EqualsTo rightBoundaryTest = new EqualsTo();
+        rightBoundaryTest.setLeftExpression(between.getLeftExpression());
+        rightBoundaryTest.setRightExpression(between.getBetweenExpressionEnd());
+        output.add(rightBoundaryTest);
+
         IsNullExpression isNullExpression = new IsNullExpression();
         isNullExpression.setLeftExpression(between.getLeftExpression());
         output.add(isNullExpression);
