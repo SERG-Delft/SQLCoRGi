@@ -66,15 +66,15 @@ public final class Generator {
      * Example query to try out the generator.
      * @param args unused.
      */
-    /*
-    public static void main(String[] args) {
-        String query = "SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id WHERE a.id > 10 GROUP BY a.id";
-        Set<String> result = generateRules(query);
+    //
+    //    public static void main(String[] args) {
+    //        String query = "SELECT * FROM Movies INNER JOIN a ON Movies.id > 5";
+    //        Set<String> result = generateRules(query);
+    //
+    //        for (String s : result) {
+    //            System.out.println(s);
+    //        }
+    //        System.out.println("Result: " + result.toString());
+    //    }
 
-        for (String s : result) {
-            System.out.println(s);
-        }
-        System.out.println("Result: " + result.toString());
-    }
-    */
 }
