@@ -191,8 +191,10 @@ public class GeneratorTest {
         Set<String> expected = new TreeSet<>();
         expected.add(query);
         expected.add(negatedQuery);
+        expected.add("SELECT * FROM Table1 WHERE x = 27");
         expected.add("SELECT * FROM Table1 WHERE x = 28");
         expected.add("SELECT * FROM Table1 WHERE x = 37");
+        expected.add("SELECT * FROM Table1 WHERE x = 38");
         expected.add("SELECT * FROM Table1 WHERE x IS NULL");
 
         assertAll(
