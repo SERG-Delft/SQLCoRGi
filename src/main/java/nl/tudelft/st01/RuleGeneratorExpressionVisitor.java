@@ -155,25 +155,29 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
 
         output.add(between);
 
+        Expression left = between.getLeftExpression();
+        Expression start = between.getBetweenExpressionStart();
+        Expression end = between.getBetweenExpressionEnd();
+
         Between betweenFlipped = new Between();
-        betweenFlipped.setLeftExpression(between.getLeftExpression());
-        betweenFlipped.setBetweenExpressionStart(between.getBetweenExpressionStart());
-        betweenFlipped.setBetweenExpressionEnd(between.getBetweenExpressionEnd());
+        betweenFlipped.setLeftExpression(left);
+        betweenFlipped.setBetweenExpressionStart(start);
+        betweenFlipped.setBetweenExpressionEnd(end);
         betweenFlipped.setNot(!between.isNot());
         output.add(betweenFlipped);
 
         EqualsTo leftBoundaryTest = new EqualsTo();
-        leftBoundaryTest.setLeftExpression(between.getLeftExpression());
-        leftBoundaryTest.setRightExpression(between.getBetweenExpressionStart());
+        leftBoundaryTest.setLeftExpression(left);
+        leftBoundaryTest.setRightExpression(start);
         output.add(leftBoundaryTest);
 
         EqualsTo rightBoundaryTest = new EqualsTo();
-        rightBoundaryTest.setLeftExpression(between.getLeftExpression());
-        rightBoundaryTest.setRightExpression(between.getBetweenExpressionEnd());
+        rightBoundaryTest.setLeftExpression(left);
+        rightBoundaryTest.setRightExpression(end);
         output.add(rightBoundaryTest);
 
         IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(between.getLeftExpression());
+        isNullExpression.setLeftExpression(left);
         output.add(isNullExpression);
     }
 
