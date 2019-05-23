@@ -63,7 +63,11 @@ public final class Generator {
      */
     public static void main(String[] args) {
 
-        String query = "SELECT Director, AVG(Length) FROM Movies WHERE a > 1 GROUP BY Director";
+//        String query = "SELECT Director, AVG(Length) FROM Movies GROUP BY Director";
+//        String query = "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director";
+
+        String query = "SELECT * FROM Table1 WHERE x IN (30, 38)";
+
         Set<String> result = generateRules(query);
 
         System.out.println("Result: " + result.toString());
