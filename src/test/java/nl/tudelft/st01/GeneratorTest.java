@@ -224,8 +224,8 @@ public class GeneratorTest {
         expected.add("SELECT * FROM Table1 WHERE x IS NULL");
 
         assertAll(
-                () -> assertEquals(expected, result1),
-                () -> assertEquals(expected, result2)
+            () -> assertEquals(expected, result1),
+            () -> assertEquals(expected, result2)
         );
     }
 
@@ -248,8 +248,8 @@ public class GeneratorTest {
         expected.add("SELECT * FROM Table1 WHERE x IS NULL");
 
         assertAll(
-                () -> assertEquals(expected, result1),
-                () -> assertEquals(expected, result2)
+            () -> assertEquals(expected, result1),
+            () -> assertEquals(expected, result2)
         );
     }
 
