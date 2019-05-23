@@ -5,7 +5,6 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,26 +23,19 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
                 "To use this visitor, you must first give it an empty list so it can pass along the generated queries."
             );
         }
+
+        handleWhere(plainSelect);
+        handleAggregators(plainSelect);
         handleJoins(plainSelect);
-
-        Expression expression = plainSelect.getWhere();
-        List<Expression> expressions;
-
-        expressions = handleWhere(plainSelect);
-        handleAggregators(plainSelect, expressions);
-
-
-        plainSelect.setWhere(expression);
 
         output = null;
     }
 
     /**
-     * Handles the where part of the query.
+     * Handles the where part of the query. Adds the results to the output.
      * @param plainSelect Input plainselect from which the expression have to be derived.
-     * @return List of mutated where expressions.
      */
-    private List<Expression> handleWhere(PlainSelect plainSelect) {
+    private void handleWhere(PlainSelect plainSelect) {
         Expression where = plainSelect.getWhere();
         ArrayList<Expression> expressions = new ArrayList<>();
 
@@ -52,42 +44,31 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
             ruleGeneratorExpressionVisitor.setOutput(expressions);
             where.accept(ruleGeneratorExpressionVisitor);
-
-        }
-        // TODO: convert to ps and set where for each case.
-        return expressions;
-    }
-
-    /**
-     * Handles the aggregators part of the query. Bases its results on the expression generated in the where handler.
-     * Adds the results to the output.
-     * @param plainSelect Input plainselect from which the cases have to be derived.
-     * @param expressions The expressions generated in the where handler.
-     */
-    private void handleAggregators(PlainSelect plainSelect, List<Expression> expressions) {
-        GenAggregateFunctions genAggregateFunctions = new GenAggregateFunctions();
-        List<PlainSelect> outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
-
-
-        for (PlainSelect ps : outputAfterAggregator) {
-            if (expressions == null || expressions.isEmpty()) {
-                output.add(ps.toString());
-            } else {
-                for (Expression e : expressions) {
-                    ps.setWhere(e);
-                    output.add(ps.toString());
-                }
+            for (Expression expression : expressions) {
+                plainSelect.setWhere(expression);
+                output.add(plainSelect.toString());
             }
-        }
-        // TODO: No cartesian product for ps and the expression, just take original.
-    }
 
-    public void setOutput(Set<String> output) {
-        this.output = output;
+        }
+
+        plainSelect.setWhere(where);
+
     }
 
     /**
-     * Handles the joins given the plainselect.
+     * Handles the aggregators part of the query. Adds the results to the output.
+     * @param plainSelect Input plainselect from which the cases have to be derived.
+     */
+    private void handleAggregators(PlainSelect plainSelect) {
+        GenAggregateFunctions genAggregateFunctions = new GenAggregateFunctions();
+        Set<String> outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
+
+        output.addAll(outputAfterAggregator);
+
+    }
+
+    /**
+     * Handles the joins given the plainselect. Adds the results to the output.
      * @param plainSelect The input query for which the mutations have to be generated.
      */
     public void handleJoins(PlainSelect plainSelect) {
@@ -96,4 +77,9 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
         output.addAll(out);
     }
+
+    public void setOutput(Set<String> output) {
+        this.output = output;
+    }
+
 }
