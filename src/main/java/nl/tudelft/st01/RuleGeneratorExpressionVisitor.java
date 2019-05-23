@@ -202,7 +202,7 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
 
             EqualsTo rightBoundaryOnTest = new EqualsTo();
             rightBoundaryOnTest.setLeftExpression(left);
-            GenDoubleValue doubleValue = new GenDoubleValue((end).toString());
+            GenDoubleValue doubleValue = new GenDoubleValue(end.toString());
             rightBoundaryOnTest.setRightExpression(doubleValue.add(1));
             output.add(rightBoundaryOnTest);
 
