@@ -272,6 +272,12 @@
                 <configuration>
                     <skipTests>false</skipTests>
                     <trimStackTrace>false</trimStackTrace>
+                    <properties>
+                        <configurationParameters>
+                            junit.jupiter.execution.parallel.enabled = true
+                            junit.jupiter.execution.parallel.mode.default = concurrent
+                        </configurationParameters>
+                    </properties>
                 </configuration>
             </plugin>
         </plugins>

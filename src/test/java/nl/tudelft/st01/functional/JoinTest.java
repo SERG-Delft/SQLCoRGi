@@ -63,8 +63,12 @@ public class JoinTest {
     }
 
     /**
+     * CURRENTLY DISABLED - FEATURE IS NOT IMPLEMENTED YET.
+     * -----------------------------------------------------
      * A parametrized test for a query with different join types with a single join condition which involves
      * nullable columns and a WHERE clause. All of which should result in the same expected output set.
+     * -----------------------------------------------------
+     * CURRENTLY DISABLED - FEATURE IS NOT IMPLEMENTED YET.
      */
     /*
     @ParameterizedTest
