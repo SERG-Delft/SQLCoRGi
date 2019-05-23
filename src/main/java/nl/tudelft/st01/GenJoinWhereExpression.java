@@ -2,6 +2,7 @@ package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.NotExpression;
 import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
@@ -111,43 +112,82 @@ public class GenJoinWhereExpression {
         Expression isNotNulls;
         Expression isNulls;
 
-        BinaryExpression leftJoinExpressionIsNull = new AndExpression(null, null);
-        BinaryExpression leftJoinExpressionIsNotNull = new AndExpression(null, null);
-        BinaryExpression rightJoinExpressionIsNull = new AndExpression(null, null);
-        BinaryExpression rightJoinExpressionIsNotNull = new AndExpression(null, null);
-
         List<JoinWhereItem> result = new ArrayList<>();
         List<Column> values;
         Stack<Column> columns = new Stack<>();
 
-        for (Map.Entry<String, List<Column>> s : map.entrySet()) {
-            values = map.get(s.getKey());
-            columns.addAll(values);
-            isNulls = createIsNullExpressions(columns, new AndExpression(null, null), true);
+        if (map.size() == 1) {
+            for (Map.Entry<String, List<Column>> s : map.entrySet()) {
+                values = map.get(s.getKey());
 
-            columns.addAll(values);
-            isNotNulls = createIsNullExpressions(columns, new AndExpression(null, null), false);
+                columns.addAll(values);
+                isNotNulls = createIsNullExpressions(columns, new AndExpression(null, null), false);
+                Parenthesis parenthesis = new Parenthesis();
+                parenthesis.setExpression(join.getOnExpression());
 
-            if (!s.getKey().equals(join.getRightItem().toString().toLowerCase())) {
-                rightJoinExpressionIsNull.setLeftExpression(isNulls);
-                rightJoinExpressionIsNotNull.setLeftExpression(isNulls);
+                NotExpression notExpression = new NotExpression(parenthesis);
 
-                leftJoinExpressionIsNull.setRightExpression(isNulls);
-                leftJoinExpressionIsNotNull.setRightExpression(isNotNulls);
-            } else {
-                rightJoinExpressionIsNull.setRightExpression(isNulls);
-                rightJoinExpressionIsNotNull.setRightExpression(isNotNulls);
+                Parenthesis left = new Parenthesis();
+                left.setExpression(notExpression);
 
-                leftJoinExpressionIsNull.setLeftExpression(isNulls);
-                leftJoinExpressionIsNotNull.setLeftExpression(isNulls);
+                AndExpression andExpression = new AndExpression(left, isNotNulls);
+
+                if (s.getKey().equals(join.getRightItem().toString().toLowerCase())) {
+                    result.add(new JoinWhereItem(rightJoin, andExpression));
+                } else {
+                    result.add(new JoinWhereItem(innerJoin, null));
+
+                    Expression coreExpression = getCoreExpression(join.getOnExpression());
+
+                    Join useJoin;
+                    if (coreExpression instanceof IsNullExpression) {
+                        useJoin = innerJoin;
+                    } else {
+                        useJoin = leftJoin;
+                    }
+
+                    result.add(new JoinWhereItem(useJoin, andExpression));
+
+                }
             }
-        }
-        result.add(new JoinWhereItem(innerJoin, null));
-        result.add(new JoinWhereItem(leftJoin, leftJoinExpressionIsNull));
-        result.add(new JoinWhereItem(leftJoin, leftJoinExpressionIsNotNull));
-        result.add(new JoinWhereItem(rightJoin, rightJoinExpressionIsNull));
-        result.add(new JoinWhereItem(rightJoin, rightJoinExpressionIsNotNull));
 
+        } else {
+
+            BinaryExpression leftJoinExpressionIsNull = new AndExpression(null, null);
+            BinaryExpression leftJoinExpressionIsNotNull = new AndExpression(null, null);
+            BinaryExpression rightJoinExpressionIsNull = new AndExpression(null, null);
+            BinaryExpression rightJoinExpressionIsNotNull = new AndExpression(null, null);
+
+            for (Map.Entry<String, List<Column>> s : map.entrySet()) {
+                values = map.get(s.getKey());
+                columns.addAll(values);
+                isNulls = createIsNullExpressions(columns, new AndExpression(null, null), true);
+
+                columns.addAll(values);
+                isNotNulls = createIsNullExpressions(columns, new AndExpression(null, null), false);
+
+                if (!s.getKey().equals(join.getRightItem().toString().toLowerCase())) {
+                    rightJoinExpressionIsNull.setLeftExpression(isNulls);
+                    rightJoinExpressionIsNotNull.setLeftExpression(isNulls);
+
+                    leftJoinExpressionIsNull.setRightExpression(isNulls);
+                    leftJoinExpressionIsNotNull.setRightExpression(isNotNulls);
+                } else {
+                    rightJoinExpressionIsNull.setRightExpression(isNulls);
+                    rightJoinExpressionIsNotNull.setRightExpression(isNotNulls);
+
+                    leftJoinExpressionIsNull.setLeftExpression(isNulls);
+                    leftJoinExpressionIsNotNull.setLeftExpression(isNulls);
+                }
+            }
+            result.add(new JoinWhereItem(innerJoin, null));
+            result.add(new JoinWhereItem(leftJoin, leftJoinExpressionIsNull));
+            result.add(new JoinWhereItem(leftJoin, leftJoinExpressionIsNotNull));
+            result.add(new JoinWhereItem(rightJoin, rightJoinExpressionIsNull));
+            result.add(new JoinWhereItem(rightJoin, rightJoinExpressionIsNotNull));
+
+
+        }
         return result;
     }
 
