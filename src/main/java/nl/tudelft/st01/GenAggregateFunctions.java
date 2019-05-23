@@ -36,7 +36,6 @@ public class GenAggregateFunctions {
                 if (selectExpressionItem.getExpression() instanceof Function) {
                     // Here we know the selectItem is a function (AVG, SUM, MAX etc.)
                     //      so we can start adding the rules for it.
-                   
                     Function func = (Function) selectExpressionItem.getExpression();
 
                     if (plainSelect.getGroupBy() != null) {
