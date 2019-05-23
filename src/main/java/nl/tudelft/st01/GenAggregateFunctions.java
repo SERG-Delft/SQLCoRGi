@@ -29,7 +29,6 @@ public class GenAggregateFunctions {
      */
     public Set<String> generate(PlainSelect plainSelect) {
         // Check if there is a Function in one of the columns. If so, generate rules for it.
-        boolean noFunction = true;
         Set<String> outputAfterAggregator = new TreeSet<>();
         for (SelectItem selectItem : plainSelect.getSelectItems()) {
             if (selectItem instanceof SelectExpressionItem) {
@@ -49,9 +48,6 @@ public class GenAggregateFunctions {
                     outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
                 }
             }
-        }
-        if (noFunction && plainSelect.getWhere() != null) {
-            outputAfterAggregator.add(plainSelect.toString());
         }
 
         return outputAfterAggregator;
