@@ -451,4 +451,37 @@ public class GeneratorTest {
         assertEquals(expected, result);
     }
 
+    /**
+     * A test case with WHERE, JOIN and AGGREGATE parts.
+     */
+    @Test
+    public void testIntegratedWhereJoinAggregate() {
+        String query = "SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE a.id1 > 10 GROUP BY a.id1";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+
+        // WHERE RESULTS
+        expected.add("SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE a.id1 = 10 GROUP BY a.id1");
+        expected.add("SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE a.id1 = 11 GROUP BY a.id1");
+        expected.add("SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE a.id1 = 9 GROUP BY a.id1");
+        expected.add("SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE a.id1 IS NULL GROUP BY a.id1");
+
+        // JOIN RESULTS
+        expected.add("SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE (a.id1 > 10) GROUP BY a.id1");
+        expected.add("SELECT AVG(id) FROM Movies LEFT JOIN a ON Movies.id = a.id1 WHERE ((a.id1 IS NULL) AND (Movies.id IS NOT NULL)) AND (a.id1 > 10) GROUP BY a.id1");
+        expected.add("SELECT AVG(id) FROM Movies LEFT JOIN a ON Movies.id = a.id1 WHERE ((a.id1 IS NULL) AND (Movies.id IS NULL)) AND (a.id1 > 10) GROUP BY a.id1");
+        expected.add("SELECT AVG(id) FROM Movies RIGHT JOIN a ON Movies.id = a.id1 WHERE ((Movies.id IS NULL) AND (a.id1 IS NOT NULL)) AND (a.id1 > 10) GROUP BY a.id1");
+        expected.add("SELECT AVG(id) FROM Movies RIGHT JOIN a ON Movies.id = a.id1 WHERE ((Movies.id IS NULL) AND (a.id1 IS NULL)) AND (a.id1 > 10) GROUP BY a.id1");
+
+        // AGGREGATE RESULTS
+        expected.add("SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE a.id1 > 10 GROUP BY a.id1 HAVING COUNT(*) > 1");
+        expected.add("SELECT COUNT(*) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE a.id1 > 10 HAVING COUNT(DISTINCT a.id1) > 1");
+        expected.add("SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE a.id1 > 10 GROUP BY a.id1 HAVING COUNT(id) > COUNT(DISTINCT id) AND COUNT(DISTINCT id) > 1");
+        expected.add("SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE a.id1 > 10 GROUP BY a.id1 HAVING COUNT(*) > COUNT(id) AND COUNT(DISTINCT id) > 1");
+
+
+        assertEquals(expected, result);
+    }
+
 }
