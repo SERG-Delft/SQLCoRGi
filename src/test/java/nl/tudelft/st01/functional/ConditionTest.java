@@ -1,9 +1,13 @@
-package nl.tudelft.st01.FunctionalTests;
+package nl.tudelft.st01.functional;
 
 import org.junit.jupiter.api.Test;
 
-import static nl.tudelft.st01.FunctionalTests.AssertUtils.assertEquals;
+import static nl.tudelft.st01.functional.AssertUtils.verify;
 
+/**
+ * This class tests if the coverage targets for queries with WHERE clauses are generated correctly.
+ */
+@SuppressWarnings("checkstyle:multipleStringLiterals")
 public class ConditionTest {
 
     /**
@@ -11,7 +15,7 @@ public class ConditionTest {
      */
     @Test
     public void testLessThanInteger() {
-        assertEquals("SELECT * FROM table WHERE a < 100",
+        verify("SELECT * FROM table WHERE a < 100",
 
                 "SELECT * FROM table WHERE a = 99",
                 "SELECT * FROM table WHERE a = 100",
@@ -24,7 +28,7 @@ public class ConditionTest {
      */
     @Test
     public void testLessThanEqualsInteger() {
-        assertEquals("SELECT * FROM table WHERE a <= 100",
+        verify("SELECT * FROM table WHERE a <= 100",
 
                 "SELECT * FROM table WHERE a = 99",
                 "SELECT * FROM table WHERE a = 100",
@@ -37,7 +41,7 @@ public class ConditionTest {
      */
     @Test
     public void testGreaterThanInteger() {
-        assertEquals("SELECT * FROM Table WHERE x > 28",
+        verify("SELECT * FROM Table WHERE x > 28",
 
                 "SELECT * FROM Table WHERE x = 27",
                 "SELECT * FROM Table WHERE x = 28",
@@ -50,7 +54,7 @@ public class ConditionTest {
      */
     @Test
     public void testGreaterThanEqualsInteger() {
-        assertEquals("SELECT * FROM Table WHERE x >= 37",
+        verify("SELECT * FROM Table WHERE x >= 37",
 
                 "SELECT * FROM Table WHERE x = 36",
                 "SELECT * FROM Table WHERE x = 37",
@@ -64,7 +68,7 @@ public class ConditionTest {
      */
     @Test
     public void testNotEqualToFloat() {
-        assertEquals("SELECT * FROM table WHERE a <> 0.0",
+        verify("SELECT * FROM table WHERE a <> 0.0",
 
                 "SELECT * FROM table WHERE a = -1.0",
                 "SELECT * FROM table WHERE a = 0.0",
@@ -77,7 +81,7 @@ public class ConditionTest {
      */
     @Test
     public void testEqualToString() {
-        assertEquals("SELECT * FROM table WHERE a = 'qwerty'",
+        verify("SELECT * FROM table WHERE a = 'qwerty'",
 
                 "SELECT * FROM table WHERE a = 'qwerty'",
                 "SELECT * FROM table WHERE a <> 'qwerty'",
@@ -89,7 +93,7 @@ public class ConditionTest {
      */
     @Test
     public void testIsNull() {
-        assertEquals("SELECT * FROM table WHERE a IS NOT NULL",
+        verify("SELECT * FROM table WHERE a IS NOT NULL",
 
                 "SELECT * FROM table WHERE a IS NOT NULL",
                 "SELECT * FROM table WHERE a IS NULL");
@@ -100,7 +104,7 @@ public class ConditionTest {
      */
     @Test
     public void testThreeConditionsAndOr() {
-        assertEquals("SELECT * FROM Table1 WHERE a1 = 11 OR a2 = 22 AND a3 = 33",
+        verify("SELECT * FROM Table1 WHERE a1 = 11 OR a2 = 22 AND a3 = 33",
 
                 "SELECT * FROM Table1 WHERE (a1 = 10) AND NOT (a2 = 22 AND a3 = 33)",
                 "SELECT * FROM Table1 WHERE (a1 = 11) AND NOT (a2 = 22 AND a3 = 33)",
@@ -120,7 +124,7 @@ public class ConditionTest {
      */
     @Test
     public void testBetweenCondition() {
-        assertEquals("SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
+        verify("SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
 
                 "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
                 "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
@@ -132,7 +136,7 @@ public class ConditionTest {
      */
     @Test
     public void testBetweenConditionNegated() {
-        assertEquals("SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
+        verify("SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
 
                 "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
                 "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
@@ -144,7 +148,7 @@ public class ConditionTest {
      */
     @Test
     public void testInCondition() {
-        assertEquals("SELECT * FROM Table1 WHERE x IN (30, 38)",
+        verify("SELECT * FROM Table1 WHERE x IN (30, 38)",
 
                 "SELECT * FROM Table1 WHERE x IN (30, 38)",
                 "SELECT * FROM Table1 WHERE x NOT IN (30, 38)",
@@ -156,7 +160,7 @@ public class ConditionTest {
      */
     @Test
     public void testInConditionNegated() {
-        assertEquals("SELECT * FROM Table1 WHERE x NOT IN (30, 38)",
+        verify("SELECT * FROM Table1 WHERE x NOT IN (30, 38)",
 
                 "SELECT * FROM Table1 WHERE x IN (30, 38)",
                 "SELECT * FROM Table1 WHERE x NOT IN (30, 38)",
@@ -168,7 +172,7 @@ public class ConditionTest {
      */
     @Test
     public void testLikeCondition() {
-        assertEquals("SELECT * FROM Table1 WHERE name LIKE 'John%'",
+        verify("SELECT * FROM Table1 WHERE name LIKE 'John%'",
 
                 "SELECT * FROM Table1 WHERE name LIKE 'John%'",
                 // JSQLParser generates "NOT name LIKE" instead of "name NOT LIKE", they are however identical in
@@ -182,7 +186,7 @@ public class ConditionTest {
      */
     @Test
     public void testLikeConditionNegated() {
-        assertEquals("SELECT * FROM Table1 WHERE name NOT LIKE 'John%'",
+        verify("SELECT * FROM Table1 WHERE name NOT LIKE 'John%'",
 
                 "SELECT * FROM Table1 WHERE name LIKE 'John%'",
                 // JSQLParser generates "NOT name LIKE" instead of "name NOT LIKE", they are however identical in

@@ -1,11 +1,15 @@
-package nl.tudelft.st01.FunctionalTests;
+package nl.tudelft.st01.functional;
 
 import nl.tudelft.st01.Generator;
 import org.junit.jupiter.api.Test;
 
-import static nl.tudelft.st01.FunctionalTests.AssertUtils.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static nl.tudelft.st01.functional.AssertUtils.verify;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+/**
+ * This class exercises several bad weather scenarios for the {@link Generator}.
+ */
 public class BadWeatherTest {
 
     /**
@@ -13,7 +17,7 @@ public class BadWeatherTest {
      */
     @Test
     public void testInvalidQuery() {
-        assertEquals("ELECT * ROM invalid WERE statement = 5");
+        verify("ELECT * ROM invalid WERE statement = 5");
     }
 
     /**
@@ -22,8 +26,7 @@ public class BadWeatherTest {
     @Test
     public void testNonSelectQuery() {
         String query = "ALTER TABLE Customers ADD Email varchar(255);";
-        assertThrows(IllegalArgumentException.class, () ->
-                Generator.generateRules(query)
-        );
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+                Generator.generateRules(query));
     }
 }

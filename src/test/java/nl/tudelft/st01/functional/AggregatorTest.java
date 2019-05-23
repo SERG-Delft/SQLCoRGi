@@ -1,9 +1,13 @@
-package nl.tudelft.st01.FunctionalTests;
+package nl.tudelft.st01.functional;
 
 import org.junit.jupiter.api.Test;
 
-import static nl.tudelft.st01.FunctionalTests.AssertUtils.assertEquals;
+import static nl.tudelft.st01.functional.AssertUtils.verify;
 
+/**
+ * This class tests if the coverage targets for queries with aggregators are generated correctly.
+ */
+@SuppressWarnings("checkstyle:multipleStringLiterals")
 public class AggregatorTest {
 
     /**
@@ -11,7 +15,7 @@ public class AggregatorTest {
      */
     @Test
     public void testAVGAggregator1column1Aggr() {
-        assertEquals("SELECT Director, AVG(Length) FROM Movies GROUP BY Director",
+        verify("SELECT Director, AVG(Length) FROM Movies GROUP BY Director",
 
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
                 "SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1",
@@ -26,18 +30,18 @@ public class AggregatorTest {
      */
     @Test
     public void testSUMAVGAggregator1column2Aggr() {
-        assertEquals("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director",
+        verify("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director",
 
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1",
-                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director " +
-                        "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1",
-                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director " +
-                        "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1",
-                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director " +
-                        "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1",
-                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director " +
-                        "HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1");
+                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
+                        + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1",
+                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
+                        + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1",
+                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
+                        + "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1",
+                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
+                        + "HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1");
     }
 
 
@@ -46,7 +50,7 @@ public class AggregatorTest {
      */
     @Test
     public void testMAXAggregator2columns1Aggr() {
-        assertEquals("SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name",
+        verify("SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name",
 
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Name) > 1",
                 "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name HAVING COUNT(*) > 1",
