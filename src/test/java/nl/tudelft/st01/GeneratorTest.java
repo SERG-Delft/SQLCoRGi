@@ -2,6 +2,7 @@ package nl.tudelft.st01;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -326,6 +327,19 @@ public class GeneratorTest {
         assertEquals(expected, result);
     }
 
+    @Test
+    public void newWayToTest() {
+        verify("SELECT * FROM table WHERE a < 100",
 
+                "SELECT * FROM table WHERE a = 99",
+                "SELECT * FROM table WHERE a = 100",
+                "SELECT * FROM table WHERE a = 101",
+                "SELECT * FROM table WHERE a IS NULL");
+    }
 
+    public void verify(String query, String... expected) {
+        Set<String> result = Generator.generateRules(query);
+
+        assertEquals(new TreeSet<>(Arrays.asList(expected)), result);
+    }
 }
