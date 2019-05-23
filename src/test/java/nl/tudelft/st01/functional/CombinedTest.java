@@ -4,15 +4,12 @@ import org.junit.jupiter.api.Test;
 
 import static nl.tudelft.st01.functional.AssertUtils.verify;
 
+/**
+ * This class tests if the coverage targets for complex queries (with joins, conditionals, aggregation functions, etc.)
+ * are generated correctly.
+ */
+@SuppressWarnings("checkstyle:multipleStringLiterals")
 public class CombinedTest {
-
-    /**
-     * Tests the most basic query, for which case no mutations should be generated.
-     */
-    @Test
-    public void testSimpleQueryNoWhere() {
-        verify("SELECT * FROM TableA");
-    }
 
 
     /**
@@ -48,5 +45,13 @@ public class CombinedTest {
                         + " HAVING COUNT(id) > COUNT(DISTINCT id) AND COUNT(DISTINCT id) > 1",
                 "SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE a.id1 > 10 GROUP BY a.id1"
                         + " HAVING COUNT(*) > COUNT(id) AND COUNT(DISTINCT id) > 1");
+    }
+
+    /**
+     * Tests the most basic query, for which case no mutations should be generated.
+     */
+    @Test
+    public void testSimpleQueryNoWhere() {
+        verify("SELECT * FROM TableA");
     }
 }
