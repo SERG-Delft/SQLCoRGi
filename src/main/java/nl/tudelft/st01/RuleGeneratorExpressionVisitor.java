@@ -162,48 +162,36 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         betweenFlipped.setNot(!between.isNot());
         output.add(betweenFlipped);
 
-        EqualsTo leftBoundaryOffTest = new EqualsTo();
-        leftBoundaryOffTest.setLeftExpression(left);
-        leftBoundaryOffTest.setRightExpression(start);
+        EqualsTo leftBoundaryOffTest = generateEqualsTo(left, start);
         output.add(leftBoundaryOffTest);
 
         if (start instanceof LongValue) {
 
-            EqualsTo leftBoundaryOnTest = new EqualsTo();
-            leftBoundaryOnTest.setLeftExpression(left);
             GenLongValue longValue = new GenLongValue(start.toString());
-            leftBoundaryOnTest.setRightExpression(longValue.add(-1));
+            EqualsTo leftBoundaryOnTest = generateEqualsTo(left, longValue.add(-1));
             output.add(leftBoundaryOnTest);
 
         } else if (start instanceof DoubleValue) {
 
-            EqualsTo leftBoundaryOnTest = new EqualsTo();
-            leftBoundaryOnTest.setLeftExpression(left);
             GenDoubleValue doubleValue = new GenDoubleValue(start.toString());
-            leftBoundaryOnTest.setRightExpression(doubleValue.add(-1));
+            EqualsTo leftBoundaryOnTest = generateEqualsTo(left, doubleValue.add(-1));
             output.add(leftBoundaryOnTest);
 
         }
 
-        EqualsTo rightBoundaryOffTest = new EqualsTo();
-        rightBoundaryOffTest.setLeftExpression(left);
-        rightBoundaryOffTest.setRightExpression(end);
+        EqualsTo rightBoundaryOffTest = generateEqualsTo(left, end);
         output.add(rightBoundaryOffTest);
 
         if (end instanceof LongValue) {
 
-            EqualsTo rightBoundaryOnTest = new EqualsTo();
-            rightBoundaryOnTest.setLeftExpression(left);
-            GenLongValue longValue = new GenLongValue(((LongValue) end).getStringValue());
-            rightBoundaryOnTest.setRightExpression(longValue.add(1));
+            GenLongValue longValue = new GenLongValue(end.toString());
+            EqualsTo rightBoundaryOnTest = generateEqualsTo(left, longValue.add(1));
             output.add(rightBoundaryOnTest);
 
         } else if (end instanceof DoubleValue) {
 
-            EqualsTo rightBoundaryOnTest = new EqualsTo();
-            rightBoundaryOnTest.setLeftExpression(left);
             GenDoubleValue doubleValue = new GenDoubleValue(end.toString());
-            rightBoundaryOnTest.setRightExpression(doubleValue.add(1));
+            EqualsTo rightBoundaryOnTest = generateEqualsTo(left, doubleValue.add(1));
             output.add(rightBoundaryOnTest);
 
         }
@@ -261,5 +249,18 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
 
     public void setOutput(List<Expression> output) {
         this.output = output;
+    }
+
+    /**
+     * Generates an `EqualsTo` expression.
+     * @param leftExpression the left side of the expression
+     * @param rightExpression the right side of the expression
+     */
+    private EqualsTo generateEqualsTo(Expression leftExpression, Expression rightExpression) {
+
+        EqualsTo equalsExpression = new EqualsTo();
+        equalsExpression.setLeftExpression(leftExpression);
+        equalsExpression.setRightExpression(rightExpression);
+        return equalsExpression;
     }
 }
