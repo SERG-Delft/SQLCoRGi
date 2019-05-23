@@ -33,7 +33,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
     /**
      * Handles the where part of the query. Adds the results to the output.
-     * @param plainSelect Input plainselect from which the expression have to be derived.
+     * @param plainSelect Input plainselect from which the expressions have to be derived.
      */
     private void handleWhere(PlainSelect plainSelect) {
         Expression where = plainSelect.getWhere();
@@ -64,7 +64,6 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         Set<String> outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
 
         output.addAll(outputAfterAggregator);
-
     }
 
     /**
