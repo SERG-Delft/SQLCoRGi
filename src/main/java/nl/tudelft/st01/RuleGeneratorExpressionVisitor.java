@@ -164,34 +164,26 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         output.add(leftBoundaryOffTest);
 
         if (start instanceof LongValue) {
-
             GenLongValue longValue = new GenLongValue(start.toString());
             EqualsTo leftBoundaryOnTest = generateEqualsTo(left, longValue.add(-1));
             output.add(leftBoundaryOnTest);
-
         } else if (start instanceof DoubleValue) {
-
             GenDoubleValue doubleValue = new GenDoubleValue(start.toString());
             EqualsTo leftBoundaryOnTest = generateEqualsTo(left, doubleValue.add(-1));
             output.add(leftBoundaryOnTest);
-
         }
 
-        EqualsTo rightBoundaryOffTest = generateEqualsTo(left, end);
-        output.add(rightBoundaryOffTest);
+        EqualsTo rightBoundaryOnTest = generateEqualsTo(left, end);
+        output.add(rightBoundaryOnTest);
 
         if (end instanceof LongValue) {
-
             GenLongValue longValue = new GenLongValue(end.toString());
-            EqualsTo rightBoundaryOnTest = generateEqualsTo(left, longValue.add(1));
-            output.add(rightBoundaryOnTest);
-
+            EqualsTo rightBoundaryOffTest = generateEqualsTo(left, longValue.add(1));
+            output.add(rightBoundaryOffTest);
         } else if (end instanceof DoubleValue) {
-
             GenDoubleValue doubleValue = new GenDoubleValue(end.toString());
-            EqualsTo rightBoundaryOnTest = generateEqualsTo(left, doubleValue.add(1));
-            output.add(rightBoundaryOnTest);
-
+            EqualsTo rightBoundaryOffTest = generateEqualsTo(left, doubleValue.add(1));
+            output.add(rightBoundaryOffTest);
         }
 
         IsNullExpression isNullExpression = new IsNullExpression();
@@ -256,10 +248,10 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
      * @return the generated `EqualsTo` expression.
      */
     private EqualsTo generateEqualsTo(Expression leftExpression, Expression rightExpression) {
-
         EqualsTo equalsExpression = new EqualsTo();
         equalsExpression.setLeftExpression(leftExpression);
         equalsExpression.setRightExpression(rightExpression);
+
         return equalsExpression;
     }
 }
