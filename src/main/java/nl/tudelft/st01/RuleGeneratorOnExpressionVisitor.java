@@ -1,10 +1,8 @@
 package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.BinaryExpression;
-import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
@@ -73,6 +71,10 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
         getColumnsOnCondition(notEqualsTo);
     }
 
+    @Override
+    public void visit(Column column) {
+        updateColumnList(column);
+    }
 
     /**
      * Retrieves the columns and values used in the on expressions.
@@ -85,12 +87,6 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
         left.accept(this);
         right.accept(this);
     }
-
-    @Override
-    public void visit(Column column) {
-        updateColumnList(column);
-    }
-
 
     /**
      * Stores each column corresponding to its table.
