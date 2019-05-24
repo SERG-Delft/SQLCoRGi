@@ -66,7 +66,7 @@ test:
     paths:
 
     reports:
-      # Show differences in nl.tudelft.st01.unit tests results in Gitlab GUI
+      # Show differences in unit tests results in Gitlab GUI
       # https://docs.gitlab.com/ee/ci/junit_test_reports.html
       junit: unit_test_report.xml
 
