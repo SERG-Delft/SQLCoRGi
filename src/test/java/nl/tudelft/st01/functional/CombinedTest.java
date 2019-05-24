@@ -7,6 +7,8 @@ import static nl.tudelft.st01.functional.AssertUtils.verify;
 /**
  * This class tests if the coverage targets for complex queries (with joins, conditionals, aggregation functions, etc.)
  * are generated correctly.
+ *
+ * Suppresses the checkstyle multipleStringLiterals violation, because some output sets have queries in common.
  */
 @SuppressWarnings("checkstyle:multipleStringLiterals")
 public class CombinedTest {
