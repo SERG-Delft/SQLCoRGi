@@ -79,8 +79,6 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
             this.output.add(new AndExpression(neutralExpression, new Parenthesis(decisionExpression)));
         }
 
-        /* TODO: Use strings to create new objects instead of doing this manually, which is prone to errors
-            and requires consistency and invariants (here: don't ever change (parts of) the original expression). */
         /*try {
             System.out.println(CCJSqlParserUtil.parseCondExpression("a2 = 30"));
         } catch (JSQLParserException e) {

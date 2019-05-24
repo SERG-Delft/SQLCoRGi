@@ -5,14 +5,14 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Custom Visitor for SELECT statements.
  */
 public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
-    private List<PlainSelect> output;
+    private Set<String> output;
 
     @Override
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
@@ -24,35 +24,61 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
             );
         }
 
-        GenAggregateFunctions genAggregateFunctions = new GenAggregateFunctions();
-        List<PlainSelect> outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
-
-        Expression where = plainSelect.getWhere();
-        if (where != null) {
-            RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
-            ArrayList<Expression> expressions = new ArrayList<>();
-            ruleGeneratorExpressionVisitor.setOutput(expressions);
-            where.accept(ruleGeneratorExpressionVisitor);
-
-            for (PlainSelect plainSelectAfterAggregator : outputAfterAggregator) {
-                for (Expression expression : expressions) {
-                    PlainSelect plainSelectOut = GenAggregateFunctions.deepCopy(plainSelectAfterAggregator, true);
-                    plainSelectOut.setWhere(expression);
-
-                    output.add(plainSelectOut);
-                }
-            }
-        } else {
-            // Since there is no where, we don't need that part.
-            // We do want the result of the output from the aggregator part,
-            //      so we add those plainSelects to the output list
-            output.addAll(outputAfterAggregator);
-        }
+        handleWhere(plainSelect);
+        handleAggregators(plainSelect);
+        handleJoins(plainSelect);
 
         output = null;
     }
 
-    public void setOutput(List<PlainSelect> output) {
+    /**
+     * Handles the where part of the query. Adds the results to the output.
+     * @param plainSelect Input plainselect from which the expressions have to be derived.
+     */
+    private void handleWhere(PlainSelect plainSelect) {
+        Expression where = plainSelect.getWhere();
+        ArrayList<Expression> expressions = new ArrayList<>();
+
+        if (where != null) {
+            RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
+
+            ruleGeneratorExpressionVisitor.setOutput(expressions);
+            where.accept(ruleGeneratorExpressionVisitor);
+            for (Expression expression : expressions) {
+                plainSelect.setWhere(expression);
+                output.add(plainSelect.toString());
+            }
+
+        }
+
+        plainSelect.setWhere(where);
+
+    }
+
+    /**
+     * Handles the aggregators part of the query. Adds the results to the output.
+     * @param plainSelect Input plainselect from which the cases have to be derived.
+     */
+    private void handleAggregators(PlainSelect plainSelect) {
+        GenAggregateFunctions genAggregateFunctions = new GenAggregateFunctions();
+        Set<String> outputAfterAggregator = genAggregateFunctions.generate(plainSelect);
+
+        output.addAll(outputAfterAggregator);
+    }
+
+    /**
+     * Handles the joins given the plainselect. Adds the results to the output.
+     * @param plainSelect The input query for which the mutations have to be generated.
+     */
+    public void handleJoins(PlainSelect plainSelect) {
+        GenJoinWhereExpression genJoinWhereExpression = new GenJoinWhereExpression();
+        Set<String> out = genJoinWhereExpression.generateJoinWhereExpressions(plainSelect);
+
+        output.addAll(out);
+    }
+
+    public void setOutput(Set<String> output) {
         this.output = output;
     }
+
 }
