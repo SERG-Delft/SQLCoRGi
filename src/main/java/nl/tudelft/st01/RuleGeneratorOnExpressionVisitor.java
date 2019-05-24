@@ -30,27 +30,27 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(AndExpression andExpression) {
-        getTerminalsOnCondition(andExpression);
+        getColumnsOnCondition(andExpression);
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        getTerminalsOnCondition(orExpression);
+        getColumnsOnCondition(orExpression);
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        getTerminalsOnCondition(equalsTo);
+        getColumnsOnCondition(equalsTo);
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        getTerminalsOnCondition(greaterThan);
+        getColumnsOnCondition(greaterThan);
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        getTerminalsOnCondition(greaterThanEquals);
+        getColumnsOnCondition(greaterThanEquals);
     }
 
     @Override
@@ -60,17 +60,17 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(MinorThan minorThan) {
-        getTerminalsOnCondition(minorThan);
+        getColumnsOnCondition(minorThan);
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        getTerminalsOnCondition(minorThanEquals);
+        getColumnsOnCondition(minorThanEquals);
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        getTerminalsOnCondition(notEqualsTo);
+        getColumnsOnCondition(notEqualsTo);
     }
 
 
@@ -78,7 +78,7 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
      * Retrieves the columns and values used in the on expressions.
      * @param binaryExpression binary expression.
      */
-    private void getTerminalsOnCondition(BinaryExpression binaryExpression) {
+    private void getColumnsOnCondition(BinaryExpression binaryExpression) {
         Expression left = binaryExpression.getLeftExpression();
         Expression right = binaryExpression.getRightExpression();
 
