@@ -8,7 +8,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -30,9 +30,9 @@ public final class Generator {
      * @return the generated queries.
      */
     public static Set<String> generateRules(String query) {
-        Set<String> result = new LinkedHashSet<>();
+        Set<String> result = new HashSet<>();
 
-        Statement statement = null;
+        Statement statement;
         try {
             statement = CCJSqlParserUtil.parse(query);
         } catch (JSQLParserException e) {
@@ -61,20 +61,19 @@ public final class Generator {
         return result;
     }
 
-    /*
+
     /**
      * Example query to try out the generator.
      * @param args unused.
      */
-    //
-    //    public static void main(String[] args) {
-    //        String query = "SELECT * FROM Movies INNER JOIN a ON Movies.id > 5";
-    //        Set<String> result = generateRules(query);
-    //
-    //        for (String s : result) {
-    //            System.out.println(s);
-    //        }
-    //        System.out.println("Result: " + result.toString());
-    //    }
+    public static void main(String[] args) {
+        String query = "SELECT * FROM Movies INNER JOIN a ON Movies.id > 5";
+        Set<String> result = generateRules(query);
+
+        for (String s : result) {
+            System.out.println(s);
+        }
+        System.out.println("Result: " + result.toString());
+    }
 
 }
