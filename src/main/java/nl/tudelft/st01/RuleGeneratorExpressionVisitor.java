@@ -1,10 +1,6 @@
 package nl.tudelft.st01;
 
-import net.sf.jsqlparser.expression.BinaryExpression;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.NotExpression;
-import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
@@ -83,8 +79,6 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
             this.output.add(new AndExpression(neutralExpression, new Parenthesis(decisionExpression)));
         }
 
-        /* TODO: Use strings to create new objects instead of doing this manually, which is prone to errors
-            and requires consistency and invariants (here: don't ever change (parts of) the original expression). */
         /*try {
             System.out.println(CCJSqlParserUtil.parseCondExpression("a2 = 30"));
         } catch (JSQLParserException e) {
@@ -155,15 +149,45 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
 
         output.add(between);
 
+        Expression left = between.getLeftExpression();
+        Expression start = between.getBetweenExpressionStart();
+        Expression end = between.getBetweenExpressionEnd();
+
         Between betweenFlipped = new Between();
-        betweenFlipped.setLeftExpression(between.getLeftExpression());
-        betweenFlipped.setBetweenExpressionStart(between.getBetweenExpressionStart());
-        betweenFlipped.setBetweenExpressionEnd(between.getBetweenExpressionEnd());
+        betweenFlipped.setLeftExpression(left);
+        betweenFlipped.setBetweenExpressionStart(start);
+        betweenFlipped.setBetweenExpressionEnd(end);
         betweenFlipped.setNot(!between.isNot());
         output.add(betweenFlipped);
 
+        EqualsTo leftBoundaryOffTest = generateEqualsTo(left, start);
+        output.add(leftBoundaryOffTest);
+
+        if (start instanceof LongValue) {
+            GenLongValue longValue = new GenLongValue(start.toString());
+            EqualsTo leftBoundaryOnTest = generateEqualsTo(left, longValue.add(-1));
+            output.add(leftBoundaryOnTest);
+        } else if (start instanceof DoubleValue) {
+            GenDoubleValue doubleValue = new GenDoubleValue(start.toString());
+            EqualsTo leftBoundaryOnTest = generateEqualsTo(left, doubleValue.add(-1));
+            output.add(leftBoundaryOnTest);
+        }
+
+        EqualsTo rightBoundaryOnTest = generateEqualsTo(left, end);
+        output.add(rightBoundaryOnTest);
+
+        if (end instanceof LongValue) {
+            GenLongValue longValue = new GenLongValue(end.toString());
+            EqualsTo rightBoundaryOffTest = generateEqualsTo(left, longValue.add(1));
+            output.add(rightBoundaryOffTest);
+        } else if (end instanceof DoubleValue) {
+            GenDoubleValue doubleValue = new GenDoubleValue(end.toString());
+            EqualsTo rightBoundaryOffTest = generateEqualsTo(left, doubleValue.add(1));
+            output.add(rightBoundaryOffTest);
+        }
+
         IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(between.getLeftExpression());
+        isNullExpression.setLeftExpression(left);
         output.add(isNullExpression);
     }
 
@@ -215,5 +239,19 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
 
     public void setOutput(List<Expression> output) {
         this.output = output;
+    }
+
+    /**
+     * Generates an `EqualsTo` expression.
+     * @param leftExpression the left side of the expression
+     * @param rightExpression the right side of the expression
+     * @return the generated `EqualsTo` expression.
+     */
+    private EqualsTo generateEqualsTo(Expression leftExpression, Expression rightExpression) {
+        EqualsTo equalsExpression = new EqualsTo();
+        equalsExpression.setLeftExpression(leftExpression);
+        equalsExpression.setRightExpression(rightExpression);
+
+        return equalsExpression;
     }
 }
