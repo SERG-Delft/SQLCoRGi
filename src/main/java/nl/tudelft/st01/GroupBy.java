@@ -9,8 +9,17 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class that generates rules based on the GROUP BY clause.
+ */
 public class GroupBy {
 
+    /**
+     * Main, public method that generates the rules for the GROUP BY clause.
+     *
+     * @param plainSelect - query object to generate rules for
+     * @return list of query objects which represent the rules for the GROUP BY clause
+     */
     public List<PlainSelect> generate(PlainSelect plainSelect) {
         List<PlainSelect> outputWithGroupBy = new ArrayList<>();
         outputWithGroupBy.add(firstRule(plainSelect));

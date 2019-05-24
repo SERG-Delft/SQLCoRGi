@@ -1,14 +1,8 @@
 package nl.tudelft.st01;
 
-import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 
 import java.util.ArrayList;
@@ -54,9 +48,10 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
                         output.add(plainSelectOut);
                     }
                 }
-            }
-            // Only add output from aggregation functions when it is has more than 1 element, otherwise it will interfere with GROUP BY
-            else if (outputAfterAggregator.size() > 1) {
+            } else if (outputAfterAggregator.size() > 1) {
+                // TODO this is really ugly and should be fixed in the JOIN Merge Request
+                // Only add output from aggregation functions when it is has more than 1 element,
+                // otherwise it will interfere with GROUP BY
                 for (PlainSelect plainSelectAfterAggregator : outputAfterAggregator) {
                     PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelectAfterAggregator, true);
 

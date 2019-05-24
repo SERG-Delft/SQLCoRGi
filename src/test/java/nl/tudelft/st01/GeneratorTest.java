@@ -326,6 +326,36 @@ public class GeneratorTest {
         assertEquals(expected, result);
     }
 
+    /**
+     * A test case for a simple GROUP BY query.
+     */
+    @Test
+    public void testBasicGroupBy() {
+        String query = "SELECT Director, Name FROM Movies GROUP BY Name";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT Director, Name FROM Movies GROUP BY Name HAVING COUNT(*) > 1");
+        expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Name) > 1");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * Unit test case for UtilityGetters getGreaterThan1 function.
+     */
+    @Test
+    public void testBasicGroupBy() {
+        String query = "SELECT Director, Name FROM Movies GROUP BY Name";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT Director, Name FROM Movies GROUP BY Name HAVING COUNT(*) > 1");
+        expected.add("SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Name) > 1");
+
+        assertEquals(expected, result);
+    }
+
 
 
 }

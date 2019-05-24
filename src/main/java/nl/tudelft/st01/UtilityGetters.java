@@ -9,10 +9,16 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
-public class UtilityGetters {
+/**
+ * Utility class that can be used to quickly create statements with COUNT(*), COUNT(DISTINCT __).
+ */
+public final class UtilityGetters {
 
     private static final String COUNT_STRING = "COUNT";
 
+    /**
+     * Make private constructor for utility class that should never be called nor do anything.
+     */
     private UtilityGetters() {
         // Should not be instantiated
     }
@@ -27,6 +33,7 @@ public class UtilityGetters {
      *                    GroupBy clause in the deep copy
      * @return deep copy of object
      */
+    // TODO possibly remove this deepCopy method
     public static PlainSelect deepCopy(PlainSelect plainSelect, boolean copyGroupBy) {
         PlainSelect newPlainSelect = new PlainSelect();
 

@@ -17,7 +17,8 @@ import java.util.List;
  */
 public class AggregateFunctions {
 
-    /** Main, public method that generates the rules for the aggregate functions.
+    /**
+     * Main, public method that generates the rules for the aggregate functions.
      *
      * @param plainSelect - query object to generate rules for
      * @return list of query objects which represent the rules for the aggregator function
@@ -133,7 +134,9 @@ public class AggregateFunctions {
         leftGreaterThan.setRightExpression(UtilityGetters.getCountDistinctColumn(expr, false));
 
         // Create count(distinct FunctionColumn) > 1
-        GreaterThan rightGreaterThan = UtilityGetters.getGreaterThan1(UtilityGetters.getCountDistinctColumn(expr, true));
+        GreaterThan rightGreaterThan = UtilityGetters.getGreaterThan1(
+            UtilityGetters.getCountDistinctColumn(expr, true)
+        );
 
         // Create AND
         BinaryExpression binaryExpression = new AndExpression(leftGreaterThan, rightGreaterThan);
@@ -162,7 +165,9 @@ public class AggregateFunctions {
         leftGreaterThan.setRightExpression(UtilityGetters.getCountDistinctColumn(expr, true));
 
         // Create right condition
-        GreaterThan rightGreaterThan = UtilityGetters.getGreaterThan1(UtilityGetters.getCountDistinctColumn(expr, true));
+        GreaterThan rightGreaterThan = UtilityGetters.getGreaterThan1(
+            UtilityGetters.getCountDistinctColumn(expr, true)
+        );
 
         // Create AND
         BinaryExpression binaryExpression = new AndExpression(leftGreaterThan, rightGreaterThan);
