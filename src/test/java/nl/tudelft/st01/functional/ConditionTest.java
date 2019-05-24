@@ -62,7 +62,6 @@ public class ConditionTest {
                 "SELECT * FROM Table WHERE x IS NULL");
     }
 
-
     /**
      * A test case for a simple query containing only one condition with != as operator.
      */
@@ -193,5 +192,97 @@ public class ConditionTest {
                 // behavior, therefore we stick with the behavior used in JSQLParser
                 "SELECT * FROM Table1 WHERE NOT name LIKE 'John%'",
                 "SELECT * FROM Table1 WHERE name IS NULL");
+    }
+
+    /**
+     * A test case with a BETWEEN condition containing `long` values.
+     */
+    @Test
+    public void testLongBetweenCondition() {
+        verify("SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
+
+        "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
+        "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
+        "SELECT * FROM Table1 WHERE x = 27",
+        "SELECT * FROM Table1 WHERE x = 28",
+        "SELECT * FROM Table1 WHERE x = 37",
+        "SELECT * FROM Table1 WHERE x = 38",
+        "SELECT * FROM Table1 WHERE x IS NULL");
+    }
+
+    /**
+     * A test case with a negated BETWEEN condition containing `long` values.
+     */
+    @Test
+    public void testLongBetweenConditionNegated() {
+        verify("SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
+
+                "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
+                "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
+                "SELECT * FROM Table1 WHERE x = 27",
+                "SELECT * FROM Table1 WHERE x = 28",
+                "SELECT * FROM Table1 WHERE x = 37",
+                "SELECT * FROM Table1 WHERE x = 38",
+                "SELECT * FROM Table1 WHERE x IS NULL");
+    }
+
+    /**
+     * A test case with a BETWEEN condition containing `double` values.
+     */
+    @Test
+    public void testDoubleBetweenCondition() {
+        verify("SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
+
+        "SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
+        "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
+        "SELECT * FROM Table1 WHERE x = 13.3",
+        "SELECT * FROM Table1 WHERE x = 14.3",
+        "SELECT * FROM Table1 WHERE x = 32.2",
+        "SELECT * FROM Table1 WHERE x = 33.2",
+        "SELECT * FROM Table1 WHERE x IS NULL");
+    }
+
+    /**
+     * A test case with a negated BETWEEN condition containing `double` values.
+     */
+    @Test
+    public void testDoubleBetweenConditionNegated() {
+        verify("SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
+
+                "SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
+                "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
+                "SELECT * FROM Table1 WHERE x = 13.3",
+                "SELECT * FROM Table1 WHERE x = 14.3",
+                "SELECT * FROM Table1 WHERE x = 32.2",
+                "SELECT * FROM Table1 WHERE x = 33.2",
+                "SELECT * FROM Table1 WHERE x IS NULL");
+    }
+
+    /**
+     * A test case with a BETWEEN condition containing `String` values.
+     */
+    @Test
+    public void testStringBetweenCondition() {
+        verify("SELECT * FROM Table1 WHERE x BETWEEN 'hello' AND 'world'",
+
+        "SELECT * FROM Table1 WHERE x BETWEEN 'hello' AND 'world'",
+        "SELECT * FROM Table1 WHERE x NOT BETWEEN 'hello' AND 'world'",
+        "SELECT * FROM Table1 WHERE x = 'hello'",
+        "SELECT * FROM Table1 WHERE x = 'world'",
+        "SELECT * FROM Table1 WHERE x IS NULL");
+    }
+
+    /**
+     * A test case with a negated BETWEEN condition containing `String` values.
+     */
+    @Test
+    public void testStringBetweenConditionNegated() {
+        verify("SELECT * FROM Table1 WHERE x NOT BETWEEN 'hello' AND 'world'",
+
+                "SELECT * FROM Table1 WHERE x BETWEEN 'hello' AND 'world'",
+                "SELECT * FROM Table1 WHERE x NOT BETWEEN 'hello' AND 'world'",
+                "SELECT * FROM Table1 WHERE x = 'hello'",
+                "SELECT * FROM Table1 WHERE x = 'world'",
+                "SELECT * FROM Table1 WHERE x IS NULL");
     }
 }

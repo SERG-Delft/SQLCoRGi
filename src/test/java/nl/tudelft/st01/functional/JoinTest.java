@@ -11,6 +11,7 @@ import static nl.tudelft.st01.functional.AssertUtils.verify;
  */
 @SuppressWarnings("checkstyle:multipleStringLiterals")
 public class JoinTest {
+
     /**
      * Parametrized test for a simple query with different join types with a single join condition which involves
      * nullable columns. All of which should result in the same expected output set.

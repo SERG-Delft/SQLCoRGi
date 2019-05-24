@@ -20,7 +20,6 @@ public class AggregatorTest {
                 "SELECT COUNT(id) FROM role HAVING COUNT(id) > COUNT(DISTINCT id) AND COUNT(DISTINCT id) > 1");
     }
 
-
     /**
      * A test case with 1 column and 1 aggregator, in this case AVG.
      */
@@ -35,7 +34,6 @@ public class AggregatorTest {
                 "SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
                         + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
     }
-
 
     /**
      * A test case with 1 column and 2 aggregators, in this case AVG and Sum.
@@ -55,7 +53,6 @@ public class AggregatorTest {
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
                         + "HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1");
     }
-
 
     /**
      * A test case with 2 columns and 1 aggregator, in this case MAX.

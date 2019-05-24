@@ -11,7 +11,6 @@ import static nl.tudelft.st01.functional.AssertUtils.verify;
 @SuppressWarnings("checkstyle:multipleStringLiterals")
 public class CombinedTest {
 
-
     /**
      * A test case with WHERE, JOIN and AGGREGATE parts.
      */
