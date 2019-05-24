@@ -88,7 +88,7 @@ public class GenJoinWhereExpression {
         parenthesisJoinWhere.setExpression(joinWhereExpression);
         if (originalWhereCondition == null) {
             out = joinWhereExpression;
-        } else if (!(joinWhereExpression == null)) {
+        } else if (joinWhereExpression != null) {
             out = new AndExpression(parenthesisJoinWhere, parenthesis);
         } else {
             out = parenthesis;

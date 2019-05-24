@@ -69,11 +69,10 @@ public final class Generator {
     public static void main(String[] args) {
         String query = "SELECT * FROM Movies INNER JOIN a ON Movies.id > 5";
         Set<String> result = generateRules(query);
-
+        System.out.println("Result:");
         for (String s : result) {
             System.out.println(s);
         }
-        System.out.println("Result: " + result.toString());
     }
 
 }
