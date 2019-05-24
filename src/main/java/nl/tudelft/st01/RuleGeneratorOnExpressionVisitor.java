@@ -121,7 +121,6 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
      * Ensures that the list of columns used in the on expression contains no duplicate column names.
      * NOTE: Suppose the column name "id" in "Movies" and the column name is unique.
      * Yet, the function considers Movies.id to be different from id.
-     * NEED REPLACEMENT BY SET. Customization equals method needed.
      * @param list list
      * @param expression e
      * @return boolean
