@@ -2,6 +2,7 @@ package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.NotExpression;
 import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
@@ -77,7 +78,8 @@ public class GenJoinWhereExpression {
      * @param originalWhereCondition The where expression corresponding to the original query.
      * @return The where condition to be used in the mutated statement.
      */
-    private Expression determineWhereExpression(Expression joinWhereExpression, Expression originalWhereCondition) {
+    private static Expression determineWhereExpression(Expression joinWhereExpression,
+                                                       Expression originalWhereCondition) {
         Parenthesis parenthesis = new Parenthesis();
         Parenthesis parenthesisJoinWhere = new Parenthesis();
 
@@ -101,6 +103,24 @@ public class GenJoinWhereExpression {
      */
     @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
     private List<JoinWhereItem> generateJoinMutations(Join join) {
+        List<JoinWhereItem> result;
+
+        if (map.size() == 1) {
+            result = handleJoinSingleTableOnCondition(join, map);
+        } else {
+            result = handleJoinMultipleTablesOnCondition(join, map);
+        }
+        return result;
+    }
+
+    /**
+     * When the map contains more than one table, then generate to corresponding mutations.
+     * @param join The join that has to be mutated.
+     * @param map The map where each table is mapped to its columns.
+     * @return List of JoinWhere items with the mutated results.
+     */
+    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
+    private static List<JoinWhereItem> handleJoinMultipleTablesOnCondition(Join join, Map<String, List<Column>> map) {
         Join leftJoin = createGenericCopyOfJoin(join);
         leftJoin.setLeft(true);
         Join rightJoin = createGenericCopyOfJoin(join);
@@ -111,14 +131,14 @@ public class GenJoinWhereExpression {
         Expression isNotNulls;
         Expression isNulls;
 
+        List<JoinWhereItem> result = new ArrayList<>();
+        List<Column> values;
+        Stack<Column> columns = new Stack<>();
+
         BinaryExpression leftJoinExpressionIsNull = new AndExpression(null, null);
         BinaryExpression leftJoinExpressionIsNotNull = new AndExpression(null, null);
         BinaryExpression rightJoinExpressionIsNull = new AndExpression(null, null);
         BinaryExpression rightJoinExpressionIsNotNull = new AndExpression(null, null);
-
-        List<JoinWhereItem> result = new ArrayList<>();
-        List<Column> values;
-        Stack<Column> columns = new Stack<>();
 
         for (Map.Entry<String, List<Column>> s : map.entrySet()) {
             values = map.get(s.getKey());
@@ -151,13 +171,81 @@ public class GenJoinWhereExpression {
         return result;
     }
 
+
+    /**
+     * In case the two tables are joined and the on condition only contains tables from one of the two tables,
+     * then this method will generate the JoinWhereItems corresponding to the test cases that should be generated.
+     * @param join The join from which the JoinWhereitems have to be generated.
+     * @param map The map where each table is mapped to its columns.
+     * @return List of JoinWhereItems that contain the mutations.
+     */
+    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
+    private static List<JoinWhereItem> handleJoinSingleTableOnCondition(Join join, Map<String, List<Column>> map) {
+        if (map.size() > 1) {
+            throw new IllegalArgumentException("Map may only contain columns from one table");
+        }
+
+        Expression isNotNulls;
+
+        List<JoinWhereItem> result = new ArrayList<>();
+        List<Column> values;
+        Stack<Column> columns = new Stack<>();
+
+        Join leftJoin = createGenericCopyOfJoin(join);
+        leftJoin.setLeft(true);
+        Join rightJoin = createGenericCopyOfJoin(join);
+        rightJoin.setRight(true);
+        Join innerJoin = createGenericCopyOfJoin(join);
+        innerJoin.setInner(true);
+
+        Expression coreExpression;
+        AndExpression andExpression;
+        Parenthesis left;
+        NotExpression notExpression;
+        Parenthesis parenthesis;
+
+        for (Map.Entry<String, List<Column>> s : map.entrySet()) {
+            values = map.get(s.getKey());
+
+            columns.addAll(values);
+            isNotNulls = createIsNullExpressions(columns, new AndExpression(null, null), false);
+            parenthesis = new Parenthesis();
+            parenthesis.setExpression(join.getOnExpression());
+
+            notExpression = new NotExpression(parenthesis);
+
+            left = new Parenthesis();
+            left.setExpression(notExpression);
+
+            andExpression = new AndExpression(left, isNotNulls);
+
+            if (s.getKey().equals(join.getRightItem().toString().toLowerCase())) {
+                result.add(new JoinWhereItem(rightJoin, andExpression));
+            } else {
+                coreExpression = getCoreExpression(join.getOnExpression());
+
+                Join useJoin;
+                if (coreExpression instanceof IsNullExpression) {
+                    useJoin = innerJoin;
+                } else {
+                    useJoin = leftJoin;
+                }
+
+                result.add(new JoinWhereItem(innerJoin, null));
+                result.add(new JoinWhereItem(useJoin, andExpression));
+            }
+        }
+
+        return result;
+    }
+
     /**
      * Creates a generic shallow copy of the given join.
      * The join type is set to the default: JOIN.
      * @param join The join that should be copied.
      * @return A generic shallow copy of join.
      */
-    private Join createGenericCopyOfJoin(Join join) {
+    private static Join createGenericCopyOfJoin(Join join) {
         Join outJoin = new Join();
         outJoin.setRightItem(join.getRightItem());
         outJoin.setOnExpression(join.getOnExpression());
@@ -173,7 +261,7 @@ public class GenJoinWhereExpression {
      * @param isNull Determines whether the column should be checked for IS NULL or IS NOT NULL.
      * @return A concatenation of IsNull expressions that contains each of the given columns.
      */
-    private Expression createIsNullExpressions(Stack<Column> columns,
+    private static Expression createIsNullExpressions(Stack<Column> columns,
                                                BinaryExpression binaryExpression, boolean isNull) {
         IsNullExpression isNullExpression = new IsNullExpression();
         isNullExpression.setNot(!isNull);
@@ -195,5 +283,21 @@ public class GenJoinWhereExpression {
         }
 
         throw new IllegalStateException("The columns list cannot be empty.");
+    }
+
+    /**
+     * If an expression is nested in parentheses or in a not expression, retrieve the innermost expression that is
+     * not either of these.
+     * @param expression The expression to evaluate.
+     * @return The innermost expression that is not nested in parenthesis or in a not.
+     */
+    private static Expression getCoreExpression(Expression expression) {
+        if (expression instanceof Parenthesis) {
+            return getCoreExpression(((Parenthesis) expression).getExpression());
+        } else if (expression instanceof NotExpression) {
+            return getCoreExpression(((NotExpression) expression).getExpression());
+        } else {
+            return expression;
+        }
     }
 }
