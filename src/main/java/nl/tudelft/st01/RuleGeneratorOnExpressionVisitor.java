@@ -55,7 +55,7 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
-        updateColumnList(isNullExpression.getLeftExpression());
+        isNullExpression.getLeftExpression().accept(this);
     }
 
     @Override
@@ -82,25 +82,22 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
         Expression left = binaryExpression.getLeftExpression();
         Expression right = binaryExpression.getRightExpression();
 
-        if (left instanceof Column) {
-            updateColumnList(left);
-        } else if (!(left instanceof LongValue | left instanceof DoubleValue)) {
-            left.accept(this);
-        }
-
-        if (right instanceof Column) {
-            updateColumnList(right);
-        } else if (!(right instanceof LongValue | right instanceof DoubleValue)) {
-            right.accept(this);
-        }
+        left.accept(this);
+        right.accept(this);
     }
+
+    @Override
+    public void visit(Column column) {
+        updateColumnList(column);
+    }
+
 
     /**
      * Stores each column corresponding to its table.
      * @param e The column that should be added.
      */
-    private void updateColumnList(Expression e) {
-        String table = ((Column) e).getTable().toString().toLowerCase();
+    private void updateColumnList(Column e) {
+        String table = e.getTable().toString().toLowerCase();
 
         if (!output.containsKey(table)) {
             List<Expression> list = new ArrayList<>();
