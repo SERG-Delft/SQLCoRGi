@@ -211,29 +211,121 @@ public class GeneratorTest {
      * nullable columns. All of which should result in the same expected output set.
      *
      * @param joinType Type of join.
+     * @param conditionType Type of condition, either AND or OR.
      */
     @ParameterizedTest
-    @CsvSource({"INNER", "RIGHT", "LEFT", "FULL"})
-    public void testJoinsOnTwoDisjointConditionsWithNullableColumns(String joinType) {
-        String query = "SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull"
-                + " OR TableA.CanBeNull2 = TableB.CanBeNull2";
+    @CsvSource({"INNER, AND", "INNER, OR", "RIGHT, AND", "INNER, OR", "LEFT, AND", "LEFT, OR", "FULL, AND", "FULL, OR"})
+    public void testJoinsOnTwoDisjointConditionsWithNullableColumns(String joinType, String conditionType) {
+        String query = "SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
+                + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2";
         Set<String> result = Generator.generateRules(query);
 
         Set<String> expected = new TreeSet<>();
-        expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR "
-                + "TableA.CanBeNull2 = TableB.CanBeNull2");
-        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR "
-                + "TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND "
+        expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
+                + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2");
+        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
+                + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND "
                 + "(TableB.CanBeNull2 IS NULL) AND (TableA.CanBeNull IS NOT NULL) AND (TableA.CanBeNull2 IS NOT NULL)");
-        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR "
-                + "TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND "
+        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
+                + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND "
                 + "(TableB.CanBeNull2 IS NULL) AND (TableA.CanBeNull IS NULL) AND (TableA.CanBeNull2 IS NULL)");
-        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR "
-                + "TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableA.CanBeNull IS NULL) AND "
+        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
+                + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableA.CanBeNull IS NULL) AND "
                 + "(TableA.CanBeNull2 IS NULL) AND (TableB.CanBeNull IS NOT NULL) AND (TableB.CanBeNull2 IS NOT NULL)");
-        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull OR "
-                + "TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableA.CanBeNull IS NULL) AND "
+        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
+                + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableA.CanBeNull IS NULL) AND "
                 + "(TableA.CanBeNull2 IS NULL) AND (TableB.CanBeNull IS NULL) AND (TableB.CanBeNull2 IS NULL)");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A parametrized test for a  query with different on conditions used in the joins.
+     *
+     * @param on The on condition in the join.
+     */
+    @ParameterizedTest
+    @CsvSource({"<", ">", "=", "<=", ">=", "<>"})
+    public void testOnConditionsInJoins(String on) {
+        String query = "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull");
+        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull"
+                + " WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NOT NULL)");
+        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull"
+                + " WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NULL)");
+        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull"
+                + " WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NOT NULL)");
+        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull"
+                + " WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NULL)");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A test for testing joins with on conditions with columns from only one table with an IS NULL expression.
+     * This case, the left one.
+     */
+    @Test
+    public void testJoinOnConditionFromSingleTableLeftNullable() {
+        String query = "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL");
+        expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL WHERE"
+                + " (NOT (TableA.CanBeNull IS NULL)) AND (TableA.CanBeNull IS NOT NULL)");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A test for testing joins with on conditions with columns from only one table with a comparison.
+     * This case, the left one.
+     */
+    @Test
+    public void testJoinOnConditionFromSingleTableLeftComparison() {
+        String query = "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull > 5";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull > 5");
+        expected.add("SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull > 5 WHERE (NOT (TableA.CanBeNull > 5))"
+                + " AND (TableA.CanBeNull IS NOT NULL)");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A test for testing joins with on conditions with columns from only one table with an IS NULL expression.
+     * This case, the right one.
+     */
+    @Test
+    public void testJoinOnConditionFromSingleTableRightNullable() {
+        String query = "SELECT * FROM TableA INNER JOIN TableB ON TableB.CanBeNull IS NULL";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableB.CanBeNull IS NULL WHERE"
+                + " (NOT (TableB.CanBeNull IS NULL)) AND (TableB.CanBeNull IS NOT NULL)");
+
+        assertEquals(expected, result);
+    }
+
+    /**
+     * A test for testing joins with on conditions with columns from only one table with a comparison.
+     * This case, the right one.
+     */
+    @Test
+    public void testJoinOnConditionFromSingleTableRightComparison() {
+        String query = "SELECT * FROM TableA INNER JOIN TableB ON TableB.CanBeNull > 5";
+        Set<String> result = Generator.generateRules(query);
+
+        Set<String> expected = new TreeSet<>();
+        expected.add("SELECT * FROM TableA RIGHT JOIN TableB ON TableB.CanBeNull > 5 WHERE (NOT (TableB.CanBeNull > 5))"
+                + " AND (TableB.CanBeNull IS NOT NULL)");
 
         assertEquals(expected, result);
     }
