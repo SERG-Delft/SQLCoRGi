@@ -119,30 +119,6 @@ public class ConditionTest {
     }
 
     /**
-     * A test case with a BETWEEN condition.
-     */
-    @Test
-    public void testBetweenCondition() {
-        verify("SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
-
-                "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x IS NULL");
-    }
-
-    /**
-     * A test case with a negated BETWEEN condition.
-     */
-    @Test
-    public void testBetweenConditionNegated() {
-        verify("SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
-
-                "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x IS NULL");
-    }
-
-    /**
      * A test case with an IN condition.
      */
     @Test
