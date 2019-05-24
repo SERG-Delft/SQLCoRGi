@@ -62,7 +62,9 @@ public final class Generator {
      * @param args unused.
      */
     public static void main(String[] args) {
-        String query = "SELECT Director, AVG(Length) FROM Movies WHERE a > 1 GROUP BY Director";
+        String query = "SELECT Director, Name\n" +
+            "FROM Movies\n" +
+            "GROUP BY Name";
         Set<String> result = generateRules(query);
 
         System.out.println("Result: " + result.toString());
