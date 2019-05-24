@@ -4,7 +4,6 @@ import nl.tudelft.st01.Generator;
 import org.junit.jupiter.api.Test;
 
 import static nl.tudelft.st01.functional.AssertUtils.verify;
-
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**

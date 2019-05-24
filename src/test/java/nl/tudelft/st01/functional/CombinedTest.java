@@ -50,7 +50,7 @@ public class CombinedTest {
      * Tests the most basic query, for which case no mutations should be generated.
      */
     @Test
-    public void testSimpleQueryNoWhere() {
+    public void testQueryOnlySelectAndFrom() {
         verify("SELECT * FROM TableA");
     }
 }
