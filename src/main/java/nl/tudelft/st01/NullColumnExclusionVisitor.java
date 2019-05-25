@@ -139,19 +139,15 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
 
         right = expression;
 
-        if (left == null) {
-            return expression;
+        if (left != null) {
+            if (right != null) {
+                expression = binaryExpression;
+            } else {
+                expression = left;
+            }
         }
 
-        System.out.println(binaryExpression);
-
-        if (right != null) {
-            this.expression = binaryExpression;
-            return binaryExpression;
-        }
-
-        this.expression = left;
-        return left;
+        return expression;
     }
 
     private Expression handleComparisonOperator(ComparisonOperator comparisonOperator) {
