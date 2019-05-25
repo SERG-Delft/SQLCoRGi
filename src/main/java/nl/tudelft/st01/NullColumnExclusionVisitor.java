@@ -119,6 +119,10 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
         this.expression = expression;
     }
 
+    public Expression getExpression() {
+        return expression;
+    }
+
     private boolean contains(Column column) {
         if (nullColumns != null) {
             for (Column c : nullColumns) {
@@ -160,7 +164,7 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
         }
 
         binaryExpression.setRightExpression(right);
-        System.out.println(expression);
+        System.out.println("FINAL\t" + expression);
         return expression;
     }
 

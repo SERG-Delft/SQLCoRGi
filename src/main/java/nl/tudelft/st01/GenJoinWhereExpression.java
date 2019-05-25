@@ -158,7 +158,7 @@ public class GenJoinWhereExpression {
                 leftJoinExpressionIsNull.setRightExpression(isNulls);
                 leftJoinExpressionIsNotNull.setRightExpression(isNotNulls);
 
-               // excludeNullColumnsInWhereExpression(values, plainSelect.getWhere());
+                excludeNullColumnsInWhereExpression(values, plainSelect.getWhere());
                 excludeNullColumnsInWhereExpression("a", plainSelect.getWhere());
             } else {
                 rightJoinExpressionIsNull.setRightExpression(isNulls);
@@ -183,10 +183,14 @@ public class GenJoinWhereExpression {
      * @param where
      */
     private static void excludeNullColumnsInWhereExpression(List<Column> nulls, Expression where) {
+        Expression filteredWhere;
+
         NullColumnExclusionVisitor nceVisitor = new NullColumnExclusionVisitor();
         nceVisitor.setNullColumns(nulls);
 
         where.accept(nceVisitor);
+        filteredWhere = nceVisitor.getExpression();
+
     }
 
     /**
@@ -195,10 +199,12 @@ public class GenJoinWhereExpression {
      * @param where
      */
     private static void excludeNullColumnsInWhereExpression(String table, Expression where) {
+        Expression filteredWhere;
+
         NullColumnExclusionVisitor nceVisitor = new NullColumnExclusionVisitor();
         nceVisitor.setTable(table);
-
         where.accept(nceVisitor);
+        filteredWhere = nceVisitor.getExpression();
     }
 
 
