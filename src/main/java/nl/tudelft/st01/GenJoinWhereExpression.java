@@ -23,6 +23,7 @@ import java.util.TreeSet;
  */
 public class GenJoinWhereExpression {
     private Map<String, List<Column>> map;
+    private PlainSelect plainSelect;
 
 
     /**
@@ -32,6 +33,7 @@ public class GenJoinWhereExpression {
      */
     public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
         map = new HashMap<>();
+        this.plainSelect = plainSelect;
 
         Set<String> result = new TreeSet<>();
 
@@ -120,7 +122,7 @@ public class GenJoinWhereExpression {
      * @return List of JoinWhere items with the mutated results.
      */
     @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
-    private static List<JoinWhereItem> handleJoinMultipleTablesOnCondition(Join join, Map<String, List<Column>> map) {
+    private List<JoinWhereItem> handleJoinMultipleTablesOnCondition(Join join, Map<String, List<Column>> map) {
         Join leftJoin = createGenericCopyOfJoin(join);
         leftJoin.setLeft(true);
         Join rightJoin = createGenericCopyOfJoin(join);
@@ -154,6 +156,8 @@ public class GenJoinWhereExpression {
 
                 leftJoinExpressionIsNull.setRightExpression(isNulls);
                 leftJoinExpressionIsNotNull.setRightExpression(isNotNulls);
+
+                excludeNullColumnsInWhereExpression(values, plainSelect.getWhere());
             } else {
                 rightJoinExpressionIsNull.setRightExpression(isNulls);
                 rightJoinExpressionIsNotNull.setRightExpression(isNotNulls);
@@ -176,7 +180,7 @@ public class GenJoinWhereExpression {
      * @param nulls
      * @param where
      */
-    private void excludeNullColumnsInWhereExpression(List<Column> nulls, Expression where) {
+    private static void excludeNullColumnsInWhereExpression(List<Column> nulls, Expression where) {
         NullColumnExclusionVisitor nceVisitor = new NullColumnExclusionVisitor();
         nceVisitor.setColumns(nulls);
 
