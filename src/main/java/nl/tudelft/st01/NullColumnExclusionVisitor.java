@@ -21,7 +21,7 @@ import net.sf.jsqlparser.schema.Column;
 import java.util.List;
 
 public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
-    private List<Column> columns;
+    private List<Column> nullColumns;
     private Expression expression;
 
     @Override
@@ -46,27 +46,40 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-
+        handleComparisonOperator(greaterThanEquals);
     }
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
-
+        /*  If the column is in the null columns list, then either
+            a) It is an IS NULL expression, leading to a duplicate.
+            b) It is an IS NOT NULL expression, leading to a contradiction.
+            Both must be excluded.
+            If the column is not in the null columns list, then the column must not be null.
+            If it is an IS NULL expression, then there is a contradiction, so it should be excluded.
+         */
+        if (contains((Column) isNullExpression.getLeftExpression())) {
+            expression = null;
+        } else if (!isNullExpression.isNot()){
+            expression = null;
+        } else {
+            expression = isNullExpression;
+        }
     }
 
     @Override
     public void visit(MinorThan minorThan) {
-
+        handleComparisonOperator(minorThan);
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-
+        handleComparisonOperator(minorThanEquals);
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-
+        handleComparisonOperator(notEqualsTo);
     }
 
     @Override
@@ -82,7 +95,6 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(Column column) {
         if (contains(column)) {
-            System.out.println("MUST EXCLUDE! " + column);
             expression = null;
         } else {
             expression = column;
@@ -92,11 +104,10 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(Parenthesis parenthesis) {
         parenthesis.getExpression().accept(this);
-        //expression = parenthesis;
     }
 
-    public void setColumns(List<Column> columns) {
-        this.columns = columns;
+    public void setNullColumns(List<Column> nullColumns) {
+        this.nullColumns = nullColumns;
     }
 
     public void setExpression(Expression expression) {
@@ -104,7 +115,7 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
     }
 
     private boolean contains(Column column) {
-        for (Column c : columns) {
+        for (Column c : nullColumns) {
             if (c.toString().toLowerCase().equals(column.toString().toLowerCase())) {
                 return true;
             }

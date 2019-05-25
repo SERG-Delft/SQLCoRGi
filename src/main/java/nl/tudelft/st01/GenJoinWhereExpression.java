@@ -182,7 +182,7 @@ public class GenJoinWhereExpression {
      */
     private static void excludeNullColumnsInWhereExpression(List<Column> nulls, Expression where) {
         NullColumnExclusionVisitor nceVisitor = new NullColumnExclusionVisitor();
-        nceVisitor.setColumns(nulls);
+        nceVisitor.setNullColumns(nulls);
 
         where.accept(nceVisitor);
     }
