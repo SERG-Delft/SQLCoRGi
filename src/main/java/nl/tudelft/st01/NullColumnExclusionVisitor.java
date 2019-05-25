@@ -22,6 +22,7 @@ import java.util.List;
 
 public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
     private List<Column> nullColumns;
+    private String table;
     private Expression expression;
 
     @Override
@@ -110,17 +111,24 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
         this.nullColumns = nullColumns;
     }
 
+    public void setTable(String table) {
+        this.table = table.toLowerCase();
+    }
+
     public void setExpression(Expression expression) {
         this.expression = expression;
     }
 
     private boolean contains(Column column) {
-        for (Column c : nullColumns) {
-            if (c.toString().toLowerCase().equals(column.toString().toLowerCase())) {
-                return true;
+        if (nullColumns != null) {
+            for (Column c : nullColumns) {
+                if (c.toString().toLowerCase().equals(column.toString().toLowerCase())) {
+                    return true;
+                }
             }
         }
-        return false;
+
+        return (table != null && table.equals(column.getTable().toString().toLowerCase()));
     }
 
     private Expression handleBinaryExpression(BinaryExpression binaryExpression) {
@@ -141,12 +149,18 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
 
         if (left != null) {
             if (right != null) {
-                expression = binaryExpression;
+                Parenthesis parenthesis = new Parenthesis();
+                parenthesis.setExpression(binaryExpression);
+                expression = parenthesis;
             } else {
                 expression = left;
             }
+        } else {
+            expression = right;
         }
 
+        binaryExpression.setRightExpression(right);
+        System.out.println(expression);
         return expression;
     }
 
@@ -156,14 +170,13 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
         Expression right = comparisonOperator.getRightExpression();
 
         if (checkSideComparisonOperator(left) || checkSideComparisonOperator(right)) {
-            System.out.println("EXCLUDED: " + comparisonOperator);
             expression = null;
             return null;
-
+        } else {
+            expression = comparisonOperator;
+            return comparisonOperator;
         }
-        System.out.println("PASSED: " + comparisonOperator);
-        expression = comparisonOperator;
-        return comparisonOperator;
+
 
     }
 
