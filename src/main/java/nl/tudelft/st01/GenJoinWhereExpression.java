@@ -24,6 +24,7 @@ import java.util.TreeSet;
 public class GenJoinWhereExpression {
     private Map<String, List<Column>> map;
     private PlainSelect plainSelect;
+    private String MODE;
 
 
     /**
@@ -157,7 +158,8 @@ public class GenJoinWhereExpression {
                 leftJoinExpressionIsNull.setRightExpression(isNulls);
                 leftJoinExpressionIsNotNull.setRightExpression(isNotNulls);
 
-                excludeNullColumnsInWhereExpression(values, plainSelect.getWhere());
+               // excludeNullColumnsInWhereExpression(values, plainSelect.getWhere());
+                excludeNullColumnsInWhereExpression("a", plainSelect.getWhere());
             } else {
                 rightJoinExpressionIsNull.setRightExpression(isNulls);
                 rightJoinExpressionIsNotNull.setRightExpression(isNotNulls);
@@ -183,6 +185,18 @@ public class GenJoinWhereExpression {
     private static void excludeNullColumnsInWhereExpression(List<Column> nulls, Expression where) {
         NullColumnExclusionVisitor nceVisitor = new NullColumnExclusionVisitor();
         nceVisitor.setNullColumns(nulls);
+
+        where.accept(nceVisitor);
+    }
+
+    /**
+     * Javadoc.
+     * @param table
+     * @param where
+     */
+    private static void excludeNullColumnsInWhereExpression(String table, Expression where) {
+        NullColumnExclusionVisitor nceVisitor = new NullColumnExclusionVisitor();
+        nceVisitor.setTable(table);
 
         where.accept(nceVisitor);
     }
@@ -307,7 +321,7 @@ public class GenJoinWhereExpression {
      * @param expression The expression to evaluate.
      * @return The innermost expression that is not nested in parenthesis or in a not.
      */
-    private static Expression getCoreExpression(Expression expression) {
+    public static Expression getCoreExpression(Expression expression) {
         if (expression instanceof Parenthesis) {
             return getCoreExpression(((Parenthesis) expression).getExpression());
         } else if (expression instanceof NotExpression) {
