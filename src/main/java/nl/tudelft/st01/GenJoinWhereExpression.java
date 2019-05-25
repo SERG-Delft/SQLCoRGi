@@ -171,6 +171,18 @@ public class GenJoinWhereExpression {
         return result;
     }
 
+    /**
+     * Javadoc.
+     * @param nulls
+     * @param where
+     */
+    private void excludeNullColumnsInWhereExpression(List<Column> nulls, Expression where) {
+        NullColumnExclusionVisitor nceVisitor = new NullColumnExclusionVisitor();
+        nceVisitor.setColumns(nulls);
+
+        where.accept(nceVisitor);
+    }
+
 
     /**
      * In case the two tables are joined and the on condition only contains tables from one of the two tables,
