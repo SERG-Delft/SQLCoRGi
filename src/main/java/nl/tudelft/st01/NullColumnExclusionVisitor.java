@@ -101,6 +101,7 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
         binaryExpression.setLeftExpression(expression);
 
         out = expression;
+
         expression = binaryExpression.getRightExpression();
         expression.accept(this);
 
@@ -111,8 +112,7 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
         }
 
         if (binaryExpression.getRightExpression() != null && binaryExpression.getLeftExpression()!= null) {
-            System.out.println(binaryExpression + "\t" + columns);
-
+            System.out.println(binaryExpression);
             return binaryExpression;
         }
 
@@ -121,23 +121,21 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
     }
 
     private Expression handleComparisonOperator(ComparisonOperator comparisonOperator) {
-        Expression expression;
-        expression = comparisonOperator.getLeftExpression();
-        expression.accept(this);
+        Expression left = comparisonOperator.getLeftExpression();
+        Expression right = comparisonOperator.getRightExpression();
 
-        if (expression == null) {
-            return null;
-        }
-
-        expression = comparisonOperator.getRightExpression();
-        expression.accept(this);
-
-        if (expression == null) {
+        if (checkSideComparisonOperator(left) || checkSideComparisonOperator(right)) {
             return null;
         }
 
         return comparisonOperator;
 
+    }
+
+    private boolean checkSideComparisonOperator(Expression expression) {
+        expression.accept(this);
+
+        return expression == null;
     }
 
 
