@@ -123,6 +123,11 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
         return expression;
     }
 
+    /**
+     * Check whether the columns list contain the given column or if the column belongs to the table.
+     * @param column The column that should be checked.
+     * @return True if the column is in the list or if it belongs to the table.
+     */
     private boolean contains(Column column) {
         if (nullColumns != null) {
             for (Column c : nullColumns) {
@@ -135,7 +140,11 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
         return (table != null && table.equals(column.getTable().toString().toLowerCase()));
     }
 
-    private Expression handleBinaryExpression(BinaryExpression binaryExpression) {
+    /**
+     * In case of a binary expression, both sides should be traversed and modified if needed.
+     * @param binaryExpression The expression to handle.
+     */
+    private void handleBinaryExpression(BinaryExpression binaryExpression) {
         Expression left;
         Expression right;
 
@@ -164,27 +173,32 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
         }
 
         binaryExpression.setRightExpression(right);
-        System.out.println("FINAL\t" + expression);
-        return expression;
     }
 
-    private Expression handleComparisonOperator(ComparisonOperator comparisonOperator) {
-        //expression;
+    /**
+     * In case of a comparison operator, the original expression may only be retained if neither side contains
+     * columns that should be excluded.
+     * @param comparisonOperator The comparison operator to evaluate.
+     */
+    private void handleComparisonOperator(ComparisonOperator comparisonOperator) {
         Expression left = comparisonOperator.getLeftExpression();
         Expression right = comparisonOperator.getRightExpression();
 
-        if (checkSideComparisonOperator(left) || checkSideComparisonOperator(right)) {
+        if (expressionContainsExcludedColumn(left) || expressionContainsExcludedColumn(right)) {
             expression = null;
-            return null;
         } else {
             expression = comparisonOperator;
-            return comparisonOperator;
         }
 
 
     }
 
-    private boolean checkSideComparisonOperator(Expression expression) {
+    /**
+     * Checks if the expression contains a column that should be excluded.
+     * @param expression The expression to evaluate.
+     * @return If the expression contains a column that should be excluded, true is returned. False otherwise.
+     */
+    private boolean expressionContainsExcludedColumn(Expression expression) {
         expression.accept(this);
 
         return this.expression == null;

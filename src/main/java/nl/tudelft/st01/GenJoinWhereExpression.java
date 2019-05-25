@@ -24,8 +24,6 @@ import java.util.TreeSet;
 public class GenJoinWhereExpression {
     private Map<String, List<Column>> map;
     private PlainSelect plainSelect;
-    private String MODE;
-
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
@@ -178,33 +176,37 @@ public class GenJoinWhereExpression {
     }
 
     /**
-     * Javadoc.
-     * @param nulls
-     * @param where
+     * Modifies the input expression such that it no longer contains any of the given columns.
+     * @param nulls The columns that should be excluded.
+     * @param expression The expression that should be modified.
+     * @return The modified expression.
      */
-    private static void excludeNullColumnsInWhereExpression(List<Column> nulls, Expression where) {
+    private static Expression excludeNullColumnsInWhereExpression(List<Column> nulls, Expression expression) {
         Expression filteredWhere;
 
         NullColumnExclusionVisitor nceVisitor = new NullColumnExclusionVisitor();
         nceVisitor.setNullColumns(nulls);
 
-        where.accept(nceVisitor);
+        expression.accept(nceVisitor);
         filteredWhere = nceVisitor.getExpression();
+        return filteredWhere;
 
     }
 
     /**
-     * Javadoc.
-     * @param table
-     * @param where
+     * Modifies input expression such that it no longer contains any columns part of the table.
+     * @param table The table from which the columns have to be excluded.
+     * @param expression The expression that should be modified.
+     * @return The modified expression.
      */
-    private static void excludeNullColumnsInWhereExpression(String table, Expression where) {
+    private static Expression excludeNullColumnsInWhereExpression(String table, Expression expression) {
         Expression filteredWhere;
 
         NullColumnExclusionVisitor nceVisitor = new NullColumnExclusionVisitor();
         nceVisitor.setTable(table);
-        where.accept(nceVisitor);
+        expression.accept(nceVisitor);
         filteredWhere = nceVisitor.getExpression();
+        return filteredWhere;
     }
 
 
