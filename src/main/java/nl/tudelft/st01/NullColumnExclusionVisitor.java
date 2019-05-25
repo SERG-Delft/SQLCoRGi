@@ -1,8 +1,10 @@
 package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.BinaryExpression;
+import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
+import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -68,20 +70,37 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
     }
 
     @Override
+    public void visit(DoubleValue doubleValue) {
+        expression = doubleValue;
+    }
+
+    @Override
+    public void visit(LongValue longValue) {
+        expression = longValue;
+    }
+
+    @Override
     public void visit(Column column) {
         if (contains(column)) {
-            System.out.println("MUST EXCLUDE!");
+            System.out.println("MUST EXCLUDE! " + column);
             expression = null;
+        } else {
+            expression = column;
         }
     }
 
     @Override
     public void visit(Parenthesis parenthesis) {
         parenthesis.getExpression().accept(this);
+        //expression = parenthesis;
     }
 
     public void setColumns(List<Column> columns) {
         this.columns = columns;
+    }
+
+    public void setExpression(Expression expression) {
+        this.expression = expression;
     }
 
     private boolean contains(Column column) {
@@ -94,40 +113,49 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
     }
 
     private Expression handleBinaryExpression(BinaryExpression binaryExpression) {
-        Expression out;
+        Expression left;
+        Expression right;
+
         expression = binaryExpression.getLeftExpression();
         expression.accept(this);
 
-        binaryExpression.setLeftExpression(expression);
+        left = expression;
 
-        out = expression;
+        binaryExpression.setLeftExpression(left);
 
         expression = binaryExpression.getRightExpression();
         expression.accept(this);
 
-        binaryExpression.setRightExpression(expression);
+        right = expression;
 
-        if (expression != null) {
-            out = expression;
+        if (left == null) {
+            return expression;
         }
 
-        if (binaryExpression.getRightExpression() != null && binaryExpression.getLeftExpression()!= null) {
-            System.out.println(binaryExpression);
+        System.out.println(binaryExpression);
+
+        if (right != null) {
+            this.expression = binaryExpression;
             return binaryExpression;
         }
 
-        System.out.println(out + "\t" + columns);
-        return out;
+        this.expression = left;
+        return left;
     }
 
     private Expression handleComparisonOperator(ComparisonOperator comparisonOperator) {
+        //expression;
         Expression left = comparisonOperator.getLeftExpression();
         Expression right = comparisonOperator.getRightExpression();
 
         if (checkSideComparisonOperator(left) || checkSideComparisonOperator(right)) {
+            System.out.println("EXCLUDED: " + comparisonOperator);
+            expression = null;
             return null;
-        }
 
+        }
+        System.out.println("PASSED: " + comparisonOperator);
+        expression = comparisonOperator;
         return comparisonOperator;
 
     }
@@ -135,7 +163,7 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
     private boolean checkSideComparisonOperator(Expression expression) {
         expression.accept(this);
 
-        return expression == null;
+        return this.expression == null;
     }
 
 
