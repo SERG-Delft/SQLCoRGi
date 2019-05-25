@@ -1,8 +1,12 @@
 package nl.tudelft.st01;
 
+import net.sf.jsqlparser.expression.BinaryExpression;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
+import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
+import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
@@ -16,20 +20,21 @@ import java.util.List;
 
 public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
     private List<Column> columns;
+    private Expression expression;
 
     @Override
     public void visit(AndExpression andExpression) {
-        
+        handleBinaryExpression(andExpression);
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-
+        handleBinaryExpression(orExpression);
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
-
+        handleComparisonOperator(equalsTo);
     }
 
     @Override
@@ -64,14 +69,74 @@ public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(Column column) {
+        if (contains(column)) {
+            System.out.println("MUST EXCLUDE!");
+            expression = null;
+        }
+    }
 
+    @Override
+    public void visit(Parenthesis parenthesis) {
+        parenthesis.getExpression().accept(this);
     }
 
     public void setColumns(List<Column> columns) {
         this.columns = columns;
     }
 
-    private void contains(Column column) {
+    private boolean contains(Column column) {
+        for (Column c : columns) {
+            if (c.toString().toLowerCase().equals(column.toString().toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Expression handleBinaryExpression(BinaryExpression binaryExpression) {
+        Expression out;
+        expression = binaryExpression.getLeftExpression();
+        expression.accept(this);
+
+        binaryExpression.setLeftExpression(expression);
+
+        out = expression;
+        expression = binaryExpression.getRightExpression();
+        expression.accept(this);
+
+        binaryExpression.setRightExpression(expression);
+
+        if (expression != null) {
+            out = expression;
+        }
+
+        if (binaryExpression.getRightExpression() != null && binaryExpression.getLeftExpression()!= null) {
+            System.out.println(binaryExpression + "\t" + columns);
+
+            return binaryExpression;
+        }
+
+        System.out.println(out + "\t" + columns);
+        return out;
+    }
+
+    private Expression handleComparisonOperator(ComparisonOperator comparisonOperator) {
+        Expression expression;
+        expression = comparisonOperator.getLeftExpression();
+        expression.accept(this);
+
+        if (expression == null) {
+            return null;
+        }
+
+        expression = comparisonOperator.getRightExpression();
+        expression.accept(this);
+
+        if (expression == null) {
+            return null;
+        }
+
+        return comparisonOperator;
 
     }
 
