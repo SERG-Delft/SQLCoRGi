@@ -17,15 +17,25 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
 
     private Set<String> output;
 
+    /**
+     * Creates a new visitor which can be used to generate coverage rules for queries. Any rules that are generated
+     * will be written to {@code output}.
+     *
+     * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
+     */
+    public SelectStatementVisitor(Set<String> output) {
+        if (output == null || !output.isEmpty()) {
+            throw new IllegalArgumentException(
+                "A SelectStatementVisitor requires an empty, non-null set to which it can output generated rules."
+            );
+        }
+
+        this.output = output;
+    }
+
     @Override
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public void visit(PlainSelect plainSelect) {
-
-        if (output == null || !output.isEmpty()) {
-            throw new IllegalArgumentException(
-                "To use this visitor, you must first give it an empty list so it can pass along the generated queries."
-            );
-        }
 
         handleWhere(plainSelect);
         handleAggregators(plainSelect);
@@ -78,10 +88,6 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
         Set<String> out = genJoinWhereExpression.generateJoinWhereExpressions(plainSelect);
 
         output.addAll(out);
-    }
-
-    public void setOutput(Set<String> output) {
-        this.output = output;
     }
 
 }

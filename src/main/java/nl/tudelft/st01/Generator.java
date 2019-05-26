@@ -3,15 +3,12 @@ package nl.tudelft.st01;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * The entry point of the coverage rule generator.
@@ -49,13 +46,8 @@ public final class Generator {
 
         SelectBody selectBody = ((Select) statement).getSelectBody();
 
-        SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor();
-
-        Set<String> out = new TreeSet<>();
-        selectStatementVisitor.setOutput(out);
+        SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(result);
         selectBody.accept(selectStatementVisitor);
-
-        result.addAll(out);
 
         return result;
     }

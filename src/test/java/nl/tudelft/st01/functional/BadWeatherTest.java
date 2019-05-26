@@ -1,13 +1,11 @@
 package nl.tudelft.st01.functional;
 
-import nl.tudelft.st01.Generator;
 import org.junit.jupiter.api.Test;
 
 import static nl.tudelft.st01.functional.AssertUtils.verify;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
- * This class exercises several bad weather scenarios for the {@link Generator}.
+ * This class exercises several bad weather scenarios for the {@code Generator}.
  */
 public class BadWeatherTest {
 
