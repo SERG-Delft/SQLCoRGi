@@ -1,4 +1,4 @@
-package nl.tudelft.st01;
+package nl.tudelft.st01.visitors.aggregate;
 
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.DoubleValue;
