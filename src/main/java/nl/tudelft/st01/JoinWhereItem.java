@@ -3,6 +3,7 @@ package nl.tudelft.st01;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.Join;
 
+
 /**
  * This class allows for linking a given join to the corresponding generated where expression.
  */
