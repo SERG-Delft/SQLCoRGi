@@ -24,6 +24,7 @@ import java.util.TreeSet;
 public class GenJoinWhereExpression {
     private Map<String, List<Column>> map;
     private PlainSelect plainSelect;
+    private Expression whereExpression;
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
@@ -33,7 +34,7 @@ public class GenJoinWhereExpression {
     public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
         map = new HashMap<>();
         this.plainSelect = plainSelect;
-
+        this.whereExpression = plainSelect.getWhere();
         Set<String> result = new TreeSet<>();
 
         List<Join> joins = plainSelect.getJoins();
@@ -57,7 +58,7 @@ public class GenJoinWhereExpression {
                     temp.set(i, joinWhereItem.getJoin());
 
                     out.setJoins(temp);
-                    out.setWhere(determineWhereExpression(joinWhereItem.getJoinWhere(), whereCondition));
+                    out.setWhere(joinWhereItem.getJoinWhere());
 
                     result.add(out.toString());
 
@@ -81,12 +82,10 @@ public class GenJoinWhereExpression {
      */
     private static Expression determineWhereExpression(Expression joinWhereExpression,
                                                        Expression originalWhereCondition) {
-        Parenthesis parenthesis = new Parenthesis();
-        Parenthesis parenthesisJoinWhere = new Parenthesis();
+        Parenthesis parenthesis = new Parenthesis(originalWhereCondition);
+        Parenthesis parenthesisJoinWhere = new Parenthesis(joinWhereExpression);
 
         Expression out;
-        parenthesis.setExpression(originalWhereCondition);
-        parenthesisJoinWhere.setExpression(joinWhereExpression);
         if (originalWhereCondition == null) {
             out = joinWhereExpression;
         } else if (joinWhereExpression != null) {
