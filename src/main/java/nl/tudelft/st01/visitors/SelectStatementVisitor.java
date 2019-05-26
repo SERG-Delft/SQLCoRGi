@@ -83,7 +83,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * Handles the joins given the plainselect. Adds the results to the output.
      * @param plainSelect The input query for which the mutations have to be generated.
      */
-    public void handleJoins(PlainSelect plainSelect) {
+    private void handleJoins(PlainSelect plainSelect) {
         GenJoinWhereExpression genJoinWhereExpression = new GenJoinWhereExpression();
         Set<String> out = genJoinWhereExpression.generateJoinWhereExpressions(plainSelect);
 
