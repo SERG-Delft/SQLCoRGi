@@ -8,6 +8,7 @@ import nl.tudelft.st01.visitors.join.GenJoinWhereExpression;
 import nl.tudelft.st01.visitors.select.RuleGeneratorExpressionVisitor;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -51,23 +52,22 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleWhere(PlainSelect plainSelect) {
+
         Expression where = plainSelect.getWhere();
-        ArrayList<Expression> expressions = new ArrayList<>();
-
         if (where != null) {
-            RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
 
+            List<Expression> expressions = new ArrayList<>();
+            RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
             ruleGeneratorExpressionVisitor.setOutput(expressions);
+
             where.accept(ruleGeneratorExpressionVisitor);
             for (Expression expression : expressions) {
                 plainSelect.setWhere(expression);
                 output.add(plainSelect.toString());
             }
 
+            plainSelect.setWhere(where);
         }
-
-        plainSelect.setWhere(where);
-
     }
 
     /**
