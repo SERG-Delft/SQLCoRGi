@@ -9,7 +9,9 @@ import java.util.Set;
 
 public class JoinOnConditionColumns {
     private List<Column> leftColumns;
+
     private Set<String> leftTables = new HashSet<>();
+
     private Set<String> rightTables = new HashSet<>();
 
     private List<Column> rightColumns;
@@ -30,6 +32,14 @@ public class JoinOnConditionColumns {
 
     public List<Column> getRightColumns() {
         return rightColumns;
+    }
+
+    public Set<String> getLeftTables() {
+        return leftTables;
+    }
+
+    public Set<String> getRightTables() {
+        return rightTables;
     }
 
     public void setLeftColumns(List<Column> leftColumns) {
@@ -77,7 +87,8 @@ public class JoinOnConditionColumns {
     }
     @Override
     public String toString() {
-        return "<JOCC\n\t<LEFT: <COLUMNS" + leftColumns + "><TABLES: " + leftTables + ">>\n\t<RIGHT: <COLUMNS" + rightColumns + "><TABLES: " + rightTables + ">>";
+        return "<JOCC\n\t<LEFT:\n\t\t<COLUMNS\t" + leftColumns + ">\n\t\t<TABLES:\t" + leftTables + ">>\n\t<RIGHT:\n\t\t<COLUMNS\t"
+                + rightColumns + ">\n\t\t<TABLES:\t" + rightTables + ">>";
     }
 
 }
