@@ -9,6 +9,9 @@ import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
+import nl.tudelft.st01.util.query.NumericDoubleValue;
+import nl.tudelft.st01.util.query.NumericLongValue;
+import nl.tudelft.st01.util.query.NumericExpression;
 
 import java.util.List;
 
@@ -42,12 +45,12 @@ public class RuleGeneratorValueVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(DoubleValue doubleValue) {
-        generateNumericCases(new GenDoubleValue(doubleValue.toString()));
+        generateNumericCases(new NumericDoubleValue(doubleValue.toString()));
     }
 
     @Override
     public void visit(LongValue longValue) {
-        generateNumericCases(new GenLongValue(longValue.toString()));
+        generateNumericCases(new NumericLongValue(longValue.toString()));
     }
 
     @Override

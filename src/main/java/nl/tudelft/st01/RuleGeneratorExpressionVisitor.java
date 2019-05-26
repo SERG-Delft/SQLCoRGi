@@ -15,6 +15,8 @@ import net.sf.jsqlparser.expression.operators.relational.InExpression;
 import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
 import net.sf.jsqlparser.expression.operators.relational.Between;
 import net.sf.jsqlparser.schema.Column;
+import nl.tudelft.st01.util.query.NumericDoubleValue;
+import nl.tudelft.st01.util.query.NumericLongValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -164,11 +166,11 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         output.add(leftBoundaryOffTest);
 
         if (start instanceof LongValue) {
-            GenLongValue longValue = new GenLongValue(start.toString());
+            NumericLongValue longValue = new NumericLongValue(start.toString());
             EqualsTo leftBoundaryOnTest = generateEqualsTo(left, longValue.add(-1));
             output.add(leftBoundaryOnTest);
         } else if (start instanceof DoubleValue) {
-            GenDoubleValue doubleValue = new GenDoubleValue(start.toString());
+            NumericDoubleValue doubleValue = new NumericDoubleValue(start.toString());
             EqualsTo leftBoundaryOnTest = generateEqualsTo(left, doubleValue.add(-1));
             output.add(leftBoundaryOnTest);
         }
@@ -177,11 +179,11 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         output.add(rightBoundaryOnTest);
 
         if (end instanceof LongValue) {
-            GenLongValue longValue = new GenLongValue(end.toString());
+            NumericLongValue longValue = new NumericLongValue(end.toString());
             EqualsTo rightBoundaryOffTest = generateEqualsTo(left, longValue.add(1));
             output.add(rightBoundaryOffTest);
         } else if (end instanceof DoubleValue) {
-            GenDoubleValue doubleValue = new GenDoubleValue(end.toString());
+            NumericDoubleValue doubleValue = new NumericDoubleValue(end.toString());
             EqualsTo rightBoundaryOffTest = generateEqualsTo(left, doubleValue.add(1));
             output.add(rightBoundaryOffTest);
         }

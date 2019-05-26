@@ -1,15 +1,15 @@
-package nl.tudelft.st01;
+package nl.tudelft.st01.util.query;
 
 import net.sf.jsqlparser.expression.Expression;
 
 /**
- * Allows implementations to be mutated in a uniform way.
+ * Provides a uniform way of accessing and modifying instances of implementing classes.
  */
 public interface NumericExpression extends Expression {
 
     /**
-     * Add number to the value implementing this interface.
-     * @param number the number to be added.
+     * Adds an integer to the value of this NumericExpression.
+     * @param number the integer to be added.
      * @return a new instance of the expression, representing the value resulting from the addition.
      */
     NumericExpression add(int number);
