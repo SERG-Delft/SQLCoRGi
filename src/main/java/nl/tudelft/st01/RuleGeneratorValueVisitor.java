@@ -9,9 +9,9 @@ import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
-import nl.tudelft.st01.util.query.NumericDoubleValue;
-import nl.tudelft.st01.util.query.NumericLongValue;
-import nl.tudelft.st01.util.query.NumericExpression;
+import nl.tudelft.st01.query.query.NumericDoubleValue;
+import nl.tudelft.st01.query.query.NumericLongValue;
+import nl.tudelft.st01.query.query.NumericExpression;
 
 import java.util.List;
 
