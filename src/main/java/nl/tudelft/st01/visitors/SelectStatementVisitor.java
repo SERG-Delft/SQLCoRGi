@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * .
  */
-public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
+public class SelectStatementVisitor extends SelectVisitorAdapter {
 
     private Set<String> output;
 

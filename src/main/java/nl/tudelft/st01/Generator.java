@@ -6,7 +6,7 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
-import nl.tudelft.st01.visitors.RuleGeneratorSelectVisitor;
+import nl.tudelft.st01.visitors.SelectStatementVisitor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -48,12 +48,12 @@ public final class Generator {
 
         SelectBody selectBody = ((Select) statement).getSelectBody();
 
-        RuleGeneratorSelectVisitor ruleGeneratorSelectVisitor = new RuleGeneratorSelectVisitor();
+        SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor();
         ArrayList<PlainSelect> plainSelects = new ArrayList<>();
 
         Set<String> out = new TreeSet<>();
-        ruleGeneratorSelectVisitor.setOutput(out);
-        selectBody.accept(ruleGeneratorSelectVisitor);
+        selectStatementVisitor.setOutput(out);
+        selectBody.accept(selectStatementVisitor);
 
         result.addAll(out);
         for (PlainSelect plainSelect : plainSelects) {
