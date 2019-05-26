@@ -180,15 +180,16 @@ public class GenJoinWhereExpression {
      * @param expression The expression that should be modified.
      * @return The modified expression.
      */
-    private static Expression excludeNullColumnsInWhereExpression(List<Column> nulls, Expression expression) {
+    private static Expression excludeInExpression(List<Column> nulls, Expression expression) {
         Expression filteredWhere;
+        ColumnExclusionVisitor ceVisitor = new ColumnExclusionVisitor();
+        ceVisitor.setNullColumns(nulls);
 
         if (expression != null) {
-            NullColumnExclusionVisitor nceVisitor = new NullColumnExclusionVisitor();
-            nceVisitor.setNullColumns(nulls);
 
-            expression.accept(nceVisitor);
-            filteredWhere = nceVisitor.getExpression();
+
+            expression.accept(ceVisitor);
+            filteredWhere = ceVisitor.getExpression();
             return filteredWhere;
         }
         return null;
@@ -197,17 +198,38 @@ public class GenJoinWhereExpression {
 
     /**
      * Modifies input expression such that it no longer contains any columns part of the table.
-     * @param table The table from which the columns have to be excluded.
+     * @param tables The tables from which the columns have to be excluded.
      * @param expression The expression that should be modified.
      * @return The modified expression.
      */
-    private static Expression excludeNullColumnsInWhereExpression(String table, Expression expression) {
+    private static Expression excludeInExpression(Set<String> tables, Expression expression) {
         Expression filteredWhere;
         if (expression != null) {
-            NullColumnExclusionVisitor nceVisitor = new NullColumnExclusionVisitor();
-            nceVisitor.setTable(table);
-            expression.accept(nceVisitor);
-            filteredWhere = nceVisitor.getExpression();
+            ColumnExclusionVisitor ceVisitor = new ColumnExclusionVisitor();
+            ceVisitor.setTables(tables);
+            expression.accept(ceVisitor);
+            filteredWhere = ceVisitor.getExpression();
+            return filteredWhere;
+        }
+        return null;
+
+    }
+
+    /**
+     * Modifies input expression such that it no longer contains any columns part of the table.
+     * @param columns The columns that should be excluded.
+     * @param tables The table from which the columns should be excluded.
+     * @param expression The expression that should be modified.
+     * @return The modified expression.
+     */
+    private static Expression excludeInExpression(List<Column> columns, Set<String> tables, Expression expression) {
+        Expression filteredWhere;
+        if (expression != null) {
+            ColumnExclusionVisitor ceVisitor = new ColumnExclusionVisitor();
+            ceVisitor.setTables(tables);
+            ceVisitor.setNullColumns(columns);
+            expression.accept(ceVisitor);
+            filteredWhere = ceVisitor.getExpression();
             return filteredWhere;
         }
         return null;
@@ -231,8 +253,7 @@ public class GenJoinWhereExpression {
         Expression isNotNulls;
 
         List<JoinWhereItem> result = new ArrayList<>();
-        List<Column> values;
-        Stack<Column> columns = new Stack<>();
+        List<Column> columns;
 
         Join leftJoin = createGenericCopyOfJoin(join);
         leftJoin.setLeft(true);
