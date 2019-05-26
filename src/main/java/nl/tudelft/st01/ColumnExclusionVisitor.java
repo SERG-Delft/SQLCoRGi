@@ -21,9 +21,15 @@ import net.sf.jsqlparser.schema.Column;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * This class allows modifying an expression such that none of the provided columns,
+ * or columns related to the provided tables, are in the expression anymore.
+ */
 public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
     private List<Column> nullColumns;
+
     private Set<String> tables;
+
     private Expression expression;
 
     @Override
@@ -62,7 +68,7 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
          */
         if (contains((Column) isNullExpression.getLeftExpression())) {
             expression = null;
-        } else if (!isNullExpression.isNot()){
+        } else if (!isNullExpression.isNot()) {
             expression = null;
         } else {
             expression = isNullExpression;
@@ -112,6 +118,12 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
         this.nullColumns = nullColumns;
     }
 
+    /**
+     * Set the tables of this instance.
+     * If the tables are not initialized yet, it will be.
+     * Otherwise the tables are added to the set.
+     * @param tables The tables to be set.
+     */
     public void setTables(Set<String> tables) {
         if (this.tables != null) {
             this.tables.clear();

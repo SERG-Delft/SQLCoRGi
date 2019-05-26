@@ -23,7 +23,7 @@ import java.util.TreeSet;
  */
 public class GenJoinWhereExpression {
     private Map<String, List<Column>> map;
-    private PlainSelect plainSelect;
+
     private Expression whereExpression;
 
     /**
@@ -33,7 +33,6 @@ public class GenJoinWhereExpression {
      */
     public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
         map = new HashMap<>();
-        this.plainSelect = plainSelect;
         this.whereExpression = plainSelect.getWhere();
         Set<String> result = new TreeSet<>();
 
@@ -148,6 +147,12 @@ public class GenJoinWhereExpression {
         return result;
     }
 
+    /**
+     * Generates the join where items for the join on condition columns provided.
+     * @param joinOnConditionColumns The object containing the columns.
+     * @param join The join used.
+     * @return List of a generated JoinWhereItem for each mutation
+     */
     private List<JoinWhereItem> generateJoinWhereItems(JoinOnConditionColumns joinOnConditionColumns, Join join) {
         Expression temp = whereExpression;
 
@@ -297,7 +302,7 @@ public class GenJoinWhereExpression {
         for (Map.Entry<String, List<Column>> s : map.entrySet()) {
             columns = map.get(s.getKey());
 
-            isNotNulls = createIsNullExpressions(columns,false);
+            isNotNulls = createIsNullExpressions(columns, false);
             parenthesis = new Parenthesis();
             parenthesis.setExpression(join.getOnExpression());
 
@@ -374,6 +379,13 @@ public class GenJoinWhereExpression {
         throw new IllegalStateException("The columns list cannot be empty.");
     }
 
+    /**
+     * Simplified version of the create is null expression method.
+     * Rather than taking in a stack and an expression, only the columns are needed.
+     * @param columns The columns for which the is null expression have to be created.
+     * @param isNull True if the columns should be IS NULL. False if the columns should be IS NOT NULL.
+     * @return Returns the concatenated expressions.
+     */
     private static Expression createIsNullExpressions(List<Column> columns, boolean isNull) {
         Stack<Column> stack = new Stack<>();
         stack.addAll(columns);

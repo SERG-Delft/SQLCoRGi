@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * This class allows for storing the columns corresponding to the left or table related to a given join.
+ */
 public class JoinOnConditionColumns {
     private List<Column> leftColumns;
 
@@ -16,11 +19,9 @@ public class JoinOnConditionColumns {
 
     private List<Column> rightColumns;
 
-    public JoinOnConditionColumns(List<Column> leftColumns, List<Column> rightColumns) {
-        this.leftColumns = leftColumns;
-        this.rightColumns = rightColumns;
-    }
-
+    /**
+     * Constructor for this class. Initializes left and right columns lists.
+     */
     public JoinOnConditionColumns() {
         leftColumns = new ArrayList<>();
         rightColumns = new ArrayList<>();
@@ -42,18 +43,10 @@ public class JoinOnConditionColumns {
         return rightTables;
     }
 
-    public void setLeftColumns(List<Column> leftColumns) {
-        this.leftColumns = leftColumns;
-        leftTables.clear();
-        updateTables(leftColumns, leftTables);
-    }
-
-    public void setRightColumns(List<Column> rightColumns) {
-        this.rightColumns = rightColumns;
-        rightTables.clear();
-        updateTables(rightColumns, rightTables);
-    }
-
+    /**
+     * Add the provided columns to the left columns list.
+     * @param columns Columns to add.
+     */
     public void addToLeftColumns(List<Column> columns) {
         if (columns != null) {
             if (leftColumns != null) {
@@ -66,6 +59,10 @@ public class JoinOnConditionColumns {
         updateTables(leftColumns, leftTables);
     }
 
+    /**
+     * Add the provided columns to the right columns list.
+     * @param columns Columns to add.
+     */
     public void addToRightColumns(List<Column> columns) {
         if (columns != null) {
             if (rightColumns != null) {
@@ -78,6 +75,11 @@ public class JoinOnConditionColumns {
         updateTables(rightColumns, rightTables);
     }
 
+    /**
+     * Adds the table corresponding to any of the columns provided.
+     * @param columns The columns from which the table should be added.
+     * @param tables The tables to which the table should be added.
+     */
     private void updateTables(List<Column> columns, Set<String> tables) {
         for (Column column : columns) {
             if (column.getTable() != null) {
@@ -85,10 +87,11 @@ public class JoinOnConditionColumns {
             }
         }
     }
-    @Override
-    public String toString() {
-        return "<JOCC\n\t<LEFT:\n\t\t<COLUMNS\t" + leftColumns + ">\n\t\t<TABLES:\t" + leftTables + ">>\n\t<RIGHT:\n\t\t<COLUMNS\t"
-                + rightColumns + ">\n\t\t<TABLES:\t" + rightTables + ">>";
-    }
+    //    @Override
+    //    public String toString() {
+    //        return "<JOCC\n\t<LEFT:\n\t\t<COLUMNS\t" + leftColumns + ">\n\t\t<TABLES:\t"
+    //                  + leftTables + ">>\n\t<RIGHT:\n\t\t<COLUMNS\t"
+    //                  + rightColumns + ">\n\t\t<TABLES:\t" + rightTables + ">>";
+    //    }
 
 }
