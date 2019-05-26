@@ -9,6 +9,7 @@ import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
+import nl.tudelft.st01.query.JoinWhereItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -15,8 +15,8 @@ import net.sf.jsqlparser.expression.operators.relational.InExpression;
 import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
 import net.sf.jsqlparser.expression.operators.relational.Between;
 import net.sf.jsqlparser.schema.Column;
-import nl.tudelft.st01.query.query.NumericDoubleValue;
-import nl.tudelft.st01.query.query.NumericLongValue;
+import nl.tudelft.st01.query.NumericDoubleValue;
+import nl.tudelft.st01.query.NumericLongValue;
 
 import java.util.ArrayList;
 import java.util.List;

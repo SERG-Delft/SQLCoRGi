@@ -1,4 +1,4 @@
 /**
- * This package contains functions and extensions of JSQLParser query objects to facilitate their use.
+ * This package contains functionality that facilitates the manipulation of queries.
  */
 package nl.tudelft.st01.query;
