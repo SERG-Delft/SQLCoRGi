@@ -132,8 +132,9 @@ public class GenJoinWhereExpression {
         Expression isNulls;
 
         List<JoinWhereItem> result = new ArrayList<>();
-        List<Column> values;
-        Stack<Column> columns = new Stack<>();
+        List<Column> columns;
+
+        JoinOnConditionColumns joinOnConditionColumns = new JoinOnConditionColumns();
 
         BinaryExpression leftJoinExpressionIsNull = new AndExpression(null, null);
         BinaryExpression leftJoinExpressionIsNotNull = new AndExpression(null, null);
@@ -141,36 +142,71 @@ public class GenJoinWhereExpression {
         BinaryExpression rightJoinExpressionIsNotNull = new AndExpression(null, null);
 
         for (Map.Entry<String, List<Column>> s : map.entrySet()) {
-            values = map.get(s.getKey());
-            columns.addAll(values);
-            isNulls = createIsNullExpressions(columns, new AndExpression(null, null), true);
-
-            columns.addAll(values);
-            isNotNulls = createIsNullExpressions(columns, new AndExpression(null, null), false);
+            columns = map.get(s.getKey());
 
             if (!s.getKey().equals(join.getRightItem().toString().toLowerCase())) {
-                rightJoinExpressionIsNull.setLeftExpression(isNulls);
-                rightJoinExpressionIsNotNull.setLeftExpression(isNulls);
-
-                leftJoinExpressionIsNull.setRightExpression(isNulls);
-                leftJoinExpressionIsNotNull.setRightExpression(isNotNulls);
-
-                excludeNullColumnsInWhereExpression(values, plainSelect.getWhere());
-                excludeNullColumnsInWhereExpression("a", plainSelect.getWhere());
+                joinOnConditionColumns.addToLeftColumns(columns);
             } else {
-                rightJoinExpressionIsNull.setRightExpression(isNulls);
-                rightJoinExpressionIsNotNull.setRightExpression(isNotNulls);
-
-                leftJoinExpressionIsNull.setLeftExpression(isNulls);
-                leftJoinExpressionIsNotNull.setLeftExpression(isNulls);
+                joinOnConditionColumns.addToRightColumns(columns);
             }
         }
-        result.add(new JoinWhereItem(innerJoin, null));
-        result.add(new JoinWhereItem(leftJoin, leftJoinExpressionIsNull));
-        result.add(new JoinWhereItem(leftJoin, leftJoinExpressionIsNotNull));
-        result.add(new JoinWhereItem(rightJoin, rightJoinExpressionIsNull));
-        result.add(new JoinWhereItem(rightJoin, rightJoinExpressionIsNotNull));
 
+        result.addAll(generateJoinWhereItems(joinOnConditionColumns, join));
+        System.out.println(joinOnConditionColumns);
+
+        return result;
+    }
+
+    private List<JoinWhereItem> generateJoinWhereItems(JoinOnConditionColumns joinOnConditionColumns, Join join) {
+        Expression temp = whereExpression;
+
+        List<JoinWhereItem> result = new ArrayList<>();
+
+        Join leftJoin = createGenericCopyOfJoin(join);
+        leftJoin.setLeft(true);
+        Join rightJoin = createGenericCopyOfJoin(join);
+        rightJoin.setRight(true);
+        Join innerJoin = createGenericCopyOfJoin(join);
+        innerJoin.setInner(true);
+
+        List<Column> left = joinOnConditionColumns.getLeftColumns();
+        Set<String> leftTables = joinOnConditionColumns.getLeftTables();
+        List<Column> right = joinOnConditionColumns.getRightColumns();
+        Set<String> rightTables = joinOnConditionColumns.getRightTables();
+
+        Expression leftColumnsIsNull = createIsNullExpressions(left, true);
+        Expression leftColumnsIsNotNull = createIsNullExpressions(left, false);
+
+        Expression rightColumnsIsNull = createIsNullExpressions(right, true);
+        Expression rightColumnsIsNotNull = createIsNullExpressions(right, false);
+
+        Expression rightIsNull = excludeInExpression(right, leftTables, temp);
+        Expression rightIsNotNull = excludeInExpression(leftTables, temp);
+
+        Expression leftIsNull = excludeInExpression(left, rightTables, temp);
+        Expression leftIsNotNull = excludeInExpression(rightTables, temp);
+
+        Expression leftNullRightNotNull = new AndExpression(leftColumnsIsNull, rightColumnsIsNotNull);
+        Expression leftNullRightNull = new AndExpression(leftColumnsIsNull, rightColumnsIsNull);
+
+        Expression rightNullLeftNotNull = new AndExpression(rightColumnsIsNull, leftColumnsIsNotNull);
+        Expression rightNullLeftNull = new AndExpression(rightColumnsIsNull, leftColumnsIsNull);
+
+        Expression rightJoinLeftIsNull = determineWhereExpression(leftNullRightNull, rightIsNull);
+        Expression rightJoinLeftIsNotNull = determineWhereExpression(leftNullRightNotNull, rightIsNotNull);
+
+        Expression leftJoinRightIsNull = determineWhereExpression(rightNullLeftNull, leftIsNull);
+        Expression leftJoinRightIsNotNull = determineWhereExpression(rightNullLeftNotNull, leftIsNotNull);
+
+        result.add(new JoinWhereItem(innerJoin, whereExpression));
+        result.add(new JoinWhereItem(leftJoin, leftJoinRightIsNull));
+        result.add(new JoinWhereItem(leftJoin, leftJoinRightIsNotNull));
+        result.add(new JoinWhereItem(rightJoin, rightJoinLeftIsNull));
+        result.add(new JoinWhereItem(rightJoin, rightJoinLeftIsNotNull));
+
+        //whereExpression = temp;
+        System.out.println("WHERE" + whereExpression);
+        System.out.println("PS" + plainSelect);
         return result;
     }
 
