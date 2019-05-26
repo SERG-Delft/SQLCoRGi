@@ -269,10 +269,9 @@ public class GenJoinWhereExpression {
         Parenthesis parenthesis;
 
         for (Map.Entry<String, List<Column>> s : map.entrySet()) {
-            values = map.get(s.getKey());
+            columns = map.get(s.getKey());
 
-            columns.addAll(values);
-            isNotNulls = createIsNullExpressions(columns, new AndExpression(null, null), false);
+            isNotNulls = createIsNullExpressions(columns,false);
             parenthesis = new Parenthesis();
             parenthesis.setExpression(join.getOnExpression());
 
@@ -348,6 +347,13 @@ public class GenJoinWhereExpression {
 
         throw new IllegalStateException("The columns list cannot be empty.");
     }
+
+    private static Expression createIsNullExpressions(List<Column> columns, boolean isNull) {
+        Stack<Column> stack = new Stack<>();
+        stack.addAll(columns);
+        return createIsNullExpressions(stack, new AndExpression(null, null), isNull);
+    }
+
 
     /**
      * If an expression is nested in parentheses or in a not expression, retrieve the innermost expression that is
