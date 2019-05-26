@@ -20,7 +20,7 @@ import net.sf.jsqlparser.schema.Column;
 
 import java.util.List;
 
-public class NullColumnExclusionVisitor extends ExpressionVisitorAdapter {
+public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
     private List<Column> nullColumns;
     private String table;
     private Expression expression;
