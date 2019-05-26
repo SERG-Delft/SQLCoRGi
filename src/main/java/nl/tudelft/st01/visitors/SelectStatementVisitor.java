@@ -45,8 +45,10 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     }
 
     /**
-     * Handles the where part of the query. Adds the results to the output.
-     * @param plainSelect Input plainselect from which the expressions have to be derived.
+     * Generates coverage rules for the WHERE clause of the query that is being visited. The generated rules are stored
+     * in the {@code output} set.
+     *
+     * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleWhere(PlainSelect plainSelect) {
         Expression where = plainSelect.getWhere();
@@ -70,7 +72,8 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
 
     /**
      * Handles the aggregators part of the query. Adds the results to the output.
-     * @param plainSelect Input plainselect from which the cases have to be derived.
+     *
+     * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleAggregators(PlainSelect plainSelect) {
         GenAggregateFunctions genAggregateFunctions = new GenAggregateFunctions();
@@ -80,8 +83,9 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     }
 
     /**
-     * Handles the joins given the plainselect. Adds the results to the output.
-     * @param plainSelect The input query for which the mutations have to be generated.
+     * Generates coverage rules for the JOIN operators of the query that is being visited. The generated rules are
+     * stored in the {@code output} set.
+     * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleJoins(PlainSelect plainSelect) {
         GenJoinWhereExpression genJoinWhereExpression = new GenJoinWhereExpression();
