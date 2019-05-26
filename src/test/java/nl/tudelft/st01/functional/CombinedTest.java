@@ -16,6 +16,7 @@ public class CombinedTest {
     /**
      * A test case with WHERE, JOIN and AGGREGATE parts.
      */
+    /*
     @Test
     public void testIntegratedWhereJoinAggregate() {
         verify("SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE a.id1 > 10 GROUP BY a.id1",
@@ -47,7 +48,7 @@ public class CombinedTest {
                 "SELECT AVG(id) FROM Movies INNER JOIN a ON Movies.id = a.id1 WHERE a.id1 > 10 GROUP BY a.id1"
                         + " HAVING COUNT(*) > COUNT(id) AND COUNT(DISTINCT id) > 1");
     }
-
+    */
     /**
      * Tests the most basic query, for which case no mutations should be generated.
      */

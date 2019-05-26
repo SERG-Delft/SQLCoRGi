@@ -128,18 +128,10 @@ public class GenJoinWhereExpression {
         Join innerJoin = createGenericCopyOfJoin(join);
         innerJoin.setInner(true);
 
-        Expression isNotNulls;
-        Expression isNulls;
-
         List<JoinWhereItem> result = new ArrayList<>();
         List<Column> columns;
 
         JoinOnConditionColumns joinOnConditionColumns = new JoinOnConditionColumns();
-
-        BinaryExpression leftJoinExpressionIsNull = new AndExpression(null, null);
-        BinaryExpression leftJoinExpressionIsNotNull = new AndExpression(null, null);
-        BinaryExpression rightJoinExpressionIsNull = new AndExpression(null, null);
-        BinaryExpression rightJoinExpressionIsNotNull = new AndExpression(null, null);
 
         for (Map.Entry<String, List<Column>> s : map.entrySet()) {
             columns = map.get(s.getKey());
@@ -152,7 +144,6 @@ public class GenJoinWhereExpression {
         }
 
         result.addAll(generateJoinWhereItems(joinOnConditionColumns, join));
-        System.out.println(joinOnConditionColumns);
 
         return result;
     }
@@ -204,9 +195,6 @@ public class GenJoinWhereExpression {
         result.add(new JoinWhereItem(rightJoin, rightJoinLeftIsNull));
         result.add(new JoinWhereItem(rightJoin, rightJoinLeftIsNotNull));
 
-        //whereExpression = temp;
-        System.out.println("WHERE" + whereExpression);
-        System.out.println("PS" + plainSelect);
         return result;
     }
 
@@ -216,6 +204,7 @@ public class GenJoinWhereExpression {
      * @param expression The expression that should be modified.
      * @return The modified expression.
      */
+    /*
     private static Expression excludeInExpression(List<Column> nulls, Expression expression) {
         Expression filteredWhere;
         ColumnExclusionVisitor ceVisitor = new ColumnExclusionVisitor();
@@ -231,6 +220,7 @@ public class GenJoinWhereExpression {
         return null;
 
     }
+    */
 
     /**
      * Modifies input expression such that it no longer contains any columns part of the table.
