@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 /**
- * Custom Visitor for SELECT statements.
+ * .
  */
 public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 

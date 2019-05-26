@@ -14,21 +14,22 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Utility class for coverage target generation.
+ * The entry point of the coverage rule generator.
  */
 public final class Generator {
 
     /**
-     * Nope.
+     * No instance of this class should be created.
      */
     private Generator() {
         throw new UnsupportedOperationException();
     }
 
     /**
-     * Generates coverage targets for a given query.
-     * @param query the query that needs to be covered.
-     * @return the generated queries.
+     * Generates coverage targets for the given query.
+     *
+     * @param query the query for which coverage rules should be generated.
+     * @return the rules that are generated for the input query.
      */
     public static Set<String> generateRules(String query) {
         Set<String> result = new HashSet<>();
@@ -64,12 +65,15 @@ public final class Generator {
 
 
     /**
-     * Example query to try out the generator.
+     * Main method for manual testing.
+     *
      * @param args unused.
      */
     public static void main(String[] args) {
+
         String query = "SELECT * FROM Movies INNER JOIN a ON Movies.id > 5";
         Set<String> result = generateRules(query);
+
         System.out.println("Result:");
         for (String s : result) {
             System.out.println(s);

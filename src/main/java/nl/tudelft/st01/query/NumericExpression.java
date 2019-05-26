@@ -9,6 +9,7 @@ public interface NumericExpression extends Expression {
 
     /**
      * Adds an integer to the value of this NumericExpression.
+     *
      * @param number the integer to be added.
      * @return a new instance of the expression, representing the value resulting from the addition.
      */

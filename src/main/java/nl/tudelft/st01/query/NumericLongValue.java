@@ -10,6 +10,7 @@ public class NumericLongValue extends LongValue implements NumericExpression {
     /**
      * Creates a new {@code NumericLongValue} instance, which is equivalent to its {@link LongValue} counterpart,
      * but provides additional functionality.
+     *
      * @param value a string representing the value of the long.
      */
     public NumericLongValue(String value) {

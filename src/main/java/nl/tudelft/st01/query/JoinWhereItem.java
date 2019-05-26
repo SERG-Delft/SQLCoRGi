@@ -14,6 +14,7 @@ public class JoinWhereItem {
 
     /**
      * Creates a new {@code JoinWhereItem} linking a given JOIN to a WHERE expression.
+     *
      * @param join a {@code Join} that should be linked to {@code joinWhere}.
      * @param joinWhere the WHERE expression that should be linked to {@code join}.
      */

@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Class that generates rules for the Aggregate functions such as MAX, AVG etc.
+ * Class that generates rules for the aggregate functions such as MAX, AVG etc.
  */
 public class GenAggregateFunctions {
     private static final String COUNT_STRING = "COUNT";

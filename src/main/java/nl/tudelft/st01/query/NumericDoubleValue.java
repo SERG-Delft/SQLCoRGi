@@ -10,6 +10,7 @@ public class NumericDoubleValue extends DoubleValue implements NumericExpression
     /**
      * Creates a new {@code NumericDoubleValue} instance, which is equivalent to its {@link DoubleValue} counterpart,
      * but provides additional functionality.
+     *
      * @param value a string representing the value of the double.
      */
     public NumericDoubleValue(String value) {
