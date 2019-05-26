@@ -50,16 +50,12 @@ public final class Generator {
         SelectBody selectBody = ((Select) statement).getSelectBody();
 
         SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor();
-        ArrayList<PlainSelect> plainSelects = new ArrayList<>();
 
         Set<String> out = new TreeSet<>();
         selectStatementVisitor.setOutput(out);
         selectBody.accept(selectStatementVisitor);
 
         result.addAll(out);
-        for (PlainSelect plainSelect : plainSelects) {
-            result.add(plainSelect.toString());
-        }
 
         return result;
     }
