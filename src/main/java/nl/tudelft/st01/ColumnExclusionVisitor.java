@@ -19,10 +19,11 @@ import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 
 import java.util.List;
+import java.util.Set;
 
 public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
     private List<Column> nullColumns;
-    private String table;
+    private Set<String> tables;
     private Expression expression;
 
     @Override
@@ -42,7 +43,7 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(GreaterThan greaterThan) {
-
+        handleComparisonOperator(greaterThan);
     }
 
     @Override
@@ -111,8 +112,16 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
         this.nullColumns = nullColumns;
     }
 
-    public void setTable(String table) {
-        this.table = table.toLowerCase();
+    public void setTables(Set<String> tables) {
+        if (this.tables != null) {
+            this.tables.clear();
+            for (String table : tables) {
+                this.tables.add(table.toLowerCase());
+            }
+        } else {
+            this.tables = tables;
+        }
+
     }
 
     public void setExpression(Expression expression) {
@@ -129,7 +138,7 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
      * @return True if the column is in the list or if it belongs to the table.
      */
     private boolean contains(Column column) {
-        if (nullColumns != null) {
+        if (nullColumns != null && !nullColumns.isEmpty()) {
             for (Column c : nullColumns) {
                 if (c.toString().toLowerCase().equals(column.toString().toLowerCase())) {
                     return true;
@@ -137,7 +146,11 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
             }
         }
 
-        return (table != null && table.equals(column.getTable().toString().toLowerCase()));
+        if (tables != null && !tables.isEmpty()) {
+            return tables.contains(column.getTable().toString().toLowerCase());
+        }
+
+        return false;
     }
 
     /**
@@ -149,14 +162,18 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
         Expression right;
 
         expression = binaryExpression.getLeftExpression();
-        expression.accept(this);
+        if (expression != null) {
+            expression.accept(this);
+        }
 
         left = expression;
 
         binaryExpression.setLeftExpression(left);
 
         expression = binaryExpression.getRightExpression();
-        expression.accept(this);
+        if (expression != null) {
+            expression.accept(this);
+        }
 
         right = expression;
 
