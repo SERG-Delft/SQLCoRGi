@@ -38,12 +38,13 @@ public final class Generator {
         try {
             statement = CCJSqlParserUtil.parse(query);
         } catch (JSQLParserException e) {
-            System.out.println("Input query could not be parsed.");
+            System.err.println("Input query could not be parsed.");
             return result;
         }
 
         if (!(statement instanceof Select)) {
-            throw new IllegalArgumentException("Only SELECT statements are accepted.");
+            System.err.println("Only SELECT statements are supported.");
+            return result;
         }
 
         SelectBody selectBody = ((Select) statement).getSelectBody();

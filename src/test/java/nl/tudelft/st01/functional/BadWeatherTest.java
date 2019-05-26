@@ -24,8 +24,6 @@ public class BadWeatherTest {
      */
     @Test
     public void testNonSelectQuery() {
-        String query = "ALTER TABLE Customers ADD Email varchar(255);";
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                Generator.generateRules(query));
+        verify("ALTER TABLE Customers ADD Email varchar(255)");
     }
 }

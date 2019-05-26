@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 /**
- * .
+ * A visitor used for generating coverage targets of a SELECT statement.
  */
 public class SelectStatementVisitor extends SelectVisitorAdapter {
 
