@@ -21,8 +21,8 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     private Set<String> output;
 
     /**
-     * Creates a new visitor which can be used to generate coverage rules for queries. Any rules that are generated
-     * will be written to {@code output}.
+     * Creates a new visitor which can be used to generate coverage rules for queries.
+     * Any rules that are generated will be written to {@code output}.
      *
      * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
      */
@@ -49,8 +49,8 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     }
 
     /**
-     * Generates coverage rules for the WHERE clause of the query that is being visited. The generated rules are stored
-     * in the {@code output} set.
+     * Generates coverage rules for the WHERE clause of the query that is being visited.
+     * The generated rules are stored in the {@code output} set.
      *
      * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
@@ -72,9 +72,10 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     }
 
     /**
-     * Handles the aggregators part of the query. Adds the results to the output.
+     * Generates coverage rules for the Aggregate functions of the query that is being visited.
+     * The generated rules are stored in the {@code output} set.
      *
-     * @param plainSelect Input plainselect from which the cases have to be derived.
+     * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleAggregators(PlainSelect plainSelect) {
         AggregateFunctionsGenerator aggregateFunctionsGenerator = new AggregateFunctionsGenerator();
@@ -84,9 +85,10 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     }
 
     /**
-     * Handles the group by part of the query. Adds the results to the output.
+     * Generates coverage rules for the GROUP BY clause of the query that is being visited.
+     * The generated rules are stored in the {@code output} set.
      *
-     * @param plainSelect Input plainselect from which the cases have to be derived.
+     * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleGroupBy(PlainSelect plainSelect) {
         GroupByElement groupBy = plainSelect.getGroupBy();
@@ -100,9 +102,10 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     }
 
     /**
-     * Handles the having part of the query. Adds the results to the output.
+     * Generates coverage rules for the HAVING clause of the query that is being visited.
+     * The generated rules are stored in the {@code output} set.
      *
-     * @param plainSelect Input plainselect from which the cases have to be derived.
+     * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleHaving(PlainSelect plainSelect) {
         Expression having = plainSelect.getHaving();
@@ -122,9 +125,10 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     }
 
     /**
-     * Handles the joins given the plainselect. Adds the results to the output.
+     * Generates coverage rules for the JOIN operators of the query that is being visited.
+     * The generated rules are stored in the {@code output} set.
      *
-     * @param plainSelect The input query for which the mutations have to be generated.
+     * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleJoins(PlainSelect plainSelect) {
         JoinWhereExpressionGenerator joinWhereExpressionGenerator = new JoinWhereExpressionGenerator();
