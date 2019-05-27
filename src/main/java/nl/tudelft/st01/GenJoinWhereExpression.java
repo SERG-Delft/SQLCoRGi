@@ -73,29 +73,6 @@ public class GenJoinWhereExpression {
     }
 
     /**
-     * Depending on whether the original statement has a where expression,
-     * determines what the where condition of the mutated statement should be.
-     * @param joinWhereExpression The where expression corresponding to the mutated join.
-     * @param originalWhereCondition The where expression corresponding to the original query.
-     * @return The where condition to be used in the mutated statement.
-     */
-    private static Expression determineWhereExpression(Expression joinWhereExpression,
-                                                       Expression originalWhereCondition) {
-        Parenthesis parenthesis = new Parenthesis(originalWhereCondition);
-        Parenthesis parenthesisJoinWhere = new Parenthesis(joinWhereExpression);
-
-        Expression out;
-        if (originalWhereCondition == null) {
-            out = joinWhereExpression;
-        } else if (joinWhereExpression != null) {
-            out = new AndExpression(parenthesisJoinWhere, parenthesis);
-        } else {
-            out = parenthesis;
-        }
-        return out;
-    }
-
-    /**
      * Mutates the given {@link Join} such that it returns a list of {@link JoinWhereItem}s.
      * @param join The join that should be mutated.
      * @return A list of mutated joins and their corresponding where expressions.
@@ -120,13 +97,6 @@ public class GenJoinWhereExpression {
      */
     @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
     private List<JoinWhereItem> handleJoinMultipleTablesOnCondition(Join join, Map<String, List<Column>> map) {
-        Join leftJoin = createGenericCopyOfJoin(join);
-        leftJoin.setLeft(true);
-        Join rightJoin = createGenericCopyOfJoin(join);
-        rightJoin.setRight(true);
-        Join innerJoin = createGenericCopyOfJoin(join);
-        innerJoin.setInner(true);
-
         List<JoinWhereItem> result = new ArrayList<>();
         List<Column> columns;
 
@@ -167,6 +137,7 @@ public class GenJoinWhereExpression {
 
         List<Column> left = joinOnConditionColumns.getLeftColumns();
         Set<String> leftTables = joinOnConditionColumns.getLeftTables();
+
         List<Column> right = joinOnConditionColumns.getRightColumns();
         Set<String> rightTables = joinOnConditionColumns.getRightTables();
 
@@ -176,23 +147,24 @@ public class GenJoinWhereExpression {
         Expression rightColumnsIsNull = createIsNullExpressions(right, true);
         Expression rightColumnsIsNotNull = createIsNullExpressions(right, false);
 
+        //TODO: Need unmodified version of the original expression when mutating for each case.
         Expression rightIsNull = excludeInExpression(right, leftTables, temp);
         Expression rightIsNotNull = excludeInExpression(leftTables, temp);
 
         Expression leftIsNull = excludeInExpression(left, rightTables, temp);
         Expression leftIsNotNull = excludeInExpression(rightTables, temp);
 
-        Expression leftNullRightNotNull = new AndExpression(leftColumnsIsNull, rightColumnsIsNotNull);
-        Expression leftNullRightNull = new AndExpression(leftColumnsIsNull, rightColumnsIsNull);
+        Expression leftNullRightNotNull = concatenate(leftColumnsIsNull, rightColumnsIsNotNull);
+        Expression leftNullRightNull = concatenate(leftColumnsIsNull, rightColumnsIsNull);
 
-        Expression rightNullLeftNotNull = new AndExpression(rightColumnsIsNull, leftColumnsIsNotNull);
-        Expression rightNullLeftNull = new AndExpression(rightColumnsIsNull, leftColumnsIsNull);
+        Expression rightNullLeftNotNull = concatenate(rightColumnsIsNull, leftColumnsIsNotNull);
+        Expression rightNullLeftNull = concatenate(rightColumnsIsNull, leftColumnsIsNull);
 
-        Expression rightJoinLeftIsNull = determineWhereExpression(leftNullRightNull, rightIsNull);
-        Expression rightJoinLeftIsNotNull = determineWhereExpression(leftNullRightNotNull, rightIsNotNull);
+        Expression rightJoinLeftIsNull = concatenate(leftNullRightNull, rightIsNull);
+        Expression rightJoinLeftIsNotNull = concatenate(leftNullRightNotNull, rightIsNotNull);
 
-        Expression leftJoinRightIsNull = determineWhereExpression(rightNullLeftNull, leftIsNull);
-        Expression leftJoinRightIsNotNull = determineWhereExpression(rightNullLeftNotNull, leftIsNotNull);
+        Expression leftJoinRightIsNull = concatenate(rightNullLeftNull, leftIsNull);
+        Expression leftJoinRightIsNotNull = concatenate(rightNullLeftNotNull, leftIsNotNull);
 
         result.add(new JoinWhereItem(innerJoin, whereExpression));
         result.add(new JoinWhereItem(leftJoin, leftJoinRightIsNull));
@@ -201,6 +173,41 @@ public class GenJoinWhereExpression {
         result.add(new JoinWhereItem(rightJoin, rightJoinLeftIsNotNull));
 
         return result;
+    }
+
+    private void generateJoinWhereItemForJoin(JoinOnConditionColumns joinOnConditionColumns, Join join) {
+
+    }
+
+    /**
+     * Returns the concatenation of two expression. If either of them is null, the other expression is wrapped
+     * in parentheses.
+     * @param left The left expression.
+     * @param right The right expression.
+     * @return An and expression if both expressions are not null, otherwise, return the expression that is not null
+     * wrapped in parentheses. If both are null, return null.
+     */
+    private Expression concatenate(Expression left, Expression right) {
+        if (left == null) {
+            return wrapInParentheses(right);
+        } else if (right != null) {
+            return new AndExpression(wrapInParentheses(left), wrapInParentheses(right));
+        } else {
+            return wrapInParentheses(left);
+        }
+    }
+
+    /**
+     * Wraps the given expression in parentheses if it is not wrapped yet.
+     * @param expression The expression to wrap.
+     * @return Expression wrapped in parentheses.
+     */
+    private Expression wrapInParentheses(Expression expression) {
+        if (expression instanceof Parenthesis) {
+            return expression;
+        } else {
+            return new Parenthesis(expression);
+        }
     }
 
     /**
@@ -240,10 +247,11 @@ public class GenJoinWhereExpression {
             ceVisitor.setTables(tables);
             expression.accept(ceVisitor);
             filteredWhere = ceVisitor.getExpression();
+
             return filteredWhere;
         }
-        return null;
 
+        return null;
     }
 
     /**
@@ -261,10 +269,11 @@ public class GenJoinWhereExpression {
             ceVisitor.setNullColumns(columns);
             expression.accept(ceVisitor);
             filteredWhere = ceVisitor.getExpression();
+
             return filteredWhere;
         }
-        return null;
 
+        return null;
     }
 
 
