@@ -35,10 +35,11 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
     }
 
     /**
-     * Generates modified conditions from a simple comparison.
-     * @param comparisonOperator the comparison operator to generate the conditions from.
+     * Generates mutations for relational operators.
+     *
+     * @param comparisonOperator the relational operator to be mutated.
      */
-    private void generateSimpleComparison(ComparisonOperator comparisonOperator) {
+    private void generateRelationalMutations(ComparisonOperator comparisonOperator) {
 
         ArrayList<Expression> cases = new ArrayList<>();
         Column column = (Column) comparisonOperator.getLeftExpression();
@@ -50,11 +51,12 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
     }
 
     /**
-     * Generates subexpressions and their combinations for {@link OrExpression}s and {@link AndExpression}d.
+     * Generates mutations for conditions containing {@link OrExpression}s and {@link AndExpression}s.
+     *
      * @param expression an {@link OrExpression} or {@link AndExpression}.
      */
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    private void generateSubExpressions(BinaryExpression expression) {
+    private void generateCompoundMutations(BinaryExpression expression) {
 
         Expression left = expression.getLeftExpression();
         Expression right = expression.getRightExpression();
@@ -96,27 +98,27 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(AndExpression andExpression) {
-        generateSubExpressions(andExpression);
+        generateCompoundMutations(andExpression);
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        generateSubExpressions(orExpression);
+        generateCompoundMutations(orExpression);
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        generateSimpleComparison(equalsTo);
+        generateRelationalMutations(equalsTo);
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        generateSimpleComparison(greaterThan);
+        generateRelationalMutations(greaterThan);
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        generateSimpleComparison(greaterThanEquals);
+        generateRelationalMutations(greaterThanEquals);
     }
 
     @Override
@@ -135,17 +137,17 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(MinorThan minorThan) {
-        generateSimpleComparison(minorThan);
+        generateRelationalMutations(minorThan);
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        generateSimpleComparison(minorThanEquals);
+        generateRelationalMutations(minorThanEquals);
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        generateSimpleComparison(notEqualsTo);
+        generateRelationalMutations(notEqualsTo);
     }
 
     /**
