@@ -1,17 +1,7 @@
 package nl.tudelft.st01.visitors.join;
 
-import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
-import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
-import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
-import net.sf.jsqlparser.expression.operators.relational.MinorThan;
-import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
-import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 
 import java.util.ArrayList;
@@ -25,15 +15,6 @@ import java.util.Map;
 public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
 
     private Map<String, List<Expression>> output = new HashMap<>();
-
-    /**
-     * Retrieves the columns and values used in the on expressions.
-     * @param binaryExpression binary expression.
-     */
-    private void getColumnsOnCondition(BinaryExpression binaryExpression) {
-        binaryExpression.getLeftExpression().accept(this);
-        binaryExpression.getRightExpression().accept(this);
-    }
 
     /**
      * Stores each column corresponding to its table.
@@ -50,8 +31,6 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
             output.get(table).add(e);
         }
     }
-
-
 
     public void setOutput(Map map) {
         this.output = map;
@@ -75,51 +54,6 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
             }
         }
         return false;
-    }
-
-    @Override
-    public void visit(AndExpression andExpression) {
-        getColumnsOnCondition(andExpression);
-    }
-
-    @Override
-    public void visit(OrExpression orExpression) {
-        getColumnsOnCondition(orExpression);
-    }
-
-    @Override
-    public void visit(EqualsTo equalsTo) {
-        getColumnsOnCondition(equalsTo);
-    }
-
-    @Override
-    public void visit(GreaterThan greaterThan) {
-        getColumnsOnCondition(greaterThan);
-    }
-
-    @Override
-    public void visit(GreaterThanEquals greaterThanEquals) {
-        getColumnsOnCondition(greaterThanEquals);
-    }
-
-    @Override
-    public void visit(IsNullExpression isNullExpression) {
-        isNullExpression.getLeftExpression().accept(this);
-    }
-
-    @Override
-    public void visit(MinorThan minorThan) {
-        getColumnsOnCondition(minorThan);
-    }
-
-    @Override
-    public void visit(MinorThanEquals minorThanEquals) {
-        getColumnsOnCondition(minorThanEquals);
-    }
-
-    @Override
-    public void visit(NotEqualsTo notEqualsTo) {
-        getColumnsOnCondition(notEqualsTo);
     }
 
     @Override

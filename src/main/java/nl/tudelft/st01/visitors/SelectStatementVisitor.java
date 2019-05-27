@@ -83,7 +83,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     /**
      * Generates coverage rules for the JOIN operators of the query that is being visited. The generated rules are
      * stored in the {@code output} set.
-     * 
+     *
      * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleJoins(PlainSelect plainSelect) {
