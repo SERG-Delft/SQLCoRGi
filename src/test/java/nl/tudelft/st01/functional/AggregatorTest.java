@@ -78,8 +78,8 @@ public class AggregatorTest {
     public void testBasicGroupBy() {
         verify("SELECT director, Name FROM Movies GROUP BY Name",
 
-            "SELECT director, Name FROM Movies GROUP BY Name HAVING COUNT(*) > 1",
-            "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Name) > 1");
+                "SELECT director, Name FROM Movies GROUP BY Name HAVING COUNT(*) > 1",
+                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Name) > 1");
     }
 
     /**
@@ -89,11 +89,11 @@ public class AggregatorTest {
     public void testGroupByWithWhere() {
         verify("SELECT director FROM Movies WHERE title = 'Finding Nemo' GROUP BY director",
 
-            "SELECT director FROM Movies WHERE title <> 'Finding Nemo' GROUP BY director",
-            "SELECT director FROM Movies WHERE title = 'Finding Nemo' GROUP BY director",
-            "SELECT director FROM Movies WHERE title IS NULL GROUP BY director",
-            "SELECT director FROM Movies WHERE title = 'Finding Nemo' GROUP BY director HAVING COUNT(*) > 1",
-            "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' HAVING COUNT(DISTINCT director) > 1");
+                "SELECT director FROM Movies WHERE title <> 'Finding Nemo' GROUP BY director",
+                "SELECT director FROM Movies WHERE title = 'Finding Nemo' GROUP BY director",
+                "SELECT director FROM Movies WHERE title IS NULL GROUP BY director",
+                "SELECT director FROM Movies WHERE title = 'Finding Nemo' GROUP BY director HAVING COUNT(*) > 1",
+                "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' HAVING COUNT(DISTINCT director) > 1");
     }
 
     /**
@@ -103,11 +103,11 @@ public class AggregatorTest {
     public void testHaving() {
         verify("SELECT director FROM Movies GROUP BY director HAVING director LIKE 'B%'",
 
-            "SELECT director FROM Movies GROUP BY director HAVING NOT director LIKE 'B%'",
-            "SELECT director FROM Movies GROUP BY director HAVING director LIKE 'B%'",
-            "SELECT director FROM Movies GROUP BY director HAVING director IS NULL",
-            "SELECT director FROM Movies GROUP BY director HAVING COUNT(*) > 1 AND director LIKE 'B%'",
-            "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1 AND director LIKE 'B%'");
+                "SELECT director FROM Movies GROUP BY director HAVING NOT director LIKE 'B%'",
+                "SELECT director FROM Movies GROUP BY director HAVING director LIKE 'B%'",
+                "SELECT director FROM Movies GROUP BY director HAVING director IS NULL",
+                "SELECT director FROM Movies GROUP BY director HAVING COUNT(*) > 1 AND director LIKE 'B%'",
+                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1 AND director LIKE 'B%'");
     }
 
     /**
@@ -118,19 +118,19 @@ public class AggregatorTest {
         verify("SELECT director FROM Movies WHERE title = 'Finding Nemo' "
                 + "GROUP BY director HAVING director LIKE 'A%'",
 
-        "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
-                + "GROUP BY director HAVING director LIKE 'A%'",
             "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
-                + "GROUP BY director HAVING NOT director LIKE 'A%'",
-            "SELECT director FROM Movies WHERE title <> 'Finding Nemo' "
-                + "GROUP BY director HAVING director LIKE 'A%'",
-            "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
-                + "GROUP BY director HAVING COUNT(*) > 1 AND director LIKE 'A%'",
-            "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' "
-                + "HAVING COUNT(DISTINCT director) > 1 AND director LIKE 'A%'",
-            "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
-                + "GROUP BY director HAVING director IS NULL",
-            "SELECT director FROM Movies WHERE title IS NULL "
-                + "GROUP BY director HAVING director LIKE 'A%'");
+                    + "GROUP BY director HAVING director LIKE 'A%'",
+                "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
+                    + "GROUP BY director HAVING NOT director LIKE 'A%'",
+                "SELECT director FROM Movies WHERE title <> 'Finding Nemo' "
+                    + "GROUP BY director HAVING director LIKE 'A%'",
+                "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
+                    + "GROUP BY director HAVING COUNT(*) > 1 AND director LIKE 'A%'",
+                "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' "
+                    + "HAVING COUNT(DISTINCT director) > 1 AND director LIKE 'A%'",
+                "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
+                    + "GROUP BY director HAVING director IS NULL",
+                "SELECT director FROM Movies WHERE title IS NULL "
+                    + "GROUP BY director HAVING director LIKE 'A%'");
     }
 }

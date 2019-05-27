@@ -83,7 +83,7 @@ public final class UtilityGetters {
      * @param distinct toggles whether or not you want to include DISTINCT
      * @return a COUNT(DISTINCT __) object
      */
-    public static Function getCountDistinctColumn(Expression expression, boolean distinct) {
+    public static Function getCountColumn(Expression expression, boolean distinct) {
         Function countColumn = new Function();
         countColumn.setName(COUNT_STRING);
         ExpressionList parameters = new ExpressionList(expression);

@@ -86,7 +86,7 @@ public class GroupBy {
         Expression groupBy = plainSelect.getGroupBy().getGroupByExpressions().get(0);
 
         // Create COUNT(distinct groupByColumn) object
-        Function countColumn = UtilityGetters.getCountDistinctColumn(groupBy, true);
+        Function countColumn = UtilityGetters.getCountColumn(groupBy, true);
 
         // Create count > 1
         GreaterThan greaterThan1 = UtilityGetters.getGreaterThan1(countColumn);
