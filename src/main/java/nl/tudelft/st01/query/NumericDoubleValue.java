@@ -5,7 +5,7 @@ import net.sf.jsqlparser.expression.DoubleValue;
 /**
  * Extension of the {@link DoubleValue} class to allow for uniform treatment with other numeric types.
  */
-public class NumericDoubleValue extends DoubleValue implements NumericExpression {
+public class NumericDoubleValue extends DoubleValue implements NumericValue {
 
     /**
      * Creates a new {@code NumericDoubleValue} instance, which is equivalent to its {@link DoubleValue} counterpart,
@@ -18,7 +18,7 @@ public class NumericDoubleValue extends DoubleValue implements NumericExpression
     }
 
     @Override
-    public NumericExpression add(int number) {
+    public NumericValue add(int number) {
         return new NumericDoubleValue(Double.toString(this.getValue() + number));
     }
 }

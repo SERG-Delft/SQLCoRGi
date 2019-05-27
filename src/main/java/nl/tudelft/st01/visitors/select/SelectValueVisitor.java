@@ -6,14 +6,14 @@ import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.query.NumericDoubleValue;
-import nl.tudelft.st01.query.NumericExpression;
+import nl.tudelft.st01.query.NumericValue;
 import nl.tudelft.st01.query.NumericLongValue;
 
 import java.util.List;
 
 /**
- * Custom visitor for the values of SELECT statements. The type of value determines what kind of cases need to be
- * generated.
+ * A visitor for values used in equality operators in SELECT expressions. The type of value determines what kind of
+ * cases are generated.
  */
 public class SelectValueVisitor extends ExpressionVisitorAdapter {
 
@@ -41,14 +41,15 @@ public class SelectValueVisitor extends ExpressionVisitorAdapter {
 
     /**
      * Generates modified conditions for numeric values.
-     * @param numericExpression the numeric value taken from the original expression.
+     *
+     * @param numericValue the numeric value taken from the original expression.
      */
     @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.UnusedPrivateMethod"})
-    private void generateNumericCases(NumericExpression numericExpression) {
+    private void generateNumericCases(NumericValue numericValue) {
         for (int i = -1; i <= 1; ++i) {
             EqualsTo equalsTo = new EqualsTo();
             equalsTo.setLeftExpression(column);
-            equalsTo.setRightExpression(numericExpression.add(i));
+            equalsTo.setRightExpression(numericValue.add(i));
             output.add(equalsTo);
         }
 

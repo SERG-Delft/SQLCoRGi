@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Custom visitor for expressions, such as WHERE clauses in SELECT statements.
+ * A visitor for select expressions, i.e. {@code WHERE} and {@code HAVING} clauses in {@code SELECT} statements.
  */
 public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
