@@ -85,8 +85,8 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
      * @param plainSelect The input query for which the mutations have to be generated.
      */
     public void handleJoins(PlainSelect plainSelect) {
-        GenJoinWhereExpression genJoinWhereExpression = new GenJoinWhereExpression();
-        Set<String> out = genJoinWhereExpression.generateJoinWhereExpressions(plainSelect);
+        JoinWhereExpression joinWhereExpression = new JoinWhereExpression();
+        Set<String> out = joinWhereExpression.generateJoinWhereExpressions(plainSelect);
 
         output.addAll(out);
     }
