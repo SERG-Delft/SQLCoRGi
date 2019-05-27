@@ -8,12 +8,13 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Sample nl.tudelft.st01.unit test class.
+ * This class tests if the functions of the {@code UtilityGetters} class exercise correct behaviour
+ * by means of unit tests.
  */
 public class UtilityGettersTest {
 
     /**
-     * Unit test case for UtilityGetters getCountAllColumns function.
+     * Test case to check whether {@code UtilityGetters getCountAllColumns} function returns COUNT(*).
      */
     @Test
     public void testGetCountAllColumns() {
@@ -21,7 +22,7 @@ public class UtilityGettersTest {
     }
 
     /**
-     * Unit test case for UtilityGetters getGreaterThan1 function.
+     * Test case to check whether {@code UtilityGetters getGreaterThan1} function returns _ > 1.
      */
     @Test
     public void testGetGreaterThan1() {
@@ -31,7 +32,7 @@ public class UtilityGettersTest {
     }
 
     /**
-     * Unit test case for UtilityGetters getCountColumn function.
+     * Test case to check whether {@code UtilityGetters getCountColumn} function returns COUNT(column).
      */
     @Test
     public void testGetCountColumn() {
@@ -41,7 +42,8 @@ public class UtilityGettersTest {
     }
 
     /**
-     * Unit test case for UtilityGetters getCountColumn function with DISTINCT enabled.
+     * Test case to check whether {@code UtilityGetters getCountDistinctColumn} function
+     * returns COUNT(DISTINCT column).
      */
     @Test
     public void testGetCountDistinctColumn() {

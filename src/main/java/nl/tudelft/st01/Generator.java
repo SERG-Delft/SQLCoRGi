@@ -59,7 +59,7 @@ public final class Generator {
      * @param args unused.
      */
     public static void main(String[] args) {
-        String query = "SELECT director FROM Movies WHERE title = 'Finding Nemo'"
+        String query = "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
             + "GROUP BY director HAVING Director LIKE 'A%'";
         Set<String> result = generateRules(query);
 
