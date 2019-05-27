@@ -73,6 +73,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
 
     /**
      * Handles the aggregators part of the query. Adds the results to the output.
+     *
      * @param plainSelect Input plainselect from which the cases have to be derived.
      */
     private void handleAggregators(PlainSelect plainSelect) {
@@ -84,6 +85,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
 
     /**
      * Handles the group by part of the query. Adds the results to the output.
+     *
      * @param plainSelect Input plainselect from which the cases have to be derived.
      */
     private void handleGroupBy(PlainSelect plainSelect) {
@@ -99,6 +101,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
 
     /**
      * Handles the having part of the query. Adds the results to the output.
+     *
      * @param plainSelect Input plainselect from which the cases have to be derived.
      */
     private void handleHaving(PlainSelect plainSelect) {
@@ -120,9 +123,10 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
 
     /**
      * Handles the joins given the plainselect. Adds the results to the output.
+     *
      * @param plainSelect The input query for which the mutations have to be generated.
      */
-    public void handleJoins(PlainSelect plainSelect) {
+    private void handleJoins(PlainSelect plainSelect) {
         JoinWhereExpression joinWhereExpression = new JoinWhereExpression();
         Set<String> out = joinWhereExpression.generateJoinWhereExpressions(plainSelect);
 
