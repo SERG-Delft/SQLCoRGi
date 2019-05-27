@@ -27,6 +27,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         handleWhere(plainSelect);
         handleAggregators(plainSelect);
         handleGroupBy(plainSelect);
+        handleHaving(plainSelect);
         handleJoins(plainSelect);
 
         output = null;
@@ -78,6 +79,28 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
 
             output.addAll(outputAfterGroupBy);
         }
+    }
+
+    /**
+     * Handles the having part of the query. Adds the results to the output.
+     * @param plainSelect Input plainselect from which the cases have to be derived.
+     */
+    private void handleHaving(PlainSelect plainSelect) {
+        Expression having = plainSelect.getHaving();
+        ArrayList<Expression> expressions = new ArrayList<>();
+
+        if (having != null) {
+            RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
+
+            ruleGeneratorExpressionVisitor.setOutput(expressions);
+            having.accept(ruleGeneratorExpressionVisitor);
+            for (Expression expression : expressions) {
+                plainSelect.setHaving(expression);
+                output.add(plainSelect.toString());
+            }
+        }
+
+        plainSelect.setHaving(having);
     }
 
     /**

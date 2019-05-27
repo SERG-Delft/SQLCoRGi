@@ -2,6 +2,7 @@ package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectItem;
@@ -45,8 +46,13 @@ public class GroupBy {
         // Create COUNT(*) > 1
         GreaterThan greaterThan1 = UtilityGetters.getGreaterThan1(count);
 
-        // Add to plainselect
-        plainSelectOut.setHaving(greaterThan1);
+        Expression having = plainSelect.getHaving();
+        if (having != null) {
+            plainSelectOut.setHaving(new AndExpression(greaterThan1, having));
+        } else {
+            // Add to plainselect
+            plainSelectOut.setHaving(greaterThan1);
+        }
 
         return plainSelectOut;
     }
@@ -85,8 +91,13 @@ public class GroupBy {
         // Create count > 1
         GreaterThan greaterThan1 = UtilityGetters.getGreaterThan1(countColumn);
 
-        // Add to plainselect
-        plainSelectOut.setHaving(greaterThan1);
+        Expression having = plainSelect.getHaving();
+        if (having != null) {
+            plainSelectOut.setHaving(new AndExpression(greaterThan1, having));
+        } else {
+            // Add to plainselect
+            plainSelectOut.setHaving(greaterThan1);
+        }
 
         return plainSelectOut;
     }
