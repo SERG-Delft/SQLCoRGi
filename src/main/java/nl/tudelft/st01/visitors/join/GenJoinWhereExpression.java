@@ -46,8 +46,7 @@ public class GenJoinWhereExpression {
         if (!(joins == null || joins.isEmpty())) {
 
             this.map = new HashMap<>();
-            OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor();
-            onExpressionVisitor.setOutput(map);
+            OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
 
             List<Join> temp = new ArrayList<>();
             for (int i = 0; i < joins.size(); i++) {

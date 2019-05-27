@@ -5,7 +5,6 @@ import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.schema.Column;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +13,17 @@ import java.util.Map;
  */
 public class OnExpressionVisitor extends ExpressionVisitorAdapter {
 
-    private Map<String, List<Column>> output = new HashMap<>();
+    private Map<String, List<Column>> output;
+
+    /**
+     * Creates a new visitor that can extract names of columns used in an expression it visits. They are stored in
+     * {@code output}.
+     *
+     * @param output the map in which extracted columns are to be stored.
+     */
+    public OnExpressionVisitor(Map<String, List<Column>> output) {
+        this.output = output;
+    }
 
     /**
      * Stores each column corresponding to its table.
@@ -33,17 +42,14 @@ public class OnExpressionVisitor extends ExpressionVisitorAdapter {
         }
     }
 
-    public void setOutput(Map map) {
-        this.output = map;
-    }
-
     /**
      * Ensures that the list of columns used in the on expression contains no duplicate column names.
      * NOTE: Suppose the column name "id" in "Movies" and the column name is unique.
      * Yet, the function considers Movies.id to be different from id.
-     * @param list list
-     * @param column e
-     * @return boolean
+     *
+     * @param list the list of columns.
+     * @param column the column to check for.
+     * @return true if {@code column} is already in {@code list}, false otherwise.
      */
     private static boolean contains(List<Column> list, Column column) {
         if (list == null) {
