@@ -1,4 +1,4 @@
-package nl.tudelft.st01.visitors.join;
+package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
@@ -10,6 +10,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import nl.tudelft.st01.query.JoinWhereItem;
+import nl.tudelft.st01.visitors.join.OnExpressionVisitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;

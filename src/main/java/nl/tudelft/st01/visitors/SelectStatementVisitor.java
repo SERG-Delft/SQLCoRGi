@@ -3,8 +3,8 @@ package nl.tudelft.st01.visitors;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
-import nl.tudelft.st01.visitors.aggregate.GenAggregateFunctions;
-import nl.tudelft.st01.visitors.join.GenJoinWhereExpression;
+import nl.tudelft.st01.GenAggregateFunctions;
+import nl.tudelft.st01.GenJoinWhereExpression;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 
 import java.util.ArrayList;
