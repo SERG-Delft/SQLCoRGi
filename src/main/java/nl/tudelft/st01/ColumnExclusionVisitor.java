@@ -189,18 +189,15 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
 
         right = expression;
 
-        if (left != null) {
-            if (right != null) {
-                Parenthesis parenthesis = new Parenthesis();
-                parenthesis.setExpression(binaryExpression);
-                expression = parenthesis;
-            } else {
-                expression = left;
-            }
-        } else {
+        if (left == null) {
             expression = right;
+        }else if (right != null) {
+            Parenthesis binaryPar = new Parenthesis();
+            binaryPar.setExpression(binaryExpression);
+            expression = binaryPar;
+        } else {
+            expression = left;
         }
-
         binaryExpression.setRightExpression(right);
     }
 
