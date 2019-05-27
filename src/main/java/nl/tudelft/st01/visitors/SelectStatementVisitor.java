@@ -35,7 +35,6 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     }
 
     @Override
-    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public void visit(PlainSelect plainSelect) {
 
         handleWhere(plainSelect);
