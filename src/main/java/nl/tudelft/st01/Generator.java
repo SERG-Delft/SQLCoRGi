@@ -10,6 +10,7 @@ import net.sf.jsqlparser.statement.select.SelectBody;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Utility class for coverage target generation.
@@ -29,10 +30,9 @@ public final class Generator {
      * @return the generated queries.
      */
     public static Set<String> generateRules(String query) {
-
         Set<String> result = new HashSet<>();
 
-        Statement statement = null;
+        Statement statement;
         try {
             statement = CCJSqlParserUtil.parse(query);
         } catch (JSQLParserException e) {
@@ -45,17 +45,22 @@ public final class Generator {
         }
 
         SelectBody selectBody = ((Select) statement).getSelectBody();
+
         RuleGeneratorSelectVisitor ruleGeneratorSelectVisitor = new RuleGeneratorSelectVisitor();
         ArrayList<PlainSelect> plainSelects = new ArrayList<>();
-        ruleGeneratorSelectVisitor.setOutput(plainSelects);
+
+        Set<String> out = new TreeSet<>();
+        ruleGeneratorSelectVisitor.setOutput(out);
         selectBody.accept(ruleGeneratorSelectVisitor);
 
+        result.addAll(out);
         for (PlainSelect plainSelect : plainSelects) {
             result.add(plainSelect.toString());
         }
 
         return result;
     }
+
 
     /**
      * Example query to try out the generator.
@@ -64,8 +69,10 @@ public final class Generator {
     public static void main(String[] args) {
         String query = "SELECT Director, Name FROM Movies GROUP BY Name";
         Set<String> result = generateRules(query);
-
-        System.out.println("Result: " + result.toString());
+        System.out.println("Result:");
+        for (String s : result) {
+            System.out.println(s);
+        }
     }
 
 }

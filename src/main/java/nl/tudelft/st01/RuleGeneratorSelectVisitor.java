@@ -6,15 +6,13 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Custom Visitor for SELECT statements.
  */
 public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
-    private static final String COUNT_STRING = "COUNT";
-
-    private List<PlainSelect> output;
+    private Set<String> output;
 
     @Override
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
@@ -26,54 +24,75 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
             );
         }
 
-        AggregateFunctions aggregateFunctions = new AggregateFunctions();
-        List<PlainSelect> outputAfterAggregator = aggregateFunctions.generate(plainSelect);
-
-        Expression where = plainSelect.getWhere();
-        GroupByElement groupBy = plainSelect.getGroupBy();
-
-        ArrayList<Expression> whereExpressions = new ArrayList<>();
-
-        if (where != null || groupBy != null) {
-            if (where != null) {
-                RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
-                ruleGeneratorExpressionVisitor.setOutput(whereExpressions);
-                where.accept(ruleGeneratorExpressionVisitor);
-
-                for (PlainSelect plainSelectAfterAggregator : outputAfterAggregator) {
-                    for (Expression whereExpression : whereExpressions) {
-                        PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelectAfterAggregator, true);
-                        plainSelectOut.setWhere(whereExpression);
-
-                        output.add(plainSelectOut);
-                    }
-                }
-            } else if (outputAfterAggregator.size() > 1) {
-                // TODO this is really ugly and should be fixed in the JOIN Merge Request
-                // Only add output from aggregation functions when it is has more than 1 element,
-                // otherwise it will interfere with GROUP BY
-                for (PlainSelect plainSelectAfterAggregator : outputAfterAggregator) {
-                    PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelectAfterAggregator, true);
-
-                    output.add(plainSelectOut);
-                }
-            }
-
-            if (groupBy != null) {
-                GroupBy groupByExpression = new GroupBy();
-                output.addAll(groupByExpression.generate(plainSelect));
-            }
-        } else {
-            // Since there is no where, we don't need that part.
-            // We do want the result of the output from the aggregator part,
-            //      so we add those plainSelects to the output list
-            output.addAll(outputAfterAggregator);
-        }
+        handleWhere(plainSelect);
+        handleAggregators(plainSelect);
+        handleGroupBy(plainSelect);
+        handleJoins(plainSelect);
 
         output = null;
     }
 
-    public void setOutput(List<PlainSelect> output) {
+    /**
+     * Handles the where part of the query. Adds the results to the output.
+     * @param plainSelect Input plainselect from which the expressions have to be derived.
+     */
+    private void handleWhere(PlainSelect plainSelect) {
+        Expression where = plainSelect.getWhere();
+        ArrayList<Expression> expressions = new ArrayList<>();
+
+        if (where != null) {
+            RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
+
+            ruleGeneratorExpressionVisitor.setOutput(expressions);
+            where.accept(ruleGeneratorExpressionVisitor);
+            for (Expression expression : expressions) {
+                plainSelect.setWhere(expression);
+                output.add(plainSelect.toString());
+            }
+        }
+
+        plainSelect.setWhere(where);
+    }
+
+    /**
+     * Handles the aggregators part of the query. Adds the results to the output.
+     * @param plainSelect Input plainselect from which the cases have to be derived.
+     */
+    private void handleAggregators(PlainSelect plainSelect) {
+        AggregateFunctions aggregateFunctions = new AggregateFunctions();
+        Set<String> outputAfterAggregator = aggregateFunctions.generate(plainSelect);
+
+        output.addAll(outputAfterAggregator);
+    }
+
+    /**
+     * Handles the group by part of the query. Adds the results to the output.
+     * @param plainSelect Input plainselect from which the cases have to be derived.
+     */
+    private void handleGroupBy(PlainSelect plainSelect) {
+        GroupByElement groupBy = plainSelect.getGroupBy();
+
+        if (groupBy != null) {
+            GroupBy groupByExpression = new GroupBy();
+            Set<String> outputAfterGroupBy = groupByExpression.generate(plainSelect);
+
+            output.addAll(outputAfterGroupBy);
+        }
+    }
+
+    /**
+     * Handles the joins given the plainselect. Adds the results to the output.
+     * @param plainSelect The input query for which the mutations have to be generated.
+     */
+    public void handleJoins(PlainSelect plainSelect) {
+        GenJoinWhereExpression genJoinWhereExpression = new GenJoinWhereExpression();
+        Set<String> out = genJoinWhereExpression.generateJoinWhereExpressions(plainSelect);
+
+        output.addAll(out);
+    }
+
+    public void setOutput(Set<String> output) {
         this.output = output;
     }
+
 }

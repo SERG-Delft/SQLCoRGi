@@ -17,10 +17,10 @@ public final class UtilityGetters {
     private static final String COUNT_STRING = "COUNT";
 
     /**
-     * Make private constructor for utility class that should never be called nor do anything.
+     * No instance of this class should be created.
      */
     private UtilityGetters() {
-        // Should not be instantiated
+        throw new UnsupportedOperationException();
     }
 
     /**

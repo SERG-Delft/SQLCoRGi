@@ -11,6 +11,8 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Class that generates rules for the Aggregate functions such as MAX, AVG etc.
@@ -23,27 +25,26 @@ public class AggregateFunctions {
      * @param plainSelect - query object to generate rules for
      * @return list of query objects which represent the rules for the aggregator function
      */
-    public List<PlainSelect> generate(PlainSelect plainSelect) {
+    public Set<String> generate(PlainSelect plainSelect) {
         // Check if there is a Function in one of the columns. If so, generate rules for it.
-        boolean noFunction = true;
-        List<PlainSelect> outputAfterAggregator = new ArrayList<>();
+        Set<String> outputAfterAggregator = new TreeSet<>();
         for (SelectItem selectItem : plainSelect.getSelectItems()) {
             if (selectItem instanceof SelectExpressionItem) {
                 SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
                 if (selectExpressionItem.getExpression() instanceof Function) {
                     // Here we know the selectItem is a function (AVG, SUM, MAX etc.)
                     //      so we can start adding the rules for it.
-                    noFunction = false;
-                    outputAfterAggregator.add(firstRule(plainSelect));
-                    outputAfterAggregator.add(secondRule(plainSelect));
                     Function func = (Function) selectExpressionItem.getExpression();
-                    outputAfterAggregator.add(thirdRule(plainSelect, func));
-                    outputAfterAggregator.add(fourthRule(plainSelect, func));
+
+                    if (plainSelect.getGroupBy() != null) {
+                        outputAfterAggregator.add(firstRule(plainSelect).toString());
+                        outputAfterAggregator.add(secondRule(plainSelect).toString());
+                        outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
+                    }
+
+                    outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
                 }
             }
-        }
-        if (noFunction) {
-            outputAfterAggregator.add(plainSelect);
         }
 
         return outputAfterAggregator;

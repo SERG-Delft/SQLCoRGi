@@ -8,6 +8,8 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Class that generates rules based on the GROUP BY clause.
@@ -20,10 +22,10 @@ public class GroupBy {
      * @param plainSelect - query object to generate rules for
      * @return list of query objects which represent the rules for the GROUP BY clause
      */
-    public List<PlainSelect> generate(PlainSelect plainSelect) {
-        List<PlainSelect> outputWithGroupBy = new ArrayList<>();
-        outputWithGroupBy.add(firstRule(plainSelect));
-        outputWithGroupBy.add(secondRule(plainSelect));
+    public Set<String> generate(PlainSelect plainSelect) {
+        Set<String> outputWithGroupBy = new TreeSet<>();
+        outputWithGroupBy.add(firstRule(plainSelect).toString());
+        outputWithGroupBy.add(secondRule(plainSelect).toString());
 
         return outputWithGroupBy;
     }
