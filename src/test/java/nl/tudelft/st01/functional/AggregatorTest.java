@@ -27,13 +27,13 @@ public class AggregatorTest {
      */
     @Test
     public void testAVGAggregator1column1Aggr() {
-        verify("SELECT Director, AVG(Length) FROM Movies GROUP BY Director",
+        verify("SELECT director, AVG(Length) FROM Movies GROUP BY director",
 
-                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
-                "SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1",
-                "SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > COUNT(Length) AND "
+                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1",
+                "SELECT director, AVG(Length) FROM Movies GROUP BY director HAVING COUNT(*) > 1",
+                "SELECT director, AVG(Length) FROM Movies GROUP BY director HAVING COUNT(*) > COUNT(Length) AND "
                         + "COUNT(DISTINCT Length) > 1",
-                "SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
+                "SELECT director, AVG(Length) FROM Movies GROUP BY director "
                         + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
     }
 
@@ -42,17 +42,17 @@ public class AggregatorTest {
      */
     @Test
     public void testSUMAVGAggregator1column2Aggr() {
-        verify("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director",
+        verify("SELECT director, AVG(Score), SUM(Length) FROM Movies GROUP BY director",
 
-                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
-                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1",
-                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
+                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1",
+                "SELECT director, AVG(Score), SUM(Length) FROM Movies GROUP BY director HAVING COUNT(*) > 1",
+                "SELECT director, AVG(Score), SUM(Length) FROM Movies GROUP BY director "
                         + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1",
-                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
+                "SELECT director, AVG(Score), SUM(Length) FROM Movies GROUP BY director "
                         + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1",
-                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
+                "SELECT director, AVG(Score), SUM(Length) FROM Movies GROUP BY director "
                         + "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1",
-                "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
+                "SELECT director, AVG(Score), SUM(Length) FROM Movies GROUP BY director "
                         + "HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1");
     }
 
@@ -61,13 +61,13 @@ public class AggregatorTest {
      */
     @Test
     public void testMAXAggregator2columns1Aggr() {
-        verify("SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name",
+        verify("SELECT director, Name, MAX(Length) FROM Movies GROUP BY Name",
 
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Name) > 1",
-                "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name HAVING COUNT(*) > 1",
-                "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name HAVING COUNT(*) > COUNT(Length) AND "
+                "SELECT director, Name, MAX(Length) FROM Movies GROUP BY Name HAVING COUNT(*) > 1",
+                "SELECT director, Name, MAX(Length) FROM Movies GROUP BY Name HAVING COUNT(*) > COUNT(Length) AND "
                         + "COUNT(DISTINCT Length) > 1",
-                "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name "
+                "SELECT director, Name, MAX(Length) FROM Movies GROUP BY Name "
                         + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
     }
 
@@ -76,14 +76,14 @@ public class AggregatorTest {
      */
     @Test
     public void testBasicGroupBy() {
-        verify("SELECT Director, Name FROM Movies GROUP BY Name",
+        verify("SELECT director, Name FROM Movies GROUP BY Name",
 
-            "SELECT Director, Name FROM Movies GROUP BY Name HAVING COUNT(*) > 1",
+            "SELECT director, Name FROM Movies GROUP BY Name HAVING COUNT(*) > 1",
             "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Name) > 1");
     }
 
     /**
-     * A test case for a simple GROUP BY query.
+     * A test case for a GROUP BY query with WHERE clause.
      */
     @Test
     public void testGroupByWithWhere() {
@@ -94,5 +94,43 @@ public class AggregatorTest {
             "SELECT director FROM Movies WHERE title IS NULL GROUP BY director",
             "SELECT director FROM Movies WHERE title = 'Finding Nemo' GROUP BY director HAVING COUNT(*) > 1",
             "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' HAVING COUNT(DISTINCT director) > 1");
+    }
+
+    /**
+     * A test case for a HAVING query.
+     */
+    @Test
+    public void testHaving() {
+        verify("SELECT director FROM Movies GROUP BY director HAVING director LIKE 'B%'",
+
+            "SELECT director FROM Movies GROUP BY director HAVING NOT director LIKE 'B%'",
+            "SELECT director FROM Movies GROUP BY director HAVING director LIKE 'B%'",
+            "SELECT director FROM Movies GROUP BY director HAVING director IS NULL",
+            "SELECT director FROM Movies GROUP BY director HAVING COUNT(*) > 1 AND director LIKE 'B%'",
+            "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1 AND director LIKE 'B%'");
+    }
+
+    /**
+     * A test case for a HAVING query with WHERE clause.
+     */
+    @Test
+    public void testHavingWithWhere() {
+        verify("SELECT director FROM Movies WHERE title = 'Finding Nemo' "
+                + "GROUP BY director HAVING director LIKE 'A%'",
+
+        "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
+                + "GROUP BY director HAVING director LIKE 'A%'",
+            "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
+                + "GROUP BY director HAVING NOT director LIKE 'A%'",
+            "SELECT director FROM Movies WHERE title <> 'Finding Nemo' "
+                + "GROUP BY director HAVING director LIKE 'A%'",
+            "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
+                + "GROUP BY director HAVING COUNT(*) > 1 AND director LIKE 'A%'",
+            "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' "
+                + "HAVING COUNT(DISTINCT director) > 1 AND director LIKE 'A%'",
+            "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
+                + "GROUP BY director HAVING director IS NULL",
+            "SELECT director FROM Movies WHERE title IS NULL "
+                + "GROUP BY director HAVING director LIKE 'A%'");
     }
 }
