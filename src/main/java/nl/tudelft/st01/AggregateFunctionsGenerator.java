@@ -17,7 +17,7 @@ import java.util.TreeSet;
 /**
  * Class that generates rules for the aggregate functions such as MAX, AVG etc.
  */
-public class AggregateFunctions {
+public class AggregateFunctionsGenerator {
 
     /**
      * Main, public method that generates the rules for the aggregate functions.

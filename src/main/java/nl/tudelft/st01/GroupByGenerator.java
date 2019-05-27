@@ -15,7 +15,7 @@ import java.util.TreeSet;
 /**
  * Class that generates rules based on the GROUP BY clause.
  */
-public class GroupBy {
+public class GroupByGenerator {
 
     /**
      * Main, public method that generates the rules for the GROUP BY clause.

@@ -4,9 +4,9 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
-import nl.tudelft.st01.AggregateFunctions;
-import nl.tudelft.st01.GroupBy;
-import nl.tudelft.st01.JoinWhereExpression;
+import nl.tudelft.st01.AggregateFunctionsGenerator;
+import nl.tudelft.st01.GroupByGenerator;
+import nl.tudelft.st01.JoinWhereExpressionGenerator;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 
 import java.util.ArrayList;
@@ -77,8 +77,8 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * @param plainSelect Input plainselect from which the cases have to be derived.
      */
     private void handleAggregators(PlainSelect plainSelect) {
-        AggregateFunctions aggregateFunctions = new AggregateFunctions();
-        Set<String> outputAfterAggregator = aggregateFunctions.generate(plainSelect);
+        AggregateFunctionsGenerator aggregateFunctionsGenerator = new AggregateFunctionsGenerator();
+        Set<String> outputAfterAggregator = aggregateFunctionsGenerator.generate(plainSelect);
 
         output.addAll(outputAfterAggregator);
     }
@@ -92,8 +92,8 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
         GroupByElement groupBy = plainSelect.getGroupBy();
 
         if (groupBy != null) {
-            GroupBy groupByExpression = new GroupBy();
-            Set<String> outputAfterGroupBy = groupByExpression.generate(plainSelect);
+            GroupByGenerator groupByGeneratorExpression = new GroupByGenerator();
+            Set<String> outputAfterGroupBy = groupByGeneratorExpression.generate(plainSelect);
 
             output.addAll(outputAfterGroupBy);
         }
@@ -127,8 +127,8 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * @param plainSelect The input query for which the mutations have to be generated.
      */
     private void handleJoins(PlainSelect plainSelect) {
-        JoinWhereExpression joinWhereExpression = new JoinWhereExpression();
-        Set<String> out = joinWhereExpression.generateJoinWhereExpressions(plainSelect);
+        JoinWhereExpressionGenerator joinWhereExpressionGenerator = new JoinWhereExpressionGenerator();
+        Set<String> out = joinWhereExpressionGenerator.generateJoinWhereExpressions(plainSelect);
 
         output.addAll(out);
     }

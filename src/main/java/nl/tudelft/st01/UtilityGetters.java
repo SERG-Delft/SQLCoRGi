@@ -30,7 +30,7 @@ public final class UtilityGetters {
      *
      * @param plainSelect - object to copy
      * @param copyGroupBy - boolean to determine whether or not you want to also include the
-     *                    GroupBy clause in the deep copy
+     *                    GroupByGenerator clause in the deep copy
      * @return deep copy of object
      */
     // TODO possibly remove this deepCopy method
