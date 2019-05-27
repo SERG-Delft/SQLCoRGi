@@ -67,7 +67,7 @@ public final class Generator {
      * @param args unused.
      */
     public static void main(String[] args) {
-        String query = "SELECT * FROM Movies INNER JOIN a ON Movies.id > 5 or a.length > 80";
+        String query = "SELECT * FROM Movies INNER JOIN a ON movies.id = a.id WHERE a.length = 60 and a.id = 60 and movies.id = 50";
         Set<String> result = generateRules(query);
         System.out.println("Result:");
         for (String s : result) {

@@ -34,17 +34,69 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(AndExpression andExpression) {
-        handleBinaryExpression(andExpression);
+        AndExpression and = new AndExpression(null, null);
+        System.out.println("AND BEFORE: " + andExpression);
+        andExpression.getLeftExpression().accept(this);
+        and.setLeftExpression(expression);
+
+
+
+        if (expression != null) {
+
+            Expression left = expression;
+            andExpression.getRightExpression().accept(this);
+            and.setRightExpression(expression);
+
+            if (expression == null) {
+                expression = left;
+            } else {
+                expression = and;
+            }
+        } else {
+            andExpression.getRightExpression().accept(this);
+
+        }
+
+        System.out.println("EXPRESSION: " + expression);
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        handleBinaryExpression(orExpression);
+        OrExpression or = new OrExpression(null, null);
+
+        orExpression.getLeftExpression().accept(this);
+        or.setLeftExpression(expression);
+
+        orExpression.getRightExpression().accept(this);
+        or.setRightExpression(expression);
+
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        handleComparisonOperator(equalsTo);
+        EqualsTo eq = new EqualsTo();
+
+        equalsTo.getLeftExpression().accept(this);
+        eq.setLeftExpression(expression);
+
+        if (expression != null) {
+            equalsTo.getRightExpression().accept(this);
+            eq.setRightExpression(expression);
+
+            if (expression != null) {
+                expression = eq;
+            }
+        } else {
+            expression = null;
+        }
+
+
+
+
+
+
+
+        System.out.println("EQ: \t" + eq);
     }
 
     @Override
