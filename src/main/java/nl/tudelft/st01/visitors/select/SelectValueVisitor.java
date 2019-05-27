@@ -22,6 +22,24 @@ public class SelectValueVisitor extends ExpressionVisitorAdapter {
     private List<Expression> output;
 
     /**
+     * Creates a new visitor which can be used to generate mutations of values in select operators. Mutations are
+     * written to {@code output};
+     *
+     * @param column the {@code Column} that is compared to the visited value.
+     * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
+     */
+    public SelectValueVisitor(Column column, List<Expression> output) {
+        if (output == null || !output.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "A SelectValueVisitor requires an empty, non-null set to which it can write generated mutations."
+            );
+        }
+
+        this.column = column;
+        this.output = output;
+    }
+
+    /**
      * Generates modified conditions for numeric values.
      * @param numericExpression the numeric value taken from the original expression.
      */
@@ -66,11 +84,4 @@ public class SelectValueVisitor extends ExpressionVisitorAdapter {
         output.add(isNullExpression);
     }
 
-    public void setColumn(Column column) {
-        this.column = column;
-    }
-
-    public void setOutput(List<Expression> output) {
-        this.output = output;
-    }
 }

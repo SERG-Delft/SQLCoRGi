@@ -19,7 +19,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
     private List<Expression> output;
 
     /**
-     * Creates a new visitor which can be used to generate mutations of SELECT operators. Any rules that are
+     * Creates a new visitor which can be used to generate mutations of select operators. Any rules that are
      * generated will be written to {@code output}.
      *
      * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
@@ -40,10 +40,10 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      */
     private void generateSimpleComparison(ComparisonOperator comparisonOperator) {
 
-        SelectValueVisitor valueVisitor = new SelectValueVisitor();
         ArrayList<Expression> cases = new ArrayList<>();
-        valueVisitor.setColumn((Column) comparisonOperator.getLeftExpression());
-        valueVisitor.setOutput(cases);
+        Column column = (Column) comparisonOperator.getLeftExpression();
+        SelectValueVisitor valueVisitor = new SelectValueVisitor(column, cases);
+
         comparisonOperator.getRightExpression().accept(valueVisitor);
 
         output.addAll(cases);
