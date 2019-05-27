@@ -12,23 +12,24 @@ import java.util.Map;
 /**
  * This visitor allows for extracting the column used in the given expression.
  */
-public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
+public class OnExpressionVisitor extends ExpressionVisitorAdapter {
 
-    private Map<String, List<Expression>> output = new HashMap<>();
+    private Map<String, List<Column>> output = new HashMap<>();
 
     /**
      * Stores each column corresponding to its table.
-     * @param e The column that should be added.
+     *
+     * @param column the column that should be added.
      */
-    private void updateColumnList(Column e) {
-        String table = e.getTable().toString().toLowerCase();
+    private void updateColumnList(Column column) {
+        String table = column.getTable().toString().toLowerCase();
 
         if (!output.containsKey(table)) {
-            List<Expression> list = new ArrayList<>();
-            list.add(e);
+            List<Column> list = new ArrayList<>();
+            list.add(column);
             output.put(table, list);
-        } else if (!contains(output.get(table), e)) {
-            output.get(table).add(e);
+        } else if (!contains(output.get(table), column)) {
+            output.get(table).add(column);
         }
     }
 
@@ -41,15 +42,15 @@ public class RuleGeneratorOnExpressionVisitor extends ExpressionVisitorAdapter {
      * NOTE: Suppose the column name "id" in "Movies" and the column name is unique.
      * Yet, the function considers Movies.id to be different from id.
      * @param list list
-     * @param expression e
+     * @param column e
      * @return boolean
      */
-    private static boolean contains(List<Expression> list, Expression expression) {
+    private static boolean contains(List<Column> list, Column column) {
         if (list == null) {
             return false;
         }
         for (Expression e : list) {
-            if (e.toString().toLowerCase().equals(expression.toString().toLowerCase())) {
+            if (e.toString().toLowerCase().equals(column.toString().toLowerCase())) {
                 return true;
             }
         }
