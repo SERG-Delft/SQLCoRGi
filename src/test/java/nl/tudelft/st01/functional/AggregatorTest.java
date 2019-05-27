@@ -81,4 +81,18 @@ public class AggregatorTest {
             "SELECT Director, Name FROM Movies GROUP BY Name HAVING COUNT(*) > 1",
             "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Name) > 1");
     }
+
+    /**
+     * A test case for a simple GROUP BY query.
+     */
+    @Test
+    public void testGroupByWithWhere() {
+        verify("SELECT director FROM Movies WHERE title = 'Finding Nemo' GROUP BY director",
+
+            "SELECT director FROM Movies WHERE title <> 'Finding Nemo' GROUP BY director",
+            "SELECT director FROM Movies WHERE title = 'Finding Nemo' GROUP BY director",
+            "SELECT director FROM Movies WHERE title IS NULL GROUP BY director",
+            "SELECT director FROM Movies WHERE title = 'Finding Nemo' GROUP BY director HAVING COUNT(*) > 1",
+            "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' HAVING COUNT(DISTINCT director) > 1");
+    }
 }

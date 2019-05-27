@@ -1,13 +1,11 @@
 package nl.tudelft.st01.functional;
 
-import nl.tudelft.st01.Generator;
 import org.junit.jupiter.api.Test;
 
 import static nl.tudelft.st01.functional.AssertUtils.verify;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
- * This class exercises several bad weather scenarios for the {@link Generator}.
+ * This class exercises several bad weather scenarios for the {@code Generator}.
  */
 public class BadWeatherTest {
 
@@ -24,8 +22,6 @@ public class BadWeatherTest {
      */
     @Test
     public void testNonSelectQuery() {
-        String query = "ALTER TABLE Customers ADD Email varchar(255);";
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                Generator.generateRules(query));
+        verify("ALTER TABLE Customers ADD Email varchar(255)");
     }
 }

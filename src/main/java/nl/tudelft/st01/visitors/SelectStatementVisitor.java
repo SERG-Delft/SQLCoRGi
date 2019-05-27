@@ -1,28 +1,43 @@
-package nl.tudelft.st01;
+package nl.tudelft.st01.visitors;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
+import nl.tudelft.st01.AggregateFunctions;
+import nl.tudelft.st01.GroupBy;
+import nl.tudelft.st01.JoinWhereExpression;
+import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
- * Custom Visitor for SELECT statements.
+ * A visitor used for generating coverage targets of a SELECT statement.
  */
-public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
+public class SelectStatementVisitor extends SelectVisitorAdapter {
+
     private Set<String> output;
 
-    @Override
-    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    public void visit(PlainSelect plainSelect) {
-
+    /**
+     * Creates a new visitor which can be used to generate coverage rules for queries. Any rules that are generated
+     * will be written to {@code output}.
+     *
+     * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
+     */
+    public SelectStatementVisitor(Set<String> output) {
         if (output == null || !output.isEmpty()) {
             throw new IllegalArgumentException(
-                "To use this visitor, you must first give it an empty list so it can pass along the generated queries."
+                "A SelectStatementVisitor requires an empty, non-null set to which it can output generated rules."
             );
         }
+
+        this.output = output;
+    }
+
+    @Override
+    public void visit(PlainSelect plainSelect) {
 
         handleWhere(plainSelect);
         handleAggregators(plainSelect);
@@ -34,25 +49,26 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
     }
 
     /**
-     * Handles the where part of the query. Adds the results to the output.
-     * @param plainSelect Input plainselect from which the expressions have to be derived.
+     * Generates coverage rules for the WHERE clause of the query that is being visited. The generated rules are stored
+     * in the {@code output} set.
+     *
+     * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleWhere(PlainSelect plainSelect) {
         Expression where = plainSelect.getWhere();
-        ArrayList<Expression> expressions = new ArrayList<>();
-
         if (where != null) {
-            RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
 
-            ruleGeneratorExpressionVisitor.setOutput(expressions);
-            where.accept(ruleGeneratorExpressionVisitor);
+            List<Expression> expressions = new ArrayList<>();
+            SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions);
+
+            where.accept(selectExpressionVisitor);
             for (Expression expression : expressions) {
                 plainSelect.setWhere(expression);
                 output.add(plainSelect.toString());
             }
-        }
 
-        plainSelect.setWhere(where);
+            plainSelect.setWhere(where);
+        }
     }
 
     /**
@@ -87,20 +103,19 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
      */
     private void handleHaving(PlainSelect plainSelect) {
         Expression having = plainSelect.getHaving();
-        ArrayList<Expression> expressions = new ArrayList<>();
-
         if (having != null) {
-            RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
 
-            ruleGeneratorExpressionVisitor.setOutput(expressions);
-            having.accept(ruleGeneratorExpressionVisitor);
+            List<Expression> expressions = new ArrayList<>();
+            SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions);
+
+            having.accept(selectExpressionVisitor);
             for (Expression expression : expressions) {
                 plainSelect.setHaving(expression);
                 output.add(plainSelect.toString());
             }
-        }
 
-        plainSelect.setHaving(having);
+            plainSelect.setHaving(having);
+        }
     }
 
     /**
@@ -112,10 +127,6 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         Set<String> out = joinWhereExpression.generateJoinWhereExpressions(plainSelect);
 
         output.addAll(out);
-    }
-
-    public void setOutput(Set<String> output) {
-        this.output = output;
     }
 
 }
