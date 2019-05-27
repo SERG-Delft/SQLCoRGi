@@ -9,6 +9,8 @@ import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
+import nl.tudelft.st01.query.JoinWhereItem;
+import nl.tudelft.st01.visitors.join.OnExpressionVisitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,16 +24,16 @@ import java.util.TreeSet;
  * This class allows for mutating a given query such that a set of mutated queries is returned.
  */
 public class GenJoinWhereExpression {
-    private Map<String, List<Column>> map;
 
+    private Map<String, List<Column>> map;
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
-     * @param plainSelect The statement for which the joins have to be mutated.
-     * @return A set of mutated queries in string format.
+     *
+     * @param plainSelect the statement for which the joins have to be mutated.
+     * @return a set of mutated queries in string format.
      */
     public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
-        map = new HashMap<>();
 
         Set<String> result = new TreeSet<>();
 
@@ -43,13 +45,14 @@ public class GenJoinWhereExpression {
         Expression whereCondition = plainSelect.getWhere();
 
         if (!(joins == null || joins.isEmpty())) {
-            RuleGeneratorOnExpressionVisitor ruleGeneratorOnExpressionVisitor = new RuleGeneratorOnExpressionVisitor();
-            ruleGeneratorOnExpressionVisitor.setOutput(map);
+
+            this.map = new HashMap<>();
+            OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
 
             List<Join> temp = new ArrayList<>();
             for (int i = 0; i < joins.size(); i++) {
                 join = joins.get(i);
-                join.getOnExpression().accept(ruleGeneratorOnExpressionVisitor);
+                join.getOnExpression().accept(onExpressionVisitor);
                 joinWhereItems = generateJoinMutations(join);
                 for (JoinWhereItem joinWhereItem : joinWhereItems) {
                     temp.addAll(joins);
