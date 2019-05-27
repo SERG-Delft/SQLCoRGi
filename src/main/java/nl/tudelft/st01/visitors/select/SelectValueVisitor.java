@@ -15,7 +15,7 @@ import java.util.List;
  * Custom visitor for the values of SELECT statements. The type of value determines what kind of cases need to be
  * generated.
  */
-public class RuleGeneratorValueVisitor extends ExpressionVisitorAdapter {
+public class SelectValueVisitor extends ExpressionVisitorAdapter {
 
     private Column column;
 

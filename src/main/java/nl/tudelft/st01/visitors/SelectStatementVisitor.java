@@ -5,7 +5,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 import nl.tudelft.st01.visitors.aggregate.GenAggregateFunctions;
 import nl.tudelft.st01.visitors.join.GenJoinWhereExpression;
-import nl.tudelft.st01.visitors.select.RuleGeneratorExpressionVisitor;
+import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,10 +56,9 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
         if (where != null) {
 
             List<Expression> expressions = new ArrayList<>();
-            RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
-            ruleGeneratorExpressionVisitor.setOutput(expressions);
+            SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions);
 
-            where.accept(ruleGeneratorExpressionVisitor);
+            where.accept(selectExpressionVisitor);
             for (Expression expression : expressions) {
                 plainSelect.setWhere(expression);
                 output.add(plainSelect.toString());

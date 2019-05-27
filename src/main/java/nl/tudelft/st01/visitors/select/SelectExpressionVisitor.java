@@ -14,9 +14,25 @@ import java.util.List;
 /**
  * Custom visitor for expressions, such as WHERE clauses in SELECT statements.
  */
-public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
+public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
     private List<Expression> output;
+
+    /**
+     * Creates a new visitor which can be used to generate mutations of SELECT operators. Any rules that are
+     * generated will be written to {@code output}.
+     *
+     * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
+     */
+    public SelectExpressionVisitor(List<Expression> output) {
+        if (output == null || !output.isEmpty()) {
+            throw new IllegalArgumentException(
+                "A SelectExpressionVisitor requires an empty, non-null set to which it can write generated expressions."
+            );
+        }
+
+        this.output = output;
+    }
 
     /**
      * Generates modified conditions from a simple comparison.
@@ -24,7 +40,7 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
      */
     private void generateSimpleComparison(ComparisonOperator comparisonOperator) {
 
-        RuleGeneratorValueVisitor valueVisitor = new RuleGeneratorValueVisitor();
+        SelectValueVisitor valueVisitor = new SelectValueVisitor();
         ArrayList<Expression> cases = new ArrayList<>();
         valueVisitor.setColumn((Column) comparisonOperator.getLeftExpression());
         valueVisitor.setOutput(cases);
@@ -227,10 +243,6 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         IsNullExpression isNullExpressionOut = new IsNullExpression();
         isNullExpressionOut.setLeftExpression(likeExpression.getLeftExpression());
         output.add(isNullExpressionOut);
-    }
-
-    public void setOutput(List<Expression> output) {
-        this.output = output;
     }
 
     /**
