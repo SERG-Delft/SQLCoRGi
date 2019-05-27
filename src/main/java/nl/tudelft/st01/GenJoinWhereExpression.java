@@ -175,17 +175,12 @@ public class GenJoinWhereExpression {
         return result;
     }
 
-    private void generateJoinWhereItemForJoin(JoinOnConditionColumns joinOnConditionColumns, Join join) {
-
-    }
-
     /**
      * Returns the concatenation of two expression. If either of them is null, the other expression is wrapped
      * in parentheses.
      * @param left The left expression.
      * @param right The right expression.
-     * @return An and expression if both expressions are not null, otherwise, return the expression that is not null
-     * wrapped in parentheses. If both are null, return null.
+     * @return An and expression if both expressions are not null, otherwise, if either is null, the other is returned.
      */
     private Expression concatenate(Expression left, Expression right) {
         if (left == null) {
@@ -203,6 +198,9 @@ public class GenJoinWhereExpression {
      * @return Expression wrapped in parentheses.
      */
     private Expression wrapInParentheses(Expression expression) {
+        if (expression == null) {
+            return null;
+        }
         if (expression instanceof Parenthesis) {
             return expression;
         } else {
