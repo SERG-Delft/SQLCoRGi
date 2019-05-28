@@ -139,14 +139,8 @@ public class JoinTest {
     }
 
     /**
-     * CURRENTLY DISABLED - FEATURE IS NOT IMPLEMENTED YET.
-     * THIS TEST REQUIRES COMPATIBILITY WITH WHERE AND JOIN. This is not yet implemented,
-     * hence why the test is commented.
-     * -----------------------------------------------------
      * A parametrized test for a query with different join types with a single join condition which involves
      * nullable columns and a WHERE clause. All of which should result in the same expected output set.
-     * -----------------------------------------------------
-     * CURRENTLY DISABLED - FEATURE IS NOT IMPLEMENTED YET.
      */
 
     @ParameterizedTest(name = "[{index}] Join type: {0}")
