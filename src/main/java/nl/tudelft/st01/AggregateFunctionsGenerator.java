@@ -5,7 +5,6 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
@@ -39,23 +38,35 @@ public class AggregateFunctionsGenerator {
                     // Here we know the selectItem is a function (AVG, SUM, MAX etc.)
                     //      so we can start adding the rules for it.
                     Function func = (Function) selectExpressionItem.getExpression();
+
                     // check for COUNT(*)
                     if (func.isAllColumns()) {
                         outputAfterAggregator.add(firstRule(plainSelect).toString());
                         outputAfterAggregator.add(secondRule(plainSelect).toString());
 
-                        continue; // skip the rest of this iteration
+                        // Skip the rest of this iteration.
+                        continue;
                     }
 
+                    // check for a query without Group By
                     if (plainSelect.getGroupBy() != null) {
                         outputAfterAggregator.add(firstRule(plainSelect).toString());
                         outputAfterAggregator.add(secondRule(plainSelect).toString());
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
-                    } else if (!func.getName().equals(COUNT_STRING)) {
-                        outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
-                    }
-                    System.out.println("hi");
+                        outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
 
+                        continue;
+                    }
+
+                    // check for an aggregator that is NOT Count
+                    if (!func.getName().equals(COUNT_STRING)) {
+                        outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
+                        outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
+
+                        continue;
+                    }
+
+                    // handle COUNT operator
                     outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
                 }
             }
