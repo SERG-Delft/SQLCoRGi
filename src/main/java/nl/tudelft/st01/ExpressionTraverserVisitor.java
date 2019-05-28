@@ -76,11 +76,12 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
          */
         if (contains((Column) isNullExpression.getLeftExpression())) {
             expression = null;
-        } else if (!isNullExpression.isNot()) {
+        } else if (isNullExpression.isNot()) {
             expression = null;
         } else {
             expression = isNullExpression;
         }
+
     }
 
     @Override
@@ -129,7 +130,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(InExpression inExpression) {
-
+        handleExpressionIn(inExpression, new InExpression());
     }
 
     @Override
@@ -245,6 +246,13 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
         }
     }
 
+    public void handleExpressionIn(InExpression inExpression, InExpression seed) {
+        inExpression.getLeftExpression().accept(this);
+        if (expression != null) {
+            expression = seed;
+        }
+    }
+
     /**
      * In case of a between, all three parts have to be evaluated.
      * @param between The between to evaluate.
@@ -255,17 +263,16 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
         if (expression != null) {
             between.getBetweenExpressionStart().accept(this);
-            seed.setLeftExpression(expression);
-        }
-
-        if (expression != null) {
-            between.getBetweenExpressionStart().accept(this);
-            seed.setBetweenExpressionStart(expression);
+            seed.setLeftExpression(between.getLeftExpression());
         }
 
         if (expression != null) {
             between.getBetweenExpressionEnd().accept(this);
-            seed.setBetweenExpressionEnd(expression);
+            seed.setBetweenExpressionStart(between.getBetweenExpressionStart());
+        }
+
+        if (expression != null) {
+            seed.setBetweenExpressionEnd(between.getBetweenExpressionEnd());
             expression = seed;
         }
     }
