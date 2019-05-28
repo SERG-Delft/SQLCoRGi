@@ -13,7 +13,10 @@
 <!---
 LINES BELOW WILL SET GITLAB ISSUE PROPERTIES
 --->
-label ~Feature
+/label ~Feature
 
 <!-- Estimate the amount of hours needed for the issue -->
 /estimate ...
+
+<!-- Set the importance of the issue as weight -->
+/weight ...
