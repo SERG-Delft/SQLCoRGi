@@ -23,7 +23,7 @@ import java.util.TreeSet;
 /**
  * This class allows for mutating a given query such that a set of mutated queries is returned.
  */
-public class GenJoinWhereExpression {
+public class JoinWhereExpressionGenerator {
 
     private Map<String, List<Column>> map;
 
