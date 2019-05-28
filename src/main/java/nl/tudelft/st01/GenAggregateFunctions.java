@@ -32,7 +32,6 @@ public class GenAggregateFunctions {
     public Set<String> generate(PlainSelect plainSelect) {
         // Check if there is a Function in one of the columns. If so, generate rules for it.
         Set<String> outputAfterAggregator = new TreeSet<>();
-        Set<String> specialFunctions = new HashSet<String>(Arrays.asList("AVG", "SUM"));
 
         for (SelectItem selectItem : plainSelect.getSelectItems()) {
             if (selectItem instanceof SelectExpressionItem) {
