@@ -19,7 +19,7 @@ public class NumericDoubleValueTest {
      * Test for NumericDoubleValue.
      */
     @Test
-    public void correctSuperclass() {
+    public void constructorNotNull() {
         NumericDoubleValue n = new NumericDoubleValue(TEST_NUMBER);
 
         assertThat(n).isNotNull();

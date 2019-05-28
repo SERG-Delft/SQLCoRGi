@@ -19,7 +19,7 @@ public class NumericLongValueTest {
      * Test for NumericLongValue.
      */
     @Test
-    public void correctSuperclass() {
+    public void constructorNotNull() {
         NumericLongValue n = new NumericLongValue(TEST_NUMBER);
 
         assertThat(n).isNotNull();
