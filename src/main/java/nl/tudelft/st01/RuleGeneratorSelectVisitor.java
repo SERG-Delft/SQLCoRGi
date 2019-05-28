@@ -1,10 +1,12 @@
 package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -38,6 +40,14 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
     private void handleWhere(PlainSelect plainSelect) {
         Expression where = plainSelect.getWhere();
         ArrayList<Expression> expressions = new ArrayList<>();
+        List<Join> joins = plainSelect.getJoins();
+
+        List<Join> innerJoins = new ArrayList<>();
+        for (int i = 0; i < joins.size(); i++) {
+            innerJoins.add(GenJoinWhereExpression.createGenericCopyOfJoin(joins.get(i)));
+            innerJoins.get(i).setInner(true);
+        }
+        plainSelect.setJoins(innerJoins);
 
         if (where != null) {
             RuleGeneratorExpressionVisitor ruleGeneratorExpressionVisitor = new RuleGeneratorExpressionVisitor();
@@ -52,6 +62,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         }
 
         plainSelect.setWhere(where);
+        plainSelect.setJoins(joins);
 
     }
 

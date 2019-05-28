@@ -60,15 +60,16 @@ public class GenJoinWhereExpression {
                     out.setWhere(joinWhereItem.getJoinWhere());
 
                     result.add(out.toString());
-
+                    out.setWhere(whereCondition);
+                    out.setJoins(joins);
                     temp.clear();
                 }
                 map.clear();
             }
         }
 
-        out.setWhere(whereCondition);
-        out.setJoins(joins);
+        plainSelect.setWhere(whereCondition);
+        plainSelect.setJoins(joins);
         return result;
     }
 
@@ -184,11 +185,11 @@ public class GenJoinWhereExpression {
      */
     private Expression concatenate(Expression left, Expression right) {
         if (left == null) {
-            return wrapInParentheses(right);
+            return right;
         } else if (right != null) {
             return new AndExpression(wrapInParentheses(left), wrapInParentheses(right));
         } else {
-            return wrapInParentheses(left);
+            return left;
         }
     }
 
@@ -346,7 +347,7 @@ public class GenJoinWhereExpression {
      * @param join The join that should be copied.
      * @return A generic shallow copy of join.
      */
-    private static Join createGenericCopyOfJoin(Join join) {
+    public static Join createGenericCopyOfJoin(Join join) {
         Join outJoin = new Join();
         outJoin.setRightItem(join.getRightItem());
         outJoin.setOnExpression(join.getOnExpression());
