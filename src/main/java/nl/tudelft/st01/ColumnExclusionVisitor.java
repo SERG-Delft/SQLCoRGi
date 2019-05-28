@@ -35,78 +35,31 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(AndExpression andExpression) {
         AndExpression and = new AndExpression(null, null);
-        System.out.println("AND BEFORE: " + andExpression);
         andExpression.getLeftExpression().accept(this);
-        and.setLeftExpression(expression);
-
-
-
-        if (expression != null) {
-
-            Expression left = expression;
-            andExpression.getRightExpression().accept(this);
-            and.setRightExpression(expression);
-
-            if (expression == null) {
-                expression = left;
-            } else {
-                expression = and;
-            }
-        } else {
-            andExpression.getRightExpression().accept(this);
-
-        }
-
-        System.out.println("EXPRESSION: " + expression);
+        handleExpression(andExpression, and);
     }
 
     @Override
     public void visit(OrExpression orExpression) {
         OrExpression or = new OrExpression(null, null);
-
-        orExpression.getLeftExpression().accept(this);
-        or.setLeftExpression(expression);
-
-        orExpression.getRightExpression().accept(this);
-        or.setRightExpression(expression);
-
+        handleExpression(orExpression, or);
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
         EqualsTo eq = new EqualsTo();
+        handleExpression(equalsTo, eq);
 
-        equalsTo.getLeftExpression().accept(this);
-        eq.setLeftExpression(expression);
-
-        if (expression != null) {
-            equalsTo.getRightExpression().accept(this);
-            eq.setRightExpression(expression);
-
-            if (expression != null) {
-                expression = eq;
-            }
-        } else {
-            expression = null;
-        }
-
-
-
-
-
-
-
-        System.out.println("EQ: \t" + eq);
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        handleComparisonOperator(greaterThan);
+        handleExpression(greaterThan, new GreaterThan());
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        handleComparisonOperator(greaterThanEquals);
+        handleExpression(greaterThanEquals, new GreaterThanEquals());
     }
 
     @Override
@@ -129,17 +82,17 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(MinorThan minorThan) {
-        handleComparisonOperator(minorThan);
+        handleExpression(minorThan, new MinorThan());
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        handleComparisonOperator(minorThanEquals);
+        handleExpression(minorThanEquals, new MinorThanEquals());
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        handleComparisonOperator(notEqualsTo);
+        handleExpression(notEqualsTo, new NotEqualsTo());
     }
 
     @Override
@@ -220,37 +173,46 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
     /**
      * In case of a binary expression, both sides should be traversed and modified if needed.
      * @param binaryExpression The expression to handle.
+     * @param seedExpression A new instance of the same class as from where the method is called.
+     *                       This acts as a seed from which the modified expression will be created.
      */
-    private void handleBinaryExpression(BinaryExpression binaryExpression) {
-        Expression left;
-        Expression right;
+    private void handleExpression(BinaryExpression binaryExpression, BinaryExpression seedExpression) {
+        binaryExpression.getLeftExpression().accept(this);
+        Expression left = expression;
+        if (left != null) {
+            seedExpression.setLeftExpression(left);
 
-        expression = binaryExpression.getLeftExpression();
-        if (expression != null) {
-            expression.accept(this);
-        }
+            binaryExpression.getRightExpression().accept(this);
+            Expression right = expression;
 
-        left = expression;
-
-        binaryExpression.setLeftExpression(left);
-
-        expression = binaryExpression.getRightExpression();
-        if (expression != null) {
-            expression.accept(this);
-        }
-
-        right = expression;
-
-        if (left == null) {
-            expression = right;
-        }else if (right != null) {
-            Parenthesis binaryPar = new Parenthesis();
-            binaryPar.setExpression(binaryExpression);
-            expression = binaryPar;
+            if (right != null) {
+                seedExpression.setRightExpression(right);
+                expression = seedExpression;
+            } else {
+                expression = left;
+            }
         } else {
-            expression = left;
+            binaryExpression.getRightExpression().accept(this);
         }
-        binaryExpression.setRightExpression(right);
+    }
+
+    private void handleExpression(ComparisonOperator comparisonOperator, ComparisonOperator seedExpression) {
+        comparisonOperator.getLeftExpression().accept(this);
+        Expression left = expression;
+
+        if (left != null) {
+            seedExpression.setLeftExpression(left);
+
+            comparisonOperator.getRightExpression().accept(this);
+            Expression right = expression;
+
+            if (right != null) {
+                seedExpression.setRightExpression(right);
+                expression = seedExpression;
+            }
+        } else {
+            expression = null;
+        }
     }
 
     /**
