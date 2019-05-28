@@ -6,13 +6,17 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
+import net.sf.jsqlparser.expression.operators.relational.Between;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.InExpression;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
+import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
 import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
@@ -22,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class allows modifying an expression such that none of the provided columns,
+ * This class allows traversing and modifying an expression such that none of the provided columns,
  * or columns related to the provided tables, are in the expression anymore.
  */
 public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
@@ -36,30 +40,29 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
     public void visit(AndExpression andExpression) {
         AndExpression and = new AndExpression(null, null);
         andExpression.getLeftExpression().accept(this);
-        handleExpression(andExpression, and);
+        handleExpressionLogical(andExpression, and);
     }
 
     @Override
     public void visit(OrExpression orExpression) {
         OrExpression or = new OrExpression(null, null);
-        handleExpression(orExpression, or);
+        handleExpressionLogical(orExpression, or);
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
         EqualsTo eq = new EqualsTo();
-        handleExpression(equalsTo, eq);
-
+        handleExpressionAllOrNone(equalsTo, eq);
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        handleExpression(greaterThan, new GreaterThan());
+        handleExpressionAllOrNone(greaterThan, new GreaterThan());
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        handleExpression(greaterThanEquals, new GreaterThanEquals());
+        handleExpressionAllOrNone(greaterThanEquals, new GreaterThanEquals());
     }
 
     @Override
@@ -82,17 +85,17 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(MinorThan minorThan) {
-        handleExpression(minorThan, new MinorThan());
+        handleExpressionAllOrNone(minorThan, new MinorThan());
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        handleExpression(minorThanEquals, new MinorThanEquals());
+        handleExpressionAllOrNone(minorThanEquals, new MinorThanEquals());
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        handleExpression(notEqualsTo, new NotEqualsTo());
+        handleExpressionAllOrNone(notEqualsTo, new NotEqualsTo());
     }
 
     @Override
@@ -112,6 +115,26 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
         } else {
             expression = column;
         }
+    }
+
+    @Override
+    public void visit(Between between) {
+        handleExpressionBetween(between, new Between());
+    }
+
+    @Override
+    public void visit(LikeExpression likeExpression) {
+        handleExpressionAllOrNone(likeExpression, new LikeExpression());
+    }
+
+    @Override
+    public void visit(InExpression inExpression) {
+
+    }
+
+    @Override
+    public void visit(StringValue value) {
+        expression = value;
     }
 
     @Override
@@ -173,21 +196,21 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
     /**
      * In case of a binary expression, both sides should be traversed and modified if needed.
      * @param binaryExpression The expression to handle.
-     * @param seedExpression A new instance of the same class as from where the method is called.
+     * @param seed A new instance of the same class as from where the method is called.
      *                       This acts as a seed from which the modified expression will be created.
      */
-    private void handleExpression(BinaryExpression binaryExpression, BinaryExpression seedExpression) {
+    private void handleExpressionLogical(BinaryExpression binaryExpression, BinaryExpression seed) {
         binaryExpression.getLeftExpression().accept(this);
         Expression left = expression;
         if (left != null) {
-            seedExpression.setLeftExpression(left);
+            seed.setLeftExpression(left);
 
             binaryExpression.getRightExpression().accept(this);
             Expression right = expression;
 
             if (right != null) {
-                seedExpression.setRightExpression(right);
-                expression = seedExpression;
+                seed.setRightExpression(right);
+                expression = seed;
             } else {
                 expression = left;
             }
@@ -196,22 +219,54 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
         }
     }
 
-    private void handleExpression(ComparisonOperator comparisonOperator, ComparisonOperator seedExpression) {
-        comparisonOperator.getLeftExpression().accept(this);
+    /**
+     * In case of a binary expression, both sides should be traversed and modified if needed.
+     * If either side evaluates to null, the expression is set to null.
+     * @param binaryExpression The expression to handle.
+     * @param seed A new instance of the same class as from where the method is called.
+     *                       This acts as a seed from which the modified expression will be created.
+     */
+    private void handleExpressionAllOrNone(BinaryExpression binaryExpression, BinaryExpression seed) {
+        binaryExpression.getLeftExpression().accept(this);
         Expression left = expression;
 
         if (left != null) {
-            seedExpression.setLeftExpression(left);
+            seed.setLeftExpression(left);
 
-            comparisonOperator.getRightExpression().accept(this);
+            binaryExpression.getRightExpression().accept(this);
             Expression right = expression;
 
             if (right != null) {
-                seedExpression.setRightExpression(right);
-                expression = seedExpression;
+                seed.setRightExpression(right);
+                expression = seed;
             }
         } else {
             expression = null;
+        }
+    }
+
+    /**
+     * In case of a between, all three parts have to be evaluated.
+     * @param between The between to evaluate.
+     * @param seed The seed corresponind to the
+     */
+    public void handleExpressionBetween(Between between, Between seed) {
+        between.getLeftExpression().accept(this);
+
+        if (expression != null) {
+            between.getBetweenExpressionStart().accept(this);
+            seed.setLeftExpression(expression);
+        }
+
+        if (expression != null) {
+            between.getBetweenExpressionStart().accept(this);
+            seed.setBetweenExpressionStart(expression);
+        }
+
+        if (expression != null) {
+            between.getBetweenExpressionEnd().accept(this);
+            seed.setBetweenExpressionEnd(expression);
+            expression = seed;
         }
     }
 }
