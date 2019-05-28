@@ -22,8 +22,10 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * This class allows traversing and modifying an expression such that none of the provided columns,
@@ -74,9 +76,10 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
             If the column is not in the null columns list, then the column must not be null.
             If it is an IS NULL expression, then there is a contradiction, so it should be excluded.
          */
-        if (contains((Column) isNullExpression.getLeftExpression())) {
+        Column column = (Column) isNullExpression.getLeftExpression();
+        if (contains(column)) {
             expression = null;
-        } else if (isNullExpression.isNot()) {
+        } else if (!isNullExpression.isNot() && !tablesContain(column)){
             expression = null;
         } else {
             expression = isNullExpression;
@@ -111,7 +114,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(Column column) {
-        if (contains(column)) {
+        if (tablesContain(column) || columnsContain(column)) {
             expression = null;
         } else {
             expression = column;
@@ -156,21 +159,22 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
     public void setTables(Set<String> tables) {
         if (this.tables != null) {
             this.tables.clear();
-            for (String table : tables) {
-                this.tables.add(table.toLowerCase());
-            }
         } else {
-            this.tables = tables;
+            this.tables = new TreeSet<>();
+        }
+
+        for (String table : tables) {
+            this.tables.add(table.toLowerCase());
         }
 
     }
 
-    public void setExpression(Expression expression) {
-        this.expression = expression;
-    }
-
     public Expression getExpression() {
         return expression;
+    }
+
+    private boolean contains(Column column) {
+        return columnsContain(column) || tablesContain(column);
     }
 
     /**
@@ -178,7 +182,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
      * @param column The column that should be checked.
      * @return True if the column is in the list or if it belongs to the table.
      */
-    private boolean contains(Column column) {
+    private boolean columnsContain(Column column) {
         if (nullColumns != null && !nullColumns.isEmpty()) {
             for (Column c : nullColumns) {
                 if (c.toString().toLowerCase().equals(column.toString().toLowerCase())) {
@@ -187,10 +191,13 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
             }
         }
 
+        return false;
+    }
+
+    private boolean tablesContain(Column column) {
         if (tables != null && !tables.isEmpty()) {
             return tables.contains(column.getTable().toString().toLowerCase());
         }
-
         return false;
     }
 
@@ -249,7 +256,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
     public void handleExpressionIn(InExpression inExpression, InExpression seed) {
         inExpression.getLeftExpression().accept(this);
         if (expression != null) {
-            expression = seed;
+            expression = inExpression;
         }
     }
 
