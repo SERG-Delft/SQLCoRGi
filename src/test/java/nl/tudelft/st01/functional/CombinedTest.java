@@ -1,6 +1,8 @@
 package nl.tudelft.st01.functional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static nl.tudelft.st01.functional.AssertUtils.verify;
 
@@ -48,18 +50,64 @@ public class CombinedTest {
                 "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id < 10 GROUP BY b.id "
                         + "HAVING COUNT(*) > 1");
     }
-//
-//    @Test
-//    public void testJoinWithWhereNonIdIncludedInRightIsNullCass() {
-//        verify("SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE a.length < 50 OR b.length > 70",
-//
-//
-//
-//
-//
-//        )
-//
-//    }
+
+    /**
+     * Tests whether the columns related to the left table (in case of LEFT JOIN)
+     * or the right table (in case of RIGHT JOIN) that are not the columns used in the on expression
+     * are still present in the where expression.
+     */
+    @Test
+    public void testJoinWithWhereNonIdsIncludedInWhereExpression() {
+        verify("SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE a.length < 50 OR b.length > 70",
+        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 69)",
+        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 71)",
+        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 70)",
+
+        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length = 49) AND NOT (b.length > 70)",
+        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length = 50) AND NOT (b.length > 70)",
+        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length = 51) AND NOT (b.length > 70)",
+
+        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length IS NULL)",
+        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length IS NULL) AND NOT (b.length > 70)",
+
+        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length < 50 OR b.length > 70)",
+        "SELECT * FROM a LEFT JOIN b ON a.id = b.id "
+                + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length < 50)",
+        "SELECT * FROM a LEFT JOIN b ON a.id = b.id "
+                + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length < 50)",
+        "SELECT * FROM a RIGHT JOIN b ON a.id = b.id "
+                + "WHERE ((a.id IS NULL) AND (b.id IS NULL)) AND (b.length > 70)",
+        "SELECT * FROM a RIGHT JOIN b ON a.id = b.id "
+                + "WHERE ((a.id IS NULL) AND (b.id IS NOT NULL)) AND (b.length > 70)");
+    }
+
+    /**
+     * Tests whether the columns related to the left table (in case of LEFT JOIN)
+     * or the right table (in case of RIGHT JOIN) that are not the columns used in the on expression
+     * are still present in the where expression.
+     */
+    @Test
+    public void testJoinWithWhereIdsExcludedInWhereExpressionWhenIsNull() {
+        verify("SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE a.id <= 50 AND b.id >= 70",
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id = 49) AND (b.id >= 70)",
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id = 50) AND (b.id >= 70)",
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id = 51) AND (b.id >= 70)",
+
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id <= 50) AND (b.id = 70)",
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id <= 50) AND (b.id = 71)",
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id <= 50) AND (b.id = 69)",
+
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id IS NULL) AND (b.id >= 70)",
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id <= 50) AND (b.id IS NULL)",
+
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id <= 50 AND b.id >= 70)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id WHERE (b.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id "
+                        + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.id <= 50)",
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE (a.id IS NULL) AND (b.id IS NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id "
+                        + "WHERE ((a.id IS NULL) AND (b.id IS NOT NULL)) AND (b.id >= 70)");
+    }
 
 
     /**
