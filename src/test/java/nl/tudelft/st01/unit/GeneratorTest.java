@@ -27,9 +27,7 @@ public class GeneratorTest {
     private static final String NULL_ERROR_MESSAGE = "Input cannot be null.";
 
     private static final String NOT_AN_SQL_QUERY_ERROR_MESSAGE = "Input query could not be parsed.";
-
     private static final String NOT_A_SELECT_STATEMENT_ERROR_MESSAGE = "Only SELECT statements are supported.";
-
     private static final String CATCH_EXCEPTION_FAIL_MESSAGE = "UnsupportedEncodingException was thrown";
 
 

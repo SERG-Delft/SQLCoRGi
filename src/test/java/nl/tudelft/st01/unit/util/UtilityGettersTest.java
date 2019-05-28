@@ -28,8 +28,9 @@ public class UtilityGettersTest {
         Constructor<UtilityGetters> utilityGettersConstructor = UtilityGetters.class.getDeclaredConstructor();
         utilityGettersConstructor.setAccessible(true);
 
-        assertThatThrownBy(() -> utilityGettersConstructor.newInstance())
-            .hasRootCauseInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(
+            () -> utilityGettersConstructor.newInstance()
+        ).hasRootCauseInstanceOf(UnsupportedOperationException.class);
     }
 
     /**
