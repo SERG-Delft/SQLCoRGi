@@ -109,4 +109,67 @@ public class AggregatorTest {
                 "SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers "
                 + "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1");
     }
+
+    /**
+     * A test case for a simple GROUP BY query.
+     */
+    @Test
+    public void testBasicGroupBy() {
+        verify("SELECT Director, Name FROM Movies GROUP BY Name",
+
+                "SELECT Director, Name FROM Movies GROUP BY Name HAVING COUNT(*) > 1",
+                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Name) > 1");
+    }
+
+    /**
+     * A test case for a GROUP BY query with WHERE clause.
+     */
+    @Test
+    public void testGroupByWithWhere() {
+        verify("SELECT Director FROM Movies WHERE title = 'Finding Nemo' GROUP BY Director",
+
+                "SELECT Director FROM Movies WHERE title <> 'Finding Nemo' GROUP BY Director",
+                "SELECT Director FROM Movies WHERE title = 'Finding Nemo' GROUP BY Director",
+                "SELECT Director FROM Movies WHERE title IS NULL GROUP BY Director",
+                "SELECT Director FROM Movies WHERE title = 'Finding Nemo' GROUP BY Director HAVING COUNT(*) > 1",
+                "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' HAVING COUNT(DISTINCT Director) > 1");
+    }
+
+    /**
+     * A test case for a HAVING query.
+     */
+    @Test
+    public void testHaving() {
+        verify("SELECT Director FROM Movies GROUP BY Director HAVING Director LIKE 'B%'",
+
+                "SELECT Director FROM Movies GROUP BY Director HAVING NOT Director LIKE 'B%'",
+                "SELECT Director FROM Movies GROUP BY Director HAVING Director LIKE 'B%'",
+                "SELECT Director FROM Movies GROUP BY Director HAVING Director IS NULL",
+                "SELECT Director FROM Movies GROUP BY Director HAVING COUNT(*) > 1 AND Director LIKE 'B%'",
+                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1 AND Director LIKE 'B%'");
+    }
+
+    /**
+     * A test case for a HAVING query with WHERE clause.
+     */
+    @Test
+    public void testHavingWithWhere() {
+        verify("SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
+                + "GROUP BY Director HAVING Director LIKE 'A%'",
+
+            "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
+                    + "GROUP BY Director HAVING Director LIKE 'A%'",
+                "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
+                    + "GROUP BY Director HAVING NOT Director LIKE 'A%'",
+                "SELECT Director FROM Movies WHERE title <> 'Finding Nemo' "
+                    + "GROUP BY Director HAVING Director LIKE 'A%'",
+                "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
+                    + "GROUP BY Director HAVING COUNT(*) > 1 AND Director LIKE 'A%'",
+                "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' "
+                    + "HAVING COUNT(DISTINCT Director) > 1 AND Director LIKE 'A%'",
+                "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
+                    + "GROUP BY Director HAVING Director IS NULL",
+                "SELECT Director FROM Movies WHERE title IS NULL "
+                    + "GROUP BY Director HAVING Director LIKE 'A%'");
+    }
 }
