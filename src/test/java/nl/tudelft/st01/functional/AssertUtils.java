@@ -1,6 +1,5 @@
 package nl.tudelft.st01.functional;
 
-import nl.tudelft.st01.GenJoinWhereExpression;
 import nl.tudelft.st01.Generator;
 
 import java.util.Arrays;
@@ -41,7 +40,7 @@ final class AssertUtils {
      * @param query The input query that needs to be covered.
      * @param atLeast The expected output of the {@link Generator}
      */
-    static void contains(String query, String... atLeast) {
+    static void containsAtLeast(String query, String... atLeast) {
         Set<String> resultSet = Generator.generateRules(query);
 
         assertThat(resultSet).contains(atLeast);

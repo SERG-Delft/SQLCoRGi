@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static nl.tudelft.st01.functional.AssertUtils.verify;
+import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
 
 /**
  * This class tests if the coverage targets for queries with JOINS are generated correctly.
@@ -141,45 +142,51 @@ public class JoinTest {
     /**
      * A parametrized test for a query with different join types with a single join condition which involves
      * nullable columns and a WHERE clause. All of which should result in the same expected output set.
+     * @param joinType The type of join that is used in the query.
      */
     @ParameterizedTest(name = "[{index}] Join type: {0}")
     @CsvSource({"INNER", "RIGHT", "LEFT", "FULL"})
     public void testJoinsOnOneEqualityConditionWithNullableColumnsAndWHEREClause(String joinType) {
-        verify("SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.Var = TableB.Var " +
-                        "WHERE TableA.Value > 1",
+        verify("SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.Var = TableB.Var "
+                        + "WHERE TableA.Value > 1",
 
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE TableA.Value = 2",
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE TableA.Value = 1",
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE TableA.Value = 0",
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE TableA.Value IS NULL",
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Value > 1)",
-                "SELECT * FROM TableA LEFT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableB.Var IS NULL) " +
-                        "AND (TableA.Var IS NOT NULL)) AND (TableA.Value > 1)",
-                "SELECT * FROM TableA LEFT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableB.Var IS NULL) " +
-                        "AND (TableA.Var IS NULL)) AND (TableA.Value > 1)",
-                "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) " +
-                        "AND (TableB.Var IS NOT NULL)",
-                "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) " +
-                        "AND (TableB.Var IS NULL)");
+                "SELECT * FROM TableA LEFT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableB.Var IS NULL) "
+                        + "AND (TableA.Var IS NOT NULL)) AND (TableA.Value > 1)",
+                "SELECT * FROM TableA LEFT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableB.Var IS NULL) "
+                        + "AND (TableA.Var IS NULL)) AND (TableA.Value > 1)",
+                "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) "
+                        + "AND (TableB.Var IS NOT NULL)",
+                "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) "
+                        + "AND (TableB.Var IS NULL)");
     }
 
+    /**
+     * A test for evaluating whether the where expression are indeed not included in
+     * the mutation when they should not be. That is, when either side is evaluated to null.
+     * @param where The where expression that should not be appended to the LEFT or RIGHT joins.
+     */
     @ParameterizedTest
     @CsvSource({"a.id < b.id", "a.id <> b.id", "b.length = a.length",
             "a.id IS NULL", "b.length IS NULL", "a.size BETWEEN 50.0 AND b.length"})
     public void testJoinWithWhereColumnsExcludedIfSideIsNull(String where) {
-        AssertUtils.contains("SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE " + where,
+        containsAtLeast("SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE " + where,
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE (" + where + ")",
                 "SELECT * FROM a LEFT JOIN b ON a.id = b.id OR a.length < b.length "
                         + "WHERE (b.id IS NULL) AND (b.length IS NULL) AND (a.id IS NULL) AND (a.length IS NULL)",
                 "SELECT * FROM a LEFT JOIN b ON a.id = b.id OR a.length < b.length "
                         + "WHERE (b.id IS NULL) AND (b.length IS NULL) "
-                        +"AND (a.id IS NOT NULL) AND (a.length IS NOT NULL)",
+                        + "AND (a.id IS NOT NULL) AND (a.length IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON a.id = b.id OR a.length < b.length "
                         + "WHERE (a.id IS NULL) AND (a.length IS NULL) AND (b.id IS NOT NULL) "
                         + "AND (b.length IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON a.id = b.id OR a.length < b.length "
                         + "WHERE (a.id IS NULL) AND (a.length IS NULL) AND (b.id IS NULL) AND (b.length IS NULL)"
-                        );
+        );
     }
 
     /**
@@ -188,10 +195,11 @@ public class JoinTest {
      */
     @Test
     public void testJoinWithWhereLogicalToUnary() {
-        AssertUtils.contains(
+        containsAtLeast(
             "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE a.length < 60 AND b.id > 40",
 
-            "SELECT * FROM a LEFT JOIN b ON b.id = a.id WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length < 60)",
+            "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
+                    + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length < 60)",
             "SELECT * FROM a LEFT JOIN b ON b.id = a.id WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length < 60)",
             "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE ((a.id IS NULL) AND (b.id IS NOT NULL)) AND (b.id > 40)",
             "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)",
@@ -205,7 +213,7 @@ public class JoinTest {
      */
     @Test
     public void testJoinWithWhereLike() {
-        AssertUtils.contains(
+        containsAtLeast(
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE a.name LIKE 'a%'",
 
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.name LIKE 'a%')",
@@ -223,7 +231,7 @@ public class JoinTest {
      */
     @Test
     public void testJoinWithWhereContainsIsNullOfNonExcludedColumn() {
-        AssertUtils.contains(
+        containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.length IS NOT NULL)",
 
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.length IS NOT NULL)",
@@ -241,7 +249,7 @@ public class JoinTest {
      */
     @Test
     public void testJoinWithWhereIn() {
-        AssertUtils.contains(
+        containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE b.length IN (1, 3, 4)",
 
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
@@ -258,7 +266,7 @@ public class JoinTest {
      */
     @Test
     public void testJoinWithUnaffectedWhereLogical() {
-        AssertUtils.contains(
+        containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE a.id = 10 AND a.length = 30",
 
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.id = 10) AND (a.length = 30)",
@@ -276,7 +284,7 @@ public class JoinTest {
      */
     @Test
     public void testJoinWithUnaffectedWhereBetween() {
-        AssertUtils.contains(
+        containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE a.length BETWEEN 10 AND 40",
 
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.length BETWEEN 10 AND 40)",

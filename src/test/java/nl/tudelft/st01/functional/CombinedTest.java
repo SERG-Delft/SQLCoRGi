@@ -1,8 +1,6 @@
 package nl.tudelft.st01.functional;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 import static nl.tudelft.st01.functional.AssertUtils.verify;
 
@@ -59,26 +57,26 @@ public class CombinedTest {
     @Test
     public void testJoinWithWhereNonIdsIncludedInWhereExpression() {
         verify("SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE a.length < 50 OR b.length > 70",
-        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 69)",
-        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 71)",
-        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 70)",
+            "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 69)",
+            "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 71)",
+            "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 70)",
 
-        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length = 49) AND NOT (b.length > 70)",
-        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length = 50) AND NOT (b.length > 70)",
-        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length = 51) AND NOT (b.length > 70)",
+            "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length = 49) AND NOT (b.length > 70)",
+            "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length = 50) AND NOT (b.length > 70)",
+            "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length = 51) AND NOT (b.length > 70)",
 
-        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length IS NULL)",
-        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length IS NULL) AND NOT (b.length > 70)",
+            "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length IS NULL)",
+            "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length IS NULL) AND NOT (b.length > 70)",
 
-        "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length < 50 OR b.length > 70)",
-        "SELECT * FROM a LEFT JOIN b ON a.id = b.id "
-                + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length < 50)",
-        "SELECT * FROM a LEFT JOIN b ON a.id = b.id "
-                + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length < 50)",
-        "SELECT * FROM a RIGHT JOIN b ON a.id = b.id "
-                + "WHERE ((a.id IS NULL) AND (b.id IS NULL)) AND (b.length > 70)",
-        "SELECT * FROM a RIGHT JOIN b ON a.id = b.id "
-                + "WHERE ((a.id IS NULL) AND (b.id IS NOT NULL)) AND (b.length > 70)");
+            "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length < 50 OR b.length > 70)",
+            "SELECT * FROM a LEFT JOIN b ON a.id = b.id "
+                    + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length < 50)",
+            "SELECT * FROM a LEFT JOIN b ON a.id = b.id "
+                    + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length < 50)",
+            "SELECT * FROM a RIGHT JOIN b ON a.id = b.id "
+                    + "WHERE ((a.id IS NULL) AND (b.id IS NULL)) AND (b.length > 70)",
+            "SELECT * FROM a RIGHT JOIN b ON a.id = b.id "
+                    + "WHERE ((a.id IS NULL) AND (b.id IS NOT NULL)) AND (b.length > 70)");
     }
 
     /**

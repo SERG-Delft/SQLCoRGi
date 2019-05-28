@@ -10,7 +10,6 @@ import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.Between;
-import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
@@ -22,7 +21,6 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -79,7 +77,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
         Column column = (Column) isNullExpression.getLeftExpression();
         if (contains(column)) {
             expression = null;
-        } else if (!isNullExpression.isNot() && !tablesContain(column)){
+        } else if (!isNullExpression.isNot() && !tablesContain(column)) {
             expression = null;
         } else {
             expression = isNullExpression;
@@ -133,7 +131,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(InExpression inExpression) {
-        handleExpressionIn(inExpression, new InExpression());
+        handleExpressionIn(inExpression);
     }
 
     @Override
@@ -173,6 +171,11 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
         return expression;
     }
 
+    /**
+     * Evaluates whether the tables set or the columns set contains the given table.
+     * @param column The column to check.
+     * @return True if either set contains the column, false otherwise.
+     */
     private boolean contains(Column column) {
         return columnsContain(column) || tablesContain(column);
     }
@@ -194,6 +197,11 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
         return false;
     }
 
+    /**
+     * Checks whether the tables set contain the table corresponding to the given column.
+     * @param column The column to check.
+     * @return True if the set contains the table, false otherwise.
+     */
     private boolean tablesContain(Column column) {
         if (tables != null && !tables.isEmpty()) {
             return tables.contains(column.getTable().toString().toLowerCase());
@@ -253,7 +261,12 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
         }
     }
 
-    public void handleExpressionIn(InExpression inExpression, InExpression seed) {
+    /**
+     * In case of an IN expression, only the left side needs to be evaluated.
+     * If the left side is to be excluded, expression is set to null. To the original expression otherwise.
+     * @param inExpression The expression to evaluate.
+     */
+    public void handleExpressionIn(InExpression inExpression) {
         inExpression.getLeftExpression().accept(this);
         if (expression != null) {
             expression = inExpression;
