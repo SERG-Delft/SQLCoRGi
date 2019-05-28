@@ -19,6 +19,7 @@ import java.util.TreeSet;
  * Class that generates rules for the aggregate functions such as MAX, AVG etc.
  */
 public class AggregateFunctionsGenerator {
+    private static final String COUNT_STRING = "COUNT";
 
     /**
      * Main, public method that generates the rules for the aggregate functions.
