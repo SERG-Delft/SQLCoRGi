@@ -67,11 +67,11 @@ public final class Generator {
      * @param args unused.
      */
     public static void main(String[] args) {
-        String query = "SELECT * FROM Movies LEFT JOIN a ON movies.id = a.id RIGHT JOIN c on c.id = a.id WHERE a.length = 60 or a.id = 60 and movies.id = 50";
+        String query = "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id < 10 GROUP BY b.id";
         Set<String> result = generateRules(query);
         System.out.println("Result:");
         for (String s : result) {
-            System.out.println(s);
+            System.out.println("\"" + s + "\",");
         }
     }
 
