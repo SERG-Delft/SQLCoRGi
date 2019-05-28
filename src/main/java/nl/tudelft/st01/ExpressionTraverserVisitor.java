@@ -25,7 +25,7 @@ import java.util.Set;
  * This class allows modifying an expression such that none of the provided columns,
  * or columns related to the provided tables, are in the expression anymore.
  */
-public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
+public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
     private List<Column> nullColumns;
 
     private Set<String> tables;
@@ -214,36 +214,4 @@ public class ColumnExclusionVisitor extends ExpressionVisitorAdapter {
             expression = null;
         }
     }
-
-    /**
-     * In case of a comparison operator, the original expression may only be retained if neither side contains
-     * columns that should be excluded.
-     * @param comparisonOperator The comparison operator to evaluate.
-     */
-    private void handleComparisonOperator(ComparisonOperator comparisonOperator) {
-        Expression left = comparisonOperator.getLeftExpression();
-        Expression right = comparisonOperator.getRightExpression();
-
-        if (expressionContainsExcludedColumn(left) || expressionContainsExcludedColumn(right)) {
-            expression = null;
-        } else {
-            expression = comparisonOperator;
-        }
-
-
-    }
-
-    /**
-     * Checks if the expression contains a column that should be excluded.
-     * @param expression The expression to evaluate.
-     * @return If the expression contains a column that should be excluded, true is returned. False otherwise.
-     */
-    private boolean expressionContainsExcludedColumn(Expression expression) {
-        expression.accept(this);
-
-        return this.expression == null;
-    }
-
-
-
 }

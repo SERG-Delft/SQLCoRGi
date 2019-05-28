@@ -248,10 +248,10 @@ public class GenJoinWhereExpression {
     private static Expression excludeInExpression(Set<String> tables, Expression expression) {
         Expression filteredWhere;
         if (expression != null) {
-            ColumnExclusionVisitor ceVisitor = new ColumnExclusionVisitor();
-            ceVisitor.setTables(tables);
-            expression.accept(ceVisitor);
-            filteredWhere = ceVisitor.getExpression();
+            ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
+            traverserVisitor.setTables(tables);
+            expression.accept(traverserVisitor);
+            filteredWhere = traverserVisitor.getExpression();
 
             return filteredWhere;
         }
@@ -269,11 +269,11 @@ public class GenJoinWhereExpression {
     private static Expression excludeInExpression(List<Column> columns, Set<String> tables, Expression expression) {
         Expression filteredWhere;
         if (expression != null) {
-            ColumnExclusionVisitor ceVisitor = new ColumnExclusionVisitor();
-            ceVisitor.setTables(tables);
-            ceVisitor.setNullColumns(columns);
-            expression.accept(ceVisitor);
-            filteredWhere = ceVisitor.getExpression();
+            ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
+            traverserVisitor.setTables(tables);
+            traverserVisitor.setNullColumns(columns);
+            expression.accept(traverserVisitor);
+            filteredWhere = traverserVisitor.getExpression();
 
             return filteredWhere;
         }
