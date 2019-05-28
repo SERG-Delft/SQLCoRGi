@@ -61,13 +61,13 @@ public final class Generator {
         return result;
     }
 
-
     /**
      * Example query to try out the generator.
      * @param args unused.
      */
     public static void main(String[] args) {
-        String query = "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE a.length < 50 OR b.length > 70";
+        String query = "SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE b.length IS NOT NULL";
+
         Set<String> result = generateRules(query);
         System.out.println("Result:");
         for (String s : result) {

@@ -182,6 +182,10 @@ public class JoinTest {
                         );
     }
 
+    /**
+     * A test for evaluation whether the given logical expression in the where clause is correctly modified
+     * and appended to the correct join type.
+     */
     @Test
     public void testJoinWithWhereLogicalToUnary() {
         AssertUtils.contains(
@@ -196,6 +200,9 @@ public class JoinTest {
     }
 
 
+    /**
+     * A test for evaluating whether LIKE expressions are handled correctly.
+     */
     @Test
     public void testJoinWithWhereLike() {
         AssertUtils.contains(
@@ -211,6 +218,9 @@ public class JoinTest {
         );
     }
 
+    /**
+     * A test for evaluating whether a redundant IS NOT NULL expression is included even though its table's id is not.
+     */
     @Test
     public void testJoinWithWhereContainsIsNullOfNonExcludedColumn() {
         AssertUtils.contains(
@@ -226,6 +236,9 @@ public class JoinTest {
         );
     }
 
+    /**
+     * A test for evaluating whether IN expressions are handled correctly.
+     */
     @Test
     public void testJoinWithWhereIn() {
         AssertUtils.contains(
@@ -240,6 +253,9 @@ public class JoinTest {
         );
     }
 
+    /**
+     * A test for evaluating whether the logical expression is not modified when it should not be.
+     */
     @Test
     public void testJoinWithUnaffectedWhereLogical() {
         AssertUtils.contains(
@@ -255,6 +271,9 @@ public class JoinTest {
         );
     }
 
+    /**
+     * A test for evaluating whether BETWEEN expression are not modified when they should not be.
+     */
     @Test
     public void testJoinWithUnaffectedWhereBetween() {
         AssertUtils.contains(
