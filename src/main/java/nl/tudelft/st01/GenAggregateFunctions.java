@@ -46,7 +46,7 @@ public class GenAggregateFunctions {
                         outputAfterAggregator.add(firstRule(plainSelect).toString());
                         outputAfterAggregator.add(secondRule(plainSelect).toString());
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
-                    } else if (specialFunctions.contains(func.getName())) {
+                    } else if (!func.getName().equals("COUNT")) {
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
                     }
 

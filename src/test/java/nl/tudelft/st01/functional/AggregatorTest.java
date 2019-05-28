@@ -18,7 +18,7 @@ public class AggregatorTest {
      * A test case with 2 columns and 1 aggregator, in this case MAX.
      */
     @Test
-    public void testAggrNoGroupBy() {
+    public void testCountNoGroupBy() {
         verify("SELECT COUNT(id) FROM role",
 
                 "SELECT COUNT(id) FROM role HAVING COUNT(id) > COUNT(DISTINCT id) AND COUNT(DISTINCT id) > 1");
@@ -28,8 +28,8 @@ public class AggregatorTest {
      * A test case for the AVG function since it needs an extra rule
      */
     @ParameterizedTest(name = "[{index}] Join type: {0}")
-    @CsvSource({"AVG", "SUM"})
-    public void testAvg(String func) {
+    @CsvSource({"AVG", "SUM", "MIN", "MAX"})
+    public void testOtherFunctionsNoGroupBby(String func) {
         verify("SELECT " + func + "(Points) FROM Customers",
 
                 "SELECT " + func + "(Points) FROM Customers HAVING COUNT(Points) > COUNT(DISTINCT Points) "
