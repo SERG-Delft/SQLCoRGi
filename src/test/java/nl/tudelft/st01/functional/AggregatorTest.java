@@ -23,6 +23,18 @@ public class AggregatorTest {
     }
 
     /**
+     * A test case for the AVG function since it needs an extra rule
+     */
+    @Test
+    public void testAvg() {
+        verify("SELECT AVG(Points) FROM Customers",
+
+                "SELECT AVG(Points) FROM Customers HAVING COUNT(Points) > COUNT(DISTINCT Points) "
+                + "AND COUNT(DISTINCT Points) > 1",
+                "SELECT AVG(Points) FROM Customers HAVING COUNT(*) > COUNT(Points) AND COUNT(DISTINCT Points) > 1");
+    }
+
+    /**
      * A test case with 1 column and 1 aggregator, in this case AVG.
      */
     @Test

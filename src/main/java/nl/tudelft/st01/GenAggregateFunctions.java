@@ -42,6 +42,8 @@ public class GenAggregateFunctions {
                         outputAfterAggregator.add(firstRule(plainSelect).toString());
                         outputAfterAggregator.add(secondRule(plainSelect).toString());
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
+                    } else if (func.getName().equals("AVG")) {
+                        outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
                     }
 
                     outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
