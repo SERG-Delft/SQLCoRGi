@@ -164,19 +164,21 @@ public class JoinTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"(a.id < b.id)", "a.id <> b.id", "b.length = a.length",
-            "b.length IS NOT NULL", "b.length IS NOT NULL", "a.size BETWEEN 50.0 AND b.length"})
+    @CsvSource({"a.id < b.id", "a.id <> b.id", "b.length = a.length",
+            "a.id IS NULL", "b.length IS NULL", "a.size BETWEEN 50.0 AND b.length"})
     public void testJoinWithWhereColumnsExcludedIfSideIsNull(String where) {
         AssertUtils.contains("SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE " + where,
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE (" + where + ")",
-                "SELECT * FROM a LEFT JOIN b ON a.id = b.id OR a.length < b.length " +
-                        "WHERE (b.id IS NULL) AND (b.length IS NULL) AND (a.id IS NULL) AND (a.length IS NULL)",
-                "SELECT * FROM a LEFT JOIN b ON a.id = b.id OR a.length < b.length " +
-                        "WHERE (b.id IS NULL) AND (b.length IS NULL) AND (a.id IS NOT NULL) AND (a.length IS NOT NULL)",
-                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id OR a.length < b.length " +
-                        "WHERE (a.id IS NULL) AND (a.length IS NULL) AND (b.id IS NOT NULL) AND (b.length IS NOT NULL)",
-                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id OR a.length < b.length " +
-                        "WHERE (a.id IS NULL) AND (a.length IS NULL) AND (b.id IS NULL) AND (b.length IS NULL)"
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id OR a.length < b.length "
+                        + "WHERE (b.id IS NULL) AND (b.length IS NULL) AND (a.id IS NULL) AND (a.length IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id OR a.length < b.length "
+                        + "WHERE (b.id IS NULL) AND (b.length IS NULL) "
+                        +"AND (a.id IS NOT NULL) AND (a.length IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id OR a.length < b.length "
+                        + "WHERE (a.id IS NULL) AND (a.length IS NULL) AND (b.id IS NOT NULL) "
+                        + "AND (b.length IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id OR a.length < b.length "
+                        + "WHERE (a.id IS NULL) AND (a.length IS NULL) AND (b.id IS NULL) AND (b.length IS NULL)"
                         );
     }
 
@@ -184,11 +186,13 @@ public class JoinTest {
     public void testJoinWithWhereLogicalToUnary() {
         AssertUtils.contains(
             "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE a.length < 60 AND b.id > 40",
+
             "SELECT * FROM a LEFT JOIN b ON b.id = a.id WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length < 60)",
             "SELECT * FROM a LEFT JOIN b ON b.id = a.id WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length < 60)",
             "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE ((a.id IS NULL) AND (b.id IS NOT NULL)) AND (b.id > 40)",
             "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)",
-            "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.length = 61) AND (b.id > 40)");
+            "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.length = 61) AND (b.id > 40)"
+        );
     }
 
 
@@ -196,13 +200,74 @@ public class JoinTest {
     public void testJoinWithWhereLike() {
         AssertUtils.contains(
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE a.name LIKE 'a%'",
+
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.name LIKE 'a%')",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
                     + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.name LIKE 'a%')",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
                         + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.name LIKE 'a%')",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
-                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)");
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)"
+        );
+    }
+
+    @Test
+    public void testJoinWithWhereContainsIsNullOfNonExcludedColumn() {
+        AssertUtils.contains(
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.length IS NOT NULL)",
+
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.length IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
+                        + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
+                        + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)"
+        );
+    }
+
+    @Test
+    public void testJoinWithWhereIn() {
+        AssertUtils.contains(
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE b.length IN (1, 3, 4)",
+
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id WHERE (b.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id "
+                        + "WHERE ((a.id IS NULL) AND (b.id IS NOT NULL)) AND (b.length IN (1, 3, 4))",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id "
+                        + "WHERE ((a.id IS NULL) AND (b.id IS NULL)) AND (b.length IN (1, 3, 4))"
+        );
+    }
+
+    @Test
+    public void testJoinWithUnaffectedWhereLogical() {
+        AssertUtils.contains(
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE a.id = 10 AND a.length = 30",
+
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.id = 10) AND (a.length = 30)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
+                        + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.id = 10 AND a.length = 30)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
+                        + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length = 30)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)"
+        );
+    }
+
+    @Test
+    public void testJoinWithUnaffectedWhereBetween() {
+        AssertUtils.contains(
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE a.length BETWEEN 10 AND 40",
+
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.length BETWEEN 10 AND 40)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
+                        + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length BETWEEN 10 AND 40)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
+                        + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length BETWEEN 10 AND 40)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)"
+        );
     }
 
 
