@@ -1,5 +1,6 @@
 package nl.tudelft.st01.functional;
 
+import nl.tudelft.st01.GenJoinWhereExpression;
 import nl.tudelft.st01.Generator;
 
 import java.util.Arrays;
@@ -33,5 +34,11 @@ final class AssertUtils {
         Set<String> expectedSet = new TreeSet<>(Arrays.asList(expected));
 
         assertThat(resultSet).isEqualTo(expectedSet);
+    }
+
+    static void contains(String query, String... atLeast) {
+        Set<String> resultSet = Generator.generateRules(query);
+
+        assertThat(resultSet).contains(atLeast);
     }
 }
