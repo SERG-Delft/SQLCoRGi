@@ -148,7 +148,7 @@ public class JoinTest {
      * -----------------------------------------------------
      * CURRENTLY DISABLED - FEATURE IS NOT IMPLEMENTED YET.
      */
-    /*
+
     @ParameterizedTest(name = "[{index}] Join type: {0}")
     @CsvSource({"INNER", "RIGHT", "LEFT", "FULL"})
     public void testJoinsOnOneEqualityConditionWithNullableColumnsAndWHEREClause(String joinType) {
@@ -169,5 +169,5 @@ public class JoinTest {
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) " +
                         "AND (TableB.Var IS NULL)");
     }
-    */
+
 }

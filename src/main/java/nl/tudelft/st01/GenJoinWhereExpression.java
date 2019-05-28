@@ -166,7 +166,7 @@ public class GenJoinWhereExpression {
         Expression leftJoinRightIsNull = concatenate(rightNullLeftNull, leftIsNull);
         Expression leftJoinRightIsNotNull = concatenate(rightNullLeftNotNull, leftIsNotNull);
 
-        result.add(new JoinWhereItem(innerJoin, whereExpression));
+        result.add(new JoinWhereItem(innerJoin, wrapInParentheses(whereExpression)));
         result.add(new JoinWhereItem(leftJoin, leftJoinRightIsNull));
         result.add(new JoinWhereItem(leftJoin, leftJoinRightIsNotNull));
         result.add(new JoinWhereItem(rightJoin, rightJoinLeftIsNull));
