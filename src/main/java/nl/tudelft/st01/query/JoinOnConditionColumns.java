@@ -1,4 +1,4 @@
-package nl.tudelft.st01;
+package nl.tudelft.st01.query;
 
 import net.sf.jsqlparser.schema.Column;
 
