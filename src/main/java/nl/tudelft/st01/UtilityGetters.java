@@ -33,7 +33,6 @@ public final class UtilityGetters {
      *                    GroupByGenerator clause in the deep copy
      * @return deep copy of object
      */
-    // TODO possibly remove this deepCopy method
     public static PlainSelect deepCopy(PlainSelect plainSelect, boolean copyGroupBy) {
         PlainSelect newPlainSelect = new PlainSelect();
 
@@ -55,7 +54,7 @@ public final class UtilityGetters {
      * @param expr - expression to fill in the __
      * @return `expr > 1` object
      */
-    public static GreaterThan getGreaterThan1(Expression expr) {
+    public static GreaterThan createGreaterThanOne(Expression expr) {
         GreaterThan greaterThan = new GreaterThan();
         greaterThan.setLeftExpression(expr);
         greaterThan.setRightExpression(new DoubleValue("1"));
@@ -68,7 +67,7 @@ public final class UtilityGetters {
      *
      * @return a COUNT(*) object
      */
-    public static Function getCountAllColumns() {
+    public static Function createCountAllColumns() {
         Function count = new Function();
         count.setName(COUNT_STRING);
         count.setAllColumns(true);
@@ -83,7 +82,7 @@ public final class UtilityGetters {
      * @param distinct toggles whether or not you want to include DISTINCT
      * @return a COUNT(DISTINCT __) object
      */
-    public static Function getCountColumn(Expression expression, boolean distinct) {
+    public static Function createCountColumn(Expression expression, boolean distinct) {
         Function countColumn = new Function();
         countColumn.setName(COUNT_STRING);
         ExpressionList parameters = new ExpressionList(expression);
@@ -100,7 +99,7 @@ public final class UtilityGetters {
      * @param expression - expression to put in the SelectItem
      * @return a SelectItem with the expression inside
      */
-    public static SelectItem getSelectItemWithObject(Expression expression) {
+    public static SelectItem createSelectItemWithObject(Expression expression) {
         SelectExpressionItem selectExpressionItem = new SelectExpressionItem();
         selectExpressionItem.setExpression(expression);
 

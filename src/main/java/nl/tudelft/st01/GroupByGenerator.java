@@ -41,10 +41,10 @@ public class GroupByGenerator {
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
 
         // Create COUNT(*) object
-        Function count = UtilityGetters.getCountAllColumns();
+        Function count = UtilityGetters.createCountAllColumns();
 
         // Create COUNT(*) > 1
-        GreaterThan greaterThan1 = UtilityGetters.getGreaterThan1(count);
+        GreaterThan greaterThan1 = UtilityGetters.createGreaterThanOne(count);
 
         Expression having = plainSelect.getHaving();
         if (having != null) {
@@ -71,10 +71,10 @@ public class GroupByGenerator {
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, false);
 
         // Create COUNT(*) object
-        Function count = UtilityGetters.getCountAllColumns();
+        Function count = UtilityGetters.createCountAllColumns();
 
         // Create selectItem object with the count in it
-        SelectItem si = UtilityGetters.getSelectItemWithObject(count);
+        SelectItem si = UtilityGetters.createSelectItemWithObject(count);
 
         List<SelectItem> selectItemList = new ArrayList<>();
         selectItemList.add(si);
@@ -86,10 +86,10 @@ public class GroupByGenerator {
         Expression groupBy = plainSelect.getGroupBy().getGroupByExpressions().get(0);
 
         // Create COUNT(distinct groupByColumn) object
-        Function countColumn = UtilityGetters.getCountColumn(groupBy, true);
+        Function countColumn = UtilityGetters.createCountColumn(groupBy, true);
 
         // Create count > 1
-        GreaterThan greaterThan1 = UtilityGetters.getGreaterThan1(countColumn);
+        GreaterThan greaterThan1 = UtilityGetters.createGreaterThanOne(countColumn);
 
         Expression having = plainSelect.getHaving();
         if (having != null) {

@@ -64,10 +64,10 @@ public class AggregateFunctionsGenerator {
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, false);
 
         // Create COUNT(*) object
-        Function count = UtilityGetters.getCountAllColumns();
+        Function count = UtilityGetters.createCountAllColumns();
 
         // Create selectItem object with the count in it
-        SelectItem si = UtilityGetters.getSelectItemWithObject(count);
+        SelectItem si = UtilityGetters.createSelectItemWithObject(count);
 
         List<SelectItem> selectItemList = new ArrayList<>();
         selectItemList.add(si);
@@ -79,10 +79,10 @@ public class AggregateFunctionsGenerator {
         Expression groupBy = plainSelect.getGroupBy().getGroupByExpressions().get(0);
 
         // Create COUNT(distinct groupByColumn) object
-        Function countColumn = UtilityGetters.getCountColumn(groupBy, true);
+        Function countColumn = UtilityGetters.createCountColumn(groupBy, true);
 
         // Create count > 1
-        GreaterThan greaterThan = UtilityGetters.getGreaterThan1(countColumn);
+        GreaterThan greaterThan = UtilityGetters.createGreaterThanOne(countColumn);
 
         // Add to plainselect
         plainSelectOut.setHaving(greaterThan);
@@ -102,10 +102,10 @@ public class AggregateFunctionsGenerator {
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
 
         // Create COUNT(*) object
-        Function count = UtilityGetters.getCountAllColumns();
+        Function count = UtilityGetters.createCountAllColumns();
 
         // Create COUNT(*) > 1
-        GreaterThan greaterThan = UtilityGetters.getGreaterThan1(count);
+        GreaterThan greaterThan = UtilityGetters.createGreaterThanOne(count);
 
         // Add to plainselect
         plainSelectOut.setHaving(greaterThan);
@@ -124,7 +124,7 @@ public class AggregateFunctionsGenerator {
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
 
         // Create COUNT(*) object
-        Function count = UtilityGetters.getCountAllColumns();
+        Function count = UtilityGetters.createCountAllColumns();
 
         // Retrieve column in function
         Expression expr = function.getParameters().getExpressions().get(0);
@@ -132,11 +132,11 @@ public class AggregateFunctionsGenerator {
         // Create count(*) > column in function
         GreaterThan leftGreaterThan = new GreaterThan();
         leftGreaterThan.setLeftExpression(count);
-        leftGreaterThan.setRightExpression(UtilityGetters.getCountColumn(expr, false));
+        leftGreaterThan.setRightExpression(UtilityGetters.createCountColumn(expr, false));
 
         // Create count(distinct FunctionColumn) > 1
-        GreaterThan rightGreaterThan = UtilityGetters.getGreaterThan1(
-            UtilityGetters.getCountColumn(expr, true)
+        GreaterThan rightGreaterThan = UtilityGetters.createGreaterThanOne(
+            UtilityGetters.createCountColumn(expr, true)
         );
 
         // Create AND
@@ -162,12 +162,12 @@ public class AggregateFunctionsGenerator {
 
         // Create left condition
         GreaterThan leftGreaterThan = new GreaterThan();
-        leftGreaterThan.setLeftExpression(UtilityGetters.getCountColumn(expr, false));
-        leftGreaterThan.setRightExpression(UtilityGetters.getCountColumn(expr, true));
+        leftGreaterThan.setLeftExpression(UtilityGetters.createCountColumn(expr, false));
+        leftGreaterThan.setRightExpression(UtilityGetters.createCountColumn(expr, true));
 
         // Create right condition
-        GreaterThan rightGreaterThan = UtilityGetters.getGreaterThan1(
-            UtilityGetters.getCountColumn(expr, true)
+        GreaterThan rightGreaterThan = UtilityGetters.createGreaterThanOne(
+            UtilityGetters.createCountColumn(expr, true)
         );
 
         // Create AND
