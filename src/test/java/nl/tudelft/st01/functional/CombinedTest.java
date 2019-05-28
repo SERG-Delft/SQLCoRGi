@@ -48,6 +48,19 @@ public class CombinedTest {
                 "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id < 10 GROUP BY b.id "
                         + "HAVING COUNT(*) > 1");
     }
+//
+//    @Test
+//    public void testJoinWithWhereNonIdIncludedInRightIsNullCass() {
+//        verify("SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE a.length < 50 OR b.length > 70",
+//
+//
+//
+//
+//
+//        )
+//
+//    }
+
 
     /**
      * Tests the most basic query, for which case no mutations should be generated.
