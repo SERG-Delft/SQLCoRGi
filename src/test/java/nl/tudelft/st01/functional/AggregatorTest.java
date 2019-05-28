@@ -36,7 +36,6 @@ public class AggregatorTest {
 
                 "SELECT " + func + "(Points) FROM Customers HAVING COUNT(Points) > COUNT(DISTINCT Points) "
                 + "AND COUNT(DISTINCT Points) > 1",
-
                 "SELECT " + func + "(Points) FROM Customers "
                 + "HAVING COUNT(*) > COUNT(Points) AND COUNT(DISTINCT Points) > 1");
     }
@@ -64,7 +63,6 @@ public class AggregatorTest {
         verify("SELECT director, COUNT(*) FROM Movies GROUP BY director",
 
                 "SELECT director, COUNT(*) FROM Movies GROUP BY director HAVING COUNT(*) > 1",
-
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1");
     }
 
@@ -114,10 +112,8 @@ public class AggregatorTest {
 
                 "SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers "
                 + "HAVING COUNT(Points) > COUNT(DISTINCT Points) AND COUNT(DISTINCT Points) > 1",
-
                 "SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers "
                 + "HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1",
-
                 "SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers "
                 + "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1");
     }
