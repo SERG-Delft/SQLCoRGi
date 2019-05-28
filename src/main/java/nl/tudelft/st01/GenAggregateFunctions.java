@@ -12,6 +12,8 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -30,6 +32,8 @@ public class GenAggregateFunctions {
     public Set<String> generate(PlainSelect plainSelect) {
         // Check if there is a Function in one of the columns. If so, generate rules for it.
         Set<String> outputAfterAggregator = new TreeSet<>();
+        Set<String> specialFunctions = new HashSet<String>(Arrays.asList("AVG", "SUM"));
+
         for (SelectItem selectItem : plainSelect.getSelectItems()) {
             if (selectItem instanceof SelectExpressionItem) {
                 SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
@@ -42,7 +46,7 @@ public class GenAggregateFunctions {
                         outputAfterAggregator.add(firstRule(plainSelect).toString());
                         outputAfterAggregator.add(secondRule(plainSelect).toString());
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
-                    } else if (func.getName().equals("AVG")) {
+                    } else if (specialFunctions.contains(func.getName())) {
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
                     }
 

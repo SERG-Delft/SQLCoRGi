@@ -28,7 +28,7 @@ public class AggregatorTest {
      * A test case for the AVG function since it needs an extra rule
      */
     @ParameterizedTest(name = "[{index}] Join type: {0}")
-    @CsvSource({"AVG"})
+    @CsvSource({"AVG", "SUM"})
     public void testAvg(String func) {
         verify("SELECT " + func + "(Points) FROM Customers",
 
