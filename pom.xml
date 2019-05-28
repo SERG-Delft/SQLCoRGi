@@ -120,6 +120,18 @@
             <type>maven-plugin</type>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-ext</artifactId>
+            <version>RELEASE</version>
+        </dependency>
     </dependencies>
 
 
@@ -182,6 +194,10 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArgs>
+                        <arg>-Xplugin:Manifold strings exceptions</arg>
+                    </compilerArgs>
                     <excludes>
                         <exclude>**/package-info.java</exclude>
                     </excludes>
