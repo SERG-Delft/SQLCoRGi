@@ -1,6 +1,5 @@
 package nl.tudelft.st01.unit;
 
-import net.sf.jsqlparser.expression.DoubleValue;
 import nl.tudelft.st01.query.NumericDoubleValue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,15 +11,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Sample nl.tudelft.st01.unit test class.
  */
 public class NumericDoubleValueTest {
+    private static final String TEST_NUMBER = "123";
+
+    private static final int TEST_NUMBER_AS_INT = 123;
 
     /**
      * Test for NumericDoubleValue.
      */
     @Test
     public void correctSuperclass() {
-        NumericDoubleValue n = new NumericDoubleValue("123");
+        NumericDoubleValue n = new NumericDoubleValue(TEST_NUMBER);
 
-        assertThat(n instanceof DoubleValue).isTrue();
+        assertThat(n).isNotNull();
     }
 
     /**
@@ -28,20 +30,22 @@ public class NumericDoubleValueTest {
      */
     @Test
     public void getTest() {
-        NumericDoubleValue n = new NumericDoubleValue("123");
+        NumericDoubleValue n = new NumericDoubleValue(TEST_NUMBER);
 
-        assertThat(n.getValue()).isEqualTo(123);
+        assertThat(n.getValue()).isEqualTo(TEST_NUMBER_AS_INT);
     }
 
     /**
      * Test for NumericDoubleValue.
+     *
+     * @param input Number to use in calculation
      */
     @ParameterizedTest(name = "[{index}] number to add: {0}")
     @CsvSource({"1", "-1", "0", "10"})
     public void addTest(int input) {
-        NumericDoubleValue oldValue = new NumericDoubleValue("123");
+        NumericDoubleValue oldValue = new NumericDoubleValue(TEST_NUMBER);
         NumericDoubleValue newValue = (NumericDoubleValue) oldValue.add(input);
 
-        assertThat(newValue.getValue()).isEqualTo(123 + input);
+        assertThat(newValue.getValue()).isEqualTo(TEST_NUMBER_AS_INT + input);
     }
 }
