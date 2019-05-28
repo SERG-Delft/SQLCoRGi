@@ -383,7 +383,6 @@ public class JoinWhereExpressionGenerator {
         return createIsNullExpressions(stack, new AndExpression(null, null), isNull);
     }
 
-
     /**
      * If an expression is nested in parentheses or in a not expression, retrieve the innermost expression that is
      * not either of these.
@@ -399,4 +398,5 @@ public class JoinWhereExpressionGenerator {
             return expression;
         }
     }
+
 }
