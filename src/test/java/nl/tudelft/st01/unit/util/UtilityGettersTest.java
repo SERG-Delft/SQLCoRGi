@@ -1,4 +1,4 @@
-package nl.tudelft.st01.unit;
+package nl.tudelft.st01.unit.util;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
