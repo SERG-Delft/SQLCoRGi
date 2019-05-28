@@ -40,3 +40,6 @@ LINES BELOW WILL SET GITLAB ISSUE PROPERTIES
 
 <!-- Estimate the amount of hours needed to fix the bug -->
 /estimate ...
+
+<!-- Set the importance of the issue as weight -->
+/weight ...
