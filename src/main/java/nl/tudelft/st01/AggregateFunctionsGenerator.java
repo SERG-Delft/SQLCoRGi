@@ -19,6 +19,7 @@ import java.util.TreeSet;
  * Class that generates rules for the aggregate functions such as MAX, AVG etc.
  */
 public class AggregateFunctionsGenerator {
+    private static final String COUNT_STRING = "COUNT";
 
     /**
      * Main, public method that generates the rules for the aggregate functions.
@@ -29,6 +30,7 @@ public class AggregateFunctionsGenerator {
     public Set<String> generate(PlainSelect plainSelect) {
         // Check if there is a Function in one of the columns. If so, generate rules for it.
         Set<String> outputAfterAggregator = new TreeSet<>();
+
         for (SelectItem selectItem : plainSelect.getSelectItems()) {
             if (selectItem instanceof SelectExpressionItem) {
                 SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
@@ -37,12 +39,34 @@ public class AggregateFunctionsGenerator {
                     //      so we can start adding the rules for it.
                     Function func = (Function) selectExpressionItem.getExpression();
 
+                    // check for COUNT(*)
+                    if (func.isAllColumns()) {
+                        outputAfterAggregator.add(firstRule(plainSelect).toString());
+                        outputAfterAggregator.add(secondRule(plainSelect).toString());
+
+                        // Skip the rest of this iteration.
+                        continue;
+                    }
+
+                    // check for a query without Group By
                     if (plainSelect.getGroupBy() != null) {
                         outputAfterAggregator.add(firstRule(plainSelect).toString());
                         outputAfterAggregator.add(secondRule(plainSelect).toString());
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
+                        outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
+
+                        continue;
                     }
 
+                    // check for an aggregator that is NOT Count
+                    if (!func.getName().equals(COUNT_STRING)) {
+                        outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
+                        outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
+
+                        continue;
+                    }
+
+                    // handle COUNT operator
                     outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
                 }
             }
