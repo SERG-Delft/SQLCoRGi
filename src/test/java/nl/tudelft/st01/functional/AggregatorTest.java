@@ -1,6 +1,8 @@
 package nl.tudelft.st01.functional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static nl.tudelft.st01.functional.AssertUtils.verify;
 
@@ -25,13 +27,14 @@ public class AggregatorTest {
     /**
      * A test case for the AVG function since it needs an extra rule
      */
-    @Test
-    public void testAvg() {
-        verify("SELECT AVG(Points) FROM Customers",
+    @ParameterizedTest(name = "[{index}] Join type: {0}")
+    @CsvSource({"AVG"})
+    public void testAvg(String func) {
+        verify("SELECT " + func + "(Points) FROM Customers",
 
-                "SELECT AVG(Points) FROM Customers HAVING COUNT(Points) > COUNT(DISTINCT Points) "
+                "SELECT " + func + "(Points) FROM Customers HAVING COUNT(Points) > COUNT(DISTINCT Points) "
                 + "AND COUNT(DISTINCT Points) > 1",
-                "SELECT AVG(Points) FROM Customers HAVING COUNT(*) > COUNT(Points) AND COUNT(DISTINCT Points) > 1");
+                "SELECT " + func + "(Points) FROM Customers HAVING COUNT(*) > COUNT(Points) AND COUNT(DISTINCT Points) > 1");
     }
 
     /**
