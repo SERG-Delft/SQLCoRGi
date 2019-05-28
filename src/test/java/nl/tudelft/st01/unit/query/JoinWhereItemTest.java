@@ -1,4 +1,4 @@
-package nl.tudelft.st01.unit;
+package nl.tudelft.st01.unit.query;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
