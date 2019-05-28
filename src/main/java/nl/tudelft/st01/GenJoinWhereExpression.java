@@ -155,17 +155,17 @@ public class GenJoinWhereExpression {
         Expression leftIsNull = excludeInExpression(left, rightTables, temp);
         Expression leftIsNotNull = excludeInExpression(rightTables, temp);
 
-        Expression leftNullRightNotNull = concatenate(leftColumnsIsNull, rightColumnsIsNotNull);
-        Expression leftNullRightNull = concatenate(leftColumnsIsNull, rightColumnsIsNull);
+        Expression leftNullRightNotNull = concatenate(leftColumnsIsNull, rightColumnsIsNotNull, false);
+        Expression leftNullRightNull = concatenate(leftColumnsIsNull, rightColumnsIsNull, false);
 
-        Expression rightNullLeftNotNull = concatenate(rightColumnsIsNull, leftColumnsIsNotNull);
-        Expression rightNullLeftNull = concatenate(rightColumnsIsNull, leftColumnsIsNull);
+        Expression rightNullLeftNotNull = concatenate(rightColumnsIsNull, leftColumnsIsNotNull, false);
+        Expression rightNullLeftNull = concatenate(rightColumnsIsNull, leftColumnsIsNull, false);
 
-        Expression rightJoinLeftIsNull = concatenate(leftNullRightNull, rightIsNull);
-        Expression rightJoinLeftIsNotNull = concatenate(leftNullRightNotNull, rightIsNotNull);
+        Expression rightJoinLeftIsNull = concatenate(leftNullRightNull, rightIsNull, true);
+        Expression rightJoinLeftIsNotNull = concatenate(leftNullRightNotNull, rightIsNotNull, true);
 
-        Expression leftJoinRightIsNull = concatenate(rightNullLeftNull, leftIsNull);
-        Expression leftJoinRightIsNotNull = concatenate(rightNullLeftNotNull, leftIsNotNull);
+        Expression leftJoinRightIsNull = concatenate(rightNullLeftNull, leftIsNull, true);
+        Expression leftJoinRightIsNotNull = concatenate(rightNullLeftNotNull, leftIsNotNull, true);
 
         result.add(new JoinWhereItem(innerJoin, wrapInParentheses(whereExpression)));
         result.add(new JoinWhereItem(leftJoin, leftJoinRightIsNull));
@@ -181,13 +181,19 @@ public class GenJoinWhereExpression {
      * in parentheses.
      * @param left The left expression.
      * @param right The right expression.
+     * @param wrapBinary True iff both sides should be wrapped in parentheses in case of a binary expression.
      * @return An and expression if both expressions are not null, otherwise, if either is null, the other is returned.
      */
-    private Expression concatenate(Expression left, Expression right) {
+    private Expression concatenate(Expression left, Expression right, boolean wrapBinary) {
         if (left == null) {
             return right;
         } else if (right != null) {
-            return new AndExpression(wrapInParentheses(left), wrapInParentheses(right));
+            if (wrapBinary) {
+                return new AndExpression(wrapInParentheses(left), wrapInParentheses(right));
+            } else {
+                return new AndExpression(left, right);
+            }
+
         } else {
             return left;
         }
