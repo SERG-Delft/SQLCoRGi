@@ -31,7 +31,7 @@ public class AggregatorTest {
      */
     @ParameterizedTest(name = "[{index}] Join type: {0}")
     @CsvSource({"AVG", "SUM", "MIN", "MAX"})
-    public void testOtherFunctionsNoGroupBby(String func) {
+    public void testOtherFunctionsNoGroupBy(String func) {
         verify("SELECT " + func + "(Points) FROM Customers",
 
                 "SELECT " + func + "(Points) FROM Customers HAVING COUNT(Points) > COUNT(DISTINCT Points) "
