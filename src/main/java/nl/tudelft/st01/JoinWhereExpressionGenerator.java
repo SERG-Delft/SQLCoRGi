@@ -11,6 +11,7 @@ import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import nl.tudelft.st01.query.JoinOnConditionColumns;
 import nl.tudelft.st01.query.JoinWhereItem;
+import nl.tudelft.st01.visitors.ExpressionTraverserVisitor;
 import nl.tudelft.st01.visitors.join.OnExpressionVisitor;
 
 import java.util.ArrayList;

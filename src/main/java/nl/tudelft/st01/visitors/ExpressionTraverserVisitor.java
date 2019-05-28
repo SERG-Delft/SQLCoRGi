@@ -1,4 +1,4 @@
-package nl.tudelft.st01;
+package nl.tudelft.st01.visitors;
 
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.DoubleValue;
@@ -27,7 +27,7 @@ import java.util.TreeSet;
 
 /**
  * This class allows traversing and modifying an expression such that none of the provided columns,
- * or columns related to the provided tables, are in the expression anymore.
+ * or columns related to the provided tables, are in the expression anymore. The expression remains valid.
  */
 public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
     private List<Column> nullColumns;
