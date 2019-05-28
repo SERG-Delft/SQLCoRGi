@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * This class tests if the functions of the {@code UtilityGetters} class exercise correct behaviour
- * by means of unit tests.
+ * This class tests the functions of the {@link UtilityGetters} class.
  */
 public class UtilityGettersTest {
 
