@@ -65,8 +65,7 @@ public class AggregatorTest {
 
                 "SELECT director, COUNT(*) FROM Movies GROUP BY director HAVING COUNT(*) > 1",
 
-                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1"
-        );
+                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1");
     }
 
     /**
