@@ -57,6 +57,19 @@ public class AggregatorTest {
     }
 
     /**
+     * A test case with 1 column and 1 aggregator, in this case AVG.
+     */
+    @Test
+    public void testCountAll() {
+        verify("SELECT director, COUNT(*) FROM Movies GROUP BY director",
+
+                "SELECT director, COUNT(*) FROM Movies GROUP BY director HAVING COUNT(*) > 1",
+
+                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1"
+        );
+    }
+
+    /**
      * A test case with 1 column and 2 aggregators, in this case AVG and Sum.
      */
     @Test
