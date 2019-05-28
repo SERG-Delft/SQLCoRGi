@@ -1,4 +1,4 @@
-package nl.tudelft.st01;
+package nl.tudelft.st01.util;
 
 import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
@@ -94,7 +94,7 @@ public final class UtilityGetters {
 
     /**
      * Generates a SelectItem but with a certain expression as content.
-     *  This is a bit cumbersome, so this method eases that task.
+     * This is a bit cumbersome, so this method eases that task.
      *
      * @param expression - expression to put in the SelectItem
      * @return a SelectItem with the expression inside

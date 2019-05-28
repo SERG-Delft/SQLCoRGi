@@ -3,7 +3,7 @@ package nl.tudelft.st01.unit;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.schema.Column;
-import nl.tudelft.st01.UtilityGetters;
+import nl.tudelft.st01.util.UtilityGetters;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

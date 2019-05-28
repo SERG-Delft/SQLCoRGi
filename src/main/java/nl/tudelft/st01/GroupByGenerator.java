@@ -6,6 +6,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectItem;
+import nl.tudelft.st01.util.UtilityGetters;
 
 import java.util.ArrayList;
 import java.util.List;
