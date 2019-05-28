@@ -74,6 +74,20 @@ public class GenJoinWhereExpression {
     }
 
     /**
+     * Creates a generic shallow copy of the given join.
+     * The join type is set to the default: JOIN.
+     * @param join The join that should be copied.
+     * @return A generic shallow copy of join.
+     */
+    public static Join genericCopyOfJoin(Join join) {
+        Join outJoin = new Join();
+        outJoin.setRightItem(join.getRightItem());
+        outJoin.setOnExpression(join.getOnExpression());
+
+        return outJoin;
+    }
+
+    /**
      * Mutates the given {@link Join} such that it returns a list of {@link JoinWhereItem}s.
      * @param join The join that should be mutated.
      * @return A list of mutated joins and their corresponding where expressions.
@@ -125,15 +139,15 @@ public class GenJoinWhereExpression {
      * @return List of a generated JoinWhereItem for each mutation
      */
     private List<JoinWhereItem> generateJoinWhereItems(JoinOnConditionColumns joinOnConditionColumns, Join join) {
-        Expression temp = whereExpression;
+        Expression where = whereExpression;
 
         List<JoinWhereItem> result = new ArrayList<>();
 
-        Join leftJoin = createGenericCopyOfJoin(join);
+        Join leftJoin = genericCopyOfJoin(join);
         leftJoin.setLeft(true);
-        Join rightJoin = createGenericCopyOfJoin(join);
+        Join rightJoin = genericCopyOfJoin(join);
         rightJoin.setRight(true);
-        Join innerJoin = createGenericCopyOfJoin(join);
+        Join innerJoin = genericCopyOfJoin(join);
         innerJoin.setInner(true);
 
         List<Column> left = joinOnConditionColumns.getLeftColumns();
@@ -148,18 +162,17 @@ public class GenJoinWhereExpression {
         Expression rightColumnsIsNull = createIsNullExpressions(right, true);
         Expression rightColumnsIsNotNull = createIsNullExpressions(right, false);
 
-        //TODO: Need unmodified version of the original expression when mutating for each case.
-        Expression rightIsNull = excludeInExpression(right, leftTables, temp);
-        Expression rightIsNotNull = excludeInExpression(leftTables, temp);
-
-        Expression leftIsNull = excludeInExpression(left, rightTables, temp);
-        Expression leftIsNotNull = excludeInExpression(rightTables, temp);
-
         Expression leftNullRightNotNull = concatenate(leftColumnsIsNull, rightColumnsIsNotNull, false);
         Expression leftNullRightNull = concatenate(leftColumnsIsNull, rightColumnsIsNull, false);
 
         Expression rightNullLeftNotNull = concatenate(rightColumnsIsNull, leftColumnsIsNotNull, false);
         Expression rightNullLeftNull = concatenate(rightColumnsIsNull, leftColumnsIsNull, false);
+
+        Expression rightIsNull = excludeInExpression(right, leftTables, where);
+        Expression rightIsNotNull = excludeInExpression(leftTables, where);
+
+        Expression leftIsNull = excludeInExpression(left, rightTables, where);
+        Expression leftIsNotNull = excludeInExpression(rightTables, where);
 
         Expression rightJoinLeftIsNull = concatenate(leftNullRightNull, rightIsNull, true);
         Expression rightJoinLeftIsNotNull = concatenate(leftNullRightNotNull, rightIsNotNull, true);
@@ -214,30 +227,6 @@ public class GenJoinWhereExpression {
             return new Parenthesis(expression);
         }
     }
-
-    /**
-     * Modifies the input expression such that it no longer contains any of the given columns.
-     * @param nulls The columns that should be excluded.
-     * @param expression The expression that should be modified.
-     * @return The modified expression.
-     */
-    /*
-    private static Expression excludeInExpression(List<Column> nulls, Expression expression) {
-        Expression filteredWhere;
-        ColumnExclusionVisitor ceVisitor = new ColumnExclusionVisitor();
-        ceVisitor.setNullColumns(nulls);
-
-        if (expression != null) {
-
-
-            expression.accept(ceVisitor);
-            filteredWhere = ceVisitor.getExpression();
-            return filteredWhere;
-        }
-        return null;
-
-    }
-    */
 
     /**
      * Modifies input expression such that it no longer contains any columns part of the table.
@@ -300,11 +289,11 @@ public class GenJoinWhereExpression {
         List<JoinWhereItem> result = new ArrayList<>();
         List<Column> columns;
 
-        Join leftJoin = createGenericCopyOfJoin(join);
+        Join leftJoin = genericCopyOfJoin(join);
         leftJoin.setLeft(true);
-        Join rightJoin = createGenericCopyOfJoin(join);
+        Join rightJoin = genericCopyOfJoin(join);
         rightJoin.setRight(true);
-        Join innerJoin = createGenericCopyOfJoin(join);
+        Join innerJoin = genericCopyOfJoin(join);
         innerJoin.setInner(true);
 
         Expression coreExpression;
@@ -345,20 +334,6 @@ public class GenJoinWhereExpression {
         }
 
         return result;
-    }
-
-    /**
-     * Creates a generic shallow copy of the given join.
-     * The join type is set to the default: JOIN.
-     * @param join The join that should be copied.
-     * @return A generic shallow copy of join.
-     */
-    public static Join createGenericCopyOfJoin(Join join) {
-        Join outJoin = new Join();
-        outJoin.setRightItem(join.getRightItem());
-        outJoin.setOnExpression(join.getOnExpression());
-
-        return outJoin;
     }
 
     /**

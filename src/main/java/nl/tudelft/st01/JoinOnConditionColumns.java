@@ -49,11 +49,7 @@ public class JoinOnConditionColumns {
      */
     public void addToLeftColumns(List<Column> columns) {
         if (columns != null) {
-            if (leftColumns != null) {
-                leftColumns.addAll(columns);
-            } else {
-                leftColumns = columns;
-            }
+            leftColumns.addAll(columns);
         }
 
         updateTables(leftColumns, leftTables);
@@ -65,11 +61,7 @@ public class JoinOnConditionColumns {
      */
     public void addToRightColumns(List<Column> columns) {
         if (columns != null) {
-            if (rightColumns != null) {
-                rightColumns.addAll(columns);
-            } else {
-                rightColumns = columns;
-            }
+            rightColumns.addAll(columns);
         }
 
         updateTables(rightColumns, rightTables);
@@ -87,11 +79,4 @@ public class JoinOnConditionColumns {
             }
         }
     }
-    //    @Override
-    //    public String toString() {
-    //        return "<JOCC\n\t<LEFT:\n\t\t<COLUMNS\t" + leftColumns + ">\n\t\t<TABLES:\t"
-    //                  + leftTables + ">>\n\t<RIGHT:\n\t\t<COLUMNS\t"
-    //                  + rightColumns + ">\n\t\t<TABLES:\t" + rightTables + ">>";
-    //    }
-
 }
