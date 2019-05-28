@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Sample nl.tudelft.st01.unit test class.
  */
-public class NumericValueTest {
+public class NumericDoubleValueTest {
 
     /**
      * Test for NumericDoubleValue.
