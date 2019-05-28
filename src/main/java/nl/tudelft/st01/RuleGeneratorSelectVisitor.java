@@ -44,7 +44,7 @@ public class RuleGeneratorSelectVisitor extends SelectVisitorAdapter {
         if (joins != null) {
             List<Join> innerJoins = new ArrayList<>();
             for (int i = 0; i < joins.size(); i++) {
-                innerJoins.add(GenJoinWhereExpression.createGenericCopyOfJoin(joins.get(i)));
+                innerJoins.add(GenJoinWhereExpression.genericCopyOfJoin(joins.get(i)));
                 innerJoins.get(i).setInner(true);
             }
             plainSelect.setJoins(innerJoins);
