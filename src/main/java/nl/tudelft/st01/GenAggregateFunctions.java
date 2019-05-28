@@ -12,8 +12,6 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -45,7 +43,7 @@ public class GenAggregateFunctions {
                         outputAfterAggregator.add(firstRule(plainSelect).toString());
                         outputAfterAggregator.add(secondRule(plainSelect).toString());
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
-                    } else if (!func.getName().equals("COUNT")) {
+                    } else if (!func.getName().equals(COUNT_STRING)) {
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
                     }
 

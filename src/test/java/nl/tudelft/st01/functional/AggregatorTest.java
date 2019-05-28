@@ -25,7 +25,9 @@ public class AggregatorTest {
     }
 
     /**
-     * A test case for the AVG function since it needs an extra rule
+     * A test case for the AVG function since it needs an extra rule.
+     *
+     * @param func Function name to use in tests
      */
     @ParameterizedTest(name = "[{index}] Join type: {0}")
     @CsvSource({"AVG", "SUM", "MIN", "MAX"})
@@ -34,7 +36,9 @@ public class AggregatorTest {
 
                 "SELECT " + func + "(Points) FROM Customers HAVING COUNT(Points) > COUNT(DISTINCT Points) "
                 + "AND COUNT(DISTINCT Points) > 1",
-                "SELECT " + func + "(Points) FROM Customers HAVING COUNT(*) > COUNT(Points) AND COUNT(DISTINCT Points) > 1");
+
+                "SELECT " + func + "(Points) FROM Customers "
+                + "HAVING COUNT(*) > COUNT(Points) AND COUNT(DISTINCT Points) > 1");
     }
 
     /**
@@ -84,5 +88,25 @@ public class AggregatorTest {
                         + "COUNT(DISTINCT Length) > 1",
                 "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name "
                         + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
+    }
+
+    /**
+     * A test case with 2 columns and 3 aggregators.
+     * This test shows that some results can be combined (AVG and SUM use the same column, so the
+     * rules for that one are re-used).
+     *
+     */
+    @Test
+    public void testDuplicateColumsDistinctOperators() {
+        verify("SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers",
+
+                "SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers "
+                + "HAVING COUNT(Points) > COUNT(DISTINCT Points) AND COUNT(DISTINCT Points) > 1",
+
+                "SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers "
+                + "HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1",
+
+                "SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers "
+                + "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1");
     }
 }
