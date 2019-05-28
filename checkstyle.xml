@@ -153,7 +153,7 @@
             <property name="tokens" value="ARRAY_DECLARATOR, AT, BNOT, DEC, DOT, INC, INDEX_OP, LNOT, METHOD_REF, UNARY_MINUS, UNARY_PLUS"/>
         </module>
         <module name="NoWhitespaceBefore">
-            <property name="allowLineBreaks" value="false"/>
+            <property name="allowLineBreaks" value="true"/>
             <property name="tokens" value="COMMA, DOT, ELLIPSIS, GENERIC_START, GENERIC_END, METHOD_REF, POST_DEC, POST_INC, SEMI"/>
         </module>
         <module name="OneStatementPerLine"/>
