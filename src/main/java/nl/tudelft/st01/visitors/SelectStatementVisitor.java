@@ -67,12 +67,11 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             List<Join> joins = plainSelect.getJoins();
             if (joins != null) {
                 List<Join> innerJoins = new ArrayList<>();
-                for (int i = 0; i < joins.size(); i++) {
-                    innerJoins.add(genericCopyOfJoin(joins.get(i)));
-                    innerJoins.get(i).setInner(true);
+                for (Join join : joins) {
+                    innerJoins.add(genericCopyOfJoin(join));
+                    innerJoins.get(innerJoins.size() - 1).setInner(true);
                 }
                 plainSelect.setJoins(innerJoins);
-
             }
 
             where.accept(selectExpressionVisitor);

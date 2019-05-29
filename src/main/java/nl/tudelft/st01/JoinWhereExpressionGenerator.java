@@ -36,7 +36,6 @@ public class JoinWhereExpressionGenerator {
      * @return A set of mutated queries in string format.
      */
     public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
-        map = new HashMap<>();
         this.whereExpression = plainSelect.getWhere();
         Set<String> result = new TreeSet<>();
 
@@ -47,13 +46,14 @@ public class JoinWhereExpressionGenerator {
         PlainSelect out = plainSelect;
         Expression whereCondition = plainSelect.getWhere();
 
-        if (!(joins == null || joins.isEmpty())) {
-            OnExpressionVisitor ruleGeneratorOnExpressionVisitor = new OnExpressionVisitor(map);
+        if (joins != null && !joins.isEmpty()) {
+            map = new HashMap<>();
+            OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
 
             List<Join> temp = new ArrayList<>();
             for (int i = 0; i < joins.size(); i++) {
                 join = joins.get(i);
-                join.getOnExpression().accept(ruleGeneratorOnExpressionVisitor);
+                join.getOnExpression().accept(onExpressionVisitor);
                 joinWhereItems = generateJoinMutations(join);
                 for (JoinWhereItem joinWhereItem : joinWhereItems) {
                     temp.addAll(joins);
