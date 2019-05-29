@@ -260,7 +260,7 @@ public class JoinWhereExpressionGenerator {
             traverserVisitor.setTables(tables);
             traverserVisitor.setNullColumns(columns);
             expression.accept(traverserVisitor);
-            
+
             return traverserVisitor.getExpression();
         }
 
