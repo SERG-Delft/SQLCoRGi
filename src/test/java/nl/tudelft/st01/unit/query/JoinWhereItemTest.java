@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Sample nl.tudelft.st01.unit test class.
+ * This class tests the functions of the {@link JoinWhereItemTest} class.
  */
 public class JoinWhereItemTest {
     private static final Join JOIN = new Join();
