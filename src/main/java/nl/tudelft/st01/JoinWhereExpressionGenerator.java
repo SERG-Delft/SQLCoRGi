@@ -130,7 +130,7 @@ public class JoinWhereExpressionGenerator {
                 joinOnConditionColumns.addToRightColumns(columns);
             }
         }
-        
+
         return generateJoinWhereItems(joinOnConditionColumns, join);
     }
 
@@ -236,14 +236,12 @@ public class JoinWhereExpressionGenerator {
      * @return The modified expression.
      */
     private static Expression excludeInExpression(Set<String> tables, Expression expression) {
-
         if (expression != null) {
             ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
             traverserVisitor.setTables(tables);
             expression.accept(traverserVisitor);
-            Expression filteredWhere = traverserVisitor.getExpression();
 
-            return filteredWhere;
+            return traverserVisitor.getExpression();
         }
 
         return null;
