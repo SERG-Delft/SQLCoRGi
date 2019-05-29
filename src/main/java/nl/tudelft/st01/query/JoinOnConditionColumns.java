@@ -13,9 +13,9 @@ import java.util.Set;
 public class JoinOnConditionColumns {
     private List<Column> leftColumns;
 
-    private Set<String> leftTables = new HashSet<>();
+    private Set<String> leftTables;
 
-    private Set<String> rightTables = new HashSet<>();
+    private Set<String> rightTables;
 
     private List<Column> rightColumns;
 
@@ -25,6 +25,8 @@ public class JoinOnConditionColumns {
     public JoinOnConditionColumns() {
         leftColumns = new ArrayList<>();
         rightColumns = new ArrayList<>();
+        leftTables = new HashSet<>();
+        rightTables = new HashSet<>();
     }
 
     public List<Column> getLeftColumns() {
