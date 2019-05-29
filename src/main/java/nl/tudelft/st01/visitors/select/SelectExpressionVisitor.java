@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static nl.tudelft.st01.util.Expressions.copy;
+import static nl.tudelft.st01.util.Expressions.createEqualsTo;
 
 /**
  * A visitor for select expressions, i.e. {@code WHERE} and {@code HAVING} clauses in {@code SELECT} statements.
@@ -150,47 +151,47 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(Between between) {
 
-        output.add(between);
-
         Expression left = between.getLeftExpression();
         Expression start = between.getBetweenExpressionStart();
         Expression end = between.getBetweenExpressionEnd();
 
-        Between betweenFlipped = new Between();
-        betweenFlipped.setLeftExpression(left);
-        betweenFlipped.setBetweenExpressionStart(start);
-        betweenFlipped.setBetweenExpressionEnd(end);
-        betweenFlipped.setNot(!between.isNot());
-        output.add(betweenFlipped);
+        output.add(createEqualsTo(left, start));
 
-        EqualsTo leftBoundaryOffTest = generateEqualsTo(left, start);
-        output.add(leftBoundaryOffTest);
+        output.add(createEqualsTo(left, end));
 
+        boolean generatedOffPoint = false;
         if (start instanceof LongValue) {
             NumericLongValue longValue = new NumericLongValue(start.toString());
-            EqualsTo leftBoundaryOnTest = generateEqualsTo(left, longValue.add(-1));
-            output.add(leftBoundaryOnTest);
+            EqualsTo leftOffPoint = createEqualsTo(left, longValue.add(-1));
+            output.add(leftOffPoint);
+            generatedOffPoint = true;
         } else if (start instanceof DoubleValue) {
             NumericDoubleValue doubleValue = new NumericDoubleValue(start.toString());
-            EqualsTo leftBoundaryOnTest = generateEqualsTo(left, doubleValue.add(-1));
-            output.add(leftBoundaryOnTest);
+            EqualsTo leftOffPoint = createEqualsTo(left, doubleValue.add(-1));
+            output.add(leftOffPoint);
+            generatedOffPoint = true;
         }
-
-        EqualsTo rightBoundaryOnTest = generateEqualsTo(left, end);
-        output.add(rightBoundaryOnTest);
 
         if (end instanceof LongValue) {
             NumericLongValue longValue = new NumericLongValue(end.toString());
-            EqualsTo rightBoundaryOffTest = generateEqualsTo(left, longValue.add(1));
-            output.add(rightBoundaryOffTest);
+            EqualsTo rightOffPoint = createEqualsTo(left, longValue.add(1));
+            output.add(rightOffPoint);
+            generatedOffPoint = true;
         } else if (end instanceof DoubleValue) {
             NumericDoubleValue doubleValue = new NumericDoubleValue(end.toString());
-            EqualsTo rightBoundaryOffTest = generateEqualsTo(left, doubleValue.add(1));
-            output.add(rightBoundaryOffTest);
+            EqualsTo rightOffPoint = createEqualsTo(left, doubleValue.add(1));
+            output.add(rightOffPoint);
+            generatedOffPoint = true;
+        }
+
+        if (!generatedOffPoint) {
+            Between betweenFlipped = (Between) copy(between);
+            betweenFlipped.setNot(true);
+            output.add(betweenFlipped);
         }
 
         IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(left);
+        isNullExpression.setLeftExpression(copy(left));
         output.add(isNullExpression);
     }
 
@@ -237,17 +238,4 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         output.add(isNullExpressionOut);
     }
 
-    /**
-     * Generates an `EqualsTo` expression.
-     * @param leftExpression the left side of the expression
-     * @param rightExpression the right side of the expression
-     * @return the generated `EqualsTo` expression.
-     */
-    private EqualsTo generateEqualsTo(Expression leftExpression, Expression rightExpression) {
-        EqualsTo equalsExpression = new EqualsTo();
-        equalsExpression.setLeftExpression(leftExpression);
-        equalsExpression.setRightExpression(rightExpression);
-
-        return equalsExpression;
-    }
 }

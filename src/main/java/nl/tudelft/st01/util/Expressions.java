@@ -2,6 +2,7 @@ package nl.tudelft.st01.util;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 
 /**
@@ -23,15 +24,30 @@ public final class Expressions {
      * @param expression the expression that needs to be copied.
      * @return a copy of {@code expression}.
      */
+    // Justification: We do not want to print the stack trace of JSQLParser here.
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public static Expression copy(Expression expression) {
 
         try {
             return CCJSqlParserUtil.parseCondExpression(expression.toString(), false);
         } catch (JSQLParserException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("Could not copy expression: " + expression);
         }
+    }
 
-        return null;
+    /**
+     * Creates an {@link EqualsTo} instance. The supplied left and right expressions are copied.
+     *
+     * @param leftExpression the left side of the expression.
+     * @param rightExpression the right side of the expression.
+     * @return a new {@link }EqualsTo` expression.
+     */
+    public static EqualsTo createEqualsTo(Expression leftExpression, Expression rightExpression) {
+        EqualsTo equalsExpression = new EqualsTo();
+        equalsExpression.setLeftExpression(copy(leftExpression));
+        equalsExpression.setRightExpression(copy(rightExpression));
+
+        return equalsExpression;
     }
 
 }
