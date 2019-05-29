@@ -47,6 +47,9 @@
         <spotbugs.version>3.1.12</spotbugs.version>
         <spotbugs.annotations.version>3.1.12</spotbugs.annotations.version>
         <spotbugs.plugin.version>3.1.11</spotbugs.plugin.version>
+
+        <systems.manifold.version>2019.1.0-ea</systems.manifold.version>
+        <systems.manifold.ext.version>2019.1.0-ea</systems.manifold.ext.version>
     </properties>
 
 
@@ -124,13 +127,13 @@
         <dependency>
             <groupId>systems.manifold</groupId>
             <artifactId>manifold</artifactId>
-            <version>RELEASE</version>
+            <version>${systems.manifold.version}</version>
         </dependency>
 
         <dependency>
             <groupId>systems.manifold</groupId>
             <artifactId>manifold-ext</artifactId>
-            <version>RELEASE</version>
+            <version>${systems.manifold.ext.version}</version>
         </dependency>
     </dependencies>
 
@@ -196,7 +199,7 @@
                     <target>${maven.compiler.target}</target>
                     <encoding>UTF-8</encoding>
                     <compilerArgs>
-                        <arg>-Xplugin:Manifold strings exceptions</arg>
+                        <arg>-Xplugin:Manifold</arg>
                     </compilerArgs>
                     <excludes>
                         <exclude>**/package-info.java</exclude>
