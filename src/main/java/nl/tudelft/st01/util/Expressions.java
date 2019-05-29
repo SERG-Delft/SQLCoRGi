@@ -40,7 +40,7 @@ public final class Expressions {
      *
      * @param leftExpression the left side of the expression.
      * @param rightExpression the right side of the expression.
-     * @return a new {@link }EqualsTo` expression.
+     * @return a new {@link EqualsTo} expression.
      */
     public static EqualsTo createEqualsTo(Expression leftExpression, Expression rightExpression) {
         EqualsTo equalsExpression = new EqualsTo();
