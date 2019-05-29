@@ -6,10 +6,12 @@ import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.query.NumericDoubleValue;
-import nl.tudelft.st01.query.NumericValue;
 import nl.tudelft.st01.query.NumericLongValue;
+import nl.tudelft.st01.query.NumericValue;
 
 import java.util.List;
+
+import static nl.tudelft.st01.util.Expressions.copy;
 
 /**
  * A visitor for values used in equality operators in SELECT expressions. The type of value determines what kind of
@@ -48,13 +50,13 @@ public class SelectValueVisitor extends ExpressionVisitorAdapter {
     private void generateNumericCases(NumericValue numericValue) {
         for (int i = -1; i <= 1; ++i) {
             EqualsTo equalsTo = new EqualsTo();
-            equalsTo.setLeftExpression(column);
+            equalsTo.setLeftExpression(copy(column));
             equalsTo.setRightExpression(numericValue.add(i));
             output.add(equalsTo);
         }
 
         IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(column);
+        isNullExpression.setLeftExpression(copy(column));
         output.add(isNullExpression);
     }
 
@@ -71,17 +73,17 @@ public class SelectValueVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(StringValue stringValue) {
         EqualsTo equalsTo = new EqualsTo();
-        equalsTo.setLeftExpression(column);
-        equalsTo.setRightExpression(stringValue);
+        equalsTo.setLeftExpression(copy(column));
+        equalsTo.setRightExpression(copy(stringValue));
         output.add(equalsTo);
 
         NotEqualsTo notEqualTo = new NotEqualsTo();
-        notEqualTo.setLeftExpression(column);
-        notEqualTo.setRightExpression(stringValue);
+        notEqualTo.setLeftExpression(copy(column));
+        notEqualTo.setRightExpression(copy(stringValue));
         output.add(notEqualTo);
 
         IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(column);
+        isNullExpression.setLeftExpression(copy(column));
         output.add(isNullExpression);
     }
 
