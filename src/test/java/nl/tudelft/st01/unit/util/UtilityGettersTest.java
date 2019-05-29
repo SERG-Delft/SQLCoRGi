@@ -58,7 +58,7 @@ public class UtilityGettersTest {
     @Test
     public void testCreateCountColumn() {
         assertThat(
-                UtilityGetters.createCountColumn(new Column("director"), false).toString()
+            UtilityGetters.createCountColumn(new Column("director"), false).toString()
         ).isEqualTo("COUNT(director)");
     }
 
@@ -69,7 +69,7 @@ public class UtilityGettersTest {
     @Test
     public void testCreateCountDistinctColumn() {
         assertThat(
-                UtilityGetters.createCountColumn(new Column("title"), true).toString()
+            UtilityGetters.createCountColumn(new Column("title"), true).toString()
         ).isEqualTo("COUNT(DISTINCT title)");
     }
 }

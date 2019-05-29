@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 /**
- * Unit tests for the {@code OnExpressionVisitorTest}.
+ * Unit tests for the {@link OnExpressionVisitorTest}.
  */
 public class OnExpressionVisitorTest {
 
