@@ -116,12 +116,12 @@ public class JoinWhereExpressionGenerator {
     @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
     private List<JoinWhereItem> handleJoinMultipleTablesOnCondition(Join join, Map<String, List<Column>> map) {
         List<JoinWhereItem> result = new ArrayList<>();
-        List<Column> columns;
+
 
         JoinOnConditionColumns joinOnConditionColumns = new JoinOnConditionColumns();
 
         for (Map.Entry<String, List<Column>> s : map.entrySet()) {
-            columns = map.get(s.getKey());
+            List<Column> columns = map.get(s.getKey());
 
             if (!s.getKey().equals(join.getRightItem().toString().toLowerCase())) {
                 joinOnConditionColumns.addToLeftColumns(columns);
@@ -143,8 +143,6 @@ public class JoinWhereExpressionGenerator {
      */
     private List<JoinWhereItem> generateJoinWhereItems(JoinOnConditionColumns joinOnConditionColumns, Join join) {
         Expression where = whereExpression;
-
-        List<JoinWhereItem> result = new ArrayList<>();
 
         Join leftJoin = genericCopyOfJoin(join);
         leftJoin.setLeft(true);
@@ -183,6 +181,7 @@ public class JoinWhereExpressionGenerator {
         Expression leftJoinRightIsNull = concatenate(rightNullLeftNull, leftIsNull, true);
         Expression leftJoinRightIsNotNull = concatenate(rightNullLeftNotNull, leftIsNotNull, true);
 
+        List<JoinWhereItem> result = new ArrayList<>();
         result.add(new JoinWhereItem(innerJoin, wrapInParentheses(whereExpression)));
         result.add(new JoinWhereItem(leftJoin, leftJoinRightIsNull));
         result.add(new JoinWhereItem(leftJoin, leftJoinRightIsNotNull));
@@ -206,13 +205,12 @@ public class JoinWhereExpressionGenerator {
         } else if (right != null) {
             if (wrapBinary) {
                 return new AndExpression(wrapInParentheses(left), wrapInParentheses(right));
-            } else {
-                return new AndExpression(left, right);
             }
 
-        } else {
-            return left;
+            return new AndExpression(left, right);
         }
+
+        return left;
     }
 
     /**
@@ -221,14 +219,11 @@ public class JoinWhereExpressionGenerator {
      * @return Expression wrapped in parentheses.
      */
     private Expression wrapInParentheses(Expression expression) {
-        if (expression == null) {
-            return null;
-        }
-        if (expression instanceof Parenthesis) {
+        if (expression == null || expression instanceof Parenthesis) {
             return expression;
-        } else {
-            return new Parenthesis(expression);
         }
+        
+        return new Parenthesis(expression);
     }
 
     /**
