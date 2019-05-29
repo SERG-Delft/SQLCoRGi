@@ -9,7 +9,7 @@ import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
-import nl.tudelft.st01.util.Queries;
+import nl.tudelft.st01.util.Expressions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -20,14 +20,14 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests the {@link Queries} utility class.
+ * Tests the {@link Expressions} utility class.
  */
-public class QueriesTest {
+public class ExpressionsTest {
 
     private static final String COLUMN_NAME = "abc";
 
     /**
-     * Tests whether {@link Queries#copy(Expression)} makes deep copies of {@link Between}s.
+     * Tests whether {@link Expressions#copy(Expression)} makes deep copies of {@link Between}s.
      */
     // Justification: Between has 3 subqueries, which means we already need 3 asserts to test those.
     @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
@@ -43,7 +43,7 @@ public class QueriesTest {
         original.setBetweenExpressionStart(lowerVal);
         original.setBetweenExpressionEnd(upperVal);
 
-        Between copy = (Between) Queries.copy(original);
+        Between copy = (Between) Expressions.copy(original);
         assertThat(copy)
                 .isNotSameAs(original)
                 .hasSameClassAs(original)
@@ -61,7 +61,7 @@ public class QueriesTest {
     }
 
     /**
-     * Tests whether {@link Queries#copy(Expression)} makes deep copies of {@link ExistsExpression}s.
+     * Tests whether {@link Expressions#copy(Expression)} makes deep copies of {@link ExistsExpression}s.
      */
     @Test
     public void testCopyExistsExpression() {
@@ -71,7 +71,7 @@ public class QueriesTest {
         ExistsExpression original = new ExistsExpression();
         original.setRightExpression(column);
 
-        ExistsExpression copy = (ExistsExpression) Queries.copy(original);
+        ExistsExpression copy = (ExistsExpression) Expressions.copy(original);
         assertThat(copy)
                 .isNotSameAs(original)
                 .hasSameClassAs(original)
@@ -83,7 +83,7 @@ public class QueriesTest {
     }
 
     /**
-     * Tests whether {@link Queries#copy(Expression)} makes deep copies of {@link IsNullExpression}s.
+     * Tests whether {@link Expressions#copy(Expression)} makes deep copies of {@link IsNullExpression}s.
      */
     @Test
     public void testCopyIsNullExpression() {
@@ -93,7 +93,7 @@ public class QueriesTest {
         IsNullExpression original = new IsNullExpression();
         original.setLeftExpression(column);
 
-        IsNullExpression copy = (IsNullExpression) Queries.copy(original);
+        IsNullExpression copy = (IsNullExpression) Expressions.copy(original);
         assertThat(copy)
                 .isNotSameAs(original)
                 .hasSameClassAs(original)
@@ -105,7 +105,7 @@ public class QueriesTest {
     }
 
     /**
-     * Tests whether {@link Queries#copy(Expression)} makes deep copies of all {@link BinaryExpression}s.
+     * Tests whether {@link Expressions#copy(Expression)} makes deep copies of all {@link BinaryExpression}s.
      *
      * @param original the original binary expression.
      */
@@ -119,7 +119,7 @@ public class QueriesTest {
         original.setLeftExpression(column);
         original.setRightExpression(longValue);
 
-        BinaryExpression copy = (BinaryExpression) Queries.copy(original);
+        BinaryExpression copy = (BinaryExpression) Expressions.copy(original);
         assertThat(copy)
                 .isNotSameAs(original)
                 .hasSameClassAs(original)

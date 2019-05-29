@@ -7,12 +7,12 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 /**
  * Provides utility functions for JSQLParser query objects.
  */
-public final class Queries {
+public final class Expressions {
 
     /**
      * No instances of this class can be created.
      */
-    private Queries() {
+    private Expressions() {
         throw new UnsupportedOperationException();
     }
 
