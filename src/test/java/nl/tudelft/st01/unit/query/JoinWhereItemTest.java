@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class JoinWhereItemTest {
     private static final Join JOIN = new Join();
 
-    //    For now it does not matter what is in the expression, just that it is an expression object
+    // For now it does not matter what is in the expression, just that it is an expression object
     private static final Expression WHERE = new GreaterThan();
 
     /**

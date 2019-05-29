@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Sample nl.tudelft.st01.unit test class.
+ * This class tests the functions of the {@link NumericDoubleValue} class.
  */
 public class NumericDoubleValueTest {
     private static final String TEST_NUMBER = "123";
