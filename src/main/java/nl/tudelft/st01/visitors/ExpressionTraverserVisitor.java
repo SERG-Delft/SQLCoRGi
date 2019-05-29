@@ -152,6 +152,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
      * Set the tables of this instance.
      * If the tables are not initialized yet, it will be.
      * Otherwise the tables are added to the set.
+     * 
      * @param tables The tables to be set.
      */
     public void setTables(Set<String> tables) {
@@ -173,6 +174,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     /**
      * Evaluates whether the tables set or the columns set contains the given table.
+     *
      * @param column The column to check.
      * @return True if either set contains the column, false otherwise.
      */
@@ -182,6 +184,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     /**
      * Check whether the columns list contain the given column or if the column belongs to the table.
+     *
      * @param column The column that should be checked.
      * @return True if the column is in the list or if it belongs to the table.
      */
@@ -199,6 +202,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     /**
      * Checks whether the tables set contain the table corresponding to the given column.
+     *
      * @param column The column to check.
      * @return True if the set contains the table, false otherwise.
      */
@@ -211,6 +215,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     /**
      * In case of a binary expression, both sides should be traversed and modified if needed.
+     *
      * @param binaryExpression The expression to handle.
      * @param seed A new instance of the same class as from where the method is called.
      *                       This acts as a seed from which the modified expression will be created.
@@ -238,6 +243,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
     /**
      * In case of a binary expression, both sides should be traversed and modified if needed.
      * If either side evaluates to null, the expression is set to null.
+     *
      * @param binaryExpression The expression to handle.
      * @param seed A new instance of the same class as from where the method is called.
      *                       This acts as a seed from which the modified expression will be created.
@@ -264,6 +270,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
     /**
      * In case of an IN expression, only the left side needs to be evaluated.
      * If the left side is to be excluded, expression is set to null. To the original expression otherwise.
+     *
      * @param inExpression The expression to evaluate.
      */
     public void handleExpressionIn(InExpression inExpression) {
@@ -275,8 +282,9 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     /**
      * In case of a between, all three parts have to be evaluated.
+     *
      * @param between The between to evaluate.
-     * @param seed The seed corresponind to the
+     * @param seed The seed corresponding to the given expression.
      */
     public void handleExpressionBetween(Between between, Between seed) {
         between.getLeftExpression().accept(this);
