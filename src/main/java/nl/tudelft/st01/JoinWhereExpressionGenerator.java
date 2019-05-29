@@ -94,7 +94,7 @@ public class JoinWhereExpressionGenerator {
 
     /**
      * Mutates the given {@link Join} such that it returns a list of {@link JoinWhereItem}s.
-     * 
+     *
      * @param join The join that should be mutated.
      * @return A list of mutated joins and their corresponding where expressions.
      */
@@ -119,9 +119,6 @@ public class JoinWhereExpressionGenerator {
      */
     @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
     private List<JoinWhereItem> handleJoinMultipleTablesOnCondition(Join join, Map<String, List<Column>> map) {
-        List<JoinWhereItem> result = new ArrayList<>();
-
-
         JoinOnConditionColumns joinOnConditionColumns = new JoinOnConditionColumns();
 
         for (Map.Entry<String, List<Column>> s : map.entrySet()) {
@@ -133,10 +130,8 @@ public class JoinWhereExpressionGenerator {
                 joinOnConditionColumns.addToRightColumns(columns);
             }
         }
-
-        result.addAll(generateJoinWhereItems(joinOnConditionColumns, join));
-
-        return result;
+        
+        return generateJoinWhereItems(joinOnConditionColumns, join);
     }
 
     /**
