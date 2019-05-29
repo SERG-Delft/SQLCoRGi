@@ -11,6 +11,8 @@ import nl.tudelft.st01.query.NumericLongValue;
 import java.util.ArrayList;
 import java.util.List;
 
+import static nl.tudelft.st01.util.Expressions.copy;
+
 /**
  * A visitor for select expressions, i.e. {@code WHERE} and {@code HAVING} clauses in {@code SELECT} statements.
  */
@@ -78,7 +80,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
             neutralExpression = new NotExpression(neutralExpression);
         }
         for (Expression decisionExpression : leftOut) {
-            this.output.add(new AndExpression(new Parenthesis(decisionExpression), neutralExpression));
+            this.output.add(copy(new AndExpression(new Parenthesis(decisionExpression), neutralExpression)));
         }
 
         neutralExpression = left instanceof Parenthesis ? left : new Parenthesis(left);
@@ -86,14 +88,8 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
             neutralExpression = new NotExpression(neutralExpression);
         }
         for (Expression decisionExpression : rightOut) {
-            this.output.add(new AndExpression(neutralExpression, new Parenthesis(decisionExpression)));
+            this.output.add(copy(new AndExpression(neutralExpression, new Parenthesis(decisionExpression))));
         }
-
-        /*try {
-            System.out.println(CCJSqlParserUtil.parseCondExpression("a2 = 30"));
-        } catch (JSQLParserException e) {
-            e.printStackTrace();
-        }*/
     }
 
     @Override
@@ -124,14 +120,10 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(IsNullExpression isNullExpression) {
 
-        IsNullExpression isNullExpressionOut = new IsNullExpression();
-        isNullExpressionOut.setLeftExpression(isNullExpression.getLeftExpression());
-        isNullExpressionOut.setNot(isNullExpression.isNot());
-        output.add(isNullExpressionOut);
+        output.add(copy(isNullExpression));
 
-        IsNullExpression isNullExpressionToggled = new IsNullExpression();
-        isNullExpressionToggled.setLeftExpression(isNullExpression.getLeftExpression());
-        isNullExpressionToggled.setNot(!isNullExpression.isNot());
+        IsNullExpression isNullExpressionToggled = (IsNullExpression) copy(isNullExpression);
+        isNullExpressionToggled.setNot(!isNullExpressionToggled.isNot());
         output.add(isNullExpressionToggled);
     }
 
@@ -152,6 +144,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
     /**
      * Generates test queries for 'BETWEEN' expressions.
+     *
      * @param between a 'BETWEEN' expression.
      */
     @Override
@@ -203,47 +196,44 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
     /**
      * Generates test queries for 'IN' expressions.
+     *
      * @param inExpression an 'IN' expression.
      */
     @Override
     public void visit(InExpression inExpression) {
 
-        output.add(inExpression);
+        output.add(copy(inExpression));
 
-        InExpression inExpressionFlipped = new InExpression();
-        inExpressionFlipped.setLeftExpression(inExpression.getLeftExpression());
-        inExpressionFlipped.setRightItemsList(inExpression.getRightItemsList());
-        inExpressionFlipped.setNot(!inExpression.isNot());
+        InExpression inExpressionFlipped = (InExpression) copy(inExpression);
+        inExpressionFlipped.setNot(!inExpressionFlipped.isNot());
         output.add(inExpressionFlipped);
 
         IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(inExpression.getLeftExpression());
+        isNullExpression.setLeftExpression(copy(inExpression.getLeftExpression()));
         output.add(isNullExpression);
     }
 
     /**
      * Generates test queries for 'LIKE' expressions.
+     *
      * @param likeExpression a LIKE expression.
      */
     @Override
     public void visit(LikeExpression likeExpression) {
 
-        output.add(likeExpression);
+        output.add(copy(likeExpression));
 
         LikeExpression likeExpressionFlipped = new LikeExpression();
-        likeExpressionFlipped.setLeftExpression(likeExpression.getLeftExpression());
-        likeExpressionFlipped.setRightExpression(likeExpression.getRightExpression());
+        likeExpressionFlipped.setLeftExpression(copy(likeExpression.getLeftExpression()));
+        likeExpressionFlipped.setRightExpression(copy(likeExpression.getRightExpression()));
 
-        // The LikeExpression class' setNot function does not accept any parameters, unlike others.
-        // Therefore an if statement is used to check wether to create a NOT expression.
         if (!likeExpression.isNot()) {
             likeExpressionFlipped.setNot();
         }
-
         output.add(likeExpressionFlipped);
 
         IsNullExpression isNullExpressionOut = new IsNullExpression();
-        isNullExpressionOut.setLeftExpression(likeExpression.getLeftExpression());
+        isNullExpressionOut.setLeftExpression(copy(likeExpression.getLeftExpression()));
         output.add(isNullExpressionOut);
     }
 
