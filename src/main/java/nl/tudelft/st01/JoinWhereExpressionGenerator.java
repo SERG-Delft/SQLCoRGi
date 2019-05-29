@@ -256,15 +256,13 @@ public class JoinWhereExpressionGenerator {
      * @return The modified expression.
      */
     private static Expression excludeInExpression(List<Column> columns, Set<String> tables, Expression expression) {
-        Expression filteredWhere;
         if (expression != null) {
             ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
             traverserVisitor.setTables(tables);
             traverserVisitor.setNullColumns(columns);
             expression.accept(traverserVisitor);
-            filteredWhere = traverserVisitor.getExpression();
-
-            return filteredWhere;
+            
+            return traverserVisitor.getExpression();
         }
 
         return null;
