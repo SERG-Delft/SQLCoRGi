@@ -12,7 +12,7 @@ import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
  *
  * Suppresses the checkstyle multipleStringLiterals violation, because some output sets have queries in common.
  */
-@SuppressWarnings("checkstyle:multipleStringLiterals")
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "checkstyle:multipleStringLiterals"})
 public class JoinTest {
 
     /**
