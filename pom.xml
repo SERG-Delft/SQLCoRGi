@@ -47,6 +47,9 @@
         <spotbugs.version>3.1.12</spotbugs.version>
         <spotbugs.annotations.version>3.1.12</spotbugs.annotations.version>
         <spotbugs.plugin.version>3.1.11</spotbugs.plugin.version>
+
+        <systems.manifold.version>2019.1.0-ea</systems.manifold.version>
+        <systems.manifold.ext.version>2019.1.0-ea</systems.manifold.ext.version>
     </properties>
 
 
@@ -120,6 +123,18 @@
             <type>maven-plugin</type>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold</artifactId>
+            <version>${systems.manifold.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-ext</artifactId>
+            <version>${systems.manifold.ext.version}</version>
+        </dependency>
     </dependencies>
 
 
@@ -182,6 +197,10 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArgs>
+                        <arg>-Xplugin:Manifold</arg>
+                    </compilerArgs>
                     <excludes>
                         <exclude>**/package-info.java</exclude>
                     </excludes>
@@ -272,12 +291,6 @@
                 <configuration>
                     <skipTests>false</skipTests>
                     <trimStackTrace>false</trimStackTrace>
-                    <properties>
-                        <configurationParameters>
-                            junit.jupiter.execution.parallel.enabled = true
-                            junit.jupiter.execution.parallel.mode.default = concurrent
-                        </configurationParameters>
-                    </properties>
                 </configuration>
             </plugin>
         </plugins>

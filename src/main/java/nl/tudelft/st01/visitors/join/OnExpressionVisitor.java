@@ -67,5 +67,4 @@ public class OnExpressionVisitor extends ExpressionVisitorAdapter {
     public void visit(Column column) {
         updateColumnList(column);
     }
-
 }

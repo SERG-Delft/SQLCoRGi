@@ -88,12 +88,6 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         for (Expression decisionExpression : rightOut) {
             this.output.add(new AndExpression(neutralExpression, new Parenthesis(decisionExpression)));
         }
-
-        /*try {
-            System.out.println(CCJSqlParserUtil.parseCondExpression("a2 = 30"));
-        } catch (JSQLParserException e) {
-            e.printStackTrace();
-        }*/
     }
 
     @Override

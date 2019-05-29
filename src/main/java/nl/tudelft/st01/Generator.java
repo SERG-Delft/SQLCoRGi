@@ -31,6 +31,11 @@ public final class Generator {
     public static Set<String> generateRules(String query) {
         Set<String> result = new HashSet<>();
 
+        if (query == null) {
+            System.err.println("Input cannot be null.");
+            return result;
+        }
+
         Statement statement;
         try {
             statement = CCJSqlParserUtil.parse(query);
