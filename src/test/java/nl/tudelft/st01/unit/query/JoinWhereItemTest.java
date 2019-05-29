@@ -9,42 +9,41 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Sample nl.tudelft.st01.unit test class.
+ * This class contains tests for {@link JoinWhereItem}.
  */
 public class JoinWhereItemTest {
-    private static final Join JOIN = new Join();
 
-    // For now it does not matter what is in the expression, just that it is an expression object
-    private static final Expression WHERE = new GreaterThan();
+    private static final Join JOIN = new Join();
+    private static final GreaterThan WHERE = new GreaterThan();
 
     /**
-     * Test for JoinWhereItem.
+     * Tests whether {@link JoinWhereItem#JoinWhereItem(Join, Expression)} does not return {@code null}.
      */
     @Test
-    public void constructorNotNull() {
+    public void testConstructorNotNull() {
         JoinWhereItem joinWhereItem = new JoinWhereItem(JOIN, WHERE);
 
         assertThat(joinWhereItem).isNotNull();
     }
 
     /**
-     * Test for JoinWhereItem.
+     * Tests whether the constructor correctly sets the join, and returns it with {@link JoinWhereItem#getJoin()}.
      */
     @Test
-    public void getJoinTest() {
+    public void testGetJoin() {
         JoinWhereItem joinWhereItem = new JoinWhereItem(JOIN, WHERE);
 
-        assertThat(joinWhereItem.getJoin()).isEqualTo(JOIN);
+        assertThat(joinWhereItem.getJoin()).isSameAs(JOIN);
     }
 
     /**
-     * Test for JoinWhereItem.
+     * Tests whether the constructor correctly sets the join, and returns it with {@link JoinWhereItem#getJoinWhere()}.
      */
     @Test
-    public void getJoinWhereTest() {
+    public void testGetJoinWhere() {
         JoinWhereItem joinWhereItem = new JoinWhereItem(JOIN, WHERE);
 
-        assertThat(joinWhereItem.getJoinWhere()).isEqualTo(WHERE);
+        assertThat(joinWhereItem.getJoinWhere()).isSameAs(WHERE);
     }
 
 }

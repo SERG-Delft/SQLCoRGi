@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * This class tests the functions of the {@link NumericLongValue} class.
+ * This class tests the {@link NumericLongValue} class.
  */
 public class NumericLongValueTest {
 
