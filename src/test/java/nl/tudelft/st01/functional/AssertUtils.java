@@ -34,4 +34,15 @@ final class AssertUtils {
 
         assertThat(resultSet).isEqualTo(expectedSet);
     }
+
+    /**
+     * Asserts that the expected targets are contained in the results list.
+     * @param query The input query that needs to be covered.
+     * @param atLeast The expected output of the {@link Generator}
+     */
+    static void containsAtLeast(String query, String... atLeast) {
+        Set<String> resultSet = Generator.generateRules(query);
+
+        assertThat(resultSet).contains(atLeast);
+    }
 }

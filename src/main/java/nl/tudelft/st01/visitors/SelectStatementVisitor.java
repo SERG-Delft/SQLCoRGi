@@ -2,6 +2,7 @@ package nl.tudelft.st01.visitors;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.GroupByElement;
+import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 import nl.tudelft.st01.AggregateFunctionsGenerator;
@@ -12,6 +13,8 @@ import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static nl.tudelft.st01.JoinWhereExpressionGenerator.genericCopyOfJoin;
 
 /**
  * A visitor used for generating coverage targets of a SELECT statement.
@@ -60,6 +63,16 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
 
             List<Expression> expressions = new ArrayList<>();
             SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions);
+
+            List<Join> joins = plainSelect.getJoins();
+            if (joins != null) {
+                List<Join> innerJoins = new ArrayList<>();
+                for (Join join : joins) {
+                    innerJoins.add(genericCopyOfJoin(join));
+                    innerJoins.get(innerJoins.size() - 1).setInner(true);
+                }
+                plainSelect.setJoins(innerJoins);
+            }
 
             where.accept(selectExpressionVisitor);
             for (Expression expression : expressions) {
