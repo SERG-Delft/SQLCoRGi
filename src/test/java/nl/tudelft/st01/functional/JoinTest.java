@@ -166,7 +166,7 @@ public class JoinTest {
     }
 
     /**
-     * A test for evaluating whether the where expression are indeed not included in
+     * A test for evaluating whether the where expressions are indeed not included in
      * the mutation when they should not be. That is, when either side is evaluated to null.
      * @param where The where expression that should not be appended to the LEFT or RIGHT joins.
      */
