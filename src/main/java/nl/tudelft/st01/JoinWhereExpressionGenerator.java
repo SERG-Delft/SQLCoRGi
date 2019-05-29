@@ -32,6 +32,7 @@ public class JoinWhereExpressionGenerator {
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
+     *
      * @param plainSelect The statement for which the joins have to be mutated.
      * @return A set of mutated queries in string format.
      */
@@ -79,6 +80,7 @@ public class JoinWhereExpressionGenerator {
     /**
      * Creates a generic shallow copy of the given join.
      * The join type is set to the default: JOIN.
+     *
      * @param join The join that should be copied.
      * @return A generic shallow copy of join.
      */
@@ -92,6 +94,7 @@ public class JoinWhereExpressionGenerator {
 
     /**
      * Mutates the given {@link Join} such that it returns a list of {@link JoinWhereItem}s.
+     * 
      * @param join The join that should be mutated.
      * @return A list of mutated joins and their corresponding where expressions.
      */
@@ -109,6 +112,7 @@ public class JoinWhereExpressionGenerator {
 
     /**
      * When the map contains more than one table, then generate to corresponding mutations.
+     *
      * @param join The join that has to be mutated.
      * @param map The map where each table is mapped to its columns.
      * @return List of JoinWhere items with the mutated results.
@@ -137,6 +141,7 @@ public class JoinWhereExpressionGenerator {
 
     /**
      * Generates the join where items for the join on condition columns provided.
+     *
      * @param joinOnConditionColumns The object containing the columns.
      * @param join The join used.
      * @return List of a generated JoinWhereItem for each mutation
@@ -194,6 +199,7 @@ public class JoinWhereExpressionGenerator {
     /**
      * Returns the concatenation of two expression. If either of them is null, the other expression is wrapped
      * in parentheses.
+     *
      * @param left The left expression.
      * @param right The right expression.
      * @param wrapBinary True iff both sides should be wrapped in parentheses in case of a binary expression.
@@ -215,6 +221,7 @@ public class JoinWhereExpressionGenerator {
 
     /**
      * Wraps the given expression in parentheses if it is not wrapped yet.
+     *
      * @param expression The expression to wrap.
      * @return Expression wrapped in parentheses.
      */
@@ -222,23 +229,24 @@ public class JoinWhereExpressionGenerator {
         if (expression == null || expression instanceof Parenthesis) {
             return expression;
         }
-        
+
         return new Parenthesis(expression);
     }
 
     /**
      * Modifies input expression such that it no longer contains any columns part of the table.
+     *
      * @param tables The tables from which the columns have to be excluded.
      * @param expression The expression that should be modified.
      * @return The modified expression.
      */
     private static Expression excludeInExpression(Set<String> tables, Expression expression) {
-        Expression filteredWhere;
+
         if (expression != null) {
             ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
             traverserVisitor.setTables(tables);
             expression.accept(traverserVisitor);
-            filteredWhere = traverserVisitor.getExpression();
+            Expression filteredWhere = traverserVisitor.getExpression();
 
             return filteredWhere;
         }
@@ -248,6 +256,7 @@ public class JoinWhereExpressionGenerator {
 
     /**
      * Modifies input expression such that it no longer contains any columns part of the table.
+     *
      * @param columns The columns that should be excluded.
      * @param tables The table from which the columns should be excluded.
      * @param expression The expression that should be modified.
@@ -272,6 +281,7 @@ public class JoinWhereExpressionGenerator {
     /**
      * In case the two tables are joined and the on condition only contains tables from one of the two tables,
      * then this method will generate the JoinWhereItems corresponding to the test cases that should be generated.
+     *
      * @param join The join from which the JoinWhereitems have to be generated.
      * @param map The map where each table is mapped to its columns.
      * @return List of JoinWhereItems that contain the mutations.
@@ -337,6 +347,7 @@ public class JoinWhereExpressionGenerator {
     /**
      * Creates an expression that concatenates {@link IsNullExpression}s
      * containing a {@link Column} using a {@link BinaryExpression}.
+     *
      * @param columns The columns that should be used in the concatenation.
      * @param binaryExpression The type of binary expression that should be used in the concatenation.
      * @param isNull Determines whether the column should be checked for IS NULL or IS NOT NULL.
@@ -369,6 +380,7 @@ public class JoinWhereExpressionGenerator {
     /**
      * Simplified version of the create is null expression method.
      * Rather than taking in a stack and an expression, only the columns are needed.
+     *
      * @param columns The columns for which the is null expression have to be created.
      * @param isNull True if the columns should be IS NULL. False if the columns should be IS NOT NULL.
      * @return Returns the concatenated expressions.
@@ -382,6 +394,7 @@ public class JoinWhereExpressionGenerator {
     /**
      * If an expression is nested in parentheses or in a not expression, retrieve the innermost expression that is
      * not either of these.
+     *
      * @param expression The expression to evaluate.
      * @return The innermost expression that is not nested in parenthesis or in a not.
      */
