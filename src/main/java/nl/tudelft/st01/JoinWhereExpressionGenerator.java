@@ -104,7 +104,6 @@ public class JoinWhereExpressionGenerator {
      * @param join The join that should be mutated.
      * @return A list of mutated joins and their corresponding where expressions.
      */
-    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
     private List<JoinWhereItem> generateJoinMutations(Join join) {
         List<JoinWhereItem> result;
 

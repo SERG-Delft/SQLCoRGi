@@ -78,7 +78,7 @@ public class AggregatorTest {
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
                         + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
-                        + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1",
+                        + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 2",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
                         + "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "

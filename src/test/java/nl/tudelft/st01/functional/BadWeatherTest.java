@@ -10,7 +10,7 @@ import static nl.tudelft.st01.functional.AssertUtils.verify;
 public class BadWeatherTest {
 
     /**
-     * A test case to check if an invalid query return nothing.
+     * A test case to check if an invalid query returns nothing.
      */
     @Test
     public void testInvalidQuery() {
@@ -18,7 +18,7 @@ public class BadWeatherTest {
     }
 
     /**
-     * A test case to check if a non-select query throws the proper exception.
+     * A test case to check if a non-select query returns nothing.
      */
     @Test
     public void testNonSelectQuery() {
