@@ -26,6 +26,62 @@ class ExpressionClonerTest {
     private static final String COLUMN_NAME = "abc";
 
     /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes a deep copy of a {@link NotExpression}.
+     */
+    @Test
+    void testCopyNotExpression() {
+
+        NotExpression original = new NotExpression(new NullValue());
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes a deep copy of a {@link Parenthesis}.
+     */
+    @Test
+    void testCopyParenthesis() {
+
+        Parenthesis original = new Parenthesis();
+        original.setExpression(new NullValue());
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes a deep copy of an {@link InExpression}.
+     */
+    @Test
+    void testCopyInExpression() {
+
+        InExpression original = new InExpression();
+        original.setLeftExpression(new Column(COLUMN_NAME));
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes a deep copy of an {@link InExpression}.
+     */
+    @Test
+    void testCopyInExpressionLeftItems() {
+
+        ExpressionList left = new ExpressionList();
+        left.setExpressions(new ArrayList<>());
+        ExpressionList right = new ExpressionList();
+
+        InExpression original = new InExpression();
+        original.setLeftItemsList(left);
+        original.setRightItemsList(right);
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
      * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link Between}s.
      */
     // Justification: Between has 3 subexpressions, which means we already need 3 asserts to test those.
@@ -43,11 +99,7 @@ class ExpressionClonerTest {
         original.setBetweenExpressionEnd(upperVal);
 
         Between copy = (Between) ExpressionCloner.copy(original);
-        assertThat(copy)
-                .isNotSameAs(original)
-                .hasSameClassAs(original)
-                .usingComparatorForType((a, b) -> 0, SimpleNode.class)
-                .isEqualToComparingFieldByFieldRecursively(original);
+        assertCopyEquals(original, copy);
 
         column.setColumnName(null);
         assertThat(((Column) copy.getLeftExpression()).getColumnName()).isEqualTo(COLUMN_NAME);
@@ -71,11 +123,7 @@ class ExpressionClonerTest {
         original.setRightExpression(column);
 
         ExistsExpression copy = (ExistsExpression) ExpressionCloner.copy(original);
-        assertThat(copy)
-                .isNotSameAs(original)
-                .hasSameClassAs(original)
-                .usingComparatorForType((a, b) -> 0, SimpleNode.class)
-                .isEqualToComparingFieldByFieldRecursively(original);
+        assertCopyEquals(original, copy);
 
         column.setColumnName(null);
         assertThat(((Column) copy.getRightExpression()).getColumnName()).isEqualTo(COLUMN_NAME);
@@ -93,11 +141,7 @@ class ExpressionClonerTest {
         original.setLeftExpression(column);
 
         IsNullExpression copy = (IsNullExpression) ExpressionCloner.copy(original);
-        assertThat(copy)
-                .isNotSameAs(original)
-                .hasSameClassAs(original)
-                .usingComparatorForType((a, b) -> 0, SimpleNode.class)
-                .isEqualToComparingFieldByFieldRecursively(original);
+        assertCopyEquals(original, copy);
 
         column.setColumnName(null);
         assertThat(((Column) copy.getLeftExpression()).getColumnName()).isEqualTo(COLUMN_NAME);
@@ -119,11 +163,7 @@ class ExpressionClonerTest {
         original.setRightExpression(longValue);
 
         BinaryExpression copy = (BinaryExpression) ExpressionCloner.copy(original);
-        assertThat(copy)
-                .isNotSameAs(original)
-                .hasSameClassAs(original)
-                .usingComparatorForType((a, b) -> 0, SimpleNode.class)
-                .isEqualToComparingFieldByFieldRecursively(original);
+        assertCopyEquals(original, copy);
 
         column.setColumnName(null);
         assertThat(((Column) copy.getLeftExpression()).getColumnName()).isEqualTo(COLUMN_NAME);
@@ -140,9 +180,17 @@ class ExpressionClonerTest {
     @ParameterizedTest
     @MethodSource("provideValues")
     void testCopyValues(Expression original) {
-
         Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
 
+    /**
+     * Tests whether {@code copy} is equivalent to {@code original}.
+     *
+     * @param original the original {@code Expression}.
+     * @param copy the copy of the original {@code Expression}.
+     */
+    private static void assertCopyEquals(Expression original, Expression copy) {
         assertThat(copy)
                 .isNotSameAs(original)
                 .hasSameClassAs(original)
