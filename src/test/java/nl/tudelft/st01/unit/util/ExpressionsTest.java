@@ -15,9 +15,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.lang.reflect.Constructor;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 /**
  * Tests the {@link Expressions} utility class.
@@ -25,6 +27,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ExpressionsTest {
 
     private static final String COLUMN_NAME = "abc";
+
+    /**
+     * Verifies that {@link Expressions} cannot be instantiated.
+     *
+     * @throws NoSuchMethodException should not happen.
+     */
+    @Test
+    public void testInstantiationForbidden() throws NoSuchMethodException {
+
+        Constructor<Expressions> constructor = Expressions.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+
+        Throwable thrown = catchThrowable(constructor::newInstance);
+
+        assertThat(thrown).hasRootCauseInstanceOf(UnsupportedOperationException.class);
+    }
 
     /**
      * Tests whether {@link Expressions#copy(Expression)} makes deep copies of {@link Between}s.
