@@ -8,6 +8,7 @@ import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.util.ExpressionCloner;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -199,6 +200,30 @@ class ExpressionClonerTest {
     }
 
     /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes a deep copy of a {@link CollateExpression}.
+     */
+    @Test
+    void testCopyCollateExpression() {
+
+        CollateExpression original = new CollateExpression(new NullValue(), COLUMN_NAME);
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} throws an exception for {@link JsonExpression}s.
+     */
+    @Test
+    void testCopyJsonExpression() {
+
+        Throwable throwable = Assertions.catchThrowable(() -> {
+            ExpressionCloner.copy(new JsonExpression());
+        });
+        assertThat(throwable).isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    /**
      * Utility function that provides a stream of {@link BinaryExpression}s.
      *
      * @return a stream of binary expressions.
@@ -209,6 +234,9 @@ class ExpressionClonerTest {
 
         LikeExpression notLike = new LikeExpression();
         notLike.setNot();
+
+        RegExpMySQLOperator regExpMySQLOperator = new RegExpMySQLOperator(RegExpMatchOperatorType.MATCH_CASESENSITIVE);
+        regExpMySQLOperator.useRLike();
 
         return Stream.of(
                 Arguments.of(new Addition()),
@@ -223,6 +251,7 @@ class ExpressionClonerTest {
                 Arguments.of(new EqualsTo()),
                 Arguments.of(new GreaterThan()),
                 Arguments.of(new GreaterThanEquals()),
+                Arguments.of(new JsonOperator("@>")),
                 Arguments.of(new LikeExpression()),
                 Arguments.of(notLike),
                 Arguments.of(new Matches()),
@@ -236,7 +265,7 @@ class ExpressionClonerTest {
                 Arguments.of(new RegExpMatchOperator(RegExpMatchOperatorType.MATCH_CASESENSITIVE)),
                 Arguments.of(new RegExpMatchOperator(RegExpMatchOperatorType.NOT_MATCH_CASEINSENSITIVE)),
                 Arguments.of(new RegExpMatchOperator(RegExpMatchOperatorType.NOT_MATCH_CASESENSITIVE)),
-                Arguments.of(new RegExpMySQLOperator(RegExpMatchOperatorType.MATCH_CASESENSITIVE)),
+                Arguments.of(regExpMySQLOperator),
                 Arguments.of(new RegExpMySQLOperator(RegExpMatchOperatorType.MATCH_CASEINSENSITIVE)),
                 Arguments.of(new Subtraction())
         );
