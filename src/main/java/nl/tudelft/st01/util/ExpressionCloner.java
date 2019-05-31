@@ -575,7 +575,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
         copy.setIntervalType(intervalExpression.getIntervalType());
         copy.setParameter(intervalExpression.getParameter());
 
-        intervalExpression.accept(this);
+        intervalExpression.getExpression().accept(this);
         copy.setExpression(this.copy);
 
         this.copy = copy;
