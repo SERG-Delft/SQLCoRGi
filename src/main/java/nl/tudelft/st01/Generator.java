@@ -31,6 +31,11 @@ public final class Generator {
     public static Set<String> generateRules(String query) {
         Set<String> result = new HashSet<>();
 
+        if (query == null) {
+            System.err.println("Input cannot be null.");
+            return result;
+        }
+
         Statement statement;
         try {
             statement = CCJSqlParserUtil.parse(query);
@@ -52,20 +57,19 @@ public final class Generator {
         return result;
     }
 
-
     /**
      * Main method for manual testing.
      *
      * @param args unused.
      */
     public static void main(String[] args) {
-        String query = "SELECT director FROM Movies WHERE title = 'Finding Nemo' "
-            + "GROUP BY director HAVING Director LIKE 'A%'";
+        String query = "SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE b.length IS NOT NULL";
+
         Set<String> result = generateRules(query);
 
         System.out.println("Result:");
         for (String s : result) {
-            System.out.println(s);
+            System.out.println("\"" + s + "\",");
         }
     }
 
