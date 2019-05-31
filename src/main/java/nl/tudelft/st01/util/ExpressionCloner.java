@@ -101,15 +101,15 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
     }
 
     @Override
-    public void visit(BitwiseRightShift aThis) {
+    public void visit(BitwiseRightShift bitwiseRightShift) {
         this.copy = new BitwiseRightShift();
-        copyBinaryExpression(aThis);
+        copyBinaryExpression(bitwiseRightShift);
     }
 
     @Override
-    public void visit(BitwiseLeftShift aThis) {
+    public void visit(BitwiseLeftShift bitwiseLeftShift) {
         this.copy = new BitwiseLeftShift();
-        copyBinaryExpression(aThis);
+        copyBinaryExpression(bitwiseLeftShift);
     }
 
     @Override
