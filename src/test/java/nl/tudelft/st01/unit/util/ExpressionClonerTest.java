@@ -257,6 +257,47 @@ class ExpressionClonerTest {
     }
 
     /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link CaseExpression}s.
+     */
+    @Test
+    void testCopyCaseExpression() {
+
+        CaseExpression original = new CaseExpression();
+
+        NullValue switchExpression = new NullValue();
+        original.setSwitchExpression(switchExpression);
+
+        LongValue elseExpression = new LongValue(1);
+        original.setElseExpression(elseExpression);
+
+        ArrayList<WhenClause> whenClauses = new ArrayList<>(1);
+        WhenClause whenClause = new WhenClause();
+        whenClauses.add(whenClause);
+        original.setWhenClauses(whenClauses);
+
+        CaseExpression copy = (CaseExpression) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getSwitchExpression()).isNotSameAs(switchExpression);
+        assertThat(copy.getElseExpression()).isNotSameAs(elseExpression);
+
+        assertThat(copy.getWhenClauses()).isNotSameAs(whenClauses);
+        assertThat(copy.getWhenClauses().get(0)).isNotSameAs(whenClause);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link CaseExpression}s.
+     */
+    @Test
+    void testCopyCaseExpressionAllNull() {
+
+        CaseExpression original = new CaseExpression();
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
      * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link JdbcParameter}s.
      */
     @Test
