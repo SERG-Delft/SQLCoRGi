@@ -154,6 +154,73 @@ class ExpressionClonerTest {
     }
 
     /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link ExpressionList}s.
+     */
+    @Test
+    void testCopyExpressionList() {
+
+        ExpressionList original = new ExpressionList();
+        ArrayList<Expression> expressions = new ArrayList<>(2);
+
+        LongValue expr0 = new LongValue(0);
+        expressions.add(expr0);
+        NullValue expr1 = new NullValue();
+        expressions.add(expr1);
+
+        original.setExpressions(expressions);
+
+        ExpressionList copy = (ExpressionList) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getExpressions().get(0)).isNotSameAs(expr0);
+        assertThat(copy.getExpressions().get(1)).isNotSameAs(expr1);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link NamedExpressionList}s.
+     */
+    @Test
+    void testCopyNamedExpressionList() {
+
+        NamedExpressionList original = new NamedExpressionList();
+        ArrayList<Expression> expressions = new ArrayList<>(2);
+        ArrayList<String> names = new ArrayList<>(2);
+
+        LongValue expr0 = new LongValue(0);
+        expressions.add(expr0);
+        names.add("LONG");
+        NullValue expr1 = new NullValue();
+        expressions.add(expr1);
+        names.add("NULL");
+
+        original.setExpressions(expressions);
+        original.setNames(names);
+
+        NamedExpressionList copy = (NamedExpressionList) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getExpressions().get(0)).isNotSameAs(expr0);
+        assertThat(copy.getExpressions().get(1)).isNotSameAs(expr1);
+        assertThat(copy.getNames()).isNotSameAs(names);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link MultiExpressionList}s.
+     */
+    @Test
+    void testCopyMultiExpressionList() {
+
+        MultiExpressionList original = new MultiExpressionList();
+        ExpressionList expressionList = new ExpressionList();
+        original.addExpressionList(expressionList);
+
+        MultiExpressionList copy = (MultiExpressionList) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getExprList().get(0)).isNotSameAs(expressionList);
+    }
+
+    /**
      * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of
      * {@link OracleHierarchicalExpression}s.
      */
@@ -418,6 +485,19 @@ class ExpressionClonerTest {
                 .isNotSameAs(original)
                 .hasSameClassAs(original)
                 .usingComparatorForType((a, b) -> 0, SimpleNode.class)
+                .isEqualToComparingFieldByFieldRecursively(original);
+    }
+
+    /**
+     * Tests whether {@code copy} is equivalent to {@code original}.
+     *
+     * @param original the original {@code ItemsList}.
+     * @param copy the copy of the original {@code ItemsList}.
+     */
+    private static void assertCopyEquals(ItemsList original, ItemsList copy) {
+        assertThat(copy)
+                .isNotSameAs(original)
+                .hasSameClassAs(original)
                 .isEqualToComparingFieldByFieldRecursively(original);
     }
 
