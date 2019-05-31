@@ -39,6 +39,21 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
     }
 
     /**
+     * Creates a deep copy of an {@link ItemsList}. This can be useful if you need to modify part of an expression,
+     * but other parts of your code need to use the unmodified expression.
+     *
+     * @param itemsList the list of items that needs to be copied.
+     * @return a copy of {@code itemsList}.
+     */
+    public static ItemsList copy(ItemsList itemsList) {
+
+        ExpressionCloner expressionCloner = new ExpressionCloner();
+        itemsList.accept(expressionCloner);
+
+        return expressionCloner.itemsList;
+    }
+
+    /**
      * Copies the {@code not} field, and the left and right expressions of a given {@link BinaryExpression}.
      *
      * @param toBeCopied the {@code BinaryExpression} that needs to be copied.
@@ -387,11 +402,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
 
         NamedExpressionList copy = new NamedExpressionList();
         copy.setExpressions(copyExpressionsList(namedExpressionList.getExpressions()));
-
-        List<String> names = namedExpressionList.getNames();
-        if (names != null) {
-            copy.setNames(new ArrayList<>(names));
-        }
+        copy.setNames(new ArrayList<>(namedExpressionList.getNames()));
 
         this.itemsList = copy;
     }
