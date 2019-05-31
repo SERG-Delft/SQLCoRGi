@@ -1,9 +1,7 @@
 package nl.tudelft.st01.util;
 
-import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 
 /**
  * Provides utility functions for JSQLParser query objects.
@@ -28,11 +26,10 @@ public final class Expressions {
     @SuppressWarnings("PMD.PreserveStackTrace")
     public static Expression copy(Expression expression) {
 
-        try {
-            return CCJSqlParserUtil.parseCondExpression(expression.toString(), false);
-        } catch (JSQLParserException e) {
-            throw new IllegalStateException("Could not copy expression: " + expression);
-        }
+        ExpressionCloner expressionCloner = new ExpressionCloner();
+        expression.accept(expressionCloner);
+
+        return expressionCloner.getCopy();
     }
 
     /**
