@@ -157,7 +157,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
 
     @Override
     public void visit(SignedExpression signedExpression) {
-        signedExpression.accept(this);
+        signedExpression.getExpression().accept(this);
         this.copy = new SignedExpression(signedExpression.getSign(), this.copy);
     }
 
