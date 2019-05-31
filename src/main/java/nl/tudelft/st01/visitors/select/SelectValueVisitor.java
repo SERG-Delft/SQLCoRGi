@@ -11,7 +11,7 @@ import nl.tudelft.st01.query.NumericValue;
 
 import java.util.List;
 
-import static nl.tudelft.st01.util.Expressions.copy;
+import static nl.tudelft.st01.util.ExpressionCloner.copy;
 
 /**
  * A visitor for values used in equality operators in SELECT expressions. The type of value determines what kind of

@@ -23,8 +23,19 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
     private Expression copy;
     private ItemsList itemsList;
 
-    public Expression getCopy() {
-        return this.copy;
+    /**
+     * Creates a deep copy of an {@link Expression}. This can be useful if you need to modify part of an expression,
+     * but other parts of your code need to use the unmodified expression.
+     *
+     * @param expression the expression that needs to be copied.
+     * @return a copy of {@code expression}.
+     */
+    public static Expression copy(Expression expression) {
+
+        ExpressionCloner expressionCloner = new ExpressionCloner();
+        expression.accept(expressionCloner);
+
+        return expressionCloner.copy;
     }
 
     /**

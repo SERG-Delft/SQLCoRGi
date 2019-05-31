@@ -16,23 +16,6 @@ public final class Expressions {
     }
 
     /**
-     * Creates a deep copy of an {@link Expression}. This can be useful if you need to modify part of an expression,
-     * but other parts of your code need to use the unmodified expression.
-     *
-     * @param expression the expression that needs to be copied.
-     * @return a copy of {@code expression}.
-     */
-    // Justification: We do not want to print the stack trace of JSQLParser here.
-    @SuppressWarnings("PMD.PreserveStackTrace")
-    public static Expression copy(Expression expression) {
-
-        ExpressionCloner expressionCloner = new ExpressionCloner();
-        expression.accept(expressionCloner);
-
-        return expressionCloner.getCopy();
-    }
-
-    /**
      * Creates an {@link EqualsTo} instance. The supplied left and right expressions are copied.
      *
      * @param leftExpression the left side of the expression.
@@ -41,8 +24,8 @@ public final class Expressions {
      */
     public static EqualsTo createEqualsTo(Expression leftExpression, Expression rightExpression) {
         EqualsTo equalsExpression = new EqualsTo();
-        equalsExpression.setLeftExpression(copy(leftExpression));
-        equalsExpression.setRightExpression(copy(rightExpression));
+        equalsExpression.setLeftExpression(ExpressionCloner.copy(leftExpression));
+        equalsExpression.setRightExpression(ExpressionCloner.copy(rightExpression));
 
         return equalsExpression;
     }

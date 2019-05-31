@@ -11,7 +11,7 @@ import nl.tudelft.st01.query.NumericLongValue;
 import java.util.ArrayList;
 import java.util.List;
 
-import static nl.tudelft.st01.util.Expressions.copy;
+import static nl.tudelft.st01.util.ExpressionCloner.copy;
 import static nl.tudelft.st01.util.Expressions.createEqualsTo;
 
 /**
