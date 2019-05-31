@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class ExpressionClonerTest {
 
-    private static final String COLUMN_NAME = "abc";
+    private static final String STRING_ABC = "abc";
 
     /**
      * Tests whether {@link ExpressionCloner#copy(Expression)} makes a deep copy of a {@link NotExpression}.
@@ -58,7 +58,7 @@ class ExpressionClonerTest {
     void testCopyInExpression() {
 
         InExpression original = new InExpression();
-        original.setLeftExpression(new Column(COLUMN_NAME));
+        original.setLeftExpression(new Column(STRING_ABC));
 
         Expression copy = ExpressionCloner.copy(original);
         assertCopyEquals(original, copy);
@@ -90,7 +90,7 @@ class ExpressionClonerTest {
     @Test
     void testCopyBetween() {
 
-        Column column = new Column(COLUMN_NAME);
+        Column column = new Column(STRING_ABC);
         LongValue lowerVal = new LongValue(0);
         LongValue upperVal = new LongValue(1);
 
@@ -103,7 +103,7 @@ class ExpressionClonerTest {
         assertCopyEquals(original, copy);
 
         column.setColumnName(null);
-        assertThat(((Column) copy.getLeftExpression()).getColumnName()).isEqualTo(COLUMN_NAME);
+        assertThat(((Column) copy.getLeftExpression()).getColumnName()).isEqualTo(STRING_ABC);
 
         lowerVal.setValue(1);
         assertThat(((LongValue) copy.getBetweenExpressionStart()).getValue()).isEqualTo(0);
@@ -118,7 +118,7 @@ class ExpressionClonerTest {
     @Test
     void testCopyExistsExpression() {
 
-        Column column = new Column(COLUMN_NAME);
+        Column column = new Column(STRING_ABC);
 
         ExistsExpression original = new ExistsExpression();
         original.setRightExpression(column);
@@ -127,7 +127,7 @@ class ExpressionClonerTest {
         assertCopyEquals(original, copy);
 
         column.setColumnName(null);
-        assertThat(((Column) copy.getRightExpression()).getColumnName()).isEqualTo(COLUMN_NAME);
+        assertThat(((Column) copy.getRightExpression()).getColumnName()).isEqualTo(STRING_ABC);
     }
 
     /**
@@ -136,7 +136,7 @@ class ExpressionClonerTest {
     @Test
     void testCopyIsNullExpression() {
 
-        Column column = new Column(COLUMN_NAME);
+        Column column = new Column(STRING_ABC);
 
         IsNullExpression original = new IsNullExpression();
         original.setLeftExpression(column);
@@ -145,7 +145,122 @@ class ExpressionClonerTest {
         assertCopyEquals(original, copy);
 
         column.setColumnName(null);
-        assertThat(((Column) copy.getLeftExpression()).getColumnName()).isEqualTo(COLUMN_NAME);
+        assertThat(((Column) copy.getLeftExpression()).getColumnName()).isEqualTo(STRING_ABC);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of
+     * {@link OracleHierarchicalExpression}s.
+     */
+    @Test
+    void testCopyOracleHierarchicalExpression() {
+
+        OracleHierarchicalExpression original = new OracleHierarchicalExpression();
+        original.setStartExpression(new NullValue());
+        original.setConnectExpression(new NullValue());
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link IntervalExpression}s.
+     */
+    @Test
+    void testCopyIntervalExpression() {
+
+        IntervalExpression original = new IntervalExpression();
+        original.setExpression(new NullValue());
+        original.setParameter(STRING_ABC);
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link JdbcNamedParameter}s.
+     */
+    @Test
+    void testCopyJdbcNamedParameter() {
+
+        JdbcNamedParameter original = new JdbcNamedParameter();
+        original.setName(STRING_ABC);
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link JdbcParameter}s.
+     */
+    @Test
+    void testCopyJdbcParameter() {
+
+        JdbcParameter original = new JdbcParameter(1, true);
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link ExtractExpression}s.
+     */
+    @Test
+    void testCopyExtractExpression() {
+
+        ExtractExpression original = new ExtractExpression();
+        original.setName(STRING_ABC);
+        original.setExpression(new NullValue());
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes a deep copy of a {@link CollateExpression}.
+     */
+    @Test
+    void testCopyCollateExpression() {
+
+        CollateExpression original = new CollateExpression(new NullValue(), STRING_ABC);
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes a deep copy of an {@link OracleHint}.
+     */
+    @Test
+    void testCopyOracleHint() {
+
+        OracleHint original = new OracleHint();
+        original.setValue(STRING_ABC);
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes a deep copy of a {@link TimeKeyExpression}.
+     */
+    @Test
+    void testCopyTimeKeyExpression() {
+
+        TimeKeyExpression original = new TimeKeyExpression(STRING_ABC);
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} throws an exception for {@link JsonExpression}s.
+     */
+    @Test
+    void testCopyJsonExpression() {
+
+        Throwable throwable = Assertions.catchThrowable(() -> ExpressionCloner.copy(new JsonExpression()));
+        assertThat(throwable).isInstanceOf(UnsupportedOperationException.class);
     }
 
     /**
@@ -157,7 +272,7 @@ class ExpressionClonerTest {
     @MethodSource("provideBinaryExpressions")
     void testCopyBinaryExpressions(BinaryExpression original) {
 
-        Column column = new Column(COLUMN_NAME);
+        Column column = new Column(STRING_ABC);
         LongValue longValue = new LongValue(1);
 
         original.setLeftExpression(column);
@@ -167,7 +282,7 @@ class ExpressionClonerTest {
         assertCopyEquals(original, copy);
 
         column.setColumnName(null);
-        assertThat(((Column) copy.getLeftExpression()).getColumnName()).isEqualTo(COLUMN_NAME);
+        assertThat(((Column) copy.getLeftExpression()).getColumnName()).isEqualTo(STRING_ABC);
 
         longValue.setValue(0L);
         assertThat(((LongValue) copy.getRightExpression()).getValue()).isEqualTo(1L);
@@ -197,30 +312,6 @@ class ExpressionClonerTest {
                 .hasSameClassAs(original)
                 .usingComparatorForType((a, b) -> 0, SimpleNode.class)
                 .isEqualToComparingFieldByFieldRecursively(original);
-    }
-
-    /**
-     * Tests whether {@link ExpressionCloner#copy(Expression)} makes a deep copy of a {@link CollateExpression}.
-     */
-    @Test
-    void testCopyCollateExpression() {
-
-        CollateExpression original = new CollateExpression(new NullValue(), COLUMN_NAME);
-
-        Expression copy = ExpressionCloner.copy(original);
-        assertCopyEquals(original, copy);
-    }
-
-    /**
-     * Tests whether {@link ExpressionCloner#copy(Expression)} throws an exception for {@link JsonExpression}s.
-     */
-    @Test
-    void testCopyJsonExpression() {
-
-        Throwable throwable = Assertions.catchThrowable(() -> {
-            ExpressionCloner.copy(new JsonExpression());
-        });
-        assertThat(throwable).isInstanceOf(UnsupportedOperationException.class);
     }
 
     /**
