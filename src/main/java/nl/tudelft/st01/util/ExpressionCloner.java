@@ -188,12 +188,12 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
 
     @Override
     public void visit(DateValue dateValue) {
-        this.copy = new DateValue(dateValue.getValue().toString());
+        this.copy = new DateValue('\'' + dateValue.getValue().toString() + '\'');
     }
 
     @Override
     public void visit(TimeValue timeValue) {
-        this.copy = new TimeValue(timeValue.getValue().toString());
+        this.copy = new TimeValue('\'' + timeValue.getValue().toString() + '\'');
     }
 
     @Override
@@ -740,7 +740,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
 
     @Override
     public void visit(NextValExpression nextValExpression) {
-        this.copy = new NextValExpression(Arrays.asList(nextValExpression.getName().split(".")));
+        this.copy = new NextValExpression(Arrays.asList(nextValExpression.getName().split("\\.")));
     }
 
     @Override
