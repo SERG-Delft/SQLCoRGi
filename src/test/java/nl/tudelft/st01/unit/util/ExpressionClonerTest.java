@@ -7,6 +7,7 @@ import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.create.table.ColDataType;
 import nl.tudelft.st01.util.ExpressionCloner;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the {@link ExpressionCloner} utility class.
  */
+// Justification: Some expressions have more than two object fields, which means we already need three asserts just
+// to test those and the actual expression.
+@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 class ExpressionClonerTest {
 
     private static final String STRING_ABC = "abc";
@@ -32,10 +36,13 @@ class ExpressionClonerTest {
     @Test
     void testCopyNotExpression() {
 
-        NotExpression original = new NotExpression(new NullValue());
+        NullValue nullValue = new NullValue();
+        NotExpression original = new NotExpression(nullValue);
 
-        Expression copy = ExpressionCloner.copy(original);
+        NotExpression copy = (NotExpression) ExpressionCloner.copy(original);
         assertCopyEquals(original, copy);
+
+        assertThat(copy.getExpression()).isNotSameAs(nullValue);
     }
 
     /**
@@ -85,8 +92,6 @@ class ExpressionClonerTest {
     /**
      * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link Between}s.
      */
-    // Justification: Between has 3 subexpressions, which means we already need 3 asserts to test those.
-    @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
     @Test
     void testCopyBetween() {
 
@@ -188,6 +193,67 @@ class ExpressionClonerTest {
 
         Expression copy = ExpressionCloner.copy(original);
         assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link SignedExpression}s.
+     */
+    @Test
+    void testCopySignedExpression() {
+
+        LongValue longValue = new LongValue(0);
+        SignedExpression original = new SignedExpression('+', longValue);
+
+        SignedExpression copy = (SignedExpression) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getExpression()).isNotSameAs(longValue);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link CastExpression}s.
+     */
+    @Test
+    void testCopyCastExpression() {
+
+        CastExpression original = new CastExpression();
+        original.setLeftExpression(new NullValue());
+
+        ColDataType type = new ColDataType();
+        type.setDataType(STRING_ABC);
+        type.setCharacterSet(STRING_ABC);
+
+        ArrayList<String> argumentsStringList = new ArrayList<>();
+        type.setArgumentsStringList(argumentsStringList);
+
+        ArrayList<Integer> arrayData = new ArrayList<>();
+        type.setArrayData(arrayData);
+
+        original.setType(type);
+
+        CastExpression copy = (CastExpression) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getType()).isNotSameAs(type);
+        assertThat(copy.getType().getArgumentsStringList()).isNotSameAs(argumentsStringList);
+        assertThat(copy.getType().getArrayData()).isNotSameAs(type.getArrayData());
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link CastExpression}s.
+     */
+    @Test
+    void testCopyCastExpressionEmptyType() {
+
+        CastExpression original = new CastExpression();
+        LongValue longValue = new LongValue(0);
+        original.setLeftExpression(longValue);
+        original.setType(new ColDataType());
+
+        CastExpression copy = (CastExpression) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getLeftExpression()).isNotSameAs(longValue);
     }
 
     /**

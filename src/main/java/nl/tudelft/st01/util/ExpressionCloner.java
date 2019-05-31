@@ -532,11 +532,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
             typeCopy.setArgumentsStringList(new ArrayList<>(argumentsStringList));
         }
 
-        List<Integer> arrayData = type.getArrayData();
-        if (arrayData != null) {
-            typeCopy.setArrayData(new ArrayList<>(arrayData));
-        }
-
+        typeCopy.setArrayData(new ArrayList<>(type.getArrayData()));
         typeCopy.setCharacterSet(type.getCharacterSet());
         typeCopy.setDataType(type.getDataType());
 
