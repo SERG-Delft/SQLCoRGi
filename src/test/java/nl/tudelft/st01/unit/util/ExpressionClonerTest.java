@@ -28,7 +28,7 @@ class ExpressionClonerTest {
     /**
      * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link Between}s.
      */
-    // Justification: Between has 3 subqueries, which means we already need 3 asserts to test those.
+    // Justification: Between has 3 subexpressions, which means we already need 3 asserts to test those.
     @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
     @Test
     void testCopyBetween() {
