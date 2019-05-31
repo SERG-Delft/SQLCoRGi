@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the {@link ExpressionCloner} utility class.
  */
-public class ExpressionClonerTest {
+class ExpressionClonerTest {
 
     private static final String COLUMN_NAME = "abc";
 
@@ -31,7 +31,7 @@ public class ExpressionClonerTest {
     // Justification: Between has 3 subqueries, which means we already need 3 asserts to test those.
     @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
     @Test
-    public void testCopyBetween() {
+    void testCopyBetween() {
 
         Column column = new Column(COLUMN_NAME);
         LongValue lowerVal = new LongValue(0);
@@ -63,7 +63,7 @@ public class ExpressionClonerTest {
      * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link ExistsExpression}s.
      */
     @Test
-    public void testCopyExistsExpression() {
+    void testCopyExistsExpression() {
 
         Column column = new Column(COLUMN_NAME);
 
@@ -85,7 +85,7 @@ public class ExpressionClonerTest {
      * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link IsNullExpression}s.
      */
     @Test
-    public void testCopyIsNullExpression() {
+    void testCopyIsNullExpression() {
 
         Column column = new Column(COLUMN_NAME);
 
@@ -110,7 +110,7 @@ public class ExpressionClonerTest {
      */
     @ParameterizedTest
     @MethodSource("provideBinaryExpressions")
-    public void testCopyBinaryExpressions(BinaryExpression original) {
+    void testCopyBinaryExpressions(BinaryExpression original) {
 
         Column column = new Column(COLUMN_NAME);
         LongValue longValue = new LongValue(1);
@@ -139,7 +139,7 @@ public class ExpressionClonerTest {
      */
     @ParameterizedTest
     @MethodSource("provideValues")
-    public void testCopyValues(Expression original) {
+    void testCopyValues(Expression original) {
 
         Expression copy = ExpressionCloner.copy(original);
 
