@@ -1,8 +1,6 @@
 package nl.tudelft.st01.unit.util;
 
-import net.sf.jsqlparser.expression.BinaryExpression;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -15,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -134,6 +133,24 @@ public class ExpressionClonerTest {
     }
 
     /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of all value {@link Expression}s.
+     *
+     * @param original the original value.
+     */
+    @ParameterizedTest
+    @MethodSource("provideValues")
+    public void testCopyValues(Expression original) {
+
+        Expression copy = ExpressionCloner.copy(original);
+
+        assertThat(copy)
+                .isNotSameAs(original)
+                .hasSameClassAs(original)
+                .usingComparatorForType((a, b) -> 0, SimpleNode.class)
+                .isEqualToComparingFieldByFieldRecursively(original);
+    }
+
+    /**
      * Utility function that provides a stream of {@link BinaryExpression}s.
      *
      * @return a stream of binary expressions.
@@ -141,6 +158,10 @@ public class ExpressionClonerTest {
     // Justification: This method is in fact used.
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static Stream<Arguments> provideBinaryExpressions() {
+
+        LikeExpression notLike = new LikeExpression();
+        notLike.setNot();
+
         return Stream.of(
                 Arguments.of(new Addition()),
                 Arguments.of(new AndExpression(null, null)),
@@ -155,6 +176,7 @@ public class ExpressionClonerTest {
                 Arguments.of(new GreaterThan()),
                 Arguments.of(new GreaterThanEquals()),
                 Arguments.of(new LikeExpression()),
+                Arguments.of(notLike),
                 Arguments.of(new Matches()),
                 Arguments.of(new MinorThan()),
                 Arguments.of(new MinorThanEquals()),
@@ -169,6 +191,48 @@ public class ExpressionClonerTest {
                 Arguments.of(new RegExpMySQLOperator(RegExpMatchOperatorType.MATCH_CASESENSITIVE)),
                 Arguments.of(new RegExpMySQLOperator(RegExpMatchOperatorType.MATCH_CASEINSENSITIVE)),
                 Arguments.of(new Subtraction())
+        );
+    }
+
+    /**
+     * Utility function that provides a stream of value {@link Expression}s.
+     *
+     * @return a stream of values.
+     */
+    // Justification: This method is in fact used.
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    private static Stream<Arguments> provideValues() {
+
+        ValueListExpression valueListExpression = new ValueListExpression();
+        valueListExpression.setExpressionList(new ExpressionList());
+
+        RowConstructor rowConstructor = new RowConstructor();
+        rowConstructor.setName("rowC");
+        rowConstructor.setExprList(new ExpressionList());
+
+        DateTimeLiteralExpression dateTimeLiteralExpression = new DateTimeLiteralExpression();
+        dateTimeLiteralExpression.setValue("1999-09-09");
+        dateTimeLiteralExpression.setType(DateTimeLiteralExpression.DateTime.DATE);
+
+        ArrayList<String> nameList = new ArrayList<>();
+        nameList.add("a");
+        nameList.add("b");
+
+        return Stream.of(
+                Arguments.of(new NullValue()),
+                Arguments.of(new LongValue(1)),
+                Arguments.of(new DoubleValue("1.0")),
+                Arguments.of(new HexValue("0x1B")),
+                Arguments.of(new DateValue("'2000-01-01'")),
+                Arguments.of(new TimeValue("'12:34:56'")),
+                Arguments.of(new TimestampValue("'2000-01-01 12:34:56'")),
+                Arguments.of(new StringValue("'h'")),
+                Arguments.of(new UserVariable()),
+                Arguments.of(new NumericBind()),
+                Arguments.of(valueListExpression),
+                Arguments.of(rowConstructor),
+                Arguments.of(dateTimeLiteralExpression),
+                Arguments.of(new NextValExpression(nameList))
         );
     }
 
