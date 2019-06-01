@@ -8,6 +8,7 @@ import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
+import net.sf.jsqlparser.statement.select.SubSelect;
 import nl.tudelft.st01.util.ExpressionCloner;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -344,6 +345,36 @@ class ExpressionClonerTest {
         assertCopyEquals(original, copy);
 
         assertThat(copy.getExpression()).isNotSameAs(longValue);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link AllComparisonExpression}s.
+     */
+    @Test
+    void testCopyAllComparisonExpression() {
+
+        SubSelect subSelect = new SubSelect();
+        AllComparisonExpression original = new AllComparisonExpression(subSelect);
+
+        AllComparisonExpression copy = (AllComparisonExpression) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getSubSelect()).isNotSameAs(subSelect);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link AnyComparisonExpression}s.
+     */
+    @Test
+    void testCopyAnyComparisonExpression() {
+
+        SubSelect subSelect = new SubSelect();
+        AnyComparisonExpression original = new AnyComparisonExpression(AnyType.SOME, subSelect);
+
+        AnyComparisonExpression copy = (AnyComparisonExpression) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getSubSelect()).isNotSameAs(subSelect);
     }
 
     /**

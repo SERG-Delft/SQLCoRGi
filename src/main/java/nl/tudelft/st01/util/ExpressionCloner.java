@@ -387,6 +387,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
     @Override
     public void visit(SubSelect subSelect) {
         // TODO
+        this.copy = new SubSelect();
     }
 
     @Override
