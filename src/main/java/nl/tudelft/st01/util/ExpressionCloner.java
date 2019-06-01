@@ -457,10 +457,10 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
 
         WhenClause copy = new WhenClause();
 
-        copy.getWhenExpression().accept(this);
+        whenClause.getWhenExpression().accept(this);
         copy.setWhenExpression(this.copy);
 
-        copy.getThenExpression().accept(this);
+        whenClause.getThenExpression().accept(this);
         copy.setThenExpression(this.copy);
 
         this.copy = copy;
