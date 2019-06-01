@@ -250,6 +250,25 @@ class ExpressionClonerTest {
     }
 
     /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link WhenClause}s.
+     */
+    @Test
+    void testCopyWhenClause() {
+
+        WhenClause original = new WhenClause();
+        NullValue when = new NullValue();
+        original.setWhenExpression(when);
+        LongValue then = new LongValue(1);
+        original.setThenExpression(then);
+
+        WhenClause copy = (WhenClause) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getWhenExpression()).isNotSameAs(when);
+        assertThat(copy.getThenExpression()).isNotSameAs(then);
+    }
+
+    /**
      * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link JdbcNamedParameter}s.
      */
     @Test
