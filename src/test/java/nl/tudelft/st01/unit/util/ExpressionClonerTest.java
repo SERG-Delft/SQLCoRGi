@@ -8,6 +8,7 @@ import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
+import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import nl.tudelft.st01.util.ExpressionCloner;
 import org.assertj.core.api.Assertions;
@@ -327,6 +328,45 @@ class ExpressionClonerTest {
         original.setAllColumns(true);
         original.setDistinct(true);
         original.setEscaped(true);
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link KeepExpression}s.
+     */
+    @Test
+    void testCopyFunctionKeepExpression() {
+
+        KeepExpression original = new KeepExpression();
+        original.setFirst(false);
+
+        ArrayList<OrderByElement> orderByElements = new ArrayList<>(1);
+        original.setOrderByElements(orderByElements);
+
+        OrderByElement orderByElement = new OrderByElement();
+        orderByElement.setExpression(new NullValue());
+        orderByElements.add(orderByElement);
+        orderByElements.add(new OrderByElement());
+
+        KeepExpression copy = (KeepExpression) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getOrderByElements()).isNotSameAs(orderByElements);
+        assertThat(copy.getOrderByElements().get(0)).isNotSameAs(orderByElement);
+        assertThat(copy.getOrderByElements().get(0).getExpression()).isNotSameAs(orderByElement);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link KeepExpression}s.
+     */
+    @Test
+    void testCopyFunctionKeepExpressionNullOrder() {
+
+        KeepExpression original = new KeepExpression();
+        original.setName(STRING_ABC);
+        original.setFirst(true);
 
         Expression copy = ExpressionCloner.copy(original);
         assertCopyEquals(original, copy);
