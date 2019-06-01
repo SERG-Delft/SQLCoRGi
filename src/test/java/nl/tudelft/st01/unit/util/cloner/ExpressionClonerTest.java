@@ -1,4 +1,4 @@
-package nl.tudelft.st01.unit.util;
+package nl.tudelft.st01.unit.util.cloner;
 
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;
@@ -10,7 +10,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.SubSelect;
-import nl.tudelft.st01.util.ExpressionCloner;
+import nl.tudelft.st01.util.cloner.ExpressionCloner;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

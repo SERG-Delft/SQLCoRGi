@@ -1,4 +1,4 @@
-package nl.tudelft.st01.util;
+package nl.tudelft.st01.util.cloner;
 
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;

@@ -2,6 +2,7 @@ package nl.tudelft.st01.util;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import nl.tudelft.st01.util.cloner.ExpressionCloner;
 
 /**
  * Provides utility functions for JSQLParser query objects.
