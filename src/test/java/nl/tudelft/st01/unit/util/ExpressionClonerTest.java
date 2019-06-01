@@ -568,6 +568,26 @@ class ExpressionClonerTest {
     }
 
     /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} throws an exception for {@link MySQLGroupConcat}s.
+     */
+    @Test
+    void testCopyMySQLGroupConcat() {
+
+        Throwable throwable = Assertions.catchThrowable(() -> ExpressionCloner.copy(new MySQLGroupConcat()));
+        assertThat(throwable).isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} throws an exception for {@link AnalyticExpression}s.
+     */
+    @Test
+    void testCopyAnalyticExpression() {
+
+        Throwable throwable = Assertions.catchThrowable(() -> ExpressionCloner.copy(new AnalyticExpression()));
+        assertThat(throwable).isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    /**
      * Tests whether {@link ExpressionCloner#copy(Expression)} throws an exception for {@link JsonExpression}s.
      */
     @Test

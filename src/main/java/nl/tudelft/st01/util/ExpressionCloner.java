@@ -564,8 +564,8 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
     }
 
     @Override
-    public void visit(AnalyticExpression aexpr) {
-        // TODO
+    public void visit(AnalyticExpression analyticExpression) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -693,7 +693,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
 
     @Override
     public void visit(MySQLGroupConcat groupConcat) {
-        // TODO
+        throw new UnsupportedOperationException();
     }
 
     @Override
