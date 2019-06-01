@@ -8,6 +8,7 @@ import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.select.OrderByElement;
+import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
 import java.util.ArrayList;
@@ -22,6 +23,24 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
 
     private Expression copy;
     private ItemsList itemsList;
+
+    private SelectCloner selectCloner;
+
+    /**
+     * Creates a new instance of this class, which uses a new {@link SelectCloner} for {@link SubSelect}s.
+     */
+    private ExpressionCloner() {
+        this.selectCloner = new SelectCloner(this);
+    }
+
+    /**
+     * Creates a new instance of this class, which uses the provided {@link SelectCloner} for {@link SubSelect}s.
+     *
+     * @param selectCloner the {@code SelectCloner} to use.
+     */
+    ExpressionCloner(SelectCloner selectCloner) {
+        this.selectCloner = selectCloner;
+    }
 
     /**
      * Creates a deep copy of an {@link Expression}. This can be useful if you need to modify part of an expression,
@@ -384,10 +403,31 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
         this.copy = new Column(tableColumn.getTable(), tableColumn.getColumnName());
     }
 
+    /**
+     * Only deep copies the {@code selectBody} and {@code Alias} fields of the given {@link SubSelect}.
+     *
+     * @param subSelect the {@code SubSelect} to be copied.
+     */
     @Override
     public void visit(SubSelect subSelect) {
-        // TODO
-        this.copy = new SubSelect();
+
+        SubSelect copy = new SubSelect();
+        copy.setUseBrackets(subSelect.isUseBrackets());
+        copy.setWithItemsList(subSelect.getWithItemsList());
+        copy.setPivot(subSelect.getPivot());
+
+        Alias alias = subSelect.getAlias();
+        if (alias != null) {
+            copy.setAlias(new Alias(alias.getName(), alias.isUseAs()));
+        }
+        // TODO: test
+        SelectBody selectBody = subSelect.getSelectBody();
+        if (selectBody != null) {
+            selectBody.accept(selectCloner);
+            copy.setSelectBody(selectCloner.getCopy());
+        }
+
+        this.copy = copy;
     }
 
     @Override
@@ -760,4 +800,9 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
         collateExpression.getLeftExpression().accept(this);
         this.copy = new CollateExpression(this.copy, collateExpression.getCollate());
     }
+
+    public Expression getCopy() {
+        return this.copy;
+    }
+
 }
