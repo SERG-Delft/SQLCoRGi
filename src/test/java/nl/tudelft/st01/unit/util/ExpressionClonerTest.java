@@ -282,6 +282,56 @@ class ExpressionClonerTest {
     }
 
     /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link Function}s.
+     */
+    @Test
+    void testCopyFunction() {
+
+        Function original = new Function();
+
+        ExpressionList parameters = new ExpressionList();
+        original.setParameters(parameters);
+
+        NamedExpressionList namedParameters = new NamedExpressionList();
+        original.setNamedParameters(namedParameters);
+
+        original.setAllColumns(false);
+        original.setDistinct(false);
+        original.setEscaped(false);
+
+        NullValue attribute = new NullValue();
+        original.setAttribute(attribute);
+        original.setAttributeName(STRING_ABC);
+
+        KeepExpression keep = new KeepExpression();
+        original.setKeep(keep);
+
+        Function copy = (Function) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getParameters()).isNotSameAs(parameters);
+        assertThat(copy.getNamedParameters()).isNotSameAs(namedParameters);
+        assertThat(copy.getAttribute()).isNotSameAs(attribute);
+        assertThat(copy.getKeep()).isNotSameAs(keep);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link Function}s.
+     */
+    @Test
+    void testCopyFunctionAllNull() {
+
+        Function original = new Function();
+        original.setName(STRING_ABC);
+        original.setAllColumns(true);
+        original.setDistinct(true);
+        original.setEscaped(true);
+
+        Expression copy = ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
      * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link SignedExpression}s.
      */
     @Test
