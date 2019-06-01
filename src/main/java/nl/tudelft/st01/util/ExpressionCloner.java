@@ -402,7 +402,11 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
 
         NamedExpressionList copy = new NamedExpressionList();
         copy.setExpressions(copyExpressionsList(namedExpressionList.getExpressions()));
-        copy.setNames(new ArrayList<>(namedExpressionList.getNames()));
+
+        List<String> names = namedExpressionList.getNames();
+        if (names != null) {
+            copy.setNames(new ArrayList<>(names));
+        }
 
         this.itemsList = copy;
     }
