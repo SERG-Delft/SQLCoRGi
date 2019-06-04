@@ -1,10 +1,14 @@
 package nl.tudelft.st01.evosql_queries;
 
 import nl.tudelft.st01.Generator;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.File;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
 import java.nio.file.Path;
@@ -25,24 +29,39 @@ public class CompareOutput {
         String erpnext_input = "erpnext_input.txt";
         String erpnext_output = "erpnext_output.json";
 
+        String[] input = {basePath + erpnext_input, basePath + suitecrm_input, basePath + espocrm_input};
+        String[] output = {basePath + erpnext_output, basePath + suitecrm_output, basePath + espocrm_output};
+
         Scanner sc = null;
+        JSONParser parser = new JSONParser();
+        Object object = null;
+
         try {
-            sc = new Scanner(new FileReader(basePath + suitecrm_input));
+            sc = new Scanner(new FileReader(input[0]));
+            object = parser.parse(new FileReader(output[0]));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        int i = 2;
-        while(sc.hasNextLine()) {
-            String query = sc.nextLine();
-            System.out.println(query);
 
-            Set<String> result = Generator.generateRules(query);
+        JSONObject jsonObject = (JSONObject) object;
 
-            System.out.println("-----------------");
-            System.out.println(result.size() + " ^^ , below here is line: " + i);
-            i++;
-            System.out.println("-----------------");
+        JSONArray entries = (JSONArray) jsonObject.get("entries");
+        Iterator<JSONObject> iterator = entries.iterator();
 
+        // nu kunnen we gaan!
+
+        while(iterator.hasNext() && sc.hasNextLine()) {
+            JSONArray queries = (JSONArray) iterator.next().get("pathList");
+            String nextQuery = sc.nextLine();
+            System.out.println(nextQuery);
+            Set<String> ourResults = Generator.generateRules(nextQuery);
+            System.out.println("we have  :" + ourResults.size());
+            System.out.println("should be: " + queries.size());
         }
+
+
+
+
     }
 }
