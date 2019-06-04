@@ -74,12 +74,12 @@ public class AggregatorTest {
     /**
      * A test case with 1 column and 2 aggregators, in this case AVG and Sum.
      * In this test you can clearly see what rules are generated for any aggregator function
-     * (
+     * (2 of them for the GROUP BY, and 2 per Aggregator)
      */
     @Test
     public void testSUMAVGAggregator1column2Aggr() {
         verify("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director",
-                // generated for any aggregator in {AVG, SUM, MIN, MAX}
+                // generated for GROUP BY
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1",
                 // generated per column used in an aggregator
