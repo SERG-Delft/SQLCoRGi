@@ -37,6 +37,8 @@
 
         <junit.jupiter.version>5.4.2</junit.jupiter.version>
 
+        <assertj.core.version>3.11.1</assertj.core.version>
+
         <mockito.version>2.27.0</mockito.version>
         <mockito.junit.jupiter.version>2.27.0</mockito.junit.jupiter.version>
 
@@ -45,6 +47,9 @@
         <spotbugs.version>3.1.12</spotbugs.version>
         <spotbugs.annotations.version>3.1.12</spotbugs.annotations.version>
         <spotbugs.plugin.version>3.1.11</spotbugs.plugin.version>
+
+        <systems.manifold.version>2019.1.0-ea</systems.manifold.version>
+        <systems.manifold.ext.version>2019.1.0-ea</systems.manifold.ext.version>
     </properties>
 
 
@@ -98,11 +103,37 @@
         </dependency>
 
         <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.core.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.openclover</groupId>
             <artifactId>clover-maven-plugin</artifactId>
             <version>${clover.version}</version>
             <type>maven-plugin</type>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold</artifactId>
+            <version>${systems.manifold.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-ext</artifactId>
+            <version>${systems.manifold.ext.version}</version>
         </dependency>
     </dependencies>
 
@@ -166,6 +197,10 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArgs>
+                        <arg>-Xplugin:Manifold</arg>
+                    </compilerArgs>
                     <excludes>
                         <exclude>**/package-info.java</exclude>
                     </excludes>

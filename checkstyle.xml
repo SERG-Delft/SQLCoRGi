@@ -75,7 +75,10 @@
             <property name="option" value="nospace"/>
         </module>
         <module name="EmptyForIteratorPad"/>
-        <module name="EmptyLineSeparator"/>
+        <module name="EmptyLineSeparator">
+            <property name="tokens" value="PACKAGE_DEF, IMPORT, STATIC_IMPORT, CLASS_DEF, INTERFACE_DEF,
+                                           ENUM_DEF, STATIC_INIT, INSTANCE_INIT, METHOD_DEF, CTOR_DEF"/>
+        </module>
         <module name="EmptyStatement"/>
         <module name="EqualsAvoidNull"/>
         <module name="EqualsHashCode"/>
@@ -196,7 +199,7 @@
         </module>
         <module name="UnnecessaryParentheses"/>
         <module name="UnusedImports">
-            <property name="processJavadoc" value="false"/>
+            <property name="processJavadoc" value="true"/>
         </module>
         <module name="UpperEll"/>
         <module name="VisibilityModifier">

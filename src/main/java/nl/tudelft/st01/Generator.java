@@ -3,9 +3,9 @@ package nl.tudelft.st01;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
+import nl.tudelft.st01.visitors.SelectStatementVisitor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,27 +14,32 @@ import java.util.Scanner;
 import java.util.Set;
 
 /**
- * Utility class for coverage target generation.
+ * The entry point of the coverage rule generator.
  */
 public final class Generator {
 
     /**
-     * Nope.
+     * No instance of this class should be created.
      */
     private Generator() {
         throw new UnsupportedOperationException();
     }
 
     /**
-     * Generates coverage targets for a given query.
-     * @param query the query that needs to be covered.
-     * @return the generated queries.
+     * Generates coverage targets for the given query.
+     *
+     * @param query the query for which coverage rules should be generated.
+     * @return the rules that are generated for the input query.
      */
     public static Set<String> generateRules(String query) {
-
         Set<String> result = new HashSet<>();
 
-        Statement statement = null;
+        if (query == null) {
+            System.err.println("Input cannot be null.");
+            return result;
+        }
+
+        Statement statement;
         try {
             statement = CCJSqlParserUtil.parse(query);
         } catch (JSQLParserException e) {
@@ -43,29 +48,26 @@ public final class Generator {
         }
 
         if (!(statement instanceof Select)) {
-            System.err.println("Only SELECT statements are accepted.");
+            System.err.println("Only SELECT statements are supported.");
             return result;
         }
 
         SelectBody selectBody = ((Select) statement).getSelectBody();
-        RuleGeneratorSelectVisitor ruleGeneratorSelectVisitor = new RuleGeneratorSelectVisitor();
-        ArrayList<PlainSelect> plainSelects = new ArrayList<>();
-        ruleGeneratorSelectVisitor.setOutput(plainSelects);
-        selectBody.accept(ruleGeneratorSelectVisitor);
 
-        for (PlainSelect plainSelect : plainSelects) {
-            result.add(plainSelect.toString());
-        }
+        SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(result);
+        selectBody.accept(selectStatementVisitor);
 
         return result;
     }
 
     /**
-     * Example query to try out the generator.
+     * Main method for manual testing.
+     *
      * @param args unused.
      */
     @SuppressWarnings("checkstyle:innerAssignment")
     public static void main(String[] args) {
+        String query = "SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE b.length IS NOT NULL";
 
         System.out.println("Enter \"demo\" to run the generator for a precompiled list of queries.\n"
             + "If you want to try out your own query, enter \"sandbox\" instead.");
@@ -81,18 +83,23 @@ public final class Generator {
                 "SELECT * FROM Movies WHERE year < 2000 AND id <> 30 OR title = 'Generic Movie Title'",
                 "SELECT * FROM Movies WHERE title NOT LIKE '%generic%'",
                 "SELECT * FROM Movies WHERE year BETWEEN 1980 AND 1987",
+                "SELECT * FROM Movies WHERE Id IN (8, 9, 10)",
                 "SELECT * FROM Movies WHERE year IS NULL",
+                "SELECT director FROM Movies GROUP BY director",
                 "SELECT MAX(duration) FROM Movies GROUP BY year",
+                "SELECT director, COUNT(*) FROM Movies GROUP BY director HAVING director LIKE 'B%'",
+                "SELECT * FROM Movies INNER JOIN Boxoffice ON Movies.id = Boxoffice.movie_id",
+                "SELECT * FROM Movies RIGHT JOIN Boxoffice ON Movies.id = Boxoffice.movie_id",
                 "UPDATE Account SET balance = 999999999 WHERE id = 123",
                 "CAN'T PARSE THIS",
             };
 
-            for (String query : queries) {
+            for (String querie : queries) {
 
-                System.out.println("Current query: " + query);
+                System.out.println("Current query: " + querie);
                 scanner.nextLine();
 
-                printResults(generateRules(query));
+                printResults(generateRules(querie));
                 scanner.nextLine();
             }
 
