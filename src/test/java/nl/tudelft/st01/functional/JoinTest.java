@@ -299,6 +299,7 @@ public class JoinTest {
 
     /**
      * A test for verifying that no targets are generated for queries with a simple join.
+     * @param query The query for which no targets should be generated.
      */
     @ParameterizedTest
     @CsvSource({"SELECT * FROM a, b", "SELECT * FROM a, b WHERE a.id > b.id HAVING a.length > 50"})
