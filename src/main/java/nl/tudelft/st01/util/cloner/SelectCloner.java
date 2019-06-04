@@ -486,7 +486,17 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
 
     @Override
     public void visit(TableFunction tableFunction) {
-        // TODO
+
+        TableFunction copy = new TableFunction();
+        copy.setAlias(copyAlias(tableFunction.getAlias()));
+
+        Function function = tableFunction.getFunction();
+        if (function != null) {
+            function.accept(this.expressionCloner);
+            copy.setFunction((Function) this.expressionCloner.getCopy());
+        }
+
+        this.fromItem = copy;
     }
 
     @Override
