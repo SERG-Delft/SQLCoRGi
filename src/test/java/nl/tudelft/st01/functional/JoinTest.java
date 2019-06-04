@@ -1,11 +1,16 @@
 package nl.tudelft.st01.functional;
 
+import nl.tudelft.st01.Generator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.util.Set;
+
 import static nl.tudelft.st01.functional.AssertUtils.verify;
 import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * This class tests if the coverage targets for queries with JOINS are generated correctly.
@@ -299,14 +304,24 @@ public class JoinTest {
 
     /**
      * A test for verifying that no targets are generated for queries with a simple join.
-     * @param query The query for which no targets should be generated.
      */
-    @ParameterizedTest
-    @CsvSource({"SELECT * FROM a, b", "SELECT * FROM a, b WHERE a.id > b.id HAVING a.length > 50"})
-    public void testJoinNoOnConditionSimpleJoin(String query) {
+    @Test
+    public void testJoinNoOnConditionSimpleJoin() {
         verify(
-                query
+                "SELECT * FROM a, b"
         );
     }
+
+    /**
+     * A test for verifying that no targets are generated and an exception is thrown for queries with a simple join,
+     * with an additional where and having clause.
+     */
+    @Test
+    public void testJoinNoOnConditionSimpleJoinWithWhereClauseException() {
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
+                () -> Generator.generateRules("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50"));
+
+    }
+
 
 }
