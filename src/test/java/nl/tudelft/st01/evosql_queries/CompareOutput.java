@@ -35,29 +35,50 @@ public class CompareOutput {
         Scanner sc = null;
         JSONParser parser = new JSONParser();
         Object object = null;
+        int counter = 0;
 
-        try {
-            sc = new Scanner(new FileReader(input[0]));
-            object = parser.parse(new FileReader(output[0]));
+        for(int i = 0; i <= 2; i++) {
+            try {
+                sc = new Scanner(new FileReader(input[i]));
+                object = parser.parse(new FileReader(output[i]));
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-        JSONObject jsonObject = (JSONObject) object;
+            JSONObject jsonObject = (JSONObject) object;
 
-        JSONArray entries = (JSONArray) jsonObject.get("entries");
-        Iterator<JSONObject> iterator = entries.iterator();
+            JSONArray entries = (JSONArray) jsonObject.get("entries");
+            Iterator<JSONObject> iterator = entries.iterator();
 
-        // nu kunnen we gaan!
+            // nu kunnen we gaan!
 
-        while(iterator.hasNext() && sc.hasNextLine()) {
-            JSONArray queries = (JSONArray) iterator.next().get("pathList");
-            String nextQuery = sc.nextLine();
-            System.out.println(nextQuery);
-            Set<String> ourResults = Generator.generateRules(nextQuery);
-            System.out.println("we have  :" + ourResults.size());
-            System.out.println("should be: " + queries.size());
+            while(iterator.hasNext() && sc.hasNextLine()) {
+                JSONArray queries = (JSONArray) iterator.next().get("pathList");
+                String nextQuery = sc.nextLine();
+                Set<String> ourResults = null;
+                try {
+                     ourResults = Generator.generateRules(nextQuery);
+                } catch (Exception e) {
+                    System.out.println(nextQuery);
+                    System.out.println("The query on the previous line caused the following exception: " + e.getMessage());
+                    System.out.println("i: " + i);
+                }
+                int ourResultSize = ourResults.size();
+                int expectedResultSize = queries.size();
+
+                if (ourResultSize != expectedResultSize) {
+                    counter++;
+                    System.out.println(counter + ") The following query is not yet handled correctly: ");
+                    System.out.println(nextQuery);
+                    System.out.printf("Expected %d rules, got %d\n", expectedResultSize, ourResultSize);
+                    System.out.println("These queries were expected:");
+                    for (Object o : queries) {
+                        System.out.println(o.toString());
+                    }
+                    System.out.println("\n\n");
+                }
+            }
         }
 
 
