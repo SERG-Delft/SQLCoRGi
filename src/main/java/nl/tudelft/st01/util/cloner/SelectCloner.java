@@ -509,8 +509,18 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
     }
 
     @Override
-    public void visit(ParenthesisFromItem aThis) {
-        // TODO
+    public void visit(ParenthesisFromItem parenthesisFromItem) {
+
+        ParenthesisFromItem copy = new ParenthesisFromItem();
+        copy.setAlias(copyAlias(parenthesisFromItem.getAlias()));
+
+        FromItem fromItem = parenthesisFromItem.getFromItem();
+        if (fromItem != null) {
+            fromItem.accept(this);
+            copy.setFromItem(this.fromItem);
+        }
+
+        this.fromItem = copy;
     }
 
     public SelectBody getCopy() {
