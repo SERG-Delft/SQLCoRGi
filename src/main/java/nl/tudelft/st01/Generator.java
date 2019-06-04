@@ -63,7 +63,8 @@ public final class Generator {
      * @param args unused.
      */
     public static void main(String[] args) {
-        String query = "SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE b.length IS NOT NULL";
+        //String query = "SELECT * FROM a inner join b where a.id > 0";
+        String query = "SELECT * FROM a, b having b.length > 0";
 
         Set<String> result = generateRules(query);
 

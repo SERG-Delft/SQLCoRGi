@@ -54,6 +54,13 @@ public class JoinWhereExpressionGenerator {
             List<Join> temp = new ArrayList<>();
             for (int i = 0; i < joins.size(); i++) {
                 join = joins.get(i);
+
+                if (join.isSimple()) {
+                    continue;
+                } else if (join.getOnExpression() == null) {
+                    throw new IllegalStateException("The ON condition cannot be null");
+                }
+
                 join.getOnExpression().accept(onExpressionVisitor);
                 joinWhereItems = generateJoinMutations(join);
                 for (JoinWhereItem joinWhereItem : joinWhereItems) {
