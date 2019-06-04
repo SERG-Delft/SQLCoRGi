@@ -805,4 +805,8 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
         return this.copy;
     }
 
+    public ItemsList getItemsList() {
+        return this.itemsList;
+    }
+
 }

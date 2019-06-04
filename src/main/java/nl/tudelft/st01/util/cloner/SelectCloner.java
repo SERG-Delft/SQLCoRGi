@@ -1,6 +1,7 @@
 package nl.tudelft.st01.util.cloner;
 
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.values.ValuesStatement;
@@ -450,7 +451,27 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
 
     @Override
     public void visit(ValuesList valuesList) {
-        // TODO
+
+        ValuesList copy = new ValuesList();
+        copy.setNoBrackets(valuesList.isNoBrackets());
+
+        Alias alias = valuesList.getAlias();
+        if (alias != null) {
+            copy.setAlias(new Alias(alias.getName(), alias.isUseAs()));
+        }
+
+        List<String> columnNames = valuesList.getColumnNames();
+        if (columnNames != null) {
+            copy.setColumnNames(new ArrayList<>(columnNames));
+        }
+
+        MultiExpressionList multiExpressionList = valuesList.getMultiExpressionList();
+        if (multiExpressionList != null) {
+            multiExpressionList.accept(this.expressionCloner);
+            copy.setMultiExpressionList((MultiExpressionList) this.expressionCloner.getItemsList());
+        }
+
+        this.fromItem = copy;
     }
 
     @Override
