@@ -5,11 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.util.Set;
-
 import static nl.tudelft.st01.functional.AssertUtils.verify;
 import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
@@ -319,7 +316,7 @@ public class JoinTest {
     @Test
     public void testJoinNoOnConditionSimpleJoinWithWhereClauseException() {
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-                () -> Generator.generateRules("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50"));
+            () -> Generator.generateRules("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50"));
 
     }
 
