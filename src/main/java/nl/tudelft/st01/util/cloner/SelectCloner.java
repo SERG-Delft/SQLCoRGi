@@ -52,6 +52,21 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
     }
 
     /**
+     * Creates a copy of the given {@link Alias}.
+     *
+     * @param alias the {@code Alias} that needs to be copied.
+     * @return a clone of {@code alias}.
+     */
+    private Alias copyAlias(Alias alias) {
+
+        if (alias == null) {
+            return null;
+        }
+
+        return new Alias(alias.getName(), alias.isUseAs());
+    }
+
+    /**
      * Creates a deep copy of the given {@link Distinct}.
      *
      * @param distinct the {@code Distinct} that needs to be copied.
@@ -422,8 +437,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         selectExpressionItem.getExpression().accept(expressionCloner);
         copy.setExpression(expressionCloner.getCopy());
 
-        Alias alias = selectExpressionItem.getAlias();
-        copy.setAlias(new Alias(alias.getName(), alias.isUseAs()));
+        copy.setAlias(copyAlias(selectExpressionItem.getAlias()));
 
         this.selectItem = copy;
     }
@@ -454,11 +468,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
 
         ValuesList copy = new ValuesList();
         copy.setNoBrackets(valuesList.isNoBrackets());
-
-        Alias alias = valuesList.getAlias();
-        if (alias != null) {
-            copy.setAlias(new Alias(alias.getName(), alias.isUseAs()));
-        }
+        copy.setAlias(copyAlias(valuesList.getAlias()));
 
         List<String> columnNames = valuesList.getColumnNames();
         if (columnNames != null) {
