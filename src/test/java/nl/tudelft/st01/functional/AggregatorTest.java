@@ -15,7 +15,8 @@ import static nl.tudelft.st01.functional.AssertUtils.verify;
 public class AggregatorTest {
 
     /**
-     * A test case with 2 columns and 1 aggregator, in this case MAX.
+     * A test case with the COUNT clause, to ensure the single rule that is required for the
+     * count clause is generated (and no more).
      */
     @Test
     public void testCountNoGroupBy() {
@@ -25,7 +26,8 @@ public class AggregatorTest {
     }
 
     /**
-     * A test case for the AVG function since it needs an extra rule.
+     * A test case for all the aggregators but COUNT since they all need 2 rules.
+     * Since there is no Group By statement here, the 2 rules for Group By are not generated.
      *
      * @param func Function name to use in tests
      */
@@ -42,6 +44,7 @@ public class AggregatorTest {
 
     /**
      * A test case with 1 column and 1 aggregator, in this case AVG.
+     * In this test all of the 4 rules from the aggregator class are generated.
      */
     @Test
     public void testAVGAggregator1column1Aggr() {
@@ -56,7 +59,9 @@ public class AggregatorTest {
     }
 
     /**
-     * A test case with 1 column and 1 aggregator, in this case AVG.
+     * A test case for the COUNT(*) clause, which has to be handled differently from a normal
+     * COUNT(column) case since COUNT(*) does not have any columns in them, thus returning
+     * a nullPointer when trying to access them.
      */
     @Test
     public void testCountAll() {
@@ -68,17 +73,22 @@ public class AggregatorTest {
 
     /**
      * A test case with 1 column and 2 aggregators, in this case AVG and Sum.
+     * In this test you can clearly see what rules are generated for any aggregator function
+     * (
      */
     @Test
     public void testSUMAVGAggregator1column2Aggr() {
         verify("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director",
-
+                // generated for any aggregator in {AVG, SUM, MIN, MAX}
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1",
+                // generated per column used in an aggregator
+                    // for Length (used in SUM)
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
                         + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
                         + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1",
+                    // for Score (used in AVG)
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
                         + "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
@@ -87,13 +97,16 @@ public class AggregatorTest {
 
     /**
      * A test case with 2 columns and 1 aggregator, in this case MAX.
+     * In this case you can clearly see the 2 rules for GROUP BY and the 2 rules for the aggregators.
      */
     @Test
     public void testMAXAggregator2columns1Aggr() {
         verify("SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name",
 
+                // Group By
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Name) > 1",
                 "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name HAVING COUNT(*) > 1",
+                // Aggregator
                 "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name HAVING COUNT(*) > COUNT(Length) AND "
                         + "COUNT(DISTINCT Length) > 1",
                 "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name "
@@ -120,6 +133,7 @@ public class AggregatorTest {
 
     /**
      * A test case for a simple GROUP BY query.
+     * This shows the two rules that are generated for the GROUP BY statement
      */
     @Test
     public void testBasicGroupBy() {
@@ -131,53 +145,66 @@ public class AggregatorTest {
 
     /**
      * A test case for a GROUP BY query with WHERE clause.
+     * Here you see the combination of handling the where clause and the group by in seperate rules.
      */
     @Test
     public void testGroupByWithWhere() {
         verify("SELECT Director FROM Movies WHERE title = 'Finding Nemo' GROUP BY Director",
 
+                // Where clause
                 "SELECT Director FROM Movies WHERE title <> 'Finding Nemo' GROUP BY Director",
                 "SELECT Director FROM Movies WHERE title = 'Finding Nemo' GROUP BY Director",
                 "SELECT Director FROM Movies WHERE title IS NULL GROUP BY Director",
+                // Group By
                 "SELECT Director FROM Movies WHERE title = 'Finding Nemo' GROUP BY Director HAVING COUNT(*) > 1",
                 "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' HAVING COUNT(DISTINCT Director) > 1");
     }
 
     /**
-     * A test case for a HAVING query.
+     * A test case for a HAVING query. Here you see that the rules generated for HAVING
+     * are suspiciously similar to the rules generated for the where clause.
      */
     @Test
     public void testHaving() {
         verify("SELECT Director FROM Movies GROUP BY Director HAVING Director LIKE 'B%'",
 
+                // HAVING clause
                 "SELECT Director FROM Movies GROUP BY Director HAVING NOT Director LIKE 'B%'",
                 "SELECT Director FROM Movies GROUP BY Director HAVING Director LIKE 'B%'",
                 "SELECT Director FROM Movies GROUP BY Director HAVING Director IS NULL",
+                // Group By clause
                 "SELECT Director FROM Movies GROUP BY Director HAVING COUNT(*) > 1 AND Director LIKE 'B%'",
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1 AND Director LIKE 'B%'");
     }
 
     /**
      * A test case for a HAVING query with WHERE clause.
+     * Here is where it all comes together, and you can see we generate 1 rule that is a copy of the
+     * original rule, and then 2 rules specifically per clause. See the comments in the code.
      */
     @Test
     public void testHavingWithWhere() {
         verify("SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                 + "GROUP BY Director HAVING Director LIKE 'A%'",
 
+                // Copy Of Original Clause
             "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                     + "GROUP BY Director HAVING Director LIKE 'A%'",
-                "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
-                    + "GROUP BY Director HAVING NOT Director LIKE 'A%'",
+                //  WHERE
                 "SELECT Director FROM Movies WHERE title <> 'Finding Nemo' "
                     + "GROUP BY Director HAVING Director LIKE 'A%'",
+                "SELECT Director FROM Movies WHERE title IS NULL "
+                    + "GROUP BY Director HAVING Director LIKE 'A%'",
+
+                // GROUP BY
                 "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                     + "GROUP BY Director HAVING COUNT(*) > 1 AND Director LIKE 'A%'",
                 "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' "
                     + "HAVING COUNT(DISTINCT Director) > 1 AND Director LIKE 'A%'",
+                // HAVING
                 "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                     + "GROUP BY Director HAVING Director IS NULL",
-                "SELECT Director FROM Movies WHERE title IS NULL "
-                    + "GROUP BY Director HAVING Director LIKE 'A%'");
+                "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
+                    + "GROUP BY Director HAVING NOT Director LIKE 'A%'");
     }
 }
