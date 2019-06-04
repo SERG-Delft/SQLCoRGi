@@ -297,4 +297,15 @@ public class JoinTest {
         );
     }
 
+    /**
+     * A test for verifying that no targets are generated for queries with a simple join.
+     */
+    @ParameterizedTest
+    @CsvSource({"SELECT * FROM a, b", "SELECT * FROM a, b WHERE a.id > b.id HAVING a.length > 50"})
+    public void testJoinNoOnConditionSimpleJoin(String query) {
+        verify(
+                query
+        );
+    }
+
 }
