@@ -83,12 +83,12 @@ public class AggregatorTest {
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1",
                 // generated per column used in an aggregator
-                    // for Length (used in SUM)
+                // for Length (used in SUM)
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
                         + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
                         + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1",
-                    // for Score (used in AVG)
+                // for Score (used in AVG)
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
                         + "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
@@ -187,7 +187,7 @@ public class AggregatorTest {
         verify("SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                 + "GROUP BY Director HAVING Director LIKE 'A%'",
 
-                // Copy Of Original Clause
+            // Copy Of Original Clause
             "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                     + "GROUP BY Director HAVING Director LIKE 'A%'",
                 //  WHERE
