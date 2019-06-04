@@ -460,7 +460,16 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
 
     @Override
     public void visit(LateralSubSelect lateralSubSelect) {
-        // TODO
+
+        LateralSubSelect copy = new LateralSubSelect();
+        copy.setAlias(lateralSubSelect.getAlias());
+
+        lateralSubSelect.setPivot(lateralSubSelect.getPivot());
+
+        lateralSubSelect.getSubSelect().accept(this);
+        copy.setSubSelect((SubSelect) this.fromItem);
+
+        this.fromItem = copy;
     }
 
     @Override
