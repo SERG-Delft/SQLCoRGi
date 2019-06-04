@@ -1,56 +1,62 @@
-package nl.tudelft.st01;
+package nl.tudelft.st01.visitors.select;
 
-import net.sf.jsqlparser.expression.BinaryExpression;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.NotExpression;
-import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
-import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
-import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
-import net.sf.jsqlparser.expression.operators.relational.MinorThan;
-import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
-import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.InExpression;
-import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
-import net.sf.jsqlparser.expression.operators.relational.Between;
+import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
+import nl.tudelft.st01.query.NumericDoubleValue;
+import nl.tudelft.st01.query.NumericLongValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Custom visitor for expressions, such as WHERE clauses in SELECT statements.
+ * A visitor for select expressions, i.e. {@code WHERE} and {@code HAVING} clauses in {@code SELECT} statements.
  */
-public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
+public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
     private List<Expression> output;
 
     /**
-     * Generates modified conditions from a simple comparison.
-     * @param comparisonOperator the comparison operator to generate the conditions from.
+     * Creates a new visitor which can be used to generate mutations of select operators. Any rules that are
+     * generated will be written to {@code output}.
+     *
+     * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
      */
-    private void generateSimpleComparison(ComparisonOperator comparisonOperator) {
+    public SelectExpressionVisitor(List<Expression> output) {
+        if (output == null || !output.isEmpty()) {
+            throw new IllegalArgumentException(
+                "A SelectExpressionVisitor requires an empty, non-null set to which it can write generated expressions."
+            );
+        }
 
-        RuleGeneratorValueVisitor valueVisitor = new RuleGeneratorValueVisitor();
+        this.output = output;
+    }
+
+    /**
+     * Generates mutations for relational operators.
+     *
+     * @param comparisonOperator the relational operator to be mutated.
+     */
+    private void generateRelationalMutations(ComparisonOperator comparisonOperator) {
+
         ArrayList<Expression> cases = new ArrayList<>();
-        valueVisitor.setColumn((Column) comparisonOperator.getLeftExpression());
-        valueVisitor.setOutput(cases);
+        Column column = (Column) comparisonOperator.getLeftExpression();
+        SelectValueVisitor valueVisitor = new SelectValueVisitor(column, cases);
+
         comparisonOperator.getRightExpression().accept(valueVisitor);
 
         output.addAll(cases);
     }
 
     /**
-     * Generates subexpressions and their combinations for {@link OrExpression}s and {@link AndExpression}d.
+     * Generates mutations for conditions containing {@link OrExpression}s and {@link AndExpression}s.
+     *
      * @param expression an {@link OrExpression} or {@link AndExpression}.
      */
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    private void generateSubExpressions(BinaryExpression expression) {
+    private void generateCompoundMutations(BinaryExpression expression) {
 
         Expression left = expression.getLeftExpression();
         Expression right = expression.getRightExpression();
@@ -82,39 +88,31 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         for (Expression decisionExpression : rightOut) {
             this.output.add(new AndExpression(neutralExpression, new Parenthesis(decisionExpression)));
         }
-
-        /* TODO: Use strings to create new objects instead of doing this manually, which is prone to errors
-            and requires consistency and invariants (here: don't ever change (parts of) the original expression). */
-        /*try {
-            System.out.println(CCJSqlParserUtil.parseCondExpression("a2 = 30"));
-        } catch (JSQLParserException e) {
-            e.printStackTrace();
-        }*/
     }
 
     @Override
     public void visit(AndExpression andExpression) {
-        generateSubExpressions(andExpression);
+        generateCompoundMutations(andExpression);
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        generateSubExpressions(orExpression);
+        generateCompoundMutations(orExpression);
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        generateSimpleComparison(equalsTo);
+        generateRelationalMutations(equalsTo);
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        generateSimpleComparison(greaterThan);
+        generateRelationalMutations(greaterThan);
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        generateSimpleComparison(greaterThanEquals);
+        generateRelationalMutations(greaterThanEquals);
     }
 
     @Override
@@ -133,17 +131,17 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(MinorThan minorThan) {
-        generateSimpleComparison(minorThan);
+        generateRelationalMutations(minorThan);
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        generateSimpleComparison(minorThanEquals);
+        generateRelationalMutations(minorThanEquals);
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        generateSimpleComparison(notEqualsTo);
+        generateRelationalMutations(notEqualsTo);
     }
 
     /**
@@ -155,15 +153,45 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
 
         output.add(between);
 
+        Expression left = between.getLeftExpression();
+        Expression start = between.getBetweenExpressionStart();
+        Expression end = between.getBetweenExpressionEnd();
+
         Between betweenFlipped = new Between();
-        betweenFlipped.setLeftExpression(between.getLeftExpression());
-        betweenFlipped.setBetweenExpressionStart(between.getBetweenExpressionStart());
-        betweenFlipped.setBetweenExpressionEnd(between.getBetweenExpressionEnd());
+        betweenFlipped.setLeftExpression(left);
+        betweenFlipped.setBetweenExpressionStart(start);
+        betweenFlipped.setBetweenExpressionEnd(end);
         betweenFlipped.setNot(!between.isNot());
         output.add(betweenFlipped);
 
+        EqualsTo leftBoundaryOffTest = generateEqualsTo(left, start);
+        output.add(leftBoundaryOffTest);
+
+        if (start instanceof LongValue) {
+            NumericLongValue longValue = new NumericLongValue(start.toString());
+            EqualsTo leftBoundaryOnTest = generateEqualsTo(left, longValue.add(-1));
+            output.add(leftBoundaryOnTest);
+        } else if (start instanceof DoubleValue) {
+            NumericDoubleValue doubleValue = new NumericDoubleValue(start.toString());
+            EqualsTo leftBoundaryOnTest = generateEqualsTo(left, doubleValue.add(-1));
+            output.add(leftBoundaryOnTest);
+        }
+
+        EqualsTo rightBoundaryOnTest = generateEqualsTo(left, end);
+        output.add(rightBoundaryOnTest);
+
+        if (end instanceof LongValue) {
+            NumericLongValue longValue = new NumericLongValue(end.toString());
+            EqualsTo rightBoundaryOffTest = generateEqualsTo(left, longValue.add(1));
+            output.add(rightBoundaryOffTest);
+        } else if (end instanceof DoubleValue) {
+            NumericDoubleValue doubleValue = new NumericDoubleValue(end.toString());
+            EqualsTo rightBoundaryOffTest = generateEqualsTo(left, doubleValue.add(1));
+            output.add(rightBoundaryOffTest);
+        }
+
         IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(between.getLeftExpression());
+        isNullExpression.setLeftExpression(left);
         output.add(isNullExpression);
     }
 
@@ -213,7 +241,17 @@ public class RuleGeneratorExpressionVisitor extends ExpressionVisitorAdapter {
         output.add(isNullExpressionOut);
     }
 
-    public void setOutput(List<Expression> output) {
-        this.output = output;
+    /**
+     * Generates an `EqualsTo` expression.
+     * @param leftExpression the left side of the expression
+     * @param rightExpression the right side of the expression
+     * @return the generated `EqualsTo` expression.
+     */
+    private EqualsTo generateEqualsTo(Expression leftExpression, Expression rightExpression) {
+        EqualsTo equalsExpression = new EqualsTo();
+        equalsExpression.setLeftExpression(leftExpression);
+        equalsExpression.setRightExpression(rightExpression);
+
+        return equalsExpression;
     }
 }
