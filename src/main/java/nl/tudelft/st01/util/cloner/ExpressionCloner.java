@@ -7,7 +7,6 @@ import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
-import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
@@ -24,13 +23,15 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
     private Expression copy;
     private ItemsList itemsList;
 
+    private OrderByCloner orderByCloner;
     private SelectCloner selectCloner;
 
     /**
      * Creates a new instance of this class, which uses a new {@link SelectCloner} for {@link SubSelect}s.
      */
     private ExpressionCloner() {
-        this.selectCloner = new SelectCloner(this);
+        this.orderByCloner = new OrderByCloner(this);
+        this.selectCloner = new SelectCloner(this, this.orderByCloner);
     }
 
     /**
@@ -704,29 +705,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
         copy.setName(keepExpression.getName());
         copy.setFirst(keepExpression.isFirst());
 
-        List<OrderByElement> orderByElements = keepExpression.getOrderByElements();
-        if (orderByElements != null) {
-
-            List<OrderByElement> orderByElementsCopy = new ArrayList<>(orderByElements.size());
-            for (OrderByElement orderBy : orderByElements) {
-
-                OrderByElement orderByCopy = new OrderByElement();
-
-                orderByCopy.setAsc(orderBy.isAsc());
-                orderByCopy.setAscDescPresent(orderBy.isAscDescPresent());
-                orderByCopy.setNullOrdering(orderBy.getNullOrdering());
-
-                Expression expression = orderBy.getExpression();
-                if (expression != null) {
-                    expression.accept(this);
-                    orderByCopy.setExpression(this.copy);
-                }
-
-                orderByElementsCopy.add(orderByCopy);
-            }
-
-            copy.setOrderByElements(orderByElementsCopy);
-        }
+        copy.setOrderByElements(this.orderByCloner.copy(keepExpression.getOrderByElements()));
 
         this.copy = copy;
     }
@@ -805,7 +784,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
         return this.copy;
     }
 
-    public ItemsList getItemsList() {
+    ItemsList getItemsList() {
         return this.itemsList;
     }
 

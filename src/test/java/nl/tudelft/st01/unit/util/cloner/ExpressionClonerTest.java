@@ -348,7 +348,7 @@ class ExpressionClonerTest {
         OrderByElement orderByElement = new OrderByElement();
         orderByElement.setExpression(new NullValue());
         orderByElements.add(orderByElement);
-        orderByElements.add(new OrderByElement());
+        orderByElements.add(orderByElement);
 
         KeepExpression copy = (KeepExpression) ExpressionCloner.copy(original);
         assertCopyEquals(original, copy);

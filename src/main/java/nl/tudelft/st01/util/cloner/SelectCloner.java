@@ -21,21 +21,27 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
     private FromItem fromItem;
 
     private ExpressionCloner expressionCloner;
+    private OrderByCloner orderByCloner;
 
     /**
-     * Creates a new instance of this class, which uses a new {@link ExpressionCloner} for {@link Expression}s.
+     * Creates a new instance of this class, which uses new cloners itself.
      */
     private SelectCloner() {
+
+        this.orderByCloner = new OrderByCloner(null);
         this.expressionCloner = new ExpressionCloner(this);
+        this.orderByCloner.setExpressionCloner(this.expressionCloner);
     }
 
     /**
-     * Creates a new instance of this class, which uses a new {@link ExpressionCloner} for {@link Expression}s.
+     * Creates a new instance of this class, which uses the provided cloners.
      *
      * @param expressionCloner the {@code ExpressionCloner} to use.
+     * @param orderByCloner the {@code OrderByCloner} to use.
      */
-    SelectCloner(ExpressionCloner expressionCloner) {
+    SelectCloner(ExpressionCloner expressionCloner, OrderByCloner orderByCloner) {
         this.expressionCloner = expressionCloner;
+        this.orderByCloner = orderByCloner;
     }
 
     /**
@@ -396,8 +402,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         // TODO:
         copy.setGroupByElement(plainSelect.getGroupBy());
 
-        // TODO:
-        copy.setOrderByElements(plainSelect.getOrderByElements());
+        copy.setOrderByElements(this.orderByCloner.copy(plainSelect.getOrderByElements()));
 
         Expression having = plainSelect.getHaving();
         if (having != null) {
@@ -458,8 +463,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         copy.setLimit(copyLimit(setOpList.getLimit()));
         copy.setOffset(copyOffset(setOpList.getOffset()));
 
-        // TODO
-        copy.setOrderByElements(null);
+        copy.setOrderByElements(this.orderByCloner.copy(copy.getOrderByElements()));
 
         List<Boolean> brackets = new ArrayList<>(setOpList.getBrackets());
         List<SetOperation> operations = new ArrayList<>(setOpList.getOperations());
