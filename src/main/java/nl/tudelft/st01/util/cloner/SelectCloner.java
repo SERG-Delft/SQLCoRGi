@@ -134,7 +134,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         copy.setVariable(first.getVariable());
         copy.setKeyword(first.getKeyword());
 
-        JdbcParameter jdbcParameter = copy.getJdbcParameter();
+        JdbcParameter jdbcParameter = first.getJdbcParameter();
         if (jdbcParameter != null) {
             jdbcParameter.accept(expressionCloner);
             copy.setJdbcParameter((JdbcParameter) expressionCloner.getCopy());
