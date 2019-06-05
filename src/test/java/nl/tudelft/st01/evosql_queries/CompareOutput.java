@@ -35,7 +35,8 @@ public class CompareOutput {
         Scanner sc = null;
         JSONParser parser = new JSONParser();
         Object object = null;
-        int counter = 0;
+        int wrongCounter = 0;
+        int totalCounter = 0;
 
         for(int i = 0; i <= 2; i++) {
             try {
@@ -54,6 +55,7 @@ public class CompareOutput {
             // nu kunnen we gaan!
 
             while(iterator.hasNext() && sc.hasNextLine()) {
+                totalCounter++;
                 JSONArray queries = (JSONArray) iterator.next().get("pathList");
                 String nextQuery = sc.nextLine();
                 Set<String> ourResults = null;
@@ -61,15 +63,15 @@ public class CompareOutput {
                      ourResults = Generator.generateRules(nextQuery);
                 } catch (Exception e) {
                     System.out.println(nextQuery);
-                    System.out.println("The query on the previous line caused the following exception: " + e.getMessage());
-                    System.out.println("i: " + i);
+                    System.out.println("The query on the previous line caused the following exception: " + e.getMessage() + "\n\n");
+                    continue;
                 }
                 int ourResultSize = ourResults.size();
                 int expectedResultSize = queries.size();
 
                 if (ourResultSize != expectedResultSize) {
-                    counter++;
-                    System.out.println(counter + ") The following query is not yet handled correctly: ");
+                    wrongCounter++;
+                    System.out.println(wrongCounter + ") The following query is not yet handled correctly: ");
                     System.out.println(nextQuery);
                     System.out.printf("Expected %d rules, got %d\n", expectedResultSize, ourResultSize);
                     System.out.println("These queries were expected:");
@@ -79,6 +81,8 @@ public class CompareOutput {
                     System.out.println("\n\n");
                 }
             }
+
+            System.out.println("FINISHED!! we got " + wrongCounter + " errors out of " + totalCounter + " total queries." );
         }
 
 
