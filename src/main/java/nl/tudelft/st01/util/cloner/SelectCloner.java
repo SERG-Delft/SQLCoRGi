@@ -86,7 +86,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         }
 
         Distinct copy = new Distinct(distinct.isUseUnique());
-        copy.setOnSelectItems(distinct.getOnSelectItems());
+        copy.setOnSelectItems(copySelectItems(distinct.getOnSelectItems()));
 
         return copy;
     }
