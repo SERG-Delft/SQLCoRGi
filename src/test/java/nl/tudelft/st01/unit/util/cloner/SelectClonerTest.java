@@ -108,7 +108,7 @@ class SelectClonerTest {
 
         PlainSelect original = new PlainSelect();
 
-        List<Join> joins = new ArrayList<>(3);
+        List<Join> joins = new ArrayList<>();
         original.setJoins(joins);
 
         Join join0 = new Join();
@@ -138,7 +138,7 @@ class SelectClonerTest {
         KSQLJoinWindow joinWindow = new KSQLJoinWindow();
         joinWindow.setBeforeAfterWindow(true);
         joinWindow.setDuration(1);
-        joinWindow.setAfterDuration(10);
+        joinWindow.setAfterDuration(0);
         joinWindow.setBeforeDuration(2);
         joinWindow.setTimeUnit(KSQLJoinWindow.TimeUnit.DAY);
         joinWindow.setAfterTimeUnit(KSQLJoinWindow.TimeUnit.MILLISECOND);
