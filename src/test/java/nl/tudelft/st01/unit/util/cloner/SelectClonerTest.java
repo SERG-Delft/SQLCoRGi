@@ -2,6 +2,7 @@ package nl.tudelft.st01.unit.util.cloner;
 
 import com.google.common.primitives.Booleans;
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
@@ -757,7 +758,26 @@ class SelectClonerTest {
         assertThat(copy.getExpressions().get(1)).isNotSameAs(longValue);
     }
 
-    // TODO: Tests for SelectItems
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link SelectExpressionItem}.
+     */
+    @Test
+    void testCopySelectExpressionItem() {
+
+        SelectExpressionItem original = new SelectExpressionItem();
+
+        Alias alias = new Alias(STRING_ABC, true);
+        original.setAlias(alias);
+
+        NullValue expression = new NullValue();
+        original.setExpression(expression);
+
+        SelectExpressionItem copy = (SelectExpressionItem) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getAlias()).isNotSameAs(alias);
+        assertThat(copy.getExpression()).isNotSameAs(expression);
+    }
 
     // TODO: Tests for FromItems
 
@@ -771,6 +791,20 @@ class SelectClonerTest {
         assertThat(copy)
                 .isNotSameAs(original)
                 .hasSameClassAs(original)
+                .isEqualToComparingFieldByFieldRecursively(original);
+    }
+
+    /**
+     * Tests whether {@code copy} is equivalent to {@code original}.
+     *
+     * @param original the original {@code SelectItem}.
+     * @param copy the copy of the original {@code SelectItem}.
+     */
+    private static void assertCopyEquals(SelectItem original, SelectItem copy) {
+        assertThat(copy)
+                .isNotSameAs(original)
+                .hasSameClassAs(original)
+                .usingComparatorForType((a, b) -> 0, SimpleNode.class)
                 .isEqualToComparingFieldByFieldRecursively(original);
     }
 

@@ -47,7 +47,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
     /**
      * Creates a deep copy of a {@link SelectBody}.
      *
-     * @param selectBody the select body that needs to be copied.
+     * @param selectBody the {@code selectBody} that needs to be copied.
      * @return a copy of {@code selectBody}.
      */
     public static SelectBody copy(SelectBody selectBody) {
@@ -56,6 +56,20 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         selectBody.accept(selectCloner);
 
         return selectCloner.copy;
+    }
+
+    /**
+     * Creates a deep copy of a {@link SelectItem}.
+     *
+     * @param selectItem the {@code selectItem} that needs to be copied.
+     * @return a copy of {@code selectItem}.
+     */
+    public static SelectItem copy(SelectItem selectItem) {
+
+        SelectCloner selectCloner = new SelectCloner();
+        selectItem.accept(selectCloner);
+
+        return selectCloner.selectItem;
     }
 
     /**
