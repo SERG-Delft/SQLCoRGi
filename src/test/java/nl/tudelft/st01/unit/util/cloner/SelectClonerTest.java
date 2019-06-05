@@ -269,6 +269,26 @@ class SelectClonerTest {
 
     /**
      * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code limit} field.
+     */
+    @Test
+    void testCopyPlainSelectLimitNullExpr() {
+
+        PlainSelect original = new PlainSelect();
+
+        Limit limit = new Limit();
+        limit.setLimitNull(false);
+
+        original.setLimit(limit);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getLimit()).isNotSameAs(limit);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
      * {@code offset} field.
      */
     @Test
@@ -374,12 +394,9 @@ class SelectClonerTest {
         PlainSelect original = new PlainSelect();
 
         Fetch fetch = new Fetch();
-        fetch.setRowCount(1);
+        fetch.setRowCount(0);
         fetch.setFetchParam(STRING_ABC);
-        fetch.setFetchParamFirst(true);
-
-        JdbcParameter jdbc = new JdbcParameter(1, true);
-        fetch.setFetchJdbcParameter(jdbc);
+        fetch.setFetchParamFirst(false);
 
         original.setFetch(fetch);
 
@@ -387,7 +404,6 @@ class SelectClonerTest {
         assertCopyEquals(original, copy);
 
         assertThat(copy.getFetch()).isNotSameAs(fetch);
-        assertThat(copy.getFetch().getFetchJdbcParameter()).isNotSameAs(jdbc);
     }
 
     /**
