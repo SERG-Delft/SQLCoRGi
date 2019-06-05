@@ -450,7 +450,19 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
 
     @Override
     public void visit(SetOperationList setOpList) {
-        throw new UnsupportedOperationException();
+
+        SetOperationList copy = new SetOperationList();
+        copy.setFetch(copyFetch(setOpList.getFetch()));
+        copy.setLimit(copyLimit(setOpList.getLimit()));
+        copy.setOffset(copyOffset(setOpList.getOffset()));
+
+        // TODO
+        copy.setOrderByElements(null);
+
+        // TODO
+        copy.setBracketsOpsAndSelects(null, null, null);
+
+        this.copy = copy;
     }
 
     @Override
