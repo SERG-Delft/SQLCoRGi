@@ -1,8 +1,6 @@
 package nl.tudelft.st01.unit.util.cloner;
 
-import net.sf.jsqlparser.expression.JdbcNamedParameter;
-import net.sf.jsqlparser.expression.JdbcParameter;
-import net.sf.jsqlparser.expression.NullValue;
+import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
@@ -545,6 +543,98 @@ class SelectClonerTest {
         assertCopyEquals(original, copy);
 
         assertThat(copy.getTop()).isNotSameAs(top);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code oracleHierarchical} field.
+     */
+    @Test
+    void testCopyPlainSelectOracleHierarchical() {
+
+        PlainSelect original = new PlainSelect();
+
+        OracleHierarchicalExpression oracleHierarchical = new OracleHierarchicalExpression();
+        oracleHierarchical.setNoCycle(true);
+        oracleHierarchical.setConnectFirst(true);
+
+        NullValue startExpression = new NullValue();
+        oracleHierarchical.setStartExpression(startExpression);
+
+        NullValue connectExpression = new NullValue();
+        oracleHierarchical.setConnectExpression(connectExpression);
+
+        original.setOracleHierarchical(oracleHierarchical);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getOracleHierarchical()).isNotSameAs(oracleHierarchical);
+        assertThat(copy.getOracleHierarchical().getStartExpression()).isNotSameAs(startExpression);
+        assertThat(copy.getOracleHierarchical().getConnectExpression()).isNotSameAs(connectExpression);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code oracleHint} field.
+     */
+    @Test
+    void testCopyPlainSelectOracleHint() {
+
+        PlainSelect original = new PlainSelect();
+
+        OracleHint oracleHint = new OracleHint();
+        oracleHint.setValue(STRING_ABC);
+        oracleHint.setSingleLine(true);
+        oracleHint.setComment(STRING_ABC);
+
+        original.setOracleHint(oracleHint);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getOracleHint()).isNotSameAs(oracleHint);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code wait} field.
+     */
+    @Test
+    void testCopyPlainSelectWait() {
+
+        PlainSelect original = new PlainSelect();
+
+        Wait wait = new Wait();
+        wait.setTimeout(1);
+
+        original.setWait(wait);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getWait()).isNotSameAs(wait);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Checks all
+     * simple fields.
+     */
+    @Test
+    void testCopyPlainSelect() {
+
+        PlainSelect original = new PlainSelect();
+
+        original.setOracleSiblings(true);
+        original.setForUpdate(true);
+        original.setForUpdateTable(new Table());
+        original.setUseBrackets(true);
+        original.setMySqlSqlCalcFoundRows(true);
+        original.setMySqlSqlNoCache(true);
+        original.setForXmlPath(STRING_ABC);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
     }
 
     /**
