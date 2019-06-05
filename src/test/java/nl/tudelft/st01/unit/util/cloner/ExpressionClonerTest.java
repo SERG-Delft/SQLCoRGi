@@ -9,7 +9,9 @@ import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.select.OrderByElement;
+import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SubSelect;
+import net.sf.jsqlparser.statement.select.WithItem;
 import nl.tudelft.st01.util.cloner.ExpressionCloner;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -385,6 +388,34 @@ class ExpressionClonerTest {
         assertCopyEquals(original, copy);
 
         assertThat(copy.getExpression()).isNotSameAs(longValue);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link SubSelect}s.
+     */
+    @Test
+    void testCopySubSelect() {
+
+        SubSelect original = new SubSelect();
+
+        Alias alias = new Alias(STRING_ABC, true);
+        original.setAlias(alias);
+
+        PlainSelect plainSelect = new PlainSelect();
+        original.setSelectBody(plainSelect);
+
+        List<WithItem> withItems = new ArrayList<>();
+        WithItem withItem = new WithItem();
+        withItem.setSelectBody(new PlainSelect());
+        withItems.add(withItem);
+        original.setWithItemsList(withItems);
+
+        SubSelect copy = (SubSelect) ExpressionCloner.copy((Expression) original);
+        assertCopyEquals((Expression) original, copy);
+
+        assertThat(copy.getAlias()).isNotSameAs(alias);
+        assertThat(copy.getSelectBody()).isNotSameAs(plainSelect);
+        assertThat(copy.getWithItemsList().get(0)).isNotSameAs(withItem);
     }
 
     /**

@@ -9,6 +9,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.SubSelect;
+import net.sf.jsqlparser.statement.select.WithItem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -414,14 +415,26 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
 
         SubSelect copy = new SubSelect();
         copy.setUseBrackets(subSelect.isUseBrackets());
-        copy.setWithItemsList(subSelect.getWithItemsList());
         copy.setPivot(subSelect.getPivot());
+
+        List<WithItem> withItemsList = subSelect.getWithItemsList();
+        if (withItemsList != null) {
+
+            ArrayList<WithItem> withItemsCopy = new ArrayList<>(withItemsList.size());
+            for (WithItem withItem : withItemsList) {
+
+                withItem.accept(this.selectCloner);
+                withItemsCopy.add((WithItem) this.selectCloner.getCopy());
+            }
+
+            copy.setWithItemsList(withItemsCopy);
+        }
 
         Alias alias = subSelect.getAlias();
         if (alias != null) {
             copy.setAlias(new Alias(alias.getName(), alias.isUseAs()));
         }
-        // TODO: test
+
         SelectBody selectBody = subSelect.getSelectBody();
         if (selectBody != null) {
             selectBody.accept(selectCloner);
