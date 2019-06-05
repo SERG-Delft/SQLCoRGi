@@ -160,6 +160,84 @@ class SelectClonerTest {
     }
 
     /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code where} field.
+     */
+    @Test
+    void testCopyPlainSelectWhere() {
+
+        PlainSelect original = new PlainSelect();
+
+        NullValue where = new NullValue();
+        original.setWhere(where);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getWhere()).isNotSameAs(where);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code groupBy} field.
+     */
+    @Test
+    void testCopyPlainSelectGroupBy() {
+
+        PlainSelect original = new PlainSelect();
+
+        // TODO: group by
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code orderBy} field.
+     */
+    @Test
+    void testCopyPlainSelectOrderBy() {
+
+        PlainSelect original = new PlainSelect();
+
+        List<OrderByElement> orderByElements = new ArrayList<>();
+        original.setOrderByElements(orderByElements);
+
+        OrderByElement orderBy = new OrderByElement();
+        NullValue expression = new NullValue();
+        orderBy.setExpression(expression);
+        orderBy.setNullOrdering(OrderByElement.NullOrdering.NULLS_FIRST);
+        orderBy.setAscDescPresent(true);
+
+        orderByElements.add(orderBy);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getOrderByElements().get(0)).isNotSameAs(orderBy);
+        assertThat(copy.getOrderByElements().get(0).getExpression()).isNotSameAs(expression);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code having} field.
+     */
+    @Test
+    void testCopyPlainSelectHaving() {
+
+        PlainSelect original = new PlainSelect();
+
+        NullValue having = new NullValue();
+        original.setHaving(having);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getHaving()).isNotSameAs(having);
+    }
+
+    /**
      * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link SetOperationList}.
      */
     @Test
