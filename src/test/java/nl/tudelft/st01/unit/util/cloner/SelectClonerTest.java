@@ -454,6 +454,100 @@ class SelectClonerTest {
     }
 
     /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code first} field.
+     */
+    @Test
+    void testCopyPlainSelectFirstJdbcParam() {
+
+        PlainSelect original = new PlainSelect();
+
+        First first = new First();
+        first.setKeyword(First.Keyword.FIRST);
+        first.setRowCount(1L);
+        first.setVariable(STRING_ABC);
+
+        JdbcParameter jdbcParameter = new JdbcParameter();
+        first.setJdbcParameter(jdbcParameter);
+
+        original.setFirst(first);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getFirst()).isNotSameAs(first);
+        assertThat(copy.getFirst().getJdbcParameter()).isNotSameAs(jdbcParameter);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code first} field.
+     */
+    @Test
+    void testCopyPlainSelectFirstNullJdbcParam() {
+
+        PlainSelect original = new PlainSelect();
+
+        First first = new First();
+        first.setKeyword(First.Keyword.FIRST);
+        first.setRowCount(1L);
+        first.setVariable(STRING_ABC);
+
+        original.setFirst(first);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getFirst()).isNotSameAs(first);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code top} field.
+     */
+    @Test
+    void testCopyPlainSelectTop() {
+
+        PlainSelect original = new PlainSelect();
+
+        Top top = new Top();
+        top.setPercentage(true);
+        top.setParenthesis(true);
+
+        NullValue expression = new NullValue();
+        top.setExpression(expression);
+
+        original.setTop(top);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getTop()).isNotSameAs(top);
+        assertThat(copy.getTop().getExpression()).isNotSameAs(expression);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code top} field.
+     */
+    @Test
+    void testCopyPlainSelectTopNullExpr() {
+
+        PlainSelect original = new PlainSelect();
+
+        Top top = new Top();
+        top.setPercentage(true);
+        top.setParenthesis(true);
+
+        original.setTop(top);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getTop()).isNotSameAs(top);
+    }
+
+    /**
      * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link SetOperationList}.
      */
     @Test
