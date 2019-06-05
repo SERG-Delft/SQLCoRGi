@@ -151,10 +151,6 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
      */
     private Join copyJoin(Join join) {
 
-        if (join == null) {
-            return null;
-        }
-
         Join copy = new Join();
         copy.setOuter(join.isOuter());
         copy.setRight(join.isRight());
@@ -176,12 +172,16 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         }
 
         List<Column> usingColumns = join.getUsingColumns();
-        List<Column> usingColumnsCopy = new ArrayList<>(usingColumns.size());
-        for (Column column : usingColumns) {
-            column.accept(this.expressionCloner);
-            usingColumnsCopy.add((Column) this.expressionCloner.getCopy());
+        if (usingColumns != null) {
+
+            List<Column> usingColumnsCopy = new ArrayList<>(usingColumns.size());
+            for (Column column : usingColumns) {
+
+                column.accept(this.expressionCloner);
+                usingColumnsCopy.add((Column) this.expressionCloner.getCopy());
+            }
+            copy.setUsingColumns(usingColumnsCopy);
         }
-        copy.setUsingColumns(usingColumnsCopy);
 
         KSQLJoinWindow joinWindow = join.getJoinWindow();
         if (joinWindow != null) {
@@ -390,7 +390,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
             for (Join join : joins) {
                 joinsCopy.add(copyJoin(join));
             }
-            copy.setJoins(joins);
+            copy.setJoins(joinsCopy);
         }
 
         Expression where = plainSelect.getWhere();
