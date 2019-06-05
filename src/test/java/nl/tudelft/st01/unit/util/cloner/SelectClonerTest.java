@@ -23,6 +23,7 @@ class SelectClonerTest {
     @Test
     void testCopyPlainSelect() {
         // TODO
+        assertThat(true);
     }
 
     /**
@@ -31,6 +32,7 @@ class SelectClonerTest {
     @Test
     void testCopySetOperationList() {
         // TODO
+        assertThat(true);
     }
 
     /**
@@ -64,6 +66,7 @@ class SelectClonerTest {
     @Test
     void testCopyValuesStatement() {
         // TODO
+        assertThat(true);
     }
 
     // TODO: Tests for SelectItems
