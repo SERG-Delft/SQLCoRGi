@@ -1,5 +1,6 @@
 package nl.tudelft.st01.unit.util.cloner;
 
+import com.google.common.primitives.Booleans;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -9,6 +10,7 @@ import nl.tudelft.st01.util.cloner.SelectCloner;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -658,8 +660,52 @@ class SelectClonerTest {
      */
     @Test
     void testCopySetOperationList() {
-        // TODO
-        assertThat(true);
+
+        SetOperationList original = new SetOperationList();
+
+        Fetch fetch = new Fetch();
+        original.setFetch(fetch);
+
+        Limit limit = new Limit();
+        original.setLimit(limit);
+
+        Offset offset = new Offset();
+        original.setOffset(offset);
+
+        List<OrderByElement> orderByElements = new ArrayList<>();
+        original.setOrderByElements(orderByElements);
+
+        OrderByElement orderBy = new OrderByElement();
+        NullValue expression = new NullValue();
+        orderBy.setExpression(expression);
+        orderByElements.add(orderBy);
+
+        PlainSelect plainSelect = new PlainSelect();
+
+        UnionOp unionOp = new UnionOp();
+        unionOp.setAll(true);
+        unionOp.setDistinct(true);
+
+        List<Boolean> brackets = Booleans.asList(Boolean.TRUE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE);
+        List<SelectBody> select =
+                Arrays.asList(plainSelect, new PlainSelect(), new PlainSelect(), new PlainSelect(), new PlainSelect());
+        List<SetOperation> operations = Arrays.asList(unionOp, new MinusOp(), new IntersectOp(), new ExceptOp());
+
+        original.setBracketsOpsAndSelects(brackets, select, operations);
+
+        SetOperationList copy = (SetOperationList) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getFetch()).isNotSameAs(fetch);
+        assertThat(copy.getLimit()).isNotSameAs(limit);
+        assertThat(copy.getOffset()).isNotSameAs(offset);
+
+        assertThat(copy.getOrderByElements().get(0)).isNotSameAs(orderBy);
+        assertThat(copy.getOrderByElements().get(0).getExpression()).isNotSameAs(expression);
+
+        assertThat(copy.getBrackets().get(0)).isSameAs(Boolean.TRUE);
+        assertThat(copy.getSelects().get(0)).isNotSameAs(plainSelect);
+        assertThat(copy.getOperations().get(0)).isNotSameAs(unionOp);
     }
 
     /**

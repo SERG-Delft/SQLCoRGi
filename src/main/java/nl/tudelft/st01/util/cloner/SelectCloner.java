@@ -501,7 +501,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         copy.setLimit(copyLimit(setOpList.getLimit()));
         copy.setOffset(copyOffset(setOpList.getOffset()));
 
-        copy.setOrderByElements(this.orderByCloner.copy(copy.getOrderByElements()));
+        copy.setOrderByElements(this.orderByCloner.copy(setOpList.getOrderByElements()));
 
         List<Boolean> brackets = new ArrayList<>(setOpList.getBrackets());
 
