@@ -341,6 +341,119 @@ class SelectClonerTest {
     }
 
     /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code fetch} field.
+     */
+    @Test
+    void testCopyPlainSelectFetchJdbcParam() {
+
+        PlainSelect original = new PlainSelect();
+
+        Fetch fetch = new Fetch();
+        fetch.setRowCount(1);
+        fetch.setFetchParam(STRING_ABC);
+        fetch.setFetchParamFirst(true);
+
+        JdbcParameter jdbc = new JdbcParameter(1, true);
+        fetch.setFetchJdbcParameter(jdbc);
+
+        original.setFetch(fetch);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getFetch()).isNotSameAs(fetch);
+        assertThat(copy.getFetch().getFetchJdbcParameter()).isNotSameAs(jdbc);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code fetch} field.
+     */
+    @Test
+    void testCopyPlainSelectFetchNullJdbcParam() {
+
+        PlainSelect original = new PlainSelect();
+
+        Fetch fetch = new Fetch();
+        fetch.setRowCount(1);
+        fetch.setFetchParam(STRING_ABC);
+        fetch.setFetchParamFirst(true);
+
+        JdbcParameter jdbc = new JdbcParameter(1, true);
+        fetch.setFetchJdbcParameter(jdbc);
+
+        original.setFetch(fetch);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getFetch()).isNotSameAs(fetch);
+        assertThat(copy.getFetch().getFetchJdbcParameter()).isNotSameAs(jdbc);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code optimizeFor} field.
+     */
+    @Test
+    void testCopyPlainSelectOptimizeFor() {
+
+        PlainSelect original = new PlainSelect();
+
+        OptimizeFor optimizeFor = new OptimizeFor(1);
+        original.setOptimizeFor(optimizeFor);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getOptimizeFor()).isNotSameAs(optimizeFor);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code skip} field.
+     */
+    @Test
+    void testCopyPlainSelectSkipJdbcParam() {
+
+        PlainSelect original = new PlainSelect();
+
+        Skip skip = new Skip();
+        skip.setRowCount(1L);
+        skip.setVariable(STRING_ABC);
+
+        JdbcParameter jdbcParameter = new JdbcParameter();
+        skip.setJdbcParameter(jdbcParameter);
+
+        original.setSkip(skip);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getSkip()).isNotSameAs(skip);
+        assertThat(copy.getSkip().getJdbcParameter()).isNotSameAs(jdbcParameter);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code skip} field.
+     */
+    @Test
+    void testCopyPlainSelectSkipNullJdbcParam() {
+
+        PlainSelect original = new PlainSelect();
+
+        Skip skip = new Skip();
+        original.setSkip(skip);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getSkip()).isNotSameAs(skip);
+    }
+
+    /**
      * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link SetOperationList}.
      */
     @Test
