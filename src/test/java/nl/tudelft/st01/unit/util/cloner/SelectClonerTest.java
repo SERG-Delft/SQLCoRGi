@@ -669,6 +669,7 @@ class SelectClonerTest {
     void testCopyWithItem() {
 
         WithItem original = new WithItem();
+        original.setRecursive(true);
 
         PlainSelect selectBody = new PlainSelect();
         original.setSelectBody(selectBody);
@@ -692,8 +693,22 @@ class SelectClonerTest {
      */
     @Test
     void testCopyValuesStatement() {
-        // TODO
-        assertThat(true);
+
+        ArrayList<Expression> expressions = new ArrayList<>();
+
+        NullValue nullValue = new NullValue();
+        expressions.add(nullValue);
+
+        LongValue longValue = new LongValue(1);
+        expressions.add(longValue);
+
+        ValuesStatement original = new ValuesStatement(expressions);
+
+        ValuesStatement copy = (ValuesStatement) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getExpressions().get(0)).isNotSameAs(nullValue);
+        assertThat(copy.getExpressions().get(1)).isNotSameAs(longValue);
     }
 
     // TODO: Tests for SelectItems
