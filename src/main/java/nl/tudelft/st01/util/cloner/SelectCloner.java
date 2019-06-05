@@ -252,7 +252,14 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         Expression offsetJdbcParameter = offset.getOffsetJdbcParameter();
         if (offsetJdbcParameter != null) {
             offsetJdbcParameter.accept(expressionCloner);
-            copy.setOffsetJdbcParameter((JdbcParameter) expressionCloner.getCopy());
+
+            Expression jdbcCopy = expressionCloner.getCopy();
+            if (jdbcCopy instanceof JdbcParameter) {
+                copy.setOffsetJdbcParameter((JdbcParameter) jdbcCopy);
+            }
+            else {
+                copy.setOffsetJdbcParameter((JdbcNamedParameter) jdbcCopy);
+            }
         }
 
         return copy;

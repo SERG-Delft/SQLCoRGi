@@ -1,5 +1,7 @@
 package nl.tudelft.st01.unit.util.cloner;
 
+import net.sf.jsqlparser.expression.JdbcNamedParameter;
+import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -19,6 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 // Justification: Some objects have multiple object fields, which we want to verify are copied as well.
 @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 class SelectClonerTest {
+
+    private static final String STRING_ABC = "abc";
 
     /**
      * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
@@ -235,6 +239,105 @@ class SelectClonerTest {
         assertCopyEquals(original, copy);
 
         assertThat(copy.getHaving()).isNotSameAs(having);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code limit} field.
+     */
+    @Test
+    void testCopyPlainSelectLimit() {
+
+        PlainSelect original = new PlainSelect();
+
+        Limit limit = new Limit();
+        limit.setLimitNull(true);
+
+        NullValue rowCount = new NullValue();
+        limit.setRowCount(rowCount);
+
+        NullValue offset = new NullValue();
+        limit.setOffset(offset);
+
+        original.setLimit(limit);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getLimit()).isNotSameAs(limit);
+        assertThat(copy.getLimit().getRowCount()).isNotSameAs(rowCount);
+        assertThat(copy.getLimit().getOffset()).isNotSameAs(offset);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code offset} field.
+     */
+    @Test
+    void testCopyPlainSelectOffsetJdbcParam() {
+
+        PlainSelect original = new PlainSelect();
+
+        Offset offset = new Offset();
+        offset.setOffset(1);
+        offset.setOffsetParam(STRING_ABC);
+
+        JdbcParameter jdbc = new JdbcParameter(1, true);
+        offset.setOffsetJdbcParameter(jdbc);
+
+        original.setOffset(offset);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getOffset()).isNotSameAs(offset);
+        assertThat(copy.getOffset().getOffsetJdbcParameter()).isNotSameAs(jdbc);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code offset} field.
+     */
+    @Test
+    void testCopyPlainSelectOffsetJdbcNamedParam() {
+
+        PlainSelect original = new PlainSelect();
+
+        Offset offset = new Offset();
+        offset.setOffset(1);
+        offset.setOffsetParam(STRING_ABC);
+
+        JdbcNamedParameter jdbc = new JdbcNamedParameter(STRING_ABC);
+        offset.setOffsetJdbcParameter(jdbc);
+
+        original.setOffset(offset);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getOffset()).isNotSameAs(offset);
+        assertThat(copy.getOffset().getOffsetJdbcParameter()).isNotSameAs(jdbc);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link PlainSelect}. Focuses on its
+     * {@code offset} field.
+     */
+    @Test
+    void testCopyPlainSelectOffsetNullJdbcParam() {
+
+        PlainSelect original = new PlainSelect();
+
+        Offset offset = new Offset();
+        offset.setOffset(1);
+        offset.setOffsetParam(STRING_ABC);
+
+        original.setOffset(offset);
+
+        PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getOffset()).isNotSameAs(offset);
     }
 
     /**
