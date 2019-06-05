@@ -2,6 +2,7 @@ package nl.tudelft.st01.util.cloner;
 
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.values.ValuesStatement;
@@ -131,6 +132,62 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         if (jdbcParameter != null) {
             jdbcParameter.accept(expressionCloner);
             copy.setJdbcParameter((JdbcParameter) expressionCloner.getCopy());
+        }
+
+        return copy;
+    }
+
+    /**
+     * Creates a copy of the given {@link Join}.
+     *
+     * @param join the {@code Join} that needs to be copied.
+     * @return a clone of {@code join}.
+     */
+    private Join copyJoin(Join join) {
+
+        if (join == null) {
+            return null;
+        }
+
+        Join copy = new Join();
+        copy.setOuter(join.isOuter());
+        copy.setRight(join.isRight());
+        copy.setLeft(join.isLeft());
+        copy.setNatural(join.isNatural());
+        copy.setFull(join.isFull());
+        copy.setInner(join.isInner());
+        copy.setSimple(join.isSimple());
+        copy.setCross(join.isCross());
+        copy.setSemi(join.isSemi());
+
+        join.getRightItem().accept(this);
+        copy.setRightItem(this.fromItem);
+
+        Expression onExpression = join.getOnExpression();
+        if (onExpression != null) {
+            onExpression.accept(this.expressionCloner);
+            copy.setOnExpression(this.expressionCloner.getCopy());
+        }
+
+        List<Column> usingColumns = join.getUsingColumns();
+        List<Column> usingColumnsCopy = new ArrayList<>(usingColumns.size());
+        for (Column column : usingColumns) {
+            column.accept(this.expressionCloner);
+            usingColumnsCopy.add((Column) this.expressionCloner.getCopy());
+        }
+        copy.setUsingColumns(usingColumnsCopy);
+
+        KSQLJoinWindow joinWindow = join.getJoinWindow();
+        if (joinWindow != null) {
+
+            KSQLJoinWindow joinWindowCopy = new KSQLJoinWindow();
+            joinWindowCopy.setAfterDuration(joinWindow.getAfterDuration());
+            joinWindowCopy.setAfterTimeUnit(joinWindow.getAfterTimeUnit());
+            joinWindowCopy.setBeforeAfterWindow(joinWindow.isBeforeAfterWindow());
+            joinWindowCopy.setBeforeDuration(joinWindow.getBeforeDuration());
+            joinWindowCopy.setBeforeTimeUnit(joinWindow.getBeforeTimeUnit());
+            joinWindowCopy.setDuration(joinWindow.getDuration());
+            joinWindowCopy.setTimeUnit(joinWindow.getTimeUnit());
         }
 
         return copy;
@@ -318,8 +375,15 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
             copy.setFromItem(this.fromItem);
         }
 
-        // TODO:
-        copy.setJoins(plainSelect.getJoins());
+        List<Join> joins = plainSelect.getJoins();
+        if (joins != null) {
+
+            List<Join> joinsCopy = new ArrayList<>(joins.size());
+            for (Join join : joins) {
+                joinsCopy.add(copyJoin(join));
+            }
+            copy.setJoins(joins);
+        }
 
         Expression where = plainSelect.getWhere();
         if (where != null) {
@@ -455,7 +519,22 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
 
     @Override
     public void visit(SubJoin subjoin) {
-        // TODO
+
+        SubJoin copy = new SubJoin();
+        copy.setAlias(copyAlias(subjoin.getAlias()));
+        copy.setPivot(subjoin.getPivot());
+
+        subjoin.getLeft().accept(this);
+        copy.setLeft(this.fromItem);
+
+        ArrayList<Join> joinListCopy = new ArrayList<>();
+        for (Join join : subjoin.getJoinList()) {
+            joinListCopy.add(copyJoin(join));
+        }
+
+        copy.setJoinList(joinListCopy);
+
+        this.fromItem = subjoin;
     }
 
     @Override
