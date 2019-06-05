@@ -188,6 +188,8 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
             joinWindowCopy.setBeforeTimeUnit(joinWindow.getBeforeTimeUnit());
             joinWindowCopy.setDuration(joinWindow.getDuration());
             joinWindowCopy.setTimeUnit(joinWindow.getTimeUnit());
+
+            copy.setJoinWindow(joinWindowCopy);
         }
 
         return copy;
