@@ -459,8 +459,19 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         // TODO
         copy.setOrderByElements(null);
 
-        // TODO
-        copy.setBracketsOpsAndSelects(null, null, null);
+        List<Boolean> brackets = new ArrayList<>(setOpList.getBrackets());
+        List<SetOperation> operations = new ArrayList<>(setOpList.getOperations());
+
+        List<SelectBody> selects = setOpList.getSelects();
+        List<SelectBody> selectsCopy = new ArrayList<>(selects.size());
+        for (SelectBody selectBody : selects) {
+
+            selectBody.accept(this);
+            selectsCopy.add(this.copy);
+        }
+
+
+        copy.setBracketsOpsAndSelects(brackets, selectsCopy, operations);
 
         this.copy = copy;
     }
