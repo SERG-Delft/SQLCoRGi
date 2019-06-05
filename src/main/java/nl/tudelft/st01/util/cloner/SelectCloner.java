@@ -280,6 +280,38 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
     }
 
     /**
+     * Creates a copy of the given list of {@link SetOperation}s.
+     *
+     * @param setOperations the list of {@code SetOperation}s that needs to be copied.
+     * @return a clone of {@code setOperations}.
+     */
+    private List<SetOperation> copySetOperations(List<SetOperation> setOperations) {
+
+        List<SetOperation> copy = new ArrayList<>(setOperations.size());
+
+        for (SetOperation setOperation : setOperations) {
+
+            if (setOperation instanceof ExceptOp) {
+                copy.add(new ExceptOp());
+            } else if (setOperation instanceof IntersectOp) {
+                copy.add(new IntersectOp());
+            } else if (setOperation instanceof MinusOp) {
+                copy.add(new MinusOp());
+            } else {
+                UnionOp unionOp = (UnionOp) setOperation;
+
+                UnionOp unionCopy = new UnionOp();
+                unionCopy.setAll(unionOp.isAll());
+                unionCopy.setDistinct(unionOp.isDistinct());
+
+                copy.add(unionCopy);
+            }
+        }
+
+        return copy;
+    }
+
+    /**
      * Creates a copy of the given {@link Skip}.
      *
      * @param skip the {@code Skip} that needs to be copied.
@@ -472,7 +504,6 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         copy.setOrderByElements(this.orderByCloner.copy(copy.getOrderByElements()));
 
         List<Boolean> brackets = new ArrayList<>(setOpList.getBrackets());
-        List<SetOperation> operations = new ArrayList<>(setOpList.getOperations());
 
         List<SelectBody> selects = setOpList.getSelects();
         List<SelectBody> selectsCopy = new ArrayList<>(selects.size());
@@ -482,6 +513,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
             selectsCopy.add(this.copy);
         }
 
+        List<SetOperation> operations = copySetOperations(setOpList.getOperations());
 
         copy.setBracketsOpsAndSelects(brackets, selectsCopy, operations);
 
