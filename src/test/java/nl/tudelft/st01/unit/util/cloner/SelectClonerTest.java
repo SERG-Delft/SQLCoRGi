@@ -824,7 +824,9 @@ class SelectClonerTest {
     void testCopySubJoin() {
 
         SubJoin original = new SubJoin();
-        original.setAlias(new Alias(STRING_ABC, false));
+
+        Alias alias = new Alias(STRING_ABC, false);
+        original.setAlias(alias);
         original.setLeft(new Table());
 
         List<Join> joinList = new ArrayList<>(1);
@@ -837,6 +839,30 @@ class SelectClonerTest {
 
         SubJoin copy = (SubJoin) SelectCloner.copy(original);
         assertCopyEquals(original, copy);
+
+        assertThat(copy.getAlias()).isNotSameAs(alias);
+        assertThat(copy.getJoinList().get(0)).isNotSameAs(join);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(FromItem)} makes a deep copy of a {@link LateralSubSelect}.
+     */
+    @Test
+    void testCopyLateralSubSelect() {
+
+        LateralSubSelect original = new LateralSubSelect();
+
+        Alias alias = new Alias(STRING_ABC, true);
+        original.setAlias(alias);
+
+        SubSelect subSelect = new SubSelect();
+        original.setSubSelect(subSelect);
+
+        LateralSubSelect copy = (LateralSubSelect) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getAlias()).isNotSameAs(alias);
+        assertThat(copy.getSubSelect()).isNotSameAs(subSelect);
     }
 
     /**

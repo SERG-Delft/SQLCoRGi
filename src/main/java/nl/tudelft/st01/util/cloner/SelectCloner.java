@@ -637,9 +637,9 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
     public void visit(LateralSubSelect lateralSubSelect) {
 
         LateralSubSelect copy = new LateralSubSelect();
-        copy.setAlias(lateralSubSelect.getAlias());
+        copy.setAlias(copyAlias(lateralSubSelect.getAlias()));
 
-        lateralSubSelect.setPivot(lateralSubSelect.getPivot());
+        copy.setPivot(lateralSubSelect.getPivot());
 
         lateralSubSelect.getSubSelect().accept(this);
         copy.setSubSelect((SubSelect) this.fromItem);
