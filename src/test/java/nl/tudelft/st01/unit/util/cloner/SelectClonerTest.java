@@ -2,6 +2,7 @@ package nl.tudelft.st01.unit.util.cloner;
 
 import com.google.common.primitives.Booleans;
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
@@ -192,10 +193,31 @@ class SelectClonerTest {
 
         PlainSelect original = new PlainSelect();
 
-        // TODO: group by
+        GroupByElement groupBy = new GroupByElement();
+        original.setGroupByElement(groupBy);
+
+        ArrayList<Expression> groupByExpressions = new ArrayList<>(1);
+        groupBy.setGroupByExpressions(groupByExpressions);
+
+        NullValue nullValue = new NullValue();
+        groupByExpressions.add(nullValue);
+
+        ArrayList<Object> groupingSets = new ArrayList<>(2);
+
+        NullValue groupingExpression = new NullValue();
+        groupingSets.add(groupingExpression);
+
+        ExpressionList expressionList = new ExpressionList();
+        groupingSets.add(expressionList);
+
+        groupBy.setGroupingSets(groupingSets);
 
         PlainSelect copy = (PlainSelect) SelectCloner.copy(original);
         assertCopyEquals(original, copy);
+
+        assertThat(copy.getGroupBy().getGroupByExpressions().get(0)).isNotSameAs(nullValue);
+        assertThat(copy.getGroupBy().getGroupingSets().get(0)).isNotSameAs(groupingExpression);
+        assertThat(copy.getGroupBy().getGroupingSets().get(1)).isNotSameAs(expressionList);
     }
 
     /**
