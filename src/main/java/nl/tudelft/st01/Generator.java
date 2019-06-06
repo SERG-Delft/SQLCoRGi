@@ -63,7 +63,10 @@ public final class Generator {
      * @param args unused.
      */
     public static void main(String[] args) {
-        String query = "SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE b.length IS NOT NULL";
+        String query = "SELECT acl_actions.* ,acl_roles_actions.access_override  FROM acl_actions "
+            + "LEFT JOIN acl_roles_actions ON acl_roles_actions.role_id = '1' AND acl_roles_actions.action_id = "
+            + "acl_actions.id AND acl_roles_actions.deleted ='0' WHERE acl_actions.deleted='0'ORDER BY "
+            + "acl_actions.category, acl_actions.name";
 
         Set<String> result = generateRules(query);
 
