@@ -23,7 +23,7 @@ public final class CompareOutput {
      * Constructor for the class.
      */
     private CompareOutput() {
-
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -38,7 +38,7 @@ public final class CompareOutput {
     @SuppressWarnings({"checkstyle:illegalcatch", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidFileStream"})
     @SuppressFBWarnings(
             value = "DM_DEFAULT_ENCODING",
-            justification = "I can't specify an encoding for FileReader, so this needs to be suppressed")
+            justification = "Encoding for FileReader can be specified, so this needs to be suppressed")
     public static void main(String[] args) {
         String basePath = "C:/Users/Timon Bestebreur/Dropbox/Opleiding/Technische Informatica/Y2/"
             + "Context Project/coverage_generator/src/test/java/nl/tudelft/st01/queries/query_resources/";
@@ -72,8 +72,6 @@ public final class CompareOutput {
 
             JSONArray entries = (JSONArray) jsonObject.get("entries");
             Iterator<JSONObject> iterator = entries.iterator();
-
-            // nu kunnen we gaan!
 
             while (iterator.hasNext() && sc.hasNextLine()) {
                 totalCounter++;
