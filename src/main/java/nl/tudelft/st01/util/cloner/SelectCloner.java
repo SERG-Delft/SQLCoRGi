@@ -622,14 +622,15 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         subjoin.getLeft().accept(this);
         copy.setLeft(this.fromItem);
 
-        ArrayList<Join> joinListCopy = new ArrayList<>();
-        for (Join join : subjoin.getJoinList()) {
+        List<Join> joinList = subjoin.getJoinList();
+        ArrayList<Join> joinListCopy = new ArrayList<>(joinList.size());
+        for (Join join : joinList) {
             joinListCopy.add(copyJoin(join));
         }
 
         copy.setJoinList(joinListCopy);
 
-        this.fromItem = subjoin;
+        this.fromItem = copy;
     }
 
     @Override
