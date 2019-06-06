@@ -69,7 +69,4 @@ class GroupByCloner {
         return copy;
     }
 
-    void setExpressionCloner(ExpressionCloner expressionCloner) {
-        this.expressionCloner = expressionCloner;
-    }
 }
