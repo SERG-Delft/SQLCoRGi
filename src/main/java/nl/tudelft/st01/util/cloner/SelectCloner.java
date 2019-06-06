@@ -73,6 +73,20 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
     }
 
     /**
+     * Creates a deep copy of a {@link FromItem}.
+     *
+     * @param fromItem the {@code FromItem} that needs to be copied.
+     * @return a copy of {@code fromItem}.
+     */
+    public static FromItem copy(FromItem fromItem) {
+
+        SelectCloner selectCloner = new SelectCloner();
+        fromItem.accept(selectCloner);
+
+        return selectCloner.fromItem;
+    }
+
+    /**
      * Creates a copy of the given {@link Alias}.
      *
      * @param alias the {@code Alias} that needs to be copied.
