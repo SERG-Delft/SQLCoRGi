@@ -893,6 +893,46 @@ class SelectClonerTest {
     }
 
     /**
+     * Tests whether {@link SelectCloner#copy(FromItem)} makes a deep copy of a {@link TableFunction}.
+     */
+    @Test
+    void testCopyTableFunction() {
+
+        TableFunction original = new TableFunction();
+
+        Alias alias = new Alias(STRING_ABC, true);
+        original.setAlias(alias);
+
+        Function function = new Function();
+        original.setFunction(function);
+
+        TableFunction copy = (TableFunction) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getAlias()).isNotSameAs(alias);
+        assertThat(copy.getFunction()).isNotSameAs(function);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(FromItem)} makes a deep copy of a {@link ParenthesisFromItem}.
+     */
+    @Test
+    void testCopyParenthesisFromItem() {
+
+        ParenthesisFromItem original = new ParenthesisFromItem();
+
+        Alias alias = new Alias(STRING_ABC, true);
+        original.setAlias(alias);
+
+        original.setFromItem(new Table());
+
+        ParenthesisFromItem copy = (ParenthesisFromItem) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getAlias()).isNotSameAs(alias);
+    }
+
+    /**
      * Tests whether {@code copy} is equivalent to {@code original}.
      *
      * @param original the original {@code SelectBody}.
