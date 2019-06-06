@@ -805,7 +805,17 @@ class SelectClonerTest {
         assertThat(copy.getExpression()).isNotSameAs(expression);
     }
 
-    // TODO: Tests for FromItems
+    /**
+     * Tests whether {@link SelectCloner#copy(FromItem)} makes a deep copy of a {@link SubSelect}.
+     */
+    @Test
+    void testCopySubSelect() {
+
+        FromItem original = new SubSelect();
+
+        FromItem copy = SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
 
     /**
      * Tests whether {@code copy} is equivalent to {@code original}.
