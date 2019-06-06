@@ -18,6 +18,7 @@ import java.util.Set;
  */
 public final class CompareOutput {
     private static final String DOUBLE_NEWLINE = "\n\n";
+    private static final int AMOUNT_OF_QUERY_SETS = 3;
 
     /**
      * Constructor for the class.
@@ -59,7 +60,7 @@ public final class CompareOutput {
         int wrongCounter = 0;
         int totalCounter = 0;
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < AMOUNT_OF_QUERY_SETS; i++) {
             try {
                 sc = new Scanner(new File(input[i]), "UTF-8");
                 object = parser.parse(new FileReader(output[i]));
