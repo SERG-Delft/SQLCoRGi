@@ -59,7 +59,7 @@ public final class CompareOutput {
         int wrongCounter = 0;
         int totalCounter = 0;
 
-        for (int i = 0; i <= 2; i++) {
+        for (int i = 0; i < 3; i++) {
             try {
                 sc = new Scanner(new File(input[i]), "UTF-8");
                 object = parser.parse(new FileReader(output[i]));
@@ -69,15 +69,14 @@ public final class CompareOutput {
             }
 
             JSONObject jsonObject = (JSONObject) object;
-
             JSONArray entries = (JSONArray) jsonObject.get("entries");
             Iterator<JSONObject> iterator = entries.iterator();
 
             while (iterator.hasNext() && sc.hasNextLine()) {
-                totalCounter++;
-                JSONArray queries = (JSONArray) iterator.next().get("pathList");
+                JSONArray expectedQueries = (JSONArray) iterator.next().get("pathList");
                 String nextQuery = sc.nextLine();
                 Set<String> ourResults = null;
+                totalCounter++;
                 try {
                     ourResults = Generator.generateRules(nextQuery);
                 } catch (Exception e) {
@@ -87,18 +86,18 @@ public final class CompareOutput {
                     continue;
                 }
                 int ourResultSize = ourResults.size();
-                int expectedResultSize = queries.size();
+                int expectedResultSize = expectedQueries.size();
 
                 if (ourResultSize != expectedResultSize) {
-                    wrongCounter++;
                     System.out.println(wrongCounter + ") The following query is not yet handled correctly: ");
                     System.out.println(nextQuery);
                     System.out.printf("Expected %d rules, got %d%n", expectedResultSize, ourResultSize);
                     System.out.println("These queries were expected:");
-                    for (Object o : queries) {
-                        System.out.println(o.toString());
+                    for (Object expectedQuery : expectedQueries) {
+                        System.out.println(expectedQuery.toString());
                     }
                     System.out.println(DOUBLE_NEWLINE);
+                    wrongCounter++;
                 }
             }
 
