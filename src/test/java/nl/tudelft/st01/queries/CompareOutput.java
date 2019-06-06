@@ -41,8 +41,7 @@ public final class CompareOutput {
             value = "DM_DEFAULT_ENCODING",
             justification = "Encoding for FileReader can be specified, so this needs to be suppressed")
     public static void main(String[] args) {
-        String basePath = "C:/Users/Timon Bestebreur/Dropbox/Opleiding/Technische Informatica/Y2/"
-            + "Context Project/coverage_generator/src/test/java/nl/tudelft/st01/queries/query_resources/";
+        String basePath = "./src/test/java/nl/tudelft/st01/queries/query_resources/";
 
         String suitecrmInput = "suitecrm_input.txt";
         String suitecrmOutput = "suitecrm_output.json";
