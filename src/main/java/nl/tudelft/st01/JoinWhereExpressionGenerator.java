@@ -16,6 +16,7 @@ import nl.tudelft.st01.visitors.join.OnExpressionVisitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,6 +84,38 @@ public class JoinWhereExpressionGenerator {
         plainSelect.setJoins(joins);
         return result;
     }
+
+    public Set<String> generate(PlainSelect plainSelect) {
+        List<Join> joins = plainSelect.getJoins();
+
+        if (joins == null || joins.isEmpty()) {
+            return new HashSet<>();
+        }
+
+        if (joins.size() == 1) {
+            handleSingleJoin(plainSelect);
+        } else {
+            handleNestedJoins(plainSelect);
+        }
+
+        return null;
+
+    }
+
+    private void handleSingleJoin(PlainSelect plainSelect) {
+    }
+
+    private void handleNestedJoins(PlainSelect plainSelect) {
+        List<Join> joins = plainSelect.getJoins();
+        
+        if (joins == null || joins.size() < 2) {
+            throw new IllegalStateException("There must be two or more joins in the query");
+        }
+
+
+
+    }
+
 
     /**
      * Creates a generic shallow copy of the given join.
