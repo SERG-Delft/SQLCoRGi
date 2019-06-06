@@ -40,8 +40,9 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
      *
      * @param selectCloner the {@code SelectCloner} to use.
      */
-    ExpressionCloner(SelectCloner selectCloner) {
+    ExpressionCloner(SelectCloner selectCloner, OrderByCloner orderByCloner) {
         this.selectCloner = selectCloner;
+        this.orderByCloner = orderByCloner;
     }
 
     /**

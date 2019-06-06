@@ -21,6 +21,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
     private FromItem fromItem;
 
     private ExpressionCloner expressionCloner;
+    private GroupByCloner groupByCloner;
     private OrderByCloner orderByCloner;
 
     /**
@@ -29,8 +30,9 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
     private SelectCloner() {
 
         this.orderByCloner = new OrderByCloner(null);
-        this.expressionCloner = new ExpressionCloner(this);
+        this.expressionCloner = new ExpressionCloner(this, orderByCloner);
         this.orderByCloner.setExpressionCloner(this.expressionCloner);
+        this.groupByCloner = new GroupByCloner(this.expressionCloner);
     }
 
     /**
@@ -41,6 +43,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
      */
     SelectCloner(ExpressionCloner expressionCloner, OrderByCloner orderByCloner) {
         this.expressionCloner = expressionCloner;
+        this.groupByCloner = new GroupByCloner(this.expressionCloner);
         this.orderByCloner = orderByCloner;
     }
 
@@ -465,8 +468,7 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
             copy.setWhere(expressionCloner.getCopy());
         }
 
-        // TODO:
-        copy.setGroupByElement(plainSelect.getGroupBy());
+        copy.setGroupByElement(this.groupByCloner.copy(plainSelect.getGroupBy()));
 
         copy.setOrderByElements(this.orderByCloner.copy(plainSelect.getOrderByElements()));
 
