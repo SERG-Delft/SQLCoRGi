@@ -105,7 +105,8 @@ public final class CompareOutput {
                     + " queries out of " + totalCounter + " correctly!");
         }
 
-        if(sc != null)
+        if (sc != null) {
             sc.close();
+        }
     }
 }
