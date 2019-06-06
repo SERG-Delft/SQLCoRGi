@@ -641,8 +641,11 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
         copy.setIntervalType(intervalExpression.getIntervalType());
         copy.setParameter(intervalExpression.getParameter());
 
-        intervalExpression.getExpression().accept(this);
-        copy.setExpression(this.copy);
+        Expression expression = intervalExpression.getExpression();
+        if (expression != null) {
+            expression.accept(this);
+            copy.setExpression(this.copy);
+        }
 
         this.copy = copy;
     }
