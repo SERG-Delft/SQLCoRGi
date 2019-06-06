@@ -63,7 +63,7 @@ public final class Generator {
      * @param args unused.
      */
     public static void main(String[] args) {
-        String query = "SELECT * FROM a join b on c.id = b.id";
+        String query = "SELECT * FROM a join b on c.id = b.id join a on a.id > 0";
 
         Set<String> result = generateRules(query);
 

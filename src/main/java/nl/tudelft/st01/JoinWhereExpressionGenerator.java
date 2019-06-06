@@ -38,6 +38,7 @@ public class JoinWhereExpressionGenerator {
      * @return A set of mutated queries in string format.
      */
     public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
+        generate(plainSelect);
         this.whereExpression = plainSelect.getWhere();
         Set<String> result = new TreeSet<>();
 
@@ -107,9 +108,30 @@ public class JoinWhereExpressionGenerator {
 
     private void handleNestedJoins(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
-        
+        List<String> mvoi = new ArrayList<>();
+        String[] labels = new String[joins.size()];
+
+        map = new HashMap<>();
+        String loirels;
+        String roirels;
+
         if (joins == null || joins.size() < 2) {
             throw new IllegalStateException("There must be two or more joins in the query");
+        }
+
+
+        OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
+
+
+        for (Join join : joins) {
+            join.getOnExpression().accept(onExpressionVisitor);
+            for (String k : map.keySet()) {
+                if (k.equals(join.getRightItem().toString().toLowerCase())) {
+                    roirels = k;
+                } else {
+                    loirels = k;
+                }
+            }
         }
 
 
