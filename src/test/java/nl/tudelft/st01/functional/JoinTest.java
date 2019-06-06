@@ -7,7 +7,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
 import static nl.tudelft.st01.functional.AssertUtils.verify;
-import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
