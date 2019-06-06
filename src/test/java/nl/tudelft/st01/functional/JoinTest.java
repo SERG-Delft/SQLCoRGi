@@ -1,11 +1,13 @@
 package nl.tudelft.st01.functional;
 
+import nl.tudelft.st01.Generator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
 import static nl.tudelft.st01.functional.AssertUtils.verify;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * This class tests if the coverage targets for queries with JOINS are generated correctly.
@@ -296,6 +298,28 @@ public class JoinTest {
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)"
         );
     }
+
+    /**
+     * A test for verifying that no targets are generated for queries with a simple join.
+     */
+    @Test
+    public void testJoinNoOnConditionSimpleJoin() {
+        verify(
+                "SELECT * FROM a, b"
+        );
+    }
+
+    /**
+     * A test for verifying that no targets are generated and an exception is thrown for queries with a simple join,
+     * with an additional where and having clause.
+     */
+    @Test
+    public void testJoinNoOnConditionSimpleJoinWithWhereClauseException() {
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
+            () -> Generator.generateRules("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50"));
+
+    }
+
 
     /**
      * Tests whether the {@code JoinWhereExpressionGenerator} supports {@code ON} clauses that contain more than two
