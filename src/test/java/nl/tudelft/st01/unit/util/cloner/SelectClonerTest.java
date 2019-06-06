@@ -818,6 +818,28 @@ class SelectClonerTest {
     }
 
     /**
+     * Tests whether {@link SelectCloner#copy(FromItem)} makes a deep copy of a {@link SubJoin}.
+     */
+    @Test
+    void testCopySubJoin() {
+
+        SubJoin original = new SubJoin();
+        original.setAlias(new Alias(STRING_ABC, false));
+        original.setLeft(new Table());
+
+        List<Join> joinList = new ArrayList<>(1);
+
+        Join join = new Join();
+        join.setRightItem(new Table());
+        joinList.add(join);
+
+        original.setJoinList(joinList);
+
+        SubJoin copy = (SubJoin) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
      * Tests whether {@code copy} is equivalent to {@code original}.
      *
      * @param original the original {@code SelectBody}.
