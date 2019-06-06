@@ -38,33 +38,27 @@ class GroupByCloner {
         GroupByElement copy = new GroupByElement();
 
         List<Expression> groupByExpressions = groupByElement.getGroupByExpressions();
-        if (groupByExpressions != null) {
+        List<Expression> expressionsCopy = new ArrayList<>(groupByExpressions.size());
+        for (Expression expression : groupByExpressions) {
 
-            List<Expression> expressionsCopy = new ArrayList<>(groupByExpressions.size());
-            for (Expression expression : groupByExpressions) {
-
-                expression.accept(this.expressionCloner);
-                expressionsCopy.add(this.expressionCloner.getCopy());
-            }
-            copy.setGroupByExpressions(expressionsCopy);
+            expression.accept(this.expressionCloner);
+            expressionsCopy.add(this.expressionCloner.getCopy());
         }
+        copy.setGroupByExpressions(expressionsCopy);
 
         List groupingSets = groupByElement.getGroupingSets();
-        if (groupingSets != null) {
+        List<Object> groupingSetsCopy = new ArrayList<>(groupingSets.size());
+        for (Object o : groupingSets) {
 
-            List<Object> groupingSetsCopy = new ArrayList<>(groupingSets.size());
-            for (Object o : groupingSets) {
-
-                if (o instanceof Expression) {
-                    ((Expression) o).accept(this.expressionCloner);
-                    groupingSetsCopy.add(this.expressionCloner.getCopy());
-                } else if (o instanceof ExpressionList) {
-                    ((ExpressionList) o).accept(this.expressionCloner);
-                    groupingSetsCopy.add(this.expressionCloner.getItemsList());
-                }
+            if (o instanceof Expression) {
+                ((Expression) o).accept(this.expressionCloner);
+                groupingSetsCopy.add(this.expressionCloner.getCopy());
+            } else {
+                ((ExpressionList) o).accept(this.expressionCloner);
+                groupingSetsCopy.add(this.expressionCloner.getItemsList());
             }
-            copy.setGroupingSets(groupingSetsCopy);
         }
+        copy.setGroupingSets(groupingSetsCopy);
 
         return copy;
     }
