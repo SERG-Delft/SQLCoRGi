@@ -689,11 +689,8 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
         ParenthesisFromItem copy = new ParenthesisFromItem();
         copy.setAlias(copyAlias(parenthesisFromItem.getAlias()));
 
-        FromItem fromItem = parenthesisFromItem.getFromItem();
-        if (fromItem != null) {
-            fromItem.accept(this);
-            copy.setFromItem(this.fromItem);
-        }
+        parenthesisFromItem.getFromItem().accept(this);
+        copy.setFromItem(this.fromItem);
 
         this.fromItem = copy;
     }
