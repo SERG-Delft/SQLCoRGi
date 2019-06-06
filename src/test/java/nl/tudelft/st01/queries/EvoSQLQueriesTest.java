@@ -1,9 +1,8 @@
-package nl.tudelft.st01.evosql_queries;
+package nl.tudelft.st01.queries;
 
 import nl.tudelft.st01.Generator;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+
 import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
