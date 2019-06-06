@@ -14,7 +14,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 /**
- * Checks output of our tool agains predefined output from another tool.
+ * Checks output of our tool against predefined output from another tool.
  */
 public final class CompareOutput {
     private static final String DOUBLE_NEWLINE = "\n\n";
