@@ -759,7 +759,33 @@ class SelectClonerTest {
     }
 
     /**
-     * Tests whether {@link SelectCloner#copy(SelectBody)} makes a deep copy of a {@link SelectExpressionItem}.
+     * Tests whether {@link SelectCloner#copy(SelectItem)} makes a deep copy of an {@link AllColumns} object.
+     */
+    @Test
+    void testCopyAllColumns() {
+
+        AllColumns original = new AllColumns();
+
+        SelectItem copy = SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectItem)} makes a deep copy of an {@link AllTableColumns}.
+     */
+    @Test
+    void testCopyAllTableColumns() {
+
+        AllTableColumns original = new AllTableColumns();
+
+        original.setTable(new Table());
+
+        SelectItem copy = SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(SelectItem)} makes a deep copy of a {@link SelectExpressionItem}.
      */
     @Test
     void testCopySelectExpressionItem() {
@@ -791,6 +817,7 @@ class SelectClonerTest {
         assertThat(copy)
                 .isNotSameAs(original)
                 .hasSameClassAs(original)
+                .usingComparatorForType((a, b) -> 0, SimpleNode.class)
                 .isEqualToComparingFieldByFieldRecursively(original);
     }
 
@@ -801,6 +828,20 @@ class SelectClonerTest {
      * @param copy the copy of the original {@code SelectItem}.
      */
     private static void assertCopyEquals(SelectItem original, SelectItem copy) {
+        assertThat(copy)
+                .isNotSameAs(original)
+                .hasSameClassAs(original)
+                .usingComparatorForType((a, b) -> 0, SimpleNode.class)
+                .isEqualToComparingFieldByFieldRecursively(original);
+    }
+
+    /**
+     * Tests whether {@code copy} is equivalent to {@code original}.
+     *
+     * @param original the original {@code SelectItem}.
+     * @param copy the copy of the original {@code SelectItem}.
+     */
+    private static void assertCopyEquals(FromItem original, FromItem copy) {
         assertThat(copy)
                 .isNotSameAs(original)
                 .hasSameClassAs(original)
