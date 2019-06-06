@@ -169,11 +169,11 @@ public class JoinWhereExpressionGenerator {
         Expression rightColumnsIsNull = createIsNullExpressions(right, true);
         Expression rightColumnsIsNotNull = createIsNullExpressions(right, false);
 
-        Expression leftNullRightNotNull = concatenate(leftColumnsIsNull, rightColumnsIsNotNull, false);
-        Expression leftNullRightNull = concatenate(leftColumnsIsNull, rightColumnsIsNull, false);
+        Expression roi = concatenate(leftColumnsIsNull, rightColumnsIsNotNull, false);
+        Expression roiNull = concatenate(leftColumnsIsNull, rightColumnsIsNull, false);
 
-        Expression rightNullLeftNotNull = concatenate(rightColumnsIsNull, leftColumnsIsNotNull, false);
-        Expression rightNullLeftNull = concatenate(rightColumnsIsNull, leftColumnsIsNull, false);
+        Expression loi = concatenate(rightColumnsIsNull, leftColumnsIsNotNull, false);
+        Expression loiNull = concatenate(rightColumnsIsNull, leftColumnsIsNull, false);
 
         Expression rightIsNull = excludeInExpression(right, leftTables, where);
         Expression rightIsNotNull = excludeInExpression(leftTables, where);
@@ -181,18 +181,18 @@ public class JoinWhereExpressionGenerator {
         Expression leftIsNull = excludeInExpression(left, rightTables, where);
         Expression leftIsNotNull = excludeInExpression(rightTables, where);
 
-        Expression rightJoinLeftIsNull = concatenate(leftNullRightNull, rightIsNull, true);
-        Expression rightJoinLeftIsNotNull = concatenate(leftNullRightNotNull, rightIsNotNull, true);
+        Expression roiJoinNull = concatenate(roiNull, rightIsNull, true);
+        Expression roiJoin = concatenate(roi, rightIsNotNull, true);
 
-        Expression leftJoinRightIsNull = concatenate(rightNullLeftNull, leftIsNull, true);
-        Expression leftJoinRightIsNotNull = concatenate(rightNullLeftNotNull, leftIsNotNull, true);
+        Expression loiJoinNull = concatenate(loiNull, leftIsNull, true);
+        Expression loiJoin = concatenate(loi, leftIsNotNull, true);
 
         List<JoinWhereItem> result = new ArrayList<>();
         result.add(new JoinWhereItem(innerJoin, wrapInParentheses(whereExpression)));
-        result.add(new JoinWhereItem(leftJoin, leftJoinRightIsNull));
-        result.add(new JoinWhereItem(leftJoin, leftJoinRightIsNotNull));
-        result.add(new JoinWhereItem(rightJoin, rightJoinLeftIsNull));
-        result.add(new JoinWhereItem(rightJoin, rightJoinLeftIsNotNull));
+        result.add(new JoinWhereItem(leftJoin, loiJoinNull));
+        result.add(new JoinWhereItem(leftJoin, loiJoin));
+        result.add(new JoinWhereItem(rightJoin, roiJoinNull));
+        result.add(new JoinWhereItem(rightJoin, roiJoin));
 
         return result;
     }
