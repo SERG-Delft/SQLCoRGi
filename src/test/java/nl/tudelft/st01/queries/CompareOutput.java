@@ -100,12 +100,12 @@ public final class CompareOutput {
                     wrongCounter++;
                 }
             }
-            sc.close();
+
+            System.out.println("FINISHED!! we handled " + (totalCounter - wrongCounter)
+                    + " queries out of " + totalCounter + " correctly!");
         }
 
 
-        System.out.println("FINISHED!! we handled " + (totalCounter - wrongCounter)
-                + " queries out of " + totalCounter + " correctly!");
 
 
     }
