@@ -2,6 +2,7 @@ package nl.tudelft.st01.unit.util.cloner;
 
 import com.google.common.primitives.Booleans;
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -863,6 +864,32 @@ class SelectClonerTest {
 
         assertThat(copy.getAlias()).isNotSameAs(alias);
         assertThat(copy.getSubSelect()).isNotSameAs(subSelect);
+    }
+
+    /**
+     * Tests whether {@link SelectCloner#copy(FromItem)} makes a deep copy of a {@link ValuesList}.
+     */
+    @Test
+    void testCopyValuesList() {
+
+        ValuesList original = new ValuesList();
+        original.setNoBrackets(true);
+
+        Alias alias = new Alias(STRING_ABC, true);
+        original.setAlias(alias);
+
+        List<String> columnNames = new ArrayList<>(1);
+        columnNames.add(STRING_ABC);
+        original.setColumnNames(columnNames);
+
+        MultiExpressionList multiExpressionList = new MultiExpressionList();
+        original.setMultiExpressionList(multiExpressionList);
+
+        ValuesList copy = (ValuesList) SelectCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getAlias()).isNotSameAs(alias);
+        assertThat(copy.getMultiExpressionList()).isNotSameAs(multiExpressionList);
     }
 
     /**
