@@ -122,8 +122,7 @@ public class JoinWhereExpressionGenerator {
         String[] labels = new String[joins.size()];
 
         map = new HashMap<>();
-        String loirels;
-        String roirels;
+
 
         if (joins == null || joins.size() < 2) {
             throw new IllegalStateException("The list of joins must contain at least two elements.");
@@ -131,15 +130,9 @@ public class JoinWhereExpressionGenerator {
 
         OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
 
-        for (Join join : joins) {
-            join.getOnExpression().accept(onExpressionVisitor);
-            for (String k : map.keySet()) {
-                if (k.equals(join.getRightItem().toString().toLowerCase())) {
-                    roirels = k;
-                } else {
-                    loirels = k;
-                }
-            }
+        for (int i = 0; i < joins.size(); i++) {
+            label("L", joins, i);
+            label("R", joins, i);
         }
     }
 
@@ -148,8 +141,8 @@ public class JoinWhereExpressionGenerator {
             throw new IllegalArgumentException("The index cannot be larger than the size of the given list of joins.");
         }
 
-        String joinOneType = "L";
-        String joinTwoType = "R";
+        String joinTypeLeft = "L";
+        String joinTypeRight = "R";
 
         Set<String> mvoi = new HashSet<>();
 
@@ -185,10 +178,10 @@ public class JoinWhereExpressionGenerator {
             if (labels.get(i) == null) {
                 if (mvoi.contains(roirelsJ)) {
                     mvoi.add(loirelsJ);
-                    labels.set(i, joinOneType);
+                    labels.set(i, joinTypeLeft);
                 } else if (mvoi.contains(loirelsJ)) {
                     mvoi.add(roirelsJ);
-                    labels.set(i, joinTwoType);
+                    labels.set(i, joinTypeRight);
                 }
             }
         }
