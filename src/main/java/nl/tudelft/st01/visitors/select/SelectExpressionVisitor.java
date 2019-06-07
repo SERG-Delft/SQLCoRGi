@@ -159,36 +159,33 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
         output.add(createEqualsTo(left, end));
 
-        boolean generatedOffPoint = false;
         if (start instanceof LongValue) {
             NumericLongValue longValue = new NumericLongValue(start.toString());
             EqualsTo leftOffPoint = createEqualsTo(left, longValue.add(-1));
             output.add(leftOffPoint);
-            generatedOffPoint = true;
         } else if (start instanceof DoubleValue) {
             NumericDoubleValue doubleValue = new NumericDoubleValue(start.toString());
             EqualsTo leftOffPoint = createEqualsTo(left, doubleValue.add(-1));
             output.add(leftOffPoint);
-            generatedOffPoint = true;
         }
 
         if (end instanceof LongValue) {
             NumericLongValue longValue = new NumericLongValue(end.toString());
             EqualsTo rightOffPoint = createEqualsTo(left, longValue.add(1));
             output.add(rightOffPoint);
-            generatedOffPoint = true;
         } else if (end instanceof DoubleValue) {
             NumericDoubleValue doubleValue = new NumericDoubleValue(end.toString());
             EqualsTo rightOffPoint = createEqualsTo(left, doubleValue.add(1));
             output.add(rightOffPoint);
-            generatedOffPoint = true;
         }
 
-        if (!generatedOffPoint) {
-            Between betweenFlipped = (Between) copy(between);
-            betweenFlipped.setNot(true);
-            output.add(betweenFlipped);
-        }
+        Between betweenNormal = (Between) copy(between);
+        betweenNormal.setNot(false);
+        output.add(betweenNormal);
+
+        Between betweenFlipped = (Between) copy(between);
+        betweenFlipped.setNot(true);
+        output.add(betweenFlipped);
 
         IsNullExpression isNullExpression = new IsNullExpression();
         isNullExpression.setLeftExpression(copy(left));
