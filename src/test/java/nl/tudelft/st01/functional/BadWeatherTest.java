@@ -11,6 +11,9 @@ public class BadWeatherTest {
 
     /**
      * A test case to check if an invalid query returns nothing.
+     *
+     * Note: Only the query is there, there is nothing in the 'expected' area. This is intentional.
+     * This indicates that there should be no rules generated since the query is invalid.
      */
     @Test
     public void testInvalidQuery() {
@@ -19,6 +22,9 @@ public class BadWeatherTest {
 
     /**
      * A test case to check if a non-select query returns nothing.
+     *
+     * Note: Only the query is there, there is nothing in the 'expected' area. This is intentional.
+     * This indicates that there should be no rules generated since the query is invalid.
      */
     @Test
     public void testNonSelectQuery() {

@@ -112,6 +112,8 @@ public class CombinedTest {
 
     /**
      * Tests the most basic query, for which case no mutations should be generated.
+     *
+     * Note that there are no queries in the 'expected' area, which indicates no queries should be generated.
      */
     @Test
     public void testQueryOnlySelectAndFrom() {

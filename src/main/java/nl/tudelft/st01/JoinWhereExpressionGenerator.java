@@ -54,6 +54,13 @@ public class JoinWhereExpressionGenerator {
             List<Join> temp = new ArrayList<>();
             for (int i = 0; i < joins.size(); i++) {
                 join = joins.get(i);
+
+                if (join.isSimple()) {
+                    continue;
+                } else if (join.getOnExpression() == null) {
+                    throw new IllegalStateException("The ON condition cannot be null");
+                }
+
                 join.getOnExpression().accept(onExpressionVisitor);
                 joinWhereItems = generateJoinMutations(join);
                 for (JoinWhereItem joinWhereItem : joinWhereItems) {
@@ -339,12 +346,10 @@ public class JoinWhereExpressionGenerator {
      * containing a {@link Column} using a {@link BinaryExpression}.
      *
      * @param columns The columns that should be used in the concatenation.
-     * @param binaryExpression The type of binary expression that should be used in the concatenation.
      * @param isNull Determines whether the column should be checked for IS NULL or IS NOT NULL.
      * @return A concatenation of IsNull expressions that contains each of the given columns.
      */
-    private static Expression createIsNullExpressions(Stack<Column> columns,
-                                               BinaryExpression binaryExpression, boolean isNull) {
+    private static Expression createIsNullExpressions(Stack<Column> columns, boolean isNull) {
         IsNullExpression isNullExpression = new IsNullExpression();
         isNullExpression.setNot(!isNull);
         Parenthesis parenthesis = new Parenthesis();
@@ -358,10 +363,7 @@ public class JoinWhereExpressionGenerator {
             isNullExpression.setLeftExpression(columns.pop());
             parenthesis.setExpression(isNullExpression);
 
-            binaryExpression.setRightExpression(parenthesis);
-            binaryExpression.setLeftExpression(createIsNullExpressions(columns, binaryExpression, isNull));
-
-            return binaryExpression;
+            return new AndExpression(createIsNullExpressions(columns, isNull), parenthesis);
         }
 
         throw new IllegalStateException("The columns list cannot be empty.");
@@ -378,7 +380,7 @@ public class JoinWhereExpressionGenerator {
     private static Expression createIsNullExpressions(List<Column> columns, boolean isNull) {
         Stack<Column> stack = new Stack<>();
         stack.addAll(columns);
-        return createIsNullExpressions(stack, new AndExpression(null, null), isNull);
+        return createIsNullExpressions(stack, isNull);
     }
 
     /**
