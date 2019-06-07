@@ -90,15 +90,15 @@ public class JoinWhereExpressionGenerator {
     public Set<String> generate(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
 
-        int i = 0;
-        for (Join join : joins) {
-            label("L", joins, i);
-            System.out.println(join.toString());
-            System.out.println("LABEL L" + label("L", joins, i).toString());
-            System.out.println("LABEL R" + label("R", joins, i).toString());
-            i++;
-        }
         label("L", joins, 0);
+        label("R", joins, 0);
+
+        label("L", joins, 1);
+        label("R", joins, 1);
+
+        label("L", joins, 2);
+        label("R", joins, 2);
+
         if (joins == null || joins.isEmpty()) {
             return new HashSet<>();
         }
@@ -151,11 +151,6 @@ public class JoinWhereExpressionGenerator {
         String joinOneType = "L";
         String joinTwoType = "R";
 
-        if (joinType.toUpperCase().equals("R")) {
-            joinOneType = "R";
-            joinTwoType = "L";
-        }
-
         Set<String> mvoi = new HashSet<>();
 
         List<String> labels = Arrays.asList(new String[joins.size()]);
@@ -170,21 +165,26 @@ public class JoinWhereExpressionGenerator {
 
         Set<String> tables = map.keySet();
         String loirels = getOuterIncrementRelation(tables, currJoin, true);
+        String roirels = getOuterIncrementRelation(tables, currJoin, false);
 
-        mvoi.add(loirels);
+
+        if (joinType.toUpperCase().equals("R")) {
+            mvoi.add(roirels);
+        } else {
+            mvoi.add(loirels);
+        }
 
         Join join;
 
         for (int i = 0; i < joins.size(); i++) {
             map.clear();
             joins.get(i).getOnExpression().accept(onExpressionVisitor);
+            join = joins.get(i);
+            String loirelsJ = getOuterIncrementRelation(tables, join, true);
+            String roirelsJ = getOuterIncrementRelation(tables, join, false);
             if (labels.get(i) == null) {
-                join = joins.get(i);
-                String loirelsJ = getOuterIncrementRelation(tables, join, true);
-                String roirelsJ = getOuterIncrementRelation(tables, join, false);
-
                 if (mvoi.contains(roirelsJ)) {
-                    mvoi.add(loirels);
+                    mvoi.add(loirelsJ);
                     labels.set(i, joinOneType);
                 } else if (mvoi.contains(loirelsJ)) {
                     mvoi.add(roirelsJ);
@@ -199,6 +199,7 @@ public class JoinWhereExpressionGenerator {
             }
         }
 
+        System.out.println(joinType + " " + joins.get(index).toString() + labels);
         return labels;
     }
 
