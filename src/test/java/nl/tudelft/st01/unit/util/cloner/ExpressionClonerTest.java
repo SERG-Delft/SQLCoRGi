@@ -247,8 +247,24 @@ class ExpressionClonerTest {
     void testCopyIntervalExpression() {
 
         IntervalExpression original = new IntervalExpression();
-        original.setExpression(new NullValue());
+
+        NullValue expression = new NullValue();
+        original.setExpression(expression);
         original.setParameter(STRING_ABC);
+
+        IntervalExpression copy = (IntervalExpression) ExpressionCloner.copy(original);
+        assertCopyEquals(original, copy);
+
+        assertThat(copy.getExpression()).isNotSameAs(expression);
+    }
+
+    /**
+     * Tests whether {@link ExpressionCloner#copy(Expression)} makes deep copies of {@link IntervalExpression}s.
+     */
+    @Test
+    void testCopyIntervalExpressionNullExpr() {
+
+        IntervalExpression original = new IntervalExpression();
 
         Expression copy = ExpressionCloner.copy(original);
         assertCopyEquals(original, copy);

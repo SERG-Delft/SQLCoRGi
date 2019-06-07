@@ -39,9 +39,11 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
      * Creates a new instance of this class, which uses the provided {@link SelectCloner} for {@link SubSelect}s.
      *
      * @param selectCloner the {@code SelectCloner} to use.
+     * @param orderByCloner the {@code OrderByCloner} to use.
      */
-    ExpressionCloner(SelectCloner selectCloner) {
+    ExpressionCloner(SelectCloner selectCloner, OrderByCloner orderByCloner) {
         this.selectCloner = selectCloner;
+        this.orderByCloner = orderByCloner;
     }
 
     /**
@@ -641,8 +643,11 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
         copy.setIntervalType(intervalExpression.getIntervalType());
         copy.setParameter(intervalExpression.getParameter());
 
-        intervalExpression.getExpression().accept(this);
-        copy.setExpression(this.copy);
+        Expression expression = intervalExpression.getExpression();
+        if (expression != null) {
+            expression.accept(this);
+            copy.setExpression(this.copy);
+        }
 
         this.copy = copy;
     }
