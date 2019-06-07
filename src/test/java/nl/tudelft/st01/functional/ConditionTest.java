@@ -179,12 +179,12 @@ public class ConditionTest {
     public void testLongBetweenCondition() {
         verify("SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
 
-                "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
                 "SELECT * FROM Table1 WHERE x = 27",
                 "SELECT * FROM Table1 WHERE x = 28",
                 "SELECT * FROM Table1 WHERE x = 37",
                 "SELECT * FROM Table1 WHERE x = 38",
+                "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
+                "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
                 "SELECT * FROM Table1 WHERE x IS NULL");
     }
 
@@ -195,12 +195,12 @@ public class ConditionTest {
     public void testLongBetweenConditionNegated() {
         verify("SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
 
-                "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
                 "SELECT * FROM Table1 WHERE x = 27",
                 "SELECT * FROM Table1 WHERE x = 28",
                 "SELECT * FROM Table1 WHERE x = 37",
                 "SELECT * FROM Table1 WHERE x = 38",
+                "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
+                "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
                 "SELECT * FROM Table1 WHERE x IS NULL");
     }
 
@@ -211,9 +211,9 @@ public class ConditionTest {
     public void testDoubleBetweenCondition() {
         verify("SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
 
+                "SELECT * FROM Table1 WHERE x = 13.3",
                 "SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
                 "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
-                "SELECT * FROM Table1 WHERE x = 13.3",
                 "SELECT * FROM Table1 WHERE x = 14.3",
                 "SELECT * FROM Table1 WHERE x = 32.2",
                 "SELECT * FROM Table1 WHERE x = 33.2",
@@ -227,12 +227,12 @@ public class ConditionTest {
     public void testDoubleBetweenConditionNegated() {
         verify("SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
 
-                "SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
                 "SELECT * FROM Table1 WHERE x = 13.3",
                 "SELECT * FROM Table1 WHERE x = 14.3",
                 "SELECT * FROM Table1 WHERE x = 32.2",
                 "SELECT * FROM Table1 WHERE x = 33.2",
+                "SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
+                "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
                 "SELECT * FROM Table1 WHERE x IS NULL");
     }
 
@@ -243,8 +243,8 @@ public class ConditionTest {
     public void testStringBetweenCondition() {
         verify("SELECT * FROM Table1 WHERE x BETWEEN 'hello' AND 'world'",
 
-                "SELECT * FROM Table1 WHERE x BETWEEN 'hello' AND 'world'",
                 "SELECT * FROM Table1 WHERE x NOT BETWEEN 'hello' AND 'world'",
+                "SELECT * FROM Table1 WHERE x BETWEEN 'hello' AND 'world'",
                 "SELECT * FROM Table1 WHERE x = 'hello'",
                 "SELECT * FROM Table1 WHERE x = 'world'",
                 "SELECT * FROM Table1 WHERE x IS NULL");
@@ -257,8 +257,8 @@ public class ConditionTest {
     public void testStringBetweenConditionNegated() {
         verify("SELECT * FROM Table1 WHERE x NOT BETWEEN 'hello' AND 'world'",
 
-                "SELECT * FROM Table1 WHERE x BETWEEN 'hello' AND 'world'",
                 "SELECT * FROM Table1 WHERE x NOT BETWEEN 'hello' AND 'world'",
+                "SELECT * FROM Table1 WHERE x BETWEEN 'hello' AND 'world'",
                 "SELECT * FROM Table1 WHERE x = 'hello'",
                 "SELECT * FROM Table1 WHERE x = 'world'",
                 "SELECT * FROM Table1 WHERE x IS NULL");

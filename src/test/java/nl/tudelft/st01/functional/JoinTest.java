@@ -1,11 +1,13 @@
 package nl.tudelft.st01.functional;
 
+import nl.tudelft.st01.Generator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static nl.tudelft.st01.functional.AssertUtils.verify;
 import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
+import static nl.tudelft.st01.functional.AssertUtils.verify;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * This class tests if the coverage targets for queries with JOINS are generated correctly.
@@ -294,6 +296,68 @@ public class JoinTest {
                         + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length BETWEEN 10 AND 40)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)"
+        );
+    }
+
+    /**
+     * A test for verifying that no targets are generated for queries with a simple join.
+     */
+    @Test
+    public void testJoinNoOnConditionSimpleJoin() {
+        verify(
+                "SELECT * FROM a, b"
+        );
+    }
+
+    /**
+     * A test for verifying that no targets are generated and an exception is thrown for queries with a simple join,
+     * with an additional where and having clause.
+     */
+    @Test
+    public void testJoinNoOnConditionSimpleJoinWithWhereClauseException() {
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
+            () -> Generator.generateRules("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50"));
+
+    }
+
+
+    /**
+     * Tests whether the {@code JoinWhereExpressionGenerator} supports {@code ON} clauses that contain more than two
+     * different columns from the same table.
+     */
+    @Test
+    void testJoinOnMultipleColumnsSameTable() {
+        containsAtLeast(
+                "SELECT acl_roles.* FROM acl_roles INNER JOIN acl_roles_users ON acl_roles_users.user_id = '1' "
+                        + "AND acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted ='0'WHERE acl_roles"
+                        + ".deleted='0'",
+
+                "SELECT acl_roles.* FROM acl_roles INNER JOIN acl_roles_users ON acl_roles_users.user_id = '1'"
+                        + " AND acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE "
+                        + "acl_roles.deleted = '0'",
+                "SELECT acl_roles.* FROM acl_roles INNER JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
+                        + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE acl_roles"
+                        + ".deleted IS NULL",
+                "SELECT acl_roles.* FROM acl_roles INNER JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
+                        + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE acl_roles"
+                        + ".deleted <> '0'",
+                "SELECT acl_roles.* FROM acl_roles LEFT JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
+                        + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE ("
+                        + "(acl_roles_users.user_id IS NULL) AND (acl_roles_users.role_id IS NULL) AND "
+                        + "(acl_roles_users.deleted IS NULL) AND (acl_roles.id IS NOT NULL)) AND (acl_roles.deleted ="
+                        + " '0')",
+                "SELECT acl_roles.* FROM acl_roles LEFT JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
+                        + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE ("
+                        + "(acl_roles_users.user_id IS NULL) AND (acl_roles_users.role_id IS NULL) AND "
+                        + "(acl_roles_users.deleted IS NULL) AND (acl_roles.id IS NULL)) AND (acl_roles.deleted = '0')",
+                "SELECT acl_roles.* FROM acl_roles RIGHT JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
+                        + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE (acl_roles"
+                        + ".id IS NULL) AND (acl_roles_users.user_id IS NULL) AND (acl_roles_users.role_id IS NULL) "
+                        + "AND (acl_roles_users.deleted IS NULL)",
+                "SELECT acl_roles.* FROM acl_roles RIGHT JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
+                        + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE (acl_roles"
+                        + ".id IS NULL) AND (acl_roles_users.user_id IS NOT NULL) AND (acl_roles_users.role_id IS NOT"
+                        + " NULL) AND (acl_roles_users.deleted IS NOT NULL)"
         );
     }
 
