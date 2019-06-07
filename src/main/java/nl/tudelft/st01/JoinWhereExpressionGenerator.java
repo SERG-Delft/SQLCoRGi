@@ -15,6 +15,7 @@ import nl.tudelft.st01.visitors.ExpressionTraverserVisitor;
 import nl.tudelft.st01.visitors.join.OnExpressionVisitor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -89,6 +90,15 @@ public class JoinWhereExpressionGenerator {
     public Set<String> generate(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
 
+        int i = 0;
+        for (Join join : joins) {
+            label("L", joins, i);
+            System.out.println(join.toString());
+            System.out.println("LABEL L" + label("L", joins, i).toString());
+            System.out.println("LABEL R" + label("R", joins, i).toString());
+            i++;
+        }
+        label("L", joins, 0);
         if (joins == null || joins.isEmpty()) {
             return new HashSet<>();
         }
@@ -116,12 +126,10 @@ public class JoinWhereExpressionGenerator {
         String roirels;
 
         if (joins == null || joins.size() < 2) {
-            throw new IllegalStateException("There must be two or more joins in the query");
+            throw new IllegalStateException("The list of joins must contain at least two elements.");
         }
 
-
         OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
-
 
         for (Join join : joins) {
             join.getOnExpression().accept(onExpressionVisitor);
@@ -133,11 +141,77 @@ public class JoinWhereExpressionGenerator {
                 }
             }
         }
-
-
-
     }
 
+    private List<String> label(String joinType, List<Join> joins, int index) {
+        if (index >= joins.size()) {
+            throw new IllegalArgumentException("The index cannot be larger than the size of the given list of joins.");
+        }
+
+        String joinOneType = "L";
+        String joinTwoType = "R";
+
+        if (joinType.toUpperCase().equals("R")) {
+            joinOneType = "R";
+            joinTwoType = "L";
+        }
+
+        Set<String> mvoi = new HashSet<>();
+
+        List<String> labels = Arrays.asList(new String[joins.size()]);
+        labels.set(index, joinType.toUpperCase());
+
+        Join currJoin = joins.get(index);
+
+        map = new HashMap<>();
+
+        OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
+        currJoin.getOnExpression().accept(onExpressionVisitor);
+
+        Set<String> tables = map.keySet();
+        String loirels = getOuterIncrementRelation(tables, currJoin, true);
+
+        mvoi.add(loirels);
+
+        Join join;
+
+        for (int i = 0; i < joins.size(); i++) {
+            map.clear();
+            joins.get(i).getOnExpression().accept(onExpressionVisitor);
+            if (labels.get(i) == null) {
+                join = joins.get(i);
+                String loirelsJ = getOuterIncrementRelation(tables, join, true);
+                String roirelsJ = getOuterIncrementRelation(tables, join, false);
+
+                if (mvoi.contains(roirelsJ)) {
+                    mvoi.add(loirels);
+                    labels.set(i, joinOneType);
+                } else if (mvoi.contains(loirelsJ)) {
+                    mvoi.add(roirelsJ);
+                    labels.set(i, joinTwoType);
+                }
+            }
+        }
+
+        for (int i = 0; i < labels.size(); i++) {
+            if (labels.get(i) == null) {
+                labels.set(i, "I");
+            }
+        }
+
+        return labels;
+    }
+
+
+    private String getOuterIncrementRelation(Set<String> tables, Join join, boolean left) {
+        for (String key : tables) {
+            if (key.equals(join.getRightItem().toString().toLowerCase()) == left) {
+                return key;
+            }
+        }
+
+        return null;
+    }
 
     /**
      * Creates a generic shallow copy of the given join.
