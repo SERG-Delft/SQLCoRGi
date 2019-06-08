@@ -183,13 +183,12 @@ public class JoinWhereExpressionGenerator {
         currJoin.getOnExpression().accept(onExpressionVisitor);
 
         Set<String> tables = map.keySet();
-        Set<String> loirels = getOuterIncrementRelation(tables, currJoin, true);
-        Set<String> roirels = getOuterIncrementRelation(tables, currJoin, false);
+        OuterIncrementRelation currOiRel = getOuterIncrementRelation(tables, currJoin);
 
         switch (joinType) {
-            case LEFT:  mvoi.addAll(loirels);
+            case LEFT:  mvoi.addAll(currOiRel.getLoiRelations());
                 break;
-            case RIGHT: mvoi.addAll(roirels);
+            case RIGHT: mvoi.addAll(currOiRel.getRoiRelations());
                 break;
             default: throw new IllegalArgumentException("The join type must be either LEFT or RIGHT");
         }
@@ -200,16 +199,17 @@ public class JoinWhereExpressionGenerator {
 
         for (int i = 0; i < joins.size(); i++) {
             map.clear();
-            joins.get(i).getOnExpression().accept(onExpressionVisitor);
-            join = joins.get(i);
-            Set<String> loirelsJ = getOuterIncrementRelation(tables, join, true);
-            Set<String> roirelsJ = getOuterIncrementRelation(tables, join, false);
+
             if (labels.get(i) == null) {
-                if (!intersection(mvoi, roirelsJ).isEmpty()) {
-                    mvoi.addAll(loirelsJ);
+                joins.get(i).getOnExpression().accept(onExpressionVisitor);
+                join = joins.get(i);
+                OuterIncrementRelation oiRel = getOuterIncrementRelation(tables, join);
+
+                if (!intersection(mvoi, oiRel.getRoiRelations()).isEmpty()) {
+                    mvoi.addAll(oiRel.getLoiRelations());
                     labels.set(i, JoinType.LEFT);
-                } else if (!intersection(mvoi, loirelsJ).isEmpty()) {
-                    mvoi.addAll(roirelsJ);
+                } else if (!intersection(mvoi, oiRel.getLoiRelations()).isEmpty()) {
+                    mvoi.addAll(oiRel.getRoiRelations());
                     labels.set(i, JoinType.RIGHT);
                 }
             }
