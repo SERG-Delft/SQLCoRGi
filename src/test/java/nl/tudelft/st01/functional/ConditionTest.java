@@ -131,13 +131,13 @@ public class ConditionTest {
     public void testTwoConditionsWithAND() {
         verify("SELECT * FROM Movies WHERE year > 1950 AND year < 2000",
 
-            "SELECT * FROM Movies WHERE (year = 1951) AND (year < 2000)",
+            "SELECT * FROM Movies WHERE (year = 1949) AND (year < 2000)",
                 "SELECT * FROM Movies WHERE (year = 1950) AND (year < 2000)",
-                "SELECT * FROM Movies WHERE (year = 1949) AND (year < 2000)",
-                "SELECT * FROM Movies WHERE (year IS NULL)",
-                "SELECT * FROM Movies WHERE (year = 2001) AND (year > 1950)",
+                "SELECT * FROM Movies WHERE (year = 1951) AND (year < 2000)",
+                "SELECT * FROM Movies WHERE (year = 1999) AND (year > 1950)",
                 "SELECT * FROM Movies WHERE (year = 2000) AND (year > 1950)",
-                "SELECT * FROM Movies WHERE (year = 1999) AND (year > 1950)");
+                "SELECT * FROM Movies WHERE (year = 2001) AND (year > 1950)",
+                "SELECT * FROM Movies WHERE (year IS NULL)");
     }
 
     /**
@@ -147,13 +147,13 @@ public class ConditionTest {
     public void testTwoConditionsWithOR() {
         verify("SELECT * FROM Movies WHERE year < 2004 OR year > 2010",
 
-            "SELECT * FROM Movies WHERE (year = 2005) AND NOT(year > 2010)",
+            "SELECT * FROM Movies WHERE (year = 2003) AND NOT(year > 2010)",
                 "SELECT * FROM Movies WHERE (year = 2004) AND NOT(year > 2010)",
-                "SELECT * FROM Movies WHERE (year = 2003) AND NOT(year > 2010)",
-                "SELECT * FROM Movies WHERE (year IS NULL)",
-                "SELECT * FROM Movies WHERE (year = 2011) AND NOT(year < 2004)",
+                "SELECT * FROM Movies WHERE (year = 2005) AND NOT(year > 2010)",
+                "SELECT * FROM Movies WHERE (year = 2009) AND NOT(year < 2004)",
                 "SELECT * FROM Movies WHERE (year = 2010) AND NOT(year < 2004)",
-                "SELECT * FROM Movies WHERE (year = 2009) AND NOT(year < 2004)");
+                "SELECT * FROM Movies WHERE (year = 2011) AND NOT(year < 2004)",
+                "SELECT * FROM Movies WHERE (year IS NULL)");
     }
 
     /**
@@ -183,18 +183,18 @@ public class ConditionTest {
     public void testThreeConditionsAndOr2() {
         verify("SELECT * FROM Movies WHERE year < 2004 AND length_minutes > 100 OR year > 2005",
 
-            "SELECT * FROM Movies WHERE (year = 2005) AND (length_minutes > 100) AND NOT(year > 2005)",
-                "SELECT * FROM Movies WHERE (year = 2004) AND (length_minutes > 100) AND NOT(year > 2005)",
-                "SELECT * FROM Movies WHERE (year = 2003) AND (length_minutes > 100) AND NOT(year > 2005)",
-                "SELECT * FROM Movies WHERE (year IS NULL) AND (length_minutes > 100)",
-                "SELECT * FROM Movies WHERE (length_minutes = 101) AND (year < 2004) AND NOT(year > 2005)",
-                "SELECT * FROM Movies WHERE (length_minutes = 100) AND (year < 2004) AND NOT(year > 2005)",
-                "SELECT * FROM Movies WHERE (length_minutes = 99) AND (year < 2004) AND NOT(year > 2005)",
-                "SELECT * FROM Movies WHERE (length_minutes IS NULL) AND (year < 2004) AND NOT(year > 2005)",
-                "SELECT * FROM Movies WHERE (year = 2006) AND NOT((year < 2004 AND length_minutes > 100))",
-                "SELECT * FROM Movies WHERE (year = 2005) AND NOT((year < 2004 AND length_minutes > 100))",
-                "SELECT * FROM Movies WHERE (year = 2004) AND NOT((year < 2004 AND length_minutes > 100))",
-                "SELECT * FROM Movies WHERE (year IS NULL) AND NOT((length_minutes > 100))");
+            "SELECT * FROM Movies WHERE ((year < 2004) AND (length_minutes = 99)) AND NOT (year > 2005)",
+            "SELECT * FROM Movies WHERE ((year < 2004) AND (length_minutes = 100)) AND NOT (year > 2005)",
+            "SELECT * FROM Movies WHERE ((year < 2004) AND (length_minutes = 101)) AND NOT (year > 2005)",
+            "SELECT * FROM Movies WHERE ((year < 2004) AND (length_minutes IS NULL)) AND NOT (year > 2005)",
+            "SELECT * FROM Movies WHERE NOT (year < 2004 AND length_minutes > 100) AND (year = 2004)",
+            "SELECT * FROM Movies WHERE NOT (year < 2004 AND length_minutes > 100) AND (year = 2005)",
+            "SELECT * FROM Movies WHERE NOT (year < 2004 AND length_minutes > 100) AND (year = 2006)",
+            "SELECT * FROM Movies WHERE NOT (year < 2004 AND length_minutes > 100) AND (year IS NULL)",
+            "SELECT * FROM Movies WHERE ((year = 2003) AND (length_minutes > 100)) AND NOT (year > 2005)",
+            "SELECT * FROM Movies WHERE ((year = 2004) AND (length_minutes > 100)) AND NOT (year > 2005)",
+            "SELECT * FROM Movies WHERE ((year = 2005) AND (length_minutes > 100)) AND NOT (year > 2005)",
+            "SELECT * FROM Movies WHERE ((year IS NULL) AND (length_minutes > 100)) AND NOT (year > 2005)");
     }
 
     /**

@@ -42,23 +42,6 @@ public class AggregatorTest {
                     + "HAVING COUNT(*) > COUNT(Points) AND COUNT(DISTINCT Points) > 1");
     }
 
-//    /**
-//     * A test case for all the aggregators but COUNT since they all need 2 rules.
-//     * Since there is no Group By statement here, the 2 rules for Group By are not generated.
-//     *
-//     * @param func Function name to use in tests
-//     */
-//    @ParameterizedTest(name = "[{index}] Aggregate function: {0}")
-//    @CsvSource({"COUNT", "AVG", "SUM", "MIN", "MAX"})
-//    public void testAggregateFunctionsWithWhere(String func) {
-//        verify("SELECT " + func + "(*) FROM Movies WHERE length_minutes < 100",
-//
-//            "SELECT " + func + "(Points) FROM Customers "
-//                + "HAVING COUNT(Points) > COUNT(DISTINCT Points) AND COUNT(DISTINCT Points) > 1",
-//            "SELECT " + func + "(Points) FROM Customers "
-//                + "HAVING COUNT(*) > COUNT(Points) AND COUNT(DISTINCT Points) > 1");
-//    }
-
     /**
      * A test case with 1 column and 1 aggregator, in this case AVG.
      * In this test all of the 4 rules from the aggregator class are generated.
