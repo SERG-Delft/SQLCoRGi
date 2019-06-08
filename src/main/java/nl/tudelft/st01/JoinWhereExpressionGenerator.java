@@ -121,12 +121,12 @@ public class JoinWhereExpressionGenerator {
         }
 
         for (int i = 0; i < joins.size(); i++) {
-            label(joins, i, true);
-            label(joins, i, false);
+            label(JoinType.LEFT, joins, i);
+            label(JoinType.RIGHT, joins, i);
         }
     }
 
-    private List<JoinType> label(List<Join> joins, int index, boolean left) {
+    private List<JoinType> label(JoinType joinType, List<Join> joins, int index) {
         if (index >= joins.size()) {
             throw new IllegalArgumentException("The index cannot be larger than the size of the given list of joins.");
         }
@@ -144,13 +144,12 @@ public class JoinWhereExpressionGenerator {
         Set<String> loirels = getOuterIncrementRelation(tables, currJoin, true);
         Set<String> roirels = getOuterIncrementRelation(tables, currJoin, false);
 
-        JoinType joinType;
-        if (left) {
-            joinType = JoinType.LEFT;
-            mvoi.addAll(loirels);
-        } else {
-            joinType = JoinType.RIGHT;
-            mvoi.addAll(roirels);
+        switch(joinType) {
+            case LEFT:  mvoi.addAll(loirels);
+                break;
+            case RIGHT: mvoi.addAll(roirels);
+                break;
+                default: throw new IllegalArgumentException("The join type must be either LEFT or RIGHT");
         }
 
         labels.set(index, joinType);
@@ -164,10 +163,10 @@ public class JoinWhereExpressionGenerator {
             Set<String> loirelsJ = getOuterIncrementRelation(tables, join, true);
             Set<String> roirelsJ = getOuterIncrementRelation(tables, join, false);
             if (labels.get(i) == null) {
-                if (intersection(mvoi, roirelsJ)) {
+                if (!intersection(mvoi, roirelsJ).isEmpty()) {
                     mvoi.addAll(loirelsJ);
                     labels.set(i, JoinType.LEFT);
-                } else if (intersection(mvoi, loirelsJ)) {
+                } else if (!intersection(mvoi, loirelsJ).isEmpty()) {
                     mvoi.addAll(roirelsJ);
                     labels.set(i, JoinType.RIGHT);
                 }
