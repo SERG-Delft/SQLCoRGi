@@ -13,6 +13,11 @@ public class SQLRules {
         this.queryNo = queryNo;
     }
 
+    public SQLRules(Integer queryNo, List<String> pathList) {
+        this.queryNo = queryNo;
+        this.pathList = pathList;
+    }
+
     public void addRule(String rule) {
         pathList.add(rule);
     }

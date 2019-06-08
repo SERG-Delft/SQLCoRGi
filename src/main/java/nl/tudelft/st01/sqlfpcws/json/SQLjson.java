@@ -1,26 +1,13 @@
-package in2test.samples.sqlmutationws.java;
+package nl.tudelft.st01.sqlfpcws.json;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
 public class SQLjson {
 
-    @SerializedName("entries")
-    @Expose
-    private List<Rules> entries = new ArrayList<>();
+    private List<SQLRules> entries = new ArrayList<>();
 
-    public List<Rules> getEntries() {
-        return entries;
-    }
-
-    public void addEntry(Rules rules) {
+    public void addEntry(SQLRules rules) {
         entries.add(rules);
     }
-
-    public void setEntries(List<Rules> entries) {
-        this.entries = entries;
-    }
-
 }
