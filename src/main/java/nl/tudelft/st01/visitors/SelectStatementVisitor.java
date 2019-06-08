@@ -8,13 +8,12 @@ import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 import nl.tudelft.st01.AggregateFunctionsGenerator;
 import nl.tudelft.st01.GroupByGenerator;
 import nl.tudelft.st01.JoinWhereExpressionGenerator;
+import nl.tudelft.st01.util.cloner.SelectCloner;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import static nl.tudelft.st01.JoinWhereExpressionGenerator.genericCopyOfJoin;
 
 /**
  * A visitor used for generating coverage targets of a SELECT statement.
@@ -48,6 +47,8 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
         handleHaving(plainSelect);
         handleJoins(plainSelect);
 
+        //applyNullReduction();
+
         output = null;
     }
 
@@ -58,6 +59,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleWhere(PlainSelect plainSelect) {
+
         Expression where = plainSelect.getWhere();
         if (where != null) {
 
@@ -68,8 +70,17 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             if (joins != null) {
                 List<Join> innerJoins = new ArrayList<>();
                 for (Join join : joins) {
-                    innerJoins.add(genericCopyOfJoin(join));
-                    innerJoins.get(innerJoins.size() - 1).setInner(true);
+                    Join copy = SelectCloner.copy(join);
+                    copy.setInner(true);
+                    copy.setRight(false);
+                    copy.setLeft(false);
+                    copy.setOuter(false);
+                    copy.setSemi(false);
+                    copy.setCross(false);
+                    copy.setSimple(false);
+                    copy.setNatural(false);
+                    copy.setFull(false);
+                    innerJoins.add(copy);
                 }
                 plainSelect.setJoins(innerJoins);
             }

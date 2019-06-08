@@ -90,6 +90,16 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
     }
 
     /**
+     * Creates a deep copy of a {@link Join}.
+     *
+     * @param join the {@code Join} that needs to be copied.
+     * @return a copy of {@code join}.
+     */
+    public static Join copy(Join join) {
+        return new SelectCloner().copyJoin(join);
+    }
+
+    /**
      * Creates a copy of the given {@link Alias}.
      *
      * @param alias the {@code Alias} that needs to be copied.
