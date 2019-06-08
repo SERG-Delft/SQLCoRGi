@@ -13,6 +13,19 @@ import static nl.tudelft.st01.functional.AssertUtils.verify;
 public class ConditionTest {
 
     /**
+     * A test case for a simple query containing only one condition with = as operator.
+     */
+    @Test
+    public void testEqualsInteger() {
+        verify("SELECT * FROM Movies WHERE year = 2003",
+
+                "SELECT * FROM Movies WHERE year = 2004",
+                "SELECT * FROM Movies WHERE year = 2003",
+                "SELECT * FROM Movies WHERE year = 2002",
+                "SELECT * FROM Movies WHERE year IS NULL");
+    }
+
+    /**
      * A test case for a simple query containing only one condition with < as operator.
      */
     @Test
@@ -94,10 +107,53 @@ public class ConditionTest {
      */
     @Test
     public void testIsNull() {
+        verify("SELECT * FROM table WHERE a IS NULL",
+
+            "SELECT * FROM table WHERE a IS NOT NULL",
+            "SELECT * FROM table WHERE a IS NULL");
+    }
+
+    /**
+     * A test case for a simple query with IS NOT NULL.
+     */
+    @Test
+    public void testIsNotNull() {
         verify("SELECT * FROM table WHERE a IS NOT NULL",
 
-                "SELECT * FROM table WHERE a IS NOT NULL",
-                "SELECT * FROM table WHERE a IS NULL");
+                "SELECT * FROM table WHERE a IS NULL",
+                "SELECT * FROM table WHERE a IS NOT NULL");
+    }
+
+    /**
+     * A test case with two conditions, combined with AND.
+     */
+    @Test
+    public void testTwoConditionsWithAND() {
+        verify("SELECT * FROM Movies WHERE year > 1950 AND year < 2000",
+
+            "SELECT * FROM Movies WHERE (year = 1951) AND (year < 2000)",
+                "SELECT * FROM Movies WHERE (year = 1950) AND (year < 2000)",
+                "SELECT * FROM Movies WHERE (year = 1949) AND (year < 2000)",
+                "SELECT * FROM Movies WHERE (year IS NULL)",
+                "SELECT * FROM Movies WHERE (year = 2001) AND (year > 1950)",
+                "SELECT * FROM Movies WHERE (year = 2000) AND (year > 1950)",
+                "SELECT * FROM Movies WHERE (year = 1999) AND (year > 1950)");
+    }
+
+    /**
+     * A test case with two conditions, combined with OR.
+     */
+    @Test
+    public void testTwoConditionsWithOR() {
+        verify("SELECT * FROM Movies WHERE year < 2004 OR year > 2010",
+
+            "SELECT * FROM Movies WHERE (year = 2005) AND NOT(year > 2010)",
+                "SELECT * FROM Movies WHERE (year = 2004) AND NOT(year > 2010)",
+                "SELECT * FROM Movies WHERE (year = 2003) AND NOT(year > 2010)",
+                "SELECT * FROM Movies WHERE (year IS NULL)",
+                "SELECT * FROM Movies WHERE (year = 2011) AND NOT(year < 2004)",
+                "SELECT * FROM Movies WHERE (year = 2010) AND NOT(year < 2004)",
+                "SELECT * FROM Movies WHERE (year = 2009) AND NOT(year < 2004)");
     }
 
     /**
@@ -118,6 +174,40 @@ public class ConditionTest {
                 "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 22) AND (a3 = 32))",
                 "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 22) AND (a3 = 34))",
                 "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 22) AND (a3 IS NULL))");
+    }
+
+    /**
+     * A test case with three conditions, combined with AND and OR. Version 2.
+     */
+    @Test
+    public void testThreeConditionsAndOr2() {
+        verify("SELECT * FROM Movies WHERE year < 2004 AND length_minutes > 100 OR year > 2005",
+
+            "SELECT * FROM Movies WHERE (year = 2005) AND (length_minutes > 100) AND NOT(year > 2005)",
+                "SELECT * FROM Movies WHERE (year = 2004) AND (length_minutes > 100) AND NOT(year > 2005)",
+                "SELECT * FROM Movies WHERE (year = 2003) AND (length_minutes > 100) AND NOT(year > 2005)",
+                "SELECT * FROM Movies WHERE (year IS NULL) AND (length_minutes > 100)",
+                "SELECT * FROM Movies WHERE (length_minutes = 101) AND (year < 2004) AND NOT(year > 2005)",
+                "SELECT * FROM Movies WHERE (length_minutes = 100) AND (year < 2004) AND NOT(year > 2005)",
+                "SELECT * FROM Movies WHERE (length_minutes = 99) AND (year < 2004) AND NOT(year > 2005)",
+                "SELECT * FROM Movies WHERE (length_minutes IS NULL) AND (year < 2004) AND NOT(year > 2005)",
+                "SELECT * FROM Movies WHERE (year = 2006) AND NOT((year < 2004 AND length_minutes > 100))",
+                "SELECT * FROM Movies WHERE (year = 2005) AND NOT((year < 2004 AND length_minutes > 100))",
+                "SELECT * FROM Movies WHERE (year = 2004) AND NOT((year < 2004 AND length_minutes > 100))",
+                "SELECT * FROM Movies WHERE (year IS NULL) AND NOT((length_minutes > 100))");
+    }
+
+    /**
+     * A test case with an alias, due to the AS condition.
+     */
+    @Test
+    public void testAliasing() {
+        verify("SELECT * FROM Movies AS M WHERE M.id = 8",
+
+            "SELECT * FROM Movies AS M WHERE M.id = 9",
+                "SELECT * FROM Movies AS M WHERE M.id = 8",
+                "SELECT * FROM Movies AS M WHERE M.id = 7",
+                "SELECT * FROM Movies AS M WHERE M.id IS NULL");
     }
 
     /**
