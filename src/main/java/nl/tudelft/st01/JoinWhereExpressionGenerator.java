@@ -183,12 +183,12 @@ public class JoinWhereExpressionGenerator {
         return labels;
     }
 
-    private boolean intersection(Set set1, Set set2) {
+    private <T> Set<T> intersection(Set<T> set1, Set<T> set2) {
         Set set = new HashSet();
         set.addAll(set1);
 
         set.retainAll(set2);
-        return set != null && !set.isEmpty();
+        return set;
     }
 
     private Set<String> getOuterIncrementRelation(Set<String> tables, Join join, boolean left) {
