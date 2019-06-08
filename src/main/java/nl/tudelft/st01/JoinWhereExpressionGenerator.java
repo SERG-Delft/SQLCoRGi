@@ -164,10 +164,10 @@ public class JoinWhereExpressionGenerator {
             Set<String> loirelsJ = getOuterIncrementRelation(tables, join, true);
             Set<String> roirelsJ = getOuterIncrementRelation(tables, join, false);
             if (labels.get(i) == null) {
-                if (mvoi.contains(roirelsJ)) {
+                if (intersection(mvoi, roirelsJ)) {
                     mvoi.addAll(loirelsJ);
                     labels.set(i, JoinType.LEFT);
-                } else if (mvoi.contains(loirelsJ)) {
+                } else if (intersection(mvoi, loirelsJ)) {
                     mvoi.addAll(roirelsJ);
                     labels.set(i, JoinType.RIGHT);
                 }
@@ -184,6 +184,13 @@ public class JoinWhereExpressionGenerator {
         return labels;
     }
 
+    private boolean intersection(Set set1, Set set2) {
+        Set set = new HashSet();
+        set.addAll(set1);
+
+        set.retainAll(set2);
+        return set != null && !set.isEmpty();
+    }
 
     private Set<String> getOuterIncrementRelation(Set<String> tables, Join join, boolean left) {
         Set<String> results = new HashSet<>();
