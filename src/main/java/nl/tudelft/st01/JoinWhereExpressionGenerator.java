@@ -120,15 +120,17 @@ public class JoinWhereExpressionGenerator {
             throw new IllegalStateException("The list of joins must contain at least two elements.");
         }
 
-        List<JoinType> labels = new ArrayList<>();
+        List<JoinType> labels;
         for (int i = 0; i < joins.size(); i++) {
             labels = label(JoinType.LEFT, joins, i);
+            transformJoins(joins, labels);
+            labels = label(JoinType.RIGHT, joins, i);
+            transformJoins(joins, labels);
 
-            label(JoinType.RIGHT, joins, i);
         }
     }
 
-    private List<JoinWhereItem> transformJoins(List<Join> joins, List<JoinType> labels) {
+    private List<Join> transformJoins(List<Join> joins, List<JoinType> labels) {
         if (labels.size() != joins.size()) {
             throw new IllegalStateException("The size of the list of joins must be "
                     + "equal to the size of the list of labels");
@@ -141,8 +143,10 @@ public class JoinWhereExpressionGenerator {
 
         while(joinIterator.hasNext() && joinTypeIterator.hasNext()) {
             Join tJoin = transformJoin(joinIterator.next(), joinTypeIterator.next());
-            out.add(tJoin);
+            transformedJoins.add(tJoin);
         }
+
+        return transformedJoins;
 
     }
 
