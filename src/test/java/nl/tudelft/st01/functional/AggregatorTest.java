@@ -26,6 +26,51 @@ public class AggregatorTest {
     }
 
     /**
+     * A test case for the COUNT(_) clause. This query doesn't focus on GROUP BY,
+     * but specifically on the WHERE clause.
+     */
+    @Test
+    public void testCountOnColumnWithWhere() {
+        verify("SELECT COUNT(id) FROM Movies WHERE length_minutes < 100",
+
+            "SELECT * FROM Movies WHERE length_minutes = 101",
+            "SELECT * FROM Movies WHERE length_minutes = 100",
+            "SELECT * FROM Movies WHERE length_minutes = 99",
+            "SELECT * FROM Movies WHERE length_minutes IS NULL",
+            "SELECT COUNT(id) FROM Movies WHERE length_minutes < 100 "
+                + "HAVING COUNT(id) > COUNT(DISTINCT id) AND COUNT(DISTINCT id) > 1");
+    }
+
+    /**
+     * A test case for the COUNT(*) clause. This query doesn't focus on GROUP BY,
+     * but specifically on the WHERE clause.
+     */
+    @Test
+    public void testCountAllWithWhere() {
+        verify("SELECT COUNT(*) FROM Movies WHERE length_minutes < 100",
+
+            "SELECT * FROM Movies WHERE length_minutes = 101",
+            "SELECT * FROM Movies WHERE length_minutes = 100",
+            "SELECT * FROM Movies WHERE length_minutes = 99",
+            "SELECT * FROM Movies WHERE length_minutes IS NULL");
+    }
+
+    /**
+     * A test case for the COUNT(*) clause, which has to be handled differently from a normal
+     * COUNT(column) case since COUNT(*) does not have any columns in them, thus returning
+     * a nullPointer when trying to access them.
+     *
+     * It also focuses on the GROUP BY clause, as this is often paired with Aggregate functions.
+     */
+    @Test
+    public void testCountAllWithGroupBy() {
+        verify("SELECT director, COUNT(*) FROM Movies GROUP BY director",
+
+            "SELECT director, COUNT(*) FROM Movies GROUP BY director HAVING COUNT(*) > 1",
+            "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1");
+    }
+
+    /**
      * A test case for all the aggregators but COUNT since they all need 2 rules.
      * Since there is no Group By statement here, the 2 rules for Group By are not generated.
      *
@@ -56,34 +101,6 @@ public class AggregatorTest {
                     + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1",
                 "SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
                     + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
-    }
-
-    /**
-     * A test case for the COUNT(*) clause. This clause doesn't focus on GROUP BY.
-     */
-    @Test
-    public void testCountAllWithWhere() {
-        verify("SELECT COUNT(*) FROM Movies WHERE length_minutes < 100",
-
-                "SELECT * FROM Movies WHERE length_minutes = 101",
-                "SELECT * FROM Movies WHERE length_minutes = 100",
-                "SELECT * FROM Movies WHERE length_minutes = 99",
-                "SELECT * FROM Movies WHERE length_minutes IS NULL");
-    }
-
-    /**
-     * A test case for the COUNT(*) clause, which has to be handled differently from a normal
-     * COUNT(column) case since COUNT(*) does not have any columns in them, thus returning
-     * a nullPointer when trying to access them.
-     *
-     * It also focuses on the GROUP BY clause, as this is often paired with Aggregate functions.
-     */
-    @Test
-    public void testCountAllWithGroupBy() {
-        verify("SELECT director, COUNT(*) FROM Movies GROUP BY director",
-
-                "SELECT director, COUNT(*) FROM Movies GROUP BY director HAVING COUNT(*) > 1",
-                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1");
     }
 
     /**
