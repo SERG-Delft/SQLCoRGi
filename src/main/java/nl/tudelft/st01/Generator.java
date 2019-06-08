@@ -64,7 +64,7 @@ public final class Generator {
      */
     public static void main(String[] args) {
 
-        String query = "SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50";
+        String query = "SELECT * FROM a LEFT JOIN b on a.id=b.id HAVING a.id=1";
 
         Set<String> result = generateRules(query);
 

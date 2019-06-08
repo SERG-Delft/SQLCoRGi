@@ -1,7 +1,10 @@
 package nl.tudelft.st01.visitors;
 
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.statement.select.*;
+import net.sf.jsqlparser.statement.select.GroupByElement;
+import net.sf.jsqlparser.statement.select.Join;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 import nl.tudelft.st01.AggregateFunctionsGenerator;
 import nl.tudelft.st01.GroupByGenerator;
 import nl.tudelft.st01.JoinWhereExpressionGenerator;
@@ -11,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static nl.tudelft.st01.util.Expressions.setJoinToInner;
 import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
 
 /**
@@ -19,7 +23,7 @@ import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
 public class SelectStatementVisitor extends SelectVisitorAdapter {
 
     private Set<String> output;
-    private List<SelectBody> statements;
+    private List<PlainSelect> statements;
 
     /**
      * Creates a new visitor which can be used to generate coverage rules for queries.
@@ -42,18 +46,18 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     public void visit(PlainSelect plainSelect) {
 
         handleWhere(plainSelect);
-        for (SelectBody selectBody : this.statements) {
-            this.output.add(selectBody.toString());
-        }
         handleAggregators(plainSelect);
         handleGroupBy(plainSelect);
         handleHaving(plainSelect);
         handleJoins(plainSelect);
 
-
         //applyNullReduction();
 
-        output = null;
+        for (PlainSelect select : this.statements) {
+            this.output.add(select.toString());
+        }
+
+        this.output = null;
     }
 
     /**
@@ -73,15 +77,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             List<Join> joins = copy.getJoins();
             if (joins != null) {
                 for (Join join : joins) {
-                    join.setInner(true);
-                    join.setRight(false);
-                    join.setLeft(false);
-                    join.setOuter(false);
-                    join.setSemi(false);
-                    join.setCross(false);
-                    join.setSimple(false);
-                    join.setNatural(false);
-                    join.setFull(false);
+                    setJoinToInner(join);
                 }
             }
 
@@ -107,7 +103,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      */
     private void handleAggregators(PlainSelect plainSelect) {
         AggregateFunctionsGenerator aggregateFunctionsGenerator = new AggregateFunctionsGenerator();
-        Set<String> outputAfterAggregator = aggregateFunctionsGenerator.generate(plainSelect);
+        Set<String> outputAfterAggregator = aggregateFunctionsGenerator.generate((PlainSelect) copy(plainSelect));
 
         output.addAll(outputAfterAggregator);
     }
@@ -123,7 +119,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
 
         if (groupBy != null) {
             GroupByGenerator groupByGeneratorExpression = new GroupByGenerator();
-            Set<String> outputAfterGroupBy = groupByGeneratorExpression.generate(plainSelect);
+            Set<String> outputAfterGroupBy = groupByGeneratorExpression.generate((PlainSelect) copy(plainSelect));
 
             output.addAll(outputAfterGroupBy);
         }
@@ -136,19 +132,31 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleHaving(PlainSelect plainSelect) {
+
         Expression having = plainSelect.getHaving();
         if (having != null) {
+
+            PlainSelect copy = (PlainSelect) copy(plainSelect);
+            having = copy.getHaving();
+
+            List<Join> joins = copy.getJoins();
+            if (joins != null) {
+                for (Join join : joins) {
+                    setJoinToInner(join);
+                }
+            }
+            copy.setHaving(null);
 
             List<Expression> expressions = new ArrayList<>();
             SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions);
 
             having.accept(selectExpressionVisitor);
             for (Expression expression : expressions) {
-                plainSelect.setHaving(expression);
-                output.add(plainSelect.toString());
-            }
 
-            plainSelect.setHaving(having);
+                PlainSelect selectCopy = (PlainSelect) copy(copy);
+                selectCopy.setHaving(expression);
+                statements.add(selectCopy);
+            }
         }
     }
 
@@ -160,7 +168,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      */
     private void handleJoins(PlainSelect plainSelect) {
         JoinWhereExpressionGenerator joinWhereExpressionGenerator = new JoinWhereExpressionGenerator();
-        Set<String> out = joinWhereExpressionGenerator.generateJoinWhereExpressions(plainSelect);
+        Set<String> out = joinWhereExpressionGenerator.generateJoinWhereExpressions((PlainSelect) copy(plainSelect));
 
         output.addAll(out);
     }
