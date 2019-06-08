@@ -28,6 +28,10 @@ import java.util.TreeSet;
  * This class allows for mutating a given query such that a set of mutated queries is returned.
  */
 public class JoinWhereExpressionGenerator {
+    enum JoinType {
+        LEFT, RIGHT, INNER
+    }
+
     private Map<String, List<Column>> map;
 
     private Expression whereExpression;
@@ -90,15 +94,6 @@ public class JoinWhereExpressionGenerator {
     public Set<String> generate(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
 
-        label("L", joins, 0);
-        label("R", joins, 0);
-
-        label("L", joins, 1);
-        label("R", joins, 1);
-
-        label("L", joins, 2);
-        label("R", joins, 2);
-
         if (joins == null || joins.isEmpty()) {
             return new HashSet<>();
         }
@@ -118,38 +113,27 @@ public class JoinWhereExpressionGenerator {
 
     private void handleNestedJoins(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
-        List<String> mvoi = new ArrayList<>();
-        String[] labels = new String[joins.size()];
 
         map = new HashMap<>();
-
 
         if (joins == null || joins.size() < 2) {
             throw new IllegalStateException("The list of joins must contain at least two elements.");
         }
 
-        OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
-
         for (int i = 0; i < joins.size(); i++) {
-            label("L", joins, i);
-            label("R", joins, i);
+            label(joins, i, true);
+            label(joins, i, false);
         }
     }
 
-    private List<String> label(String joinType, List<Join> joins, int index) {
+    private List<JoinType> label(List<Join> joins, int index, boolean left) {
         if (index >= joins.size()) {
             throw new IllegalArgumentException("The index cannot be larger than the size of the given list of joins.");
         }
 
-        String joinTypeLeft = "L";
-        String joinTypeRight = "R";
-
-        Set<String> mvoi = new HashSet<>();
-
-        List<String> labels = Arrays.asList(new String[joins.size()]);
-        labels.set(index, joinType.toUpperCase());
-
         Join currJoin = joins.get(index);
+        Set<String> mvoi = new HashSet<>();
+        List<JoinType> labels = Arrays.asList(new JoinType[joins.size()]);
 
         map = new HashMap<>();
 
@@ -160,12 +144,16 @@ public class JoinWhereExpressionGenerator {
         String loirels = getOuterIncrementRelation(tables, currJoin, true);
         String roirels = getOuterIncrementRelation(tables, currJoin, false);
 
-
-        if (joinType.toUpperCase().equals("R")) {
-            mvoi.add(roirels);
-        } else {
+        JoinType joinType;
+        if (left) {
+            joinType = JoinType.LEFT;
             mvoi.add(loirels);
+        } else {
+            joinType = JoinType.RIGHT;
+            mvoi.add(roirels);
         }
+
+        labels.set(index, joinType);
 
         Join join;
 
@@ -178,17 +166,17 @@ public class JoinWhereExpressionGenerator {
             if (labels.get(i) == null) {
                 if (mvoi.contains(roirelsJ)) {
                     mvoi.add(loirelsJ);
-                    labels.set(i, joinTypeLeft);
+                    labels.set(i, JoinType.LEFT);
                 } else if (mvoi.contains(loirelsJ)) {
                     mvoi.add(roirelsJ);
-                    labels.set(i, joinTypeRight);
+                    labels.set(i, JoinType.RIGHT);
                 }
             }
         }
 
         for (int i = 0; i < labels.size(); i++) {
             if (labels.get(i) == null) {
-                labels.set(i, "I");
+                labels.set(i, JoinType.INNER);
             }
         }
 
