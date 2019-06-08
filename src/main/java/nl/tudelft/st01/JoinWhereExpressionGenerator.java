@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -105,7 +106,6 @@ public class JoinWhereExpressionGenerator {
         }
 
         return null;
-
     }
 
     private void handleSingleJoin(PlainSelect plainSelect) {
@@ -120,10 +120,52 @@ public class JoinWhereExpressionGenerator {
             throw new IllegalStateException("The list of joins must contain at least two elements.");
         }
 
+        List<JoinType> labels = new ArrayList<>();
         for (int i = 0; i < joins.size(); i++) {
-            label(JoinType.LEFT, joins, i);
+            labels = label(JoinType.LEFT, joins, i);
+
             label(JoinType.RIGHT, joins, i);
         }
+    }
+
+    private List<JoinWhereItem> transformJoins(List<Join> joins, List<JoinType> labels) {
+        if (labels.size() != joins.size()) {
+            throw new IllegalStateException("The size of the list of joins must be "
+                    + "equal to the size of the list of labels");
+        }
+
+        Iterator<Join> joinIterator = joins.iterator();
+        Iterator<JoinType> joinTypeIterator = labels.iterator();
+
+        List<Join> transformedJoins = new ArrayList<>();
+
+        while(joinIterator.hasNext() && joinTypeIterator.hasNext()) {
+            Join tJoin = transformJoin(joinIterator.next(), joinTypeIterator.next());
+            out.add(tJoin);
+        }
+
+    }
+
+    private Join transformJoin(Join join, JoinType joinType) {
+        return setJoinType(genericCopyOfJoin(join), joinType);
+    }
+
+    private Join setJoinType(Join join, JoinType joinType) {
+        switch (joinType) {
+            case LEFT:
+                join.setLeft(true);
+                break;
+            case RIGHT:
+                join.setRight(true);
+                break;
+            case INNER:
+                join.setInner(true);
+                break;
+            default:
+                throw new IllegalArgumentException("Join type must be either LEFT, RIGHT or INNER");
+        }
+
+        return join;
     }
 
     private List<JoinType> label(JoinType joinType, List<Join> joins, int index) {
@@ -144,12 +186,12 @@ public class JoinWhereExpressionGenerator {
         Set<String> loirels = getOuterIncrementRelation(tables, currJoin, true);
         Set<String> roirels = getOuterIncrementRelation(tables, currJoin, false);
 
-        switch(joinType) {
+        switch (joinType) {
             case LEFT:  mvoi.addAll(loirels);
                 break;
             case RIGHT: mvoi.addAll(roirels);
                 break;
-                default: throw new IllegalArgumentException("The join type must be either LEFT or RIGHT");
+            default: throw new IllegalArgumentException("The join type must be either LEFT or RIGHT");
         }
 
         labels.set(index, joinType);
@@ -183,11 +225,11 @@ public class JoinWhereExpressionGenerator {
         return labels;
     }
 
-    private <T> Set<T> intersection(Set<T> set1, Set<T> set2) {
+    private static<T> Set<T> intersection(Set<T> set1, Set<T> set2) {
         Set set = new HashSet();
         set.addAll(set1);
-
         set.retainAll(set2);
+
         return set;
     }
 
