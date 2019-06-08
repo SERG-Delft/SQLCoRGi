@@ -1,6 +1,6 @@
 package nl.tudelft.st01.functional;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static nl.tudelft.st01.functional.AssertUtils.verify;
@@ -128,7 +128,7 @@ public class ConditionTest {
     /**
      * A test case with two conditions, combined with AND.
      */
-    @Ignore("We handle the IS NULL case differently with an extra rule")
+    @Disabled("We handle the IS NULL case differently with an extra rule")
     @Test
     public void testTwoConditionsWithAND() {
         verify("SELECT * FROM Movies WHERE year > 1950 AND year < 2000",
@@ -145,7 +145,7 @@ public class ConditionTest {
     /**
      * A test case with two conditions, combined with OR.
      */
-    @Ignore("We handle the IS NULL case differently with an extra rule")
+    @Disabled("We handle the IS NULL case differently with an extra rule")
     @Test
     public void testTwoConditionsWithOR() {
         verify("SELECT * FROM Movies WHERE year < 2004 OR year > 2010",
