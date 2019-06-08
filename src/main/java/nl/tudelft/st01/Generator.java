@@ -64,7 +64,7 @@ public final class Generator {
      */
     public static void main(String[] args) {
 
-        String query = "SELECT * FROM t WHERE a = 3 AND (b>0 OR ((a < 8 AND b<5) OR a >2))";
+        String query = "SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50";
 
         Set<String> result = generateRules(query);
 

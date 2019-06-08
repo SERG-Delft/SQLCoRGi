@@ -1,19 +1,17 @@
 package nl.tudelft.st01.visitors;
 
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.statement.select.GroupByElement;
-import net.sf.jsqlparser.statement.select.Join;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
+import net.sf.jsqlparser.statement.select.*;
 import nl.tudelft.st01.AggregateFunctionsGenerator;
 import nl.tudelft.st01.GroupByGenerator;
 import nl.tudelft.st01.JoinWhereExpressionGenerator;
-import nl.tudelft.st01.util.cloner.SelectCloner;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
 
 /**
  * A visitor used for generating coverage targets of a SELECT statement.
@@ -21,6 +19,7 @@ import java.util.Set;
 public class SelectStatementVisitor extends SelectVisitorAdapter {
 
     private Set<String> output;
+    private List<SelectBody> statements;
 
     /**
      * Creates a new visitor which can be used to generate coverage rules for queries.
@@ -36,16 +35,21 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
         }
 
         this.output = output;
+        this.statements = new ArrayList<>();
     }
 
     @Override
     public void visit(PlainSelect plainSelect) {
 
         handleWhere(plainSelect);
+        for (SelectBody selectBody : this.statements) {
+            this.output.add(selectBody.toString());
+        }
         handleAggregators(plainSelect);
         handleGroupBy(plainSelect);
         handleHaving(plainSelect);
         handleJoins(plainSelect);
+
 
         //applyNullReduction();
 
@@ -63,35 +67,35 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
         Expression where = plainSelect.getWhere();
         if (where != null) {
 
+            PlainSelect copy = (PlainSelect) copy(plainSelect);
+            where = copy.getWhere();
+
+            List<Join> joins = copy.getJoins();
+            if (joins != null) {
+                for (Join join : joins) {
+                    join.setInner(true);
+                    join.setRight(false);
+                    join.setLeft(false);
+                    join.setOuter(false);
+                    join.setSemi(false);
+                    join.setCross(false);
+                    join.setSimple(false);
+                    join.setNatural(false);
+                    join.setFull(false);
+                }
+            }
+
             List<Expression> expressions = new ArrayList<>();
             SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions);
 
-            List<Join> joins = plainSelect.getJoins();
-            if (joins != null) {
-                List<Join> innerJoins = new ArrayList<>();
-                for (Join join : joins) {
-                    Join copy = SelectCloner.copy(join);
-                    copy.setInner(true);
-                    copy.setRight(false);
-                    copy.setLeft(false);
-                    copy.setOuter(false);
-                    copy.setSemi(false);
-                    copy.setCross(false);
-                    copy.setSimple(false);
-                    copy.setNatural(false);
-                    copy.setFull(false);
-                    innerJoins.add(copy);
-                }
-                plainSelect.setJoins(innerJoins);
-            }
-
             where.accept(selectExpressionVisitor);
+            copy.setWhere(null);
             for (Expression expression : expressions) {
-                plainSelect.setWhere(expression);
-                output.add(plainSelect.toString());
-            }
 
-            plainSelect.setWhere(where);
+                PlainSelect selectCopy = (PlainSelect) copy(copy);
+                selectCopy.setWhere(expression);
+                statements.add(selectCopy);
+            }
         }
     }
 
