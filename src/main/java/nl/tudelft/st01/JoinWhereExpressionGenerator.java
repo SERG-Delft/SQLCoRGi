@@ -141,16 +141,16 @@ public class JoinWhereExpressionGenerator {
         currJoin.getOnExpression().accept(onExpressionVisitor);
 
         Set<String> tables = map.keySet();
-        String loirels = getOuterIncrementRelation(tables, currJoin, true);
-        String roirels = getOuterIncrementRelation(tables, currJoin, false);
+        Set<String> loirels = getOuterIncrementRelation(tables, currJoin, true);
+        Set<String> roirels = getOuterIncrementRelation(tables, currJoin, false);
 
         JoinType joinType;
         if (left) {
             joinType = JoinType.LEFT;
-            mvoi.add(loirels);
+            mvoi.addAll(loirels);
         } else {
             joinType = JoinType.RIGHT;
-            mvoi.add(roirels);
+            mvoi.addAll(roirels);
         }
 
         labels.set(index, joinType);
@@ -161,14 +161,14 @@ public class JoinWhereExpressionGenerator {
             map.clear();
             joins.get(i).getOnExpression().accept(onExpressionVisitor);
             join = joins.get(i);
-            String loirelsJ = getOuterIncrementRelation(tables, join, true);
-            String roirelsJ = getOuterIncrementRelation(tables, join, false);
+            Set<String> loirelsJ = getOuterIncrementRelation(tables, join, true);
+            Set<String> roirelsJ = getOuterIncrementRelation(tables, join, false);
             if (labels.get(i) == null) {
                 if (mvoi.contains(roirelsJ)) {
-                    mvoi.add(loirelsJ);
+                    mvoi.addAll(loirelsJ);
                     labels.set(i, JoinType.LEFT);
                 } else if (mvoi.contains(loirelsJ)) {
-                    mvoi.add(roirelsJ);
+                    mvoi.addAll(roirelsJ);
                     labels.set(i, JoinType.RIGHT);
                 }
             }
@@ -185,15 +185,26 @@ public class JoinWhereExpressionGenerator {
     }
 
 
-    private String getOuterIncrementRelation(Set<String> tables, Join join, boolean left) {
+    private Set<String> getOuterIncrementRelation(Set<String> tables, Join join, boolean left) {
+        Set<String> results = new HashSet<>();
         for (String key : tables) {
             if (key.equals(join.getRightItem().toString().toLowerCase()) == left) {
-                return key;
+                results.add(key);
             }
         }
 
-        return null;
+        return results;
     }
+//
+//    private String getOuterIncrementRelation(Set<String> tables, Join join, boolean left) {
+//        for (String key : tables) {
+//            if (key.equals(join.getRightItem().toString().toLowerCase()) == left) {
+//                return key;
+//            }
+//        }
+//
+//        return null;
+//    }
 
     /**
      * Creates a generic shallow copy of the given join.
