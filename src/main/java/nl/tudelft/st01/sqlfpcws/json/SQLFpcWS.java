@@ -11,7 +11,10 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SQLFpcWS {
+public final class SQLFpcWS {
+
+    private static final String ERROR_XPATH = "/sqlfpc/error";
+    private static final String SQL_TARGET_XPATH = "/sqlfpc/fpcrules/fpcrule/sql";
 
     private List<String> extractSQLTargetsFromXMLResponse(String xmlResponseString) {
         ArrayList<String> result = new ArrayList<>();
@@ -25,13 +28,13 @@ public class SQLFpcWS {
             return result;
         }
 
-        Node error = xmlReponse.selectSingleNode("/sqlfpc/error");
+        Node error = xmlReponse.selectSingleNode(ERROR_XPATH);
         if(error != null) {
             System.err.println("SQL Query could not be parsed: " + error.getText());
             return result;
         }
 
-        List<Element> sqlRules = (List<Element>)xmlReponse.selectNodes("/sqlfpc/fpcrules/fpcrule/sql");
+        List<Element> sqlRules = (List<Element>)xmlReponse.selectNodes(SQL_TARGET_XPATH);
         for (Element sqlRule : sqlRules) {
             result.add(sqlRule.getText());
         }
