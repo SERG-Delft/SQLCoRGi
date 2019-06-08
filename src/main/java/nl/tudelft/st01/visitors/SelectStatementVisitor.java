@@ -1,12 +1,10 @@
 package nl.tudelft.st01.visitors;
 
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.statement.select.*;
 import nl.tudelft.st01.AggregateFunctionsGenerator;
 import nl.tudelft.st01.GroupByGenerator;
 import nl.tudelft.st01.JoinWhereExpressionGenerator;
-import nl.tudelft.st01.util.cloner.SelectCloner;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 
 import java.util.ArrayList;
@@ -14,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import static nl.tudelft.st01.JoinWhereExpressionGenerator.genericCopyOfJoin;
-import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
 
 /**
  * A visitor used for generating coverage targets of a SELECT statement.
@@ -76,26 +73,6 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
 
             where.accept(selectExpressionVisitor);
             for (Expression expression : expressions) {
-                // Check if SELECT statement only consists of an Aggregate function
-                SelectItem possibleAggregateFunction = plainSelect.getSelectItems().get(0);
-                if (possibleAggregateFunction instanceof SelectExpressionItem) {
-                    SelectExpressionItem possibleFunction = (SelectExpressionItem) possibleAggregateFunction;
-
-                    if (possibleFunction.getExpression() instanceof Function) {
-                        // Change Aggregate function in SELECT statement to *
-                        PlainSelect plainSelectCopy = (PlainSelect) SelectCloner.copy(plainSelect);
-
-                        SelectItem allColumns = new AllColumns();
-                        List allColumnList = new ArrayList();
-                        allColumnList.add(allColumns);
-
-                        plainSelectCopy.setSelectItems(allColumnList);
-                        plainSelectCopy.setWhere(expression);
-                        output.add(plainSelectCopy.toString());
-                        continue;
-                    }
-                }
-
                 plainSelect.setWhere(expression);
                 output.add(plainSelect.toString());
             }

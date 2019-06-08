@@ -33,10 +33,10 @@ public class AggregatorTest {
     public void testCountOnColumnWithWhere() {
         verify("SELECT COUNT(id) FROM Movies WHERE length_minutes < 100",
 
-            "SELECT * FROM Movies WHERE length_minutes = 101",
-            "SELECT * FROM Movies WHERE length_minutes = 100",
-            "SELECT * FROM Movies WHERE length_minutes = 99",
-            "SELECT * FROM Movies WHERE length_minutes IS NULL",
+            "SELECT COUNT(id) FROM Movies WHERE length_minutes = 101",
+            "SELECT COUNT(id) FROM Movies WHERE length_minutes = 100",
+            "SELECT COUNT(id) FROM Movies WHERE length_minutes = 99",
+            "SELECT COUNT(id) FROM Movies WHERE length_minutes IS NULL",
             "SELECT COUNT(id) FROM Movies WHERE length_minutes < 100 "
                 + "HAVING COUNT(id) > COUNT(DISTINCT id) AND COUNT(DISTINCT id) > 1");
     }
@@ -49,10 +49,10 @@ public class AggregatorTest {
     public void testCountAllWithWhere() {
         verify("SELECT COUNT(*) FROM Movies WHERE length_minutes < 100",
 
-            "SELECT * FROM Movies WHERE length_minutes = 101",
-            "SELECT * FROM Movies WHERE length_minutes = 100",
-            "SELECT * FROM Movies WHERE length_minutes = 99",
-            "SELECT * FROM Movies WHERE length_minutes IS NULL");
+            "SELECT COUNT(*) FROM Movies WHERE length_minutes = 101",
+            "SELECT COUNT(*) FROM Movies WHERE length_minutes = 100",
+            "SELECT COUNT(*) FROM Movies WHERE length_minutes = 99",
+            "SELECT COUNT(*) FROM Movies WHERE length_minutes IS NULL");
     }
 
     /**
@@ -220,7 +220,7 @@ public class AggregatorTest {
         verify("SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                 + "GROUP BY Director HAVING Director LIKE 'A%'",
 
-            // Copy Of Original Clause
+                // Copy Of Original Clause
                 "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                     + "GROUP BY Director HAVING Director LIKE 'A%'",
                 //  WHERE
