@@ -30,13 +30,13 @@ public class JoinTest {
 
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull "
-                        + "WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NOT NULL)",
+                    + "WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NOT NULL)",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull "
-                        + "WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NULL)",
+                    + "WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NULL)",
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull "
-                        + "WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NOT NULL)",
+                    + "WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NOT NULL)",
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull "
-                        + "WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NULL)");
+                    + "WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NULL)");
     }
 
     /**
@@ -50,24 +50,24 @@ public class JoinTest {
     @CsvSource({"INNER, AND", "INNER, OR", "RIGHT, AND", "RIGHT, OR", "LEFT, AND", "LEFT, OR", "FULL, AND", "FULL, OR"})
     public void testJoinsOnTwoDisjointConditionsWithNullableColumns(String joinType, String conditionType) {
         verify("SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
-                        + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2",
+                    + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2",
 
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
-                        + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2",
+                    + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
-                        + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND "
-                        + "(TableB.CanBeNull2 IS NULL) AND (TableA.CanBeNull IS NOT NULL) AND "
-                        + "(TableA.CanBeNull2 IS NOT NULL)",
+                    + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND "
+                    + "(TableB.CanBeNull2 IS NULL) AND (TableA.CanBeNull IS NOT NULL) AND "
+                    + "(TableA.CanBeNull2 IS NOT NULL)",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
-                        + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND "
-                        + "(TableB.CanBeNull2 IS NULL) AND (TableA.CanBeNull IS NULL) AND (TableA.CanBeNull2 IS NULL)",
+                    + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND "
+                    + "(TableB.CanBeNull2 IS NULL) AND (TableA.CanBeNull IS NULL) AND (TableA.CanBeNull2 IS NULL)",
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
-                        + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableA.CanBeNull IS NULL) AND "
-                        + "(TableA.CanBeNull2 IS NULL) AND (TableB.CanBeNull IS NOT NULL) AND "
-                        + "(TableB.CanBeNull2 IS NOT NULL)",
+                    + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableA.CanBeNull IS NULL) AND "
+                    + "(TableA.CanBeNull2 IS NULL) AND (TableB.CanBeNull IS NOT NULL) AND "
+                    + "(TableB.CanBeNull2 IS NOT NULL)",
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
-                        + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableA.CanBeNull IS NULL) AND "
-                        + "(TableA.CanBeNull2 IS NULL) AND (TableB.CanBeNull IS NULL) AND (TableB.CanBeNull2 IS NULL)");
+                    + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableA.CanBeNull IS NULL) AND "
+                    + "(TableA.CanBeNull2 IS NULL) AND (TableB.CanBeNull IS NULL) AND (TableB.CanBeNull2 IS NULL)");
     }
 
     /**
@@ -82,13 +82,13 @@ public class JoinTest {
 
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull"
-                        + " WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NOT NULL)",
+                    + " WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NOT NULL)",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull"
-                        + " WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NULL)",
+                    + " WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NULL)",
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull"
-                        + " WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NOT NULL)",
+                    + " WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NOT NULL)",
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull"
-                        + " WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NULL)");
+                    + " WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NULL)");
     }
 
     /**
@@ -101,7 +101,7 @@ public class JoinTest {
 
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL",
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL WHERE"
-                        + " (NOT (TableA.CanBeNull IS NULL)) AND (TableA.CanBeNull IS NOT NULL)");
+                    + " (NOT (TableA.CanBeNull IS NULL)) AND (TableA.CanBeNull IS NOT NULL)");
     }
 
     /**
@@ -114,7 +114,7 @@ public class JoinTest {
 
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull > 5",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull > 5 WHERE (NOT (TableA.CanBeNull > 5))"
-                        + " AND (TableA.CanBeNull IS NOT NULL)");
+                    + " AND (TableA.CanBeNull IS NOT NULL)");
     }
 
     /**
@@ -126,7 +126,7 @@ public class JoinTest {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableB.CanBeNull IS NULL",
 
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableB.CanBeNull IS NULL WHERE"
-                        + " (NOT (TableB.CanBeNull IS NULL)) AND (TableB.CanBeNull IS NOT NULL)");
+                    + " (NOT (TableB.CanBeNull IS NULL)) AND (TableB.CanBeNull IS NOT NULL)");
     }
 
     /**
@@ -138,7 +138,7 @@ public class JoinTest {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableB.CanBeNull > 5",
 
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableB.CanBeNull > 5 WHERE (NOT (TableB.CanBeNull > 5))"
-                        + " AND (TableB.CanBeNull IS NOT NULL)");
+                    + " AND (TableB.CanBeNull IS NOT NULL)");
     }
 
     /**
@@ -158,13 +158,13 @@ public class JoinTest {
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE TableA.Value IS NULL",
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Value > 1)",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableB.Var IS NULL) "
-                        + "AND (TableA.Var IS NOT NULL)) AND (TableA.Value > 1)",
+                    + "AND (TableA.Var IS NOT NULL)) AND (TableA.Value > 1)",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.Var = TableB.Var WHERE ((TableB.Var IS NULL) "
-                        + "AND (TableA.Var IS NULL)) AND (TableA.Value > 1)",
+                    + "AND (TableA.Var IS NULL)) AND (TableA.Value > 1)",
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) "
-                        + "AND (TableB.Var IS NOT NULL)",
+                    + "AND (TableB.Var IS NOT NULL)",
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.Var = TableB.Var WHERE (TableA.Var IS NULL) "
-                        + "AND (TableB.Var IS NULL)");
+                    + "AND (TableB.Var IS NULL)");
     }
 
     /**
@@ -177,17 +177,18 @@ public class JoinTest {
             "a.id IS NULL", "b.length IS NULL", "a.size BETWEEN 50.0 AND b.length"})
     public void testJoinWithWhereColumnsExcludedIfSideIsNull(String where) {
         containsAtLeast("SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE " + where,
+
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE (" + where + ")",
                 "SELECT * FROM a LEFT JOIN b ON a.id = b.id OR a.length < b.length "
-                        + "WHERE (b.id IS NULL) AND (b.length IS NULL) AND (a.id IS NULL) AND (a.length IS NULL)",
+                    + "WHERE (b.id IS NULL) AND (b.length IS NULL) AND (a.id IS NULL) AND (a.length IS NULL)",
                 "SELECT * FROM a LEFT JOIN b ON a.id = b.id OR a.length < b.length "
-                        + "WHERE (b.id IS NULL) AND (b.length IS NULL) "
-                        + "AND (a.id IS NOT NULL) AND (a.length IS NOT NULL)",
+                    + "WHERE (b.id IS NULL) AND (b.length IS NULL) "
+                    + "AND (a.id IS NOT NULL) AND (a.length IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON a.id = b.id OR a.length < b.length "
-                        + "WHERE (a.id IS NULL) AND (a.length IS NULL) AND (b.id IS NOT NULL) "
-                        + "AND (b.length IS NOT NULL)",
+                    + "WHERE (a.id IS NULL) AND (a.length IS NULL) AND (b.id IS NOT NULL) "
+                    + "AND (b.length IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON a.id = b.id OR a.length < b.length "
-                        + "WHERE (a.id IS NULL) AND (a.length IS NULL) AND (b.id IS NULL) AND (b.length IS NULL)"
+                    + "WHERE (a.id IS NULL) AND (a.length IS NULL) AND (b.id IS NULL) AND (b.length IS NULL)"
         );
     }
 
@@ -201,7 +202,7 @@ public class JoinTest {
             "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE a.length < 60 AND b.id > 40",
 
             "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
-                    + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length < 60)",
+                + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length < 60)",
             "SELECT * FROM a LEFT JOIN b ON b.id = a.id WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length < 60)",
             "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE ((a.id IS NULL) AND (b.id IS NOT NULL)) AND (b.id > 40)",
             "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)",
@@ -222,7 +223,7 @@ public class JoinTest {
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
                     + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.name LIKE 'a%')",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
-                        + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.name LIKE 'a%')",
+                    + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.name LIKE 'a%')",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)"
         );
@@ -238,9 +239,9 @@ public class JoinTest {
 
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.length IS NOT NULL)",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
-                        + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length IS NOT NULL)",
+                    + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length IS NOT NULL)",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
-                        + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length IS NOT NULL)",
+                    + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)"
         );
@@ -257,9 +258,9 @@ public class JoinTest {
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id WHERE (b.id IS NULL) AND (a.id IS NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id "
-                        + "WHERE ((a.id IS NULL) AND (b.id IS NOT NULL)) AND (b.length IN (1, 3, 4))",
+                    + "WHERE ((a.id IS NULL) AND (b.id IS NOT NULL)) AND (b.length IN (1, 3, 4))",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id "
-                        + "WHERE ((a.id IS NULL) AND (b.id IS NULL)) AND (b.length IN (1, 3, 4))"
+                    + "WHERE ((a.id IS NULL) AND (b.id IS NULL)) AND (b.length IN (1, 3, 4))"
         );
     }
 
@@ -273,9 +274,9 @@ public class JoinTest {
 
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.id = 10) AND (a.length = 30)",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
-                        + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.id = 10 AND a.length = 30)",
+                    + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.id = 10 AND a.length = 30)",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
-                        + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length = 30)",
+                    + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length = 30)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)"
         );
@@ -291,9 +292,9 @@ public class JoinTest {
 
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE (a.length BETWEEN 10 AND 40)",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
-                        + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length BETWEEN 10 AND 40)",
+                    + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length BETWEEN 10 AND 40)",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id "
-                        + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length BETWEEN 10 AND 40)",
+                    + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length BETWEEN 10 AND 40)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)"
         );
@@ -304,9 +305,7 @@ public class JoinTest {
      */
     @Test
     public void testJoinNoOnConditionSimpleJoin() {
-        verify(
-                "SELECT * FROM a, b"
-        );
+        verify("SELECT * FROM a, b");
     }
 
     /**
@@ -316,8 +315,8 @@ public class JoinTest {
     @Test
     public void testJoinNoOnConditionSimpleJoinWithWhereClauseException() {
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-            () -> Generator.generateRules("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50"));
-
+            () -> Generator.generateRules("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50")
+        );
     }
 
 
@@ -329,35 +328,35 @@ public class JoinTest {
     void testJoinOnMultipleColumnsSameTable() {
         containsAtLeast(
                 "SELECT acl_roles.* FROM acl_roles INNER JOIN acl_roles_users ON acl_roles_users.user_id = '1' "
-                        + "AND acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted ='0'WHERE acl_roles"
-                        + ".deleted='0'",
+                    + "AND acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted ='0'WHERE acl_roles"
+                    + ".deleted='0'",
 
                 "SELECT acl_roles.* FROM acl_roles INNER JOIN acl_roles_users ON acl_roles_users.user_id = '1'"
-                        + " AND acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE "
-                        + "acl_roles.deleted = '0'",
+                    + " AND acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE "
+                    + "acl_roles.deleted = '0'",
                 "SELECT acl_roles.* FROM acl_roles INNER JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
-                        + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE acl_roles"
-                        + ".deleted IS NULL",
+                    + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE acl_roles"
+                    + ".deleted IS NULL",
                 "SELECT acl_roles.* FROM acl_roles INNER JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
-                        + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE acl_roles"
-                        + ".deleted <> '0'",
+                    + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE acl_roles"
+                    + ".deleted <> '0'",
                 "SELECT acl_roles.* FROM acl_roles LEFT JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
-                        + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE ("
-                        + "(acl_roles_users.user_id IS NULL) AND (acl_roles_users.role_id IS NULL) AND "
-                        + "(acl_roles_users.deleted IS NULL) AND (acl_roles.id IS NOT NULL)) AND (acl_roles.deleted ="
-                        + " '0')",
+                    + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE ("
+                    + "(acl_roles_users.user_id IS NULL) AND (acl_roles_users.role_id IS NULL) AND "
+                    + "(acl_roles_users.deleted IS NULL) AND (acl_roles.id IS NOT NULL)) AND (acl_roles.deleted ="
+                    + " '0')",
                 "SELECT acl_roles.* FROM acl_roles LEFT JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
-                        + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE ("
-                        + "(acl_roles_users.user_id IS NULL) AND (acl_roles_users.role_id IS NULL) AND "
-                        + "(acl_roles_users.deleted IS NULL) AND (acl_roles.id IS NULL)) AND (acl_roles.deleted = '0')",
+                    + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE ("
+                    + "(acl_roles_users.user_id IS NULL) AND (acl_roles_users.role_id IS NULL) AND "
+                    + "(acl_roles_users.deleted IS NULL) AND (acl_roles.id IS NULL)) AND (acl_roles.deleted = '0')",
                 "SELECT acl_roles.* FROM acl_roles RIGHT JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
-                        + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE (acl_roles"
-                        + ".id IS NULL) AND (acl_roles_users.user_id IS NULL) AND (acl_roles_users.role_id IS NULL) "
-                        + "AND (acl_roles_users.deleted IS NULL)",
+                    + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE (acl_roles"
+                    + ".id IS NULL) AND (acl_roles_users.user_id IS NULL) AND (acl_roles_users.role_id IS NULL) "
+                    + "AND (acl_roles_users.deleted IS NULL)",
                 "SELECT acl_roles.* FROM acl_roles RIGHT JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
-                        + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE (acl_roles"
-                        + ".id IS NULL) AND (acl_roles_users.user_id IS NOT NULL) AND (acl_roles_users.role_id IS NOT"
-                        + " NULL) AND (acl_roles_users.deleted IS NOT NULL)"
+                    + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE (acl_roles"
+                    + ".id IS NULL) AND (acl_roles_users.user_id IS NOT NULL) AND (acl_roles_users.role_id IS NOT"
+                    + " NULL) AND (acl_roles_users.deleted IS NOT NULL)"
         );
     }
 

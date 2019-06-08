@@ -50,7 +50,7 @@ public class AggregatorTest {
     public void testAVGAggregator1column1Aggr() {
         verify("SELECT Director, AVG(Length) FROM Movies GROUP BY Director",
 
-            "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
+                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
                 "SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1",
                 "SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
                     + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1",
@@ -65,7 +65,7 @@ public class AggregatorTest {
     public void testCountAllWithWhere() {
         verify("SELECT COUNT(*) FROM Movies WHERE length_minutes < 100",
 
-            "SELECT * FROM Movies WHERE length_minutes = 101",
+                "SELECT * FROM Movies WHERE length_minutes = 101",
                 "SELECT * FROM Movies WHERE length_minutes = 100",
                 "SELECT * FROM Movies WHERE length_minutes = 99",
                 "SELECT * FROM Movies WHERE length_minutes IS NULL");
@@ -94,6 +94,7 @@ public class AggregatorTest {
     @Test
     public void testSUMAVGAggregator1column2Aggr() {
         verify("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director",
+
                 // generated for GROUP BY
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1",
@@ -203,7 +204,7 @@ public class AggregatorTest {
                 + "GROUP BY Director HAVING Director LIKE 'A%'",
 
             // Copy Of Original Clause
-            "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
+                "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                     + "GROUP BY Director HAVING Director LIKE 'A%'",
                 //  WHERE
                 "SELECT Director FROM Movies WHERE title <> 'Finding Nemo' "
