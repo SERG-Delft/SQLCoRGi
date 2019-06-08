@@ -149,7 +149,7 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/lib/sqlrules.jar</systemPath>
         </dependency>
-        
+
     </dependencies>
 
 
