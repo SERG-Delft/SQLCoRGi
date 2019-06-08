@@ -233,15 +233,19 @@ public class JoinWhereExpressionGenerator {
         return set;
     }
 
-    private Set<String> getOuterIncrementRelation(Set<String> tables, Join join, boolean left) {
-        Set<String> results = new HashSet<>();
+    private OuterIncrementRelation getOuterIncrementRelation(Set<String> tables, Join join) {
+        Set<String> loirels = new HashSet<>();
+        Set<String> roirels = new HashSet<>();
+
         for (String key : tables) {
-            if (key.equals(join.getRightItem().toString().toLowerCase()) == left) {
-                results.add(key);
+            if (key.equals(join.getRightItem().toString().toLowerCase())) {
+                loirels.add(key);
+            } else {
+                roirels.add(key);
             }
         }
 
-        return results;
+        return new OuterIncrementRelation(loirels, roirels);
     }
 
     /**
