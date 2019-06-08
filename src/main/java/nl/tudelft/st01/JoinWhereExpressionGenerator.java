@@ -202,16 +202,6 @@ public class JoinWhereExpressionGenerator {
 
         return results;
     }
-//
-//    private String getOuterIncrementRelation(Set<String> tables, Join join, boolean left) {
-//        for (String key : tables) {
-//            if (key.equals(join.getRightItem().toString().toLowerCase()) == left) {
-//                return key;
-//            }
-//        }
-//
-//        return null;
-//    }
 
     /**
      * Creates a generic shallow copy of the given join.
