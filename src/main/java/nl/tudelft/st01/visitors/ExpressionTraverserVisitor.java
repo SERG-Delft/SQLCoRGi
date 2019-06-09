@@ -112,10 +112,10 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(Column column) {
-        if (tablesContain(column) || columnsContain(column)) {
-            expression = null;
-        } else {
+        if (tablesContain(column) && !columnsContain(column)) {
             expression = column;
+        } else {
+            expression = null;
         }
     }
 
