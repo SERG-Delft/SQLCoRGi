@@ -137,62 +137,40 @@ public class JoinWhereExpressionGenerator {
         List<JoinType> labels;
         for (int i = 0; i < joins.size(); i++) {
             // TODO: differentiate between multitable and singletable on expressions.
-            // TODO: handle nullable columns in on expression.
-            labels = label(JoinType.LEFT, joins, i);
-            List<Join> tJoinsLoi = transformJoins(joins, labels);
             OuterIncrementRelation oir = outerIncrementRelations.get(i);
 
-            Expression loi = getLeftOuterIncrement(oir, false);
+            labels = label(JoinType.LEFT, joins, i);
+            List<Join> tJoinsLoi = transformJoins(joins, labels);
 
-            Expression reducedWhereLoi = nullReduction(whereCondition, oir.getLoiRelations());
-            Expression finalLoi = concatenate(loi, reducedWhereLoi, true);
-            JoinWhereItem joinWhereItemLoi = new JoinWhereItem(tJoinsLoi, finalLoi);
+            Expression loi = getLeftOuterIncrement(oir, false);
+            Expression loiNull = getLeftOuterIncrement(oir, true);
+            Expression reducedWhereLoi = nullReduction(whereCondition, oir, JoinType.LEFT, false);
+            Expression reducedWhereLoiNull = nullReduction(whereCondition, oir, JoinType.LEFT, true);
+
+            results.add(new JoinWhereItem(tJoinsLoi, concatenate(loi, reducedWhereLoi, true)));
+            results.add(new JoinWhereItem(tJoinsLoi, concatenate(loiNull, reducedWhereLoiNull, true)));
 
             labels = label(JoinType.RIGHT, joins, i);
             List<Join> tJoinsRoi = transformJoins(joins, labels);
+
             Expression roi = getRightOuterIncrement(oir, false);
+            Expression roiNull = getRightOuterIncrement(oir, true);
+            Expression reducedWhereRoi = nullReduction(whereCondition, oir, JoinType.RIGHT, false);
+            Expression reducedWhereRoiNull = nullReduction(whereCondition, oir, JoinType.RIGHT, true);
 
-            Expression reducedWhereRoi = nullReduction(whereCondition, oir.getRoiRelations());
-            Expression finalRoi = concatenate(roi, reducedWhereRoi, true);
-            JoinWhereItem joinWhereItemRoi = new JoinWhereItem(tJoinsRoi, finalRoi);
-
-            Expression loiNullable = getLeftOuterIncrement(oir, true);
-            Expression roiNullable = getRightOuterIncrement(oir, true);
-
-            Expression e = nullReduction(whereCondition, oir, JoinType.LEFT, true);
-            Expression e2 = nullReduction(whereCondition, oir, JoinType.LEFT, false);
-
-            results.add(joinWhereItemLoi);
-            results.add(joinWhereItemRoi);
+            results.add(new JoinWhereItem(tJoinsRoi, concatenate(roi, reducedWhereRoi, true)));
+            results.add(new JoinWhereItem(tJoinsRoi, concatenate(roiNull, reducedWhereRoiNull, true)));
         }
 
         plainSelect.setWhere(whereCondition);
         plainSelect.setJoins(joins);
     }
 
-    /**
-     * Modifies input expression such that it no longer contains any columns part of the table.
-     *
-     * @param tables The tables from which the columns have to be excluded.
-     * @param expression The expression that should be modified.
-     * @return The modified expression.
-     */
-    private static Expression nullReduction(Expression expression, Set<String> tables) {
-        if (expression != null) {
-            ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
-            traverserVisitor.setTables(tables);
-            expression.accept(traverserVisitor);
-
-            return traverserVisitor.getExpression();
-        }
-
-        return null;
-    }
-
     private static Expression nullReduction(Expression expression, OuterIncrementRelation oir, JoinType joinType, boolean nullable) {
         if (expression != null) {
             Set<String> includeTables;
             List<Column> excludeColumns;
+            
             if (joinType == JoinType.LEFT) {
                 includeTables = oir.getRoiRelations();
                 excludeColumns = oir.getRoiRelColumns();
@@ -210,27 +188,6 @@ public class JoinWhereExpressionGenerator {
                 traverserVisitor.setNullColumns(excludeColumns);
             }
 
-            expression.accept(traverserVisitor);
-
-            return traverserVisitor.getExpression();
-        }
-
-        return null;
-    }
-
-    /**
-     * Modifies input expression such that it no longer contains any columns part of the table.
-     *
-     * @param columns The columns that should be excluded.
-     * @param tables The table from which the columns should be excluded.
-     * @param expression The expression that should be modified.
-     * @return The modified expression.
-     */
-    private static Expression nullReduction(Expression expression, List<Column> columns, Set<String> tables) {
-        if (expression != null) {
-            ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
-            traverserVisitor.setTables(tables);
-            traverserVisitor.setNullColumns(columns);
             expression.accept(traverserVisitor);
 
             return traverserVisitor.getExpression();
