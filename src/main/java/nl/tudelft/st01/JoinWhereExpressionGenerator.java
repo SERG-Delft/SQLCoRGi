@@ -134,6 +134,7 @@ public class JoinWhereExpressionGenerator {
 
     private void handleNestedJoins(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
+        Expression whereCondition = plainSelect.getWhere();
 
         if (joins == null || joins.size() < 2) {
             throw new IllegalStateException("The list of joins must contain at least two elements.");
@@ -141,13 +142,34 @@ public class JoinWhereExpressionGenerator {
 
         List<JoinType> labels;
         for (int i = 0; i < joins.size(); i++) {
+            // TODO: differentiate between multitable and singletable on expressions.
             labels = label(JoinType.LEFT, joins, i);
-            transformJoins(joins, labels);
+            List<Join> tJoinsLoi = transformJoins(joins, labels);
+            Expression loi = getLeftOuterIncrement(outerIncrementRelations.get(i), false);
+            Expression reducedWhereLoi = nullReduction(plainSelect.getWhere(), outerIncrementRelations.get(i).getLoiRelations());
+            concatenate(loi, reducedWhereLoi, true);
+            JoinWhereItem joinWhereItemLoi = new JoinWhereItem(tJoinsLoi, reducedWhereLoi);
 
             labels = label(JoinType.RIGHT, joins, i);
-            transformJoins(joins, labels);
+            List<Join> tJoinsRoi = transformJoins(joins, labels);
+            Expression roi = getRightOuterIncrement(outerIncrementRelations.get(i), false);
+            Expression reducedWhereRoi = nullReduction(plainSelect.getWhere(), outerIncrementRelations.get(i).getRoiRelations());
+            concatenate(roi, reducedWhereRoi, true);
+            JoinWhereItem joinWhereItemRoi = new JoinWhereItem(tJoinsRoi, reducedWhereRoi);
+
+
         }
 
+        plainSelect.setWhere(whereCondition);
+        plainSelect.setJoins(joins);
+    }
+
+    private Expression nullReduction(Expression where, Set<String> oiRels) {
+        ExpressionTraverserVisitor visitor = new ExpressionTraverserVisitor();
+        visitor.setTables(oiRels);
+        where.accept(visitor);
+
+        return visitor.getExpression();
     }
 
     private Expression getLeftOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
@@ -157,8 +179,6 @@ public class JoinWhereExpressionGenerator {
         return new AndExpression(
                 createIsNullExpressions(loiColumns, true),
                 createIsNullExpressions(roiColumns, nullable));
-
-
     }
 
     private Expression getRightOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
@@ -167,7 +187,6 @@ public class JoinWhereExpressionGenerator {
         return new AndExpression(
                 createIsNullExpressions(loiColumns, nullable),
                 createIsNullExpressions(roiColumns, true));
-
     }
 
     private List<Join> transformJoins(List<Join> joins, List<JoinType> labels) {
@@ -188,8 +207,6 @@ public class JoinWhereExpressionGenerator {
 
         return transformedJoins;
     }
-
-
 
     private Join transformJoin(Join join, JoinType joinType) {
         return setJoinType(genericCopyOfJoin(join), joinType);
@@ -218,18 +235,10 @@ public class JoinWhereExpressionGenerator {
             throw new IllegalArgumentException("The index cannot be larger than the size of the given list of joins.");
         }
 
-        Join currJoin = joins.get(index);
         Set<String> mvoi = new HashSet<>();
         List<JoinType> labels = Arrays.asList(new JoinType[joins.size()]);
 
         OuterIncrementRelation currOiRel = outerIncrementRelations.get(index);
-//        map = new HashMap<>();
-//
-//        OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
-//        currJoin.getOnExpression().accept(onExpressionVisitor);
-//
-//        Set<String> tables = map.keySet();
-//         = getOuterIncrementRelation(map, currJoin);
 
         switch (joinType) {
             case LEFT:  mvoi.addAll(currOiRel.getLoiRelations());
