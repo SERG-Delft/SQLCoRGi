@@ -1,10 +1,12 @@
 package nl.tudelft.st01.visitors.select;
 
-import net.sf.jsqlparser.expression.BinaryExpression;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
+import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.arithmetic.*;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
+import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.*;
 
 import java.util.Collection;
 
@@ -43,24 +45,7 @@ public class NullReducer extends ExpressionVisitorAdapter {
         return original;
     }
 
-    @Override
-    public void visit(Column column) {
-
-        if (nulls.contains(column.toString())) {
-            this.child = null;
-            this.updateChild = true;
-        }
-    }
-
-    @Override
-    public void visit(IsNullExpression isNull) {
-        if (isNull.isNot()) {
-            isNull.getLeftExpression().accept(this);
-        }
-    }
-
-    @Override
-    protected void visitBinaryExpression(BinaryExpression expr) {
+    private void visitLogicalOperator(BinaryExpression expr) {
 
         Expression left = expr.getLeftExpression();
         Expression right = expr.getRightExpression();
@@ -102,6 +87,67 @@ public class NullReducer extends ExpressionVisitorAdapter {
                 this.updateChild = false;
             }
         }
+    }
+
+
+    /**
+     * Checks whether the children of this {@link BinaryExpression} have been removed. If they have been removed, signal
+     * the parent of this binary expression to remove this child.
+     *
+     * @param expr the binary expression to check.
+     */
+    @Override
+    protected void visitBinaryExpression(BinaryExpression expr) {
+        expr.getLeftExpression().accept(this);
+        if (this.updateChild) {
+            this.child = null;
+            return;
+        }
+        expr.getRightExpression().accept(this);
+        if (this.updateChild) {
+            this.child = null;
+        }
+    }
+
+    @Override
+    public void visit(AndExpression andExpression) {
+        visitLogicalOperator(andExpression);
+    }
+
+    @Override
+    public void visit(OrExpression orExpression) {
+        visitLogicalOperator(orExpression);
+    }
+
+    @Override
+    public void visit(IsNullExpression isNull) {
+        if (isNull.isNot()) {
+            isNull.getLeftExpression().accept(this);
+        }
+    }
+
+    @Override
+    public void visit(Column column) {
+        if (nulls.contains(column.toString())) {
+            this.child = null;
+            this.updateChild = true;
+        }
+    }
+
+    @Override
+    public void visit(SubSelect subSelect) {
+        // TODO: Stop here?
+    }
+
+    @Override
+    public void visit(CaseExpression expr) {
+        // TODO: Remove WHEN clauses from the CASE expression that cannot be satisfied, or delete whole CASE
+        // expression if no WHEN clauses are left.
+    }
+
+    @Override
+    public void visit(WhenClause expr) {
+        // TODO: Remove WHEN clauses that cannot be satisfied
     }
 
 }
