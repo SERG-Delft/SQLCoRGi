@@ -103,11 +103,7 @@ public class JoinWhereExpressionGenerator {
 
         outerIncrementRelations = generateOIRsForEachJoin(plainSelect.getJoins());
 
-        if (joins.size() == 1) {
-            handleSingleJoin(plainSelect);
-        } else {
-            handleNestedJoins(plainSelect);
-        }
+        handleNestedJoins(plainSelect);
 
         return null;
     }
@@ -136,40 +132,111 @@ public class JoinWhereExpressionGenerator {
         List<Join> joins = plainSelect.getJoins();
         Expression whereCondition = plainSelect.getWhere();
 
-        if (joins == null || joins.size() < 2) {
-            throw new IllegalStateException("The list of joins must contain at least two elements.");
-        }
+        List<JoinWhereItem> results = new ArrayList<>();
 
         List<JoinType> labels;
         for (int i = 0; i < joins.size(); i++) {
             // TODO: differentiate between multitable and singletable on expressions.
+            // TODO: handle nullable columns in on expression.
             labels = label(JoinType.LEFT, joins, i);
             List<Join> tJoinsLoi = transformJoins(joins, labels);
-            Expression loi = getLeftOuterIncrement(outerIncrementRelations.get(i), false);
-            Expression reducedWhereLoi = nullReduction(plainSelect.getWhere(), outerIncrementRelations.get(i).getLoiRelations());
-            concatenate(loi, reducedWhereLoi, true);
-            JoinWhereItem joinWhereItemLoi = new JoinWhereItem(tJoinsLoi, reducedWhereLoi);
+            OuterIncrementRelation oir = outerIncrementRelations.get(i);
+
+            Expression loi = getLeftOuterIncrement(oir, false);
+
+            Expression reducedWhereLoi = nullReduction(whereCondition, oir.getLoiRelations());
+            Expression finalLoi = concatenate(loi, reducedWhereLoi, true);
+            JoinWhereItem joinWhereItemLoi = new JoinWhereItem(tJoinsLoi, finalLoi);
 
             labels = label(JoinType.RIGHT, joins, i);
             List<Join> tJoinsRoi = transformJoins(joins, labels);
-            Expression roi = getRightOuterIncrement(outerIncrementRelations.get(i), false);
-            Expression reducedWhereRoi = nullReduction(plainSelect.getWhere(), outerIncrementRelations.get(i).getRoiRelations());
-            concatenate(roi, reducedWhereRoi, true);
-            JoinWhereItem joinWhereItemRoi = new JoinWhereItem(tJoinsRoi, reducedWhereRoi);
+            Expression roi = getRightOuterIncrement(oir, false);
 
+            Expression reducedWhereRoi = nullReduction(whereCondition, oir.getRoiRelations());
+            Expression finalRoi = concatenate(roi, reducedWhereRoi, true);
+            JoinWhereItem joinWhereItemRoi = new JoinWhereItem(tJoinsRoi, finalRoi);
 
+            Expression loiNullable = getLeftOuterIncrement(oir, true);
+            Expression roiNullable = getRightOuterIncrement(oir, true);
+
+            Expression e = nullReduction(whereCondition, oir, JoinType.LEFT, true);
+            Expression e2 = nullReduction(whereCondition, oir, JoinType.LEFT, false);
+
+            results.add(joinWhereItemLoi);
+            results.add(joinWhereItemRoi);
         }
 
         plainSelect.setWhere(whereCondition);
         plainSelect.setJoins(joins);
     }
 
-    private Expression nullReduction(Expression where, Set<String> oiRels) {
-        ExpressionTraverserVisitor visitor = new ExpressionTraverserVisitor();
-        visitor.setTables(oiRels);
-        where.accept(visitor);
+    /**
+     * Modifies input expression such that it no longer contains any columns part of the table.
+     *
+     * @param tables The tables from which the columns have to be excluded.
+     * @param expression The expression that should be modified.
+     * @return The modified expression.
+     */
+    private static Expression nullReduction(Expression expression, Set<String> tables) {
+        if (expression != null) {
+            ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
+            traverserVisitor.setTables(tables);
+            expression.accept(traverserVisitor);
 
-        return visitor.getExpression();
+            return traverserVisitor.getExpression();
+        }
+
+        return null;
+    }
+
+    private static Expression nullReduction(Expression expression, OuterIncrementRelation oir, JoinType joinType, boolean nullable) {
+        if (expression != null) {
+            Set<String> includeTables;
+            List<Column> excludeColumns;
+            if (joinType == JoinType.LEFT) {
+                includeTables = oir.getRoiRelations();
+                excludeColumns = oir.getRoiRelColumns();
+            } else if (joinType == JoinType.RIGHT) {
+                includeTables = oir.getLoiRelations();
+                excludeColumns = oir.getLoiRelColumns();
+            } else {
+                throw new IllegalArgumentException("Join type must be either LEFT or RIGHT");
+            }
+
+            ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
+            traverserVisitor.setTables(includeTables);
+
+            if (nullable) {
+                traverserVisitor.setNullColumns(excludeColumns);
+            }
+
+            expression.accept(traverserVisitor);
+
+            return traverserVisitor.getExpression();
+        }
+
+        return null;
+    }
+
+    /**
+     * Modifies input expression such that it no longer contains any columns part of the table.
+     *
+     * @param columns The columns that should be excluded.
+     * @param tables The table from which the columns should be excluded.
+     * @param expression The expression that should be modified.
+     * @return The modified expression.
+     */
+    private static Expression nullReduction(Expression expression, List<Column> columns, Set<String> tables) {
+        if (expression != null) {
+            ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
+            traverserVisitor.setTables(tables);
+            traverserVisitor.setNullColumns(columns);
+            expression.accept(traverserVisitor);
+
+            return traverserVisitor.getExpression();
+        }
+
+        return null;
     }
 
     private Expression getLeftOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
