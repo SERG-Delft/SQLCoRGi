@@ -17,10 +17,16 @@ import org.dom4j.io.SAXReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,17 +47,17 @@ public class BulkRuleGenerator {
         setUpSchemaDocument(xmlSchemaPath);
         this.jsonOutputPath = jsonOutputPath;
 
-        this.queryNo = 1;
+        this.queryNo = 0;
         this.sqlJson = new SQLjson();
     }
 
     private void setUpQueriesToParse(String sqlInputPath) {
-        try (Stream<String> stream = Files.lines(Paths.get(sqlInputPath))) {
+        try (Stream<String> stream = Files.lines(Paths.get(this.getClass().getResource(sqlInputPath).toURI()))) {
             queriesToParse = stream
                     .filter(query -> !query.isEmpty())
                     .map(String::toLowerCase)
                     .collect(Collectors.toList());
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             System.err.println("Could not open schema file: " + e.getMessage());
             queriesToParse = new ArrayList<>();
         }
@@ -59,7 +65,7 @@ public class BulkRuleGenerator {
 
     private void setUpSchemaDocument(String xmlSchemaPath) {
         try {
-            schema = new SAXReader().read(new File(xmlSchemaPath));
+            schema = new SAXReader().read(this.getClass().getResourceAsStream(xmlSchemaPath));
         } catch (DocumentException e) {
             System.err.println("Schema could not be parsed: " + e.getMessage());
             schema = DocumentHelper.createDocument();
@@ -76,7 +82,7 @@ public class BulkRuleGenerator {
             gson.toJson(sqlJson, jsonWriter);
             jsonWriter.flush();
         } catch (IOException e) {
-            System.err.println("Unable to write to output file " + e.getMessage());
+            System.err.println("Unable to write to output file: " + e.getMessage());
         }
     }
 
@@ -88,7 +94,7 @@ public class BulkRuleGenerator {
             SQLRules sqlRules = new SQLRules(queryNo++, coverageTargets);
             sqlJson.addEntry(sqlRules);
 
-            System.out.println("Processed query " +  queryNo + ": " + query);
+            System.out.println("[" +  queryNo + "]: " + query);
             System.out.println("Generated rules (" + coverageTargets.size() + "):");
             coverageTargets.forEach(target -> System.out.println("\t" + target));
             System.out.println();
@@ -132,6 +138,25 @@ public class BulkRuleGenerator {
 
 
         return tableNames;
+    }
+
+    public String statisticsString() {
+        StringBuilder sBuilder = new StringBuilder();
+
+        long queries = queriesToParse.size();
+        long tables = schema.selectNodes("/schema/table").size();
+        long columns = schema.selectNodes("/schema/table/column").size();
+        long duration = RULE_GENERATOR_INTERVAL * 1000000 * queries;
+
+        LocalDateTime finishTime = LocalDateTime.now().plusNanos(duration);
+        String formattedFinishTime = finishTime.format(DateTimeFormatter.ISO_DATE_TIME);
+
+        sBuilder.append("- Number of queries provided: " + queries + "\n")
+                .append("- Number of tables in schema: " + tables + "\n")
+                .append("- Number of columns in schema: " + columns + "\n")
+                .append("- Estimated completion time: " + formattedFinishTime + "\n");
+
+        return sBuilder.toString();
     }
 
 }
