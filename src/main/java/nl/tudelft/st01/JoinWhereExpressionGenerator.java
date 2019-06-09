@@ -29,13 +29,15 @@ import java.util.TreeSet;
  * This class allows for mutating a given query such that a set of mutated queries is returned.
  */
 public class JoinWhereExpressionGenerator {
-    enum JoinType {
+    private enum JoinType {
         LEFT, RIGHT, INNER
     }
 
     private Map<String, List<Column>> map;
 
     private Expression whereExpression;
+
+    private List<OuterIncrementRelation> outerIncrementRelations;
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
@@ -114,8 +116,6 @@ public class JoinWhereExpressionGenerator {
     private void handleNestedJoins(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
 
-        map = new HashMap<>();
-
         if (joins == null || joins.size() < 2) {
             throw new IllegalStateException("The list of joins must contain at least two elements.");
         }
@@ -124,14 +124,35 @@ public class JoinWhereExpressionGenerator {
         for (int i = 0; i < joins.size(); i++) {
             labels = label(JoinType.LEFT, joins, i);
             transformJoins(joins, labels);
+
             labels = label(JoinType.RIGHT, joins, i);
             transformJoins(joins, labels);
 
         }
+
     }
 
-    private Expression nullReduction() {
-        return null;
+    private Expression getLeftOuterIncrement(OuterIncrementRelation oiRel, Map<String, List<Column>> map) {
+        List<Column> loiColumns = new ArrayList<>();
+        List<Column> roiColumns = new ArrayList<>();
+
+        for (String table : oiRel.getLoiRelations()) {
+            loiColumns.addAll(map.get(table));
+        }
+
+        for (String table : oiRel.getRoiRelations()) {
+            roiColumns.addAll(map.get(table));
+        }
+
+        return new AndExpression(
+                createIsNullExpressions(loiColumns, true),
+                createIsNullExpressions(roiColumns, false));
+
+
+    }
+
+    private Expression getRightOuterIncrement(OuterIncrementRelation oiRel) {
+
     }
 
     private List<Join> transformJoins(List<Join> joins, List<JoinType> labels) {
@@ -210,8 +231,8 @@ public class JoinWhereExpressionGenerator {
             map.clear();
 
             if (labels.get(i) == null) {
-                joins.get(i).getOnExpression().accept(onExpressionVisitor);
                 join = joins.get(i);
+                join.getOnExpression().accept(onExpressionVisitor);
                 OuterIncrementRelation oiRel = getOuterIncrementRelation(tables, join);
                 labels.set(i, getLabel(mvoi, oiRel));
             }
