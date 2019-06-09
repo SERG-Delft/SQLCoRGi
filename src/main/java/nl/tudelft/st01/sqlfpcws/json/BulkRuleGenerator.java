@@ -55,7 +55,6 @@ public class BulkRuleGenerator {
         try (Stream<String> stream = Files.lines(Paths.get(this.getClass().getResource(sqlInputPath).toURI()))) {
             queriesToParse = stream
                     .filter(query -> !query.isEmpty())
-                    .map(String::toLowerCase)
                     .collect(Collectors.toList());
         } catch (IOException | URISyntaxException e) {
             System.err.println("Could not open schema file: " + e.getMessage());
@@ -91,10 +90,10 @@ public class BulkRuleGenerator {
             String schema = filterSchema(query).asXML();
             List<String> coverageTargets = SQLFpcWS.getCoverageTargets(query, schema, "");
 
-            SQLRules sqlRules = new SQLRules(queryNo++, coverageTargets);
+            SQLRules sqlRules = new SQLRules(++queryNo, coverageTargets);
             sqlJson.addEntry(sqlRules);
 
-            System.out.println("[" +  queryNo + "]: " + query);
+            System.out.println("[" + queryNo + "]: " + query);
             System.out.println("Generated rules (" + coverageTargets.size() + "):");
             coverageTargets.forEach(target -> System.out.println("\t" + target));
             System.out.println();
@@ -109,6 +108,8 @@ public class BulkRuleGenerator {
     private Document filterSchema(String query) {
         List<String> tableNames = getInvolvedTableFromQuery(query);
         Document filteredSchema = (Document)schema.clone();
+
+        tableNames.replaceAll(String::toLowerCase);
 
         List<Node> tables = (List<Node>)filteredSchema.selectNodes("/schema/table");
         for (Node table : tables) {
