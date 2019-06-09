@@ -64,7 +64,7 @@ public final class Generator {
      */
     public static void main(String[] args) {
 
-        String query = "SELECT * FROM t WHERE a < 7 AND b BETWEEN 1 AND a";
+        String query = "SELECT * FROM t WHERE a IS NULL AND CASE WHEN b = 2 THEN 2 ELSE a END";
 
         Set<String> result = generateRules(query);
 

@@ -9,6 +9,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.*;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * A visitor that performs a null reduction transformation given a list of attributes and an expression.
@@ -140,14 +141,56 @@ public class NullReducer extends ExpressionVisitorAdapter {
     }
 
     @Override
-    public void visit(CaseExpression expr) {
-        // TODO: Remove WHEN clauses from the CASE expression that cannot be satisfied, or delete whole CASE
-        // expression if no WHEN clauses are left.
+    public void visit(CaseExpression caseExpression) {
+
+        Expression switchExpression = caseExpression.getSwitchExpression();
+        if (switchExpression != null) {
+            switchExpression.accept(this);
+            if (this.updateChild) {
+                this.child = null;
+                return;
+            }
+        }
+
+        Expression elseExpression = caseExpression.getElseExpression();
+        if (elseExpression != null) {
+            elseExpression.accept(this);
+            if (this.updateChild) {
+                caseExpression.setElseExpression(this.child);
+                this.updateChild = false;
+            }
+        }
+
+        Iterator<WhenClause> iterator = caseExpression.getWhenClauses().iterator();
+        while (iterator.hasNext()) {
+            WhenClause whenClause = iterator.next();
+            whenClause.accept(this);
+            if (this.updateChild) {
+                iterator.remove();
+                this.updateChild = false;
+            }
+        }
+
+        if (caseExpression.getWhenClauses().isEmpty()) {
+            this.child = null;
+            this.updateChild = true;
+        }
     }
 
     @Override
     public void visit(WhenClause expr) {
-        // TODO: Remove WHEN clauses that cannot be satisfied
+
+        expr.getWhenExpression().accept(this);
+        if (this.updateChild) {
+            if (this.child == null) {
+                return;
+            } else {
+                expr.setWhenExpression(this.child);
+                this.updateChild = false;
+            }
+        }
+
+        expr.getThenExpression().accept(this);
     }
 
 }
