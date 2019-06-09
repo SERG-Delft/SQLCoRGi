@@ -34,12 +34,13 @@ public class BulkRuleGenerator {
     private SQLjson sqlJson;
     private int queryNo;
 
+    private static final int RULE_GENERATOR_INTERVAL = 1000;
 
     public BulkRuleGenerator(String sqlInputPath, String xmlSchemaPath, String jsonOutputPath) {
         setUpQueriesToParse(sqlInputPath);
         setUpSchemaDocument(xmlSchemaPath);
         this.jsonOutputPath = jsonOutputPath;
-        
+
         this.queryNo = 1;
         this.sqlJson = new SQLjson();
     }
@@ -79,13 +80,20 @@ public class BulkRuleGenerator {
         }
     }
 
-    public void generate() {
+    public void generate() throws InterruptedException {
         for (String query : queriesToParse) {
             String schema = filterSchema(query).asXML();
             List<String> coverageTargets = SQLFpcWS.getCoverageTargets(query, schema, "");
 
             SQLRules sqlRules = new SQLRules(queryNo++, coverageTargets);
             sqlJson.addEntry(sqlRules);
+
+            System.out.println("Processed query " +  queryNo + ": " + query);
+            System.out.println("Generated rules (" + coverageTargets.size() + "):");
+            coverageTargets.forEach(target -> System.out.println("\t" + target));
+            System.out.println();
+
+            Thread.sleep(RULE_GENERATOR_INTERVAL);
         }
 
         outputToJsonFile();

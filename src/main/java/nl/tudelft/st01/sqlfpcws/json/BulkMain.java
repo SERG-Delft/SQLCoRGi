@@ -11,7 +11,7 @@ public final class BulkMain {
     private static final String XML_SCHEMA_PATH = ".src/main/resources/database/schema_xml" + DATABASE + ".xml";
     private static final String JSON_OUTPUT_PATH = ".src/main/resources/database/output_json" + DATABASE + ".json";
 
-    private static final int RULE_GENERATOR_INTERVAL = 1000;
+
 
     public static void main(String[] args) {
 
