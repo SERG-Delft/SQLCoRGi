@@ -128,7 +128,7 @@ public class JoinWhereExpressionGenerator {
     private void handleSingleJoin(PlainSelect plainSelect) {
     }
 
-    private void handleNestedJoins(PlainSelect plainSelect) {
+    private List<JoinWhereItem> handleNestedJoins(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
         Expression whereCondition = plainSelect.getWhere();
 
@@ -164,13 +164,15 @@ public class JoinWhereExpressionGenerator {
 
         plainSelect.setWhere(whereCondition);
         plainSelect.setJoins(joins);
+
+        return results;
     }
 
     private static Expression nullReduction(Expression expression, OuterIncrementRelation oir, JoinType joinType, boolean nullable) {
         if (expression != null) {
             Set<String> includeTables;
             List<Column> excludeColumns;
-            
+
             if (joinType == JoinType.LEFT) {
                 includeTables = oir.getRoiRelations();
                 excludeColumns = oir.getRoiRelColumns();
@@ -209,8 +211,8 @@ public class JoinWhereExpressionGenerator {
         List<Column> loiColumns = oiRel.getLoiRelColumns();
         List<Column> roiColumns = oiRel.getRoiRelColumns();
         return new AndExpression(
-                createIsNullExpressions(loiColumns, nullable),
-                createIsNullExpressions(roiColumns, true));
+                createIsNullExpressions(roiColumns, true),
+                createIsNullExpressions(loiColumns, nullable));
     }
 
     private List<Join> transformJoins(List<Join> joins, List<JoinType> labels) {
