@@ -1,4 +1,4 @@
-package nl.tudelft.st01.sqlfpcws.json;
+package nl.tudelft.st01.sqlfpcws;
 
 import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
 import org.dom4j.Document;
@@ -8,7 +8,6 @@ import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
 import java.io.StringReader;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
