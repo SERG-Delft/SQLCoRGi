@@ -3,13 +3,17 @@ package nl.tudelft.st01.query;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.Join;
 
+import java.util.List;
+
 
 /**
  * Wrapper class that can be used to link a {@link Join} to a generated WHERE expression.
  */
 public class JoinWhereItem {
 
+    private List<Join> joins;
     private Join join;
+
 
     private Expression joinWhere;
 
@@ -21,6 +25,11 @@ public class JoinWhereItem {
      */
     public JoinWhereItem(Join join, Expression joinWhere) {
         this.join = join;
+        this.joinWhere = joinWhere;
+    }
+
+    public JoinWhereItem(List<Join> joins, Expression joinWhere) {
+        this.joins = joins;
         this.joinWhere = joinWhere;
     }
 
