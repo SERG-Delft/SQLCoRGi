@@ -47,65 +47,76 @@ public class JoinWhereExpressionGenerator {
      */
     public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
         generate(plainSelect);
-        this.whereExpression = plainSelect.getWhere();
-        Set<String> result = new TreeSet<>();
+//        this.whereExpression = plainSelect.getWhere();
+        Set<String> result = generate(plainSelect);
 
-        List<Join> joins = plainSelect.getJoins();
-        List<JoinWhereItem> joinWhereItems;
-        Join join;
-
-        PlainSelect out = plainSelect;
-        Expression whereCondition = plainSelect.getWhere();
-
-        if (joins != null && !joins.isEmpty()) {
-            map = new HashMap<>();
-            OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
-
-            List<Join> temp = new ArrayList<>();
-            for (int i = 0; i < joins.size(); i++) {
-                join = joins.get(i);
-
-                if (join.isSimple()) {
-                    continue;
-                } else if (join.getOnExpression() == null) {
-                    throw new IllegalStateException("The ON condition cannot be null");
-                }
-
-                join.getOnExpression().accept(onExpressionVisitor);
-                joinWhereItems = generateJoinMutations(join);
-                for (JoinWhereItem joinWhereItem : joinWhereItems) {
-                    temp.addAll(joins);
-                    temp.set(i, joinWhereItem.getJoin());
-
-                    out.setJoins(temp);
-                    out.setWhere(joinWhereItem.getJoinWhere());
-
-                    result.add(out.toString());
-                    out.setWhere(whereCondition);
-                    out.setJoins(joins);
-                    temp.clear();
-                }
-                map.clear();
-            }
-        }
-
-        plainSelect.setWhere(whereCondition);
-        plainSelect.setJoins(joins);
+//
+//        List<Join> joins = plainSelect.getJoins();
+//        List<JoinWhereItem> joinWhereItems;
+//        Join join;
+//
+//        PlainSelect out = plainSelect;
+//        Expression whereCondition = plainSelect.getWhere();
+//
+//        if (joins != null && !joins.isEmpty()) {
+//            map = new HashMap<>();
+//            OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
+//
+//            List<Join> temp = new ArrayList<>();
+//            for (int i = 0; i < joins.size(); i++) {
+//                join = joins.get(i);
+//
+//                if (join.isSimple()) {
+//                    continue;
+//                } else if (join.getOnExpression() == null) {
+//                    throw new IllegalStateException("The ON condition cannot be null");
+//                }
+//
+//                join.getOnExpression().accept(onExpressionVisitor);
+//                joinWhereItems = generateJoinMutations(join);
+//                for (JoinWhereItem joinWhereItem : joinWhereItems) {
+//                    temp.addAll(joins);
+//                    temp.set(i, joinWhereItem.getJoin());
+//
+//                    out.setJoins(temp);
+//                    out.setWhere(joinWhereItem.getJoinWhere());
+//
+//                    result.add(out.toString());
+//                    out.setWhere(whereCondition);
+//                    out.setJoins(joins);
+//                    temp.clear();
+//                }
+//                map.clear();
+//            }
+//        }
+//
+//        plainSelect.setWhere(whereCondition);
+//        plainSelect.setJoins(joins);
         return result;
     }
 
     public Set<String> generate(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
-
+        Expression where = plainSelect.getWhere();
+        Set<String> result = new TreeSet<>();
         if (joins == null || joins.isEmpty()) {
             return new HashSet<>();
         }
 
         outerIncrementRelations = generateOIRsForEachJoin(plainSelect.getJoins());
 
-        handleNestedJoins(plainSelect);
+        if (!outerIncrementRelations.isEmpty()) {
+            List<JoinWhereItem> items = handleJoins(plainSelect);
+            for (JoinWhereItem j : items) {
+                plainSelect.setJoins(j.getJoins());
+                plainSelect.setWhere(j.getJoinWhere());
+                result.add(plainSelect.toString());
+            }
+        }
 
-        return null;
+        plainSelect.setJoins(joins);
+        plainSelect.setWhere(where);
+        return result;
     }
 
     private List<OuterIncrementRelation> generateOIRsForEachJoin(List<Join> joins) {
@@ -117,7 +128,7 @@ public class JoinWhereExpressionGenerator {
                 join.getOnExpression().accept(onExpressionVisitor);
                 out.add(getOuterIncrementRelation(map, join));
                 map.clear();
-            } else {
+            } else if (!join.isSimple()){
                 throw new IllegalStateException("The ON condition cannot be null");
             }
         }
@@ -125,10 +136,7 @@ public class JoinWhereExpressionGenerator {
         return out;
     }
 
-    private void handleSingleJoin(PlainSelect plainSelect) {
-    }
-
-    private List<JoinWhereItem> handleNestedJoins(PlainSelect plainSelect) {
+    private List<JoinWhereItem> handleJoins(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
         Expression whereCondition = plainSelect.getWhere();
 
@@ -165,7 +173,18 @@ public class JoinWhereExpressionGenerator {
         plainSelect.setWhere(whereCondition);
         plainSelect.setJoins(joins);
 
+        results.add(new JoinWhereItem(setAllToInner(joins), wrapInParentheses(whereCondition)));
+
         return results;
+    }
+
+    private List<Join> setAllToInner(List<Join> joins) {
+        List<Join> outJoins = new ArrayList<>();
+        for (Join join : joins) {
+            outJoins.add(setJoinType(genericCopyOfJoin(join), JoinType.INNER));
+        }
+
+        return outJoins;
     }
 
     private static Expression nullReduction(Expression expression, OuterIncrementRelation oir, JoinType joinType, boolean nullable) {
@@ -283,7 +302,6 @@ public class JoinWhereExpressionGenerator {
             }
         }
 
-        System.out.println(joinType + " " + joins.get(index).toString() + labels);
         return labels;
     }
 

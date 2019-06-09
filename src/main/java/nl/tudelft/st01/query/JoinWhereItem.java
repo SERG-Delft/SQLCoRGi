@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class JoinWhereItem {
 
+
+
     private List<Join> joins;
     private Join join;
 
@@ -39,5 +41,9 @@ public class JoinWhereItem {
 
     public Expression getJoinWhere() {
         return joinWhere;
+    }
+
+    public List<Join> getJoins() {
+        return joins;
     }
 }
