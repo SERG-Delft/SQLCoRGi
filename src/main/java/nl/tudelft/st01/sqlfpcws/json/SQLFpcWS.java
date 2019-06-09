@@ -15,6 +15,10 @@ import java.util.List;
 
 public final class SQLFpcWS {
 
+    private SQLFpcWS() {
+        throw new UnsupportedOperationException();
+    }
+
     private static final String ERROR_XPATH = "/sqlfpc/error";
     private static final String SQL_TARGET_XPATH = "/sqlfpc/fpcrules/fpcrule/sql";
 
