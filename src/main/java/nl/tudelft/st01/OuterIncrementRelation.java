@@ -11,11 +11,12 @@ public class OuterIncrementRelation {
     private List<Column> loiRelColumns;
     private List<Column> roiRelColumns;
 
-    public OuterIncrementRelation(Set<String> leftOuterIncrementRelation, Set<String> rightOuterIncrementRelation) {
+    public OuterIncrementRelation(Set<String> leftOuterIncrementRelation, Set<String> rightOuterIncrementRelation,
+                                  List<Column> loiRelColumns, List<Column> roiRelColumns) {
         this.loiRelations = leftOuterIncrementRelation;
         this.roiRelations = rightOuterIncrementRelation;
-        this.loiRelColumns = null;
-        this.roiRelColumns = null;
+        this.loiRelColumns = loiRelColumns;
+        this.roiRelColumns = roiRelColumns;
     }
 
     public void setLoiRelations(Set<String> loiRelations) {

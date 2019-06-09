@@ -101,6 +101,8 @@ public class JoinWhereExpressionGenerator {
             return new HashSet<>();
         }
 
+        outerIncrementRelations = generateOIRsForEachJoin(plainSelect.getJoins());
+
         if (joins.size() == 1) {
             handleSingleJoin(plainSelect);
         } else {
@@ -108,6 +110,23 @@ public class JoinWhereExpressionGenerator {
         }
 
         return null;
+    }
+
+    private List<OuterIncrementRelation> generateOIRsForEachJoin(List<Join> joins) {
+        Map<String, List<Column>> map = new HashMap<>();
+        List<OuterIncrementRelation> out = new ArrayList<>();
+        OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
+        for (Join join : joins) {
+            if (join.getOnExpression() != null) {
+                join.getOnExpression().accept(onExpressionVisitor);
+                out.add(getOuterIncrementRelation(map, join));
+                map.clear();
+            } else {
+                throw new IllegalStateException("The ON condition cannot be null");
+            }
+        }
+
+        return out;
     }
 
     private void handleSingleJoin(PlainSelect plainSelect) {
@@ -127,31 +146,27 @@ public class JoinWhereExpressionGenerator {
 
             labels = label(JoinType.RIGHT, joins, i);
             transformJoins(joins, labels);
-
         }
 
     }
 
-    private Expression getLeftOuterIncrement(OuterIncrementRelation oiRel, Map<String, List<Column>> map) {
-        List<Column> loiColumns = new ArrayList<>();
-        List<Column> roiColumns = new ArrayList<>();
-
-        for (String table : oiRel.getLoiRelations()) {
-            loiColumns.addAll(map.get(table));
-        }
-
-        for (String table : oiRel.getRoiRelations()) {
-            roiColumns.addAll(map.get(table));
-        }
+    private Expression getLeftOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
+        List<Column> loiColumns = oiRel.getLoiRelColumns();
+        List<Column> roiColumns = oiRel.getRoiRelColumns();
 
         return new AndExpression(
                 createIsNullExpressions(loiColumns, true),
-                createIsNullExpressions(roiColumns, false));
+                createIsNullExpressions(roiColumns, nullable));
 
 
     }
 
-    private Expression getRightOuterIncrement(OuterIncrementRelation oiRel) {
+    private Expression getRightOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
+        List<Column> loiColumns = oiRel.getLoiRelColumns();
+        List<Column> roiColumns = oiRel.getRoiRelColumns();
+        return new AndExpression(
+                createIsNullExpressions(loiColumns, nullable),
+                createIsNullExpressions(roiColumns, true));
 
     }
 
@@ -207,13 +222,14 @@ public class JoinWhereExpressionGenerator {
         Set<String> mvoi = new HashSet<>();
         List<JoinType> labels = Arrays.asList(new JoinType[joins.size()]);
 
-        map = new HashMap<>();
-
-        OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
-        currJoin.getOnExpression().accept(onExpressionVisitor);
-
-        Set<String> tables = map.keySet();
-        OuterIncrementRelation currOiRel = getOuterIncrementRelation(tables, currJoin);
+        OuterIncrementRelation currOiRel = outerIncrementRelations.get(index);
+//        map = new HashMap<>();
+//
+//        OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
+//        currJoin.getOnExpression().accept(onExpressionVisitor);
+//
+//        Set<String> tables = map.keySet();
+//         = getOuterIncrementRelation(map, currJoin);
 
         switch (joinType) {
             case LEFT:  mvoi.addAll(currOiRel.getLoiRelations());
@@ -225,15 +241,9 @@ public class JoinWhereExpressionGenerator {
 
         labels.set(index, joinType);
 
-        Join join;
-
         for (int i = 0; i < joins.size(); i++) {
-            map.clear();
-
             if (labels.get(i) == null) {
-                join = joins.get(i);
-                join.getOnExpression().accept(onExpressionVisitor);
-                OuterIncrementRelation oiRel = getOuterIncrementRelation(tables, join);
+                OuterIncrementRelation oiRel = outerIncrementRelations.get(i);
                 labels.set(i, getLabel(mvoi, oiRel));
             }
         }
@@ -262,19 +272,24 @@ public class JoinWhereExpressionGenerator {
         return set;
     }
 
-    private OuterIncrementRelation getOuterIncrementRelation(Set<String> tables, Join join) {
+    private OuterIncrementRelation getOuterIncrementRelation(Map<String, List<Column>> map, Join join) {
         Set<String> loirels = new HashSet<>();
         Set<String> roirels = new HashSet<>();
 
-        for (String key : tables) {
+        List<Column> loiRelColumns = new ArrayList<>();
+        List<Column> roiRelColumns = new ArrayList<>();
+
+        for (String key : map.keySet()) {
             if (key.equals(join.getRightItem().toString().toLowerCase())) {
                 loirels.add(key);
+                loiRelColumns.addAll(map.get(key));
             } else {
                 roirels.add(key);
+                roiRelColumns.addAll(map.get(key));
             }
         }
 
-        return new OuterIncrementRelation(loirels, roirels);
+        return new OuterIncrementRelation(loirels, roirels, loiRelColumns, roiRelColumns);
     }
 
     /**
