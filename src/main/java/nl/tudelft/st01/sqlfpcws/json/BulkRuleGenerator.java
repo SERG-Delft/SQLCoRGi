@@ -6,6 +6,7 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.util.TablesNamesFinder;
+import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -28,9 +29,7 @@ public class BulkRuleGenerator {
 
     private List<String> queriesToParse;
     private Document schema;
-
-    private FileWriter jsonWriter;
-    private Gson gson;
+    private String jsonOutputPath;
 
     private SQLjson sqlJson;
     private int queryNo;
@@ -39,9 +38,9 @@ public class BulkRuleGenerator {
     public BulkRuleGenerator(String sqlInputPath, String xmlSchemaPath, String jsonOutputPath) {
         setUpQueriesToParse(sqlInputPath);
         setUpSchemaDocument(xmlSchemaPath);
-        setUpOutputJsonWriter(jsonOutputPath);
-
-        this.queryNo = 0;
+        this.jsonOutputPath = jsonOutputPath;
+        
+        this.queryNo = 1;
         this.sqlJson = new SQLjson();
     }
 
@@ -66,26 +65,47 @@ public class BulkRuleGenerator {
         }
     }
 
-    private void setUpOutputJsonWriter(String jsonOutputPath) {
-        try {
-            jsonWriter = new FileWriter(jsonOutputPath);
-        } catch (IOException e) {
-            System.err.println("Output file could not be opened: " + e.getMessage());
-        }
-
-        gson = new GsonBuilder()
+    private void outputToJsonFile() {
+        Gson gson = new GsonBuilder()
                 .disableHtmlEscaping()
                 .setPrettyPrinting()
                 .create();
+
+        try (FileWriter jsonWriter = new FileWriter(jsonOutputPath)) {
+            gson.toJson(sqlJson, jsonWriter);
+            jsonWriter.flush();
+        } catch (IOException e) {
+            System.err.println("Unable to write to output file " + e.getMessage());
+        }
     }
 
     public void generate() {
-        // Loop over each query
-            // Filter schema
-            // Send to SQLFpc
-            // Add response to output
+        for (String query : queriesToParse) {
+            String schema = filterSchema(query).asXML();
+            List<String> coverageTargets = SQLFpcWS.getCoverageTargets(query, schema, "");
 
-        // Save JSON file
+            SQLRules sqlRules = new SQLRules(queryNo++, coverageTargets);
+            sqlJson.addEntry(sqlRules);
+        }
+
+        outputToJsonFile();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Document filterSchema(String query) {
+        List<String> tableNames = getInvolvedTableFromQuery(query);
+        Document filteredSchema = (Document)schema.clone();
+
+        List<Node> tables = (List<Node>)filteredSchema.selectNodes("/schema/table");
+        for (Node table : tables) {
+            String tableNameXML = ((Element) table).attribute("name").getValue().toLowerCase();
+
+            if(!tableNames.contains(tableNameXML)) {
+                table.detach();
+            }
+        }
+
+        return filteredSchema;
     }
 
     private List<String> getInvolvedTableFromQuery(String query) {
@@ -104,23 +124,6 @@ public class BulkRuleGenerator {
 
 
         return tableNames;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Document filterSchema(String query) {
-        List<String> tableNames = getInvolvedTableFromQuery(query);
-        Document filteredSchema = (Document)schema.clone();
-
-        List<Node> tables = (List<Node>)filteredSchema.selectNodes("/schema/table");
-        for (Node table : tables) {
-            String tableNameXML = ((Element) table).attribute("name").getValue().toLowerCase();
-
-            if(!tableNames.contains(tableNameXML)) {
-                table.detach();
-            }
-        }
-
-        return filteredSchema;
     }
 
 }
