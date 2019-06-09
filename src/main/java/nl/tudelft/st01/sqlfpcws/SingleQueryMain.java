@@ -2,9 +2,9 @@ package nl.tudelft.st01.sqlfpcws;
 
 import java.util.List;
 
-public final class Application {
+public final class SingleQueryMain {
 
-    protected Application() throws UnsupportedOperationException {
+    protected SingleQueryMain() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
