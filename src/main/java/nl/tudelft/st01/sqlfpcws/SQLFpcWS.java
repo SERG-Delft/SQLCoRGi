@@ -3,7 +3,6 @@ package nl.tudelft.st01.sqlfpcws;
 import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
@@ -38,26 +37,27 @@ public final class SQLFpcWS {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     private static List<String> extractSQLTargetsFromXMLResponse(String xmlResponseString) {
         ArrayList<String> result = new ArrayList<>();
         SAXReader reader = new SAXReader();
 
-        Document xmlReponse;
+        Document xmlResponse;
         try {
-            xmlReponse = reader.read(new StringReader(xmlResponseString));
+            xmlResponse = reader.read(new StringReader(xmlResponseString));
         } catch (DocumentException e) {
             System.err.println("Server response was invalid");
             return result;
         }
 
-        Node error = xmlReponse.selectSingleNode(ERROR_XPATH);
+        Node error = xmlResponse.selectSingleNode(ERROR_XPATH);
         if(error != null) {
             System.err.println("SQL Query could not be parsed: " + error.getText());
             return result;
         }
 
-        List<Element> sqlRules = (List<Element>)xmlReponse.selectNodes(SQL_TARGET_XPATH);
-        for (Element sqlRule : sqlRules) {
+        List<Node> sqlRules = (List<Node>)xmlResponse.selectNodes(SQL_TARGET_XPATH);
+        for (Node sqlRule : sqlRules) {
             result.add(sqlRule.getText());
         }
 
