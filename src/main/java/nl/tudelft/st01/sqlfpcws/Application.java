@@ -20,9 +20,9 @@ public final class Application {
 
         List<String> result = SQLFpcWS.getCoverageTargets(sqlQuery, dbSchema, options);
 
-        System.out.println("Coverage targets:");
-        for (String s : result) {
-            System.out.println("\"" + s + "\",");
+        System.out.println("Coverage targets (" + result.size() + "):");
+        for (String target : result) {
+            System.out.println(target);
         }
     }
 }
