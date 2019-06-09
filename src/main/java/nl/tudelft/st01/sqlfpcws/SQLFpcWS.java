@@ -21,7 +21,7 @@ public final class SQLFpcWS {
     private static final String ERROR_XPATH = "/sqlfpc/error";
     private static final String SQL_TARGET_XPATH = "/sqlfpc/fpcrules/fpcrule/sql";
 
-    public List<String> getCoverageTargets(String sqlQuery, String schema, String options) {
+    public static List<String> getCoverageTargets(String sqlQuery, String schema, String options) {
         SQLFpcWSSoapProxy proxy = new SQLFpcWSSoapProxy();
         List<String> result;
 
@@ -38,7 +38,7 @@ public final class SQLFpcWS {
         return result;
     }
 
-    private List<String> extractSQLTargetsFromXMLResponse(String xmlResponseString) {
+    private static List<String> extractSQLTargetsFromXMLResponse(String xmlResponseString) {
         ArrayList<String> result = new ArrayList<>();
         SAXReader reader = new SAXReader();
 
