@@ -1,12 +1,11 @@
 package nl.tudelft.st01.visitors.select;
 
 import net.sf.jsqlparser.expression.*;
-import net.sf.jsqlparser.expression.operators.arithmetic.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-import net.sf.jsqlparser.expression.operators.relational.*;
+import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.*;
+import net.sf.jsqlparser.statement.select.SubSelect;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -46,6 +45,13 @@ public class NullReducer extends ExpressionVisitorAdapter {
         return original;
     }
 
+    /**
+     * Checks whether the left or right expressions of a given logical operator have been updated or removed.
+     * Updates the left and right expressions if necessary, or instructs the parent of the logical operator
+     * either to replace it with its left or right expression or to remove it altogether.
+     *
+     * @param expr the logical operator to check, i.e. an AND or OR operator.
+     */
     private void visitLogicalOperator(BinaryExpression expr) {
 
         Expression left = expr.getLeftExpression();
