@@ -8,9 +8,12 @@ import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 import nl.tudelft.st01.AggregateFunctionsGenerator;
 import nl.tudelft.st01.GroupByGenerator;
 import nl.tudelft.st01.JoinWhereExpressionGenerator;
+import nl.tudelft.st01.visitors.select.NullAttributeFinder;
+import nl.tudelft.st01.visitors.select.NullReducer;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -51,13 +54,50 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
         handleHaving(plainSelect);
         handleJoins(plainSelect);
 
-        //applyNullReduction();
-
         for (PlainSelect select : this.statements) {
+            applyNullReduction(select);
             this.output.add(select.toString());
         }
 
         this.output = null;
+    }
+
+    /**
+     * Applies a null reduction transformation to the WHERE and HAVING clauses of the given {@link PlainSelect}.
+     *
+     * @param plainSelect the select on which to perform the transformation.
+     */
+    private void applyNullReduction(PlainSelect plainSelect) {
+
+        Expression where = plainSelect.getWhere();
+        Expression having = plainSelect.getHaving();
+
+        if (where == null && having == null) {
+            return;
+        }
+
+        Set<String> attributes = new HashSet<>();
+
+        if (where != null) {
+            NullAttributeFinder nullAttributeFinder = new NullAttributeFinder();
+            where.accept(nullAttributeFinder);
+            attributes.addAll(nullAttributeFinder.getColumns());
+        }
+        if (having != null) {
+            NullAttributeFinder nullAttributeFinder = new NullAttributeFinder();
+            having.accept(nullAttributeFinder);
+            attributes.addAll(nullAttributeFinder.getColumns());
+
+            NullReducer nullReducer = new NullReducer(attributes);
+            having.accept(nullReducer);
+            plainSelect.setHaving(nullReducer.getRoot(having));
+        }
+
+        if (where != null) {
+            NullReducer nullReducer = new NullReducer(attributes);
+            where.accept(nullReducer);
+            plainSelect.setWhere(nullReducer.getRoot(where));
+        }
     }
 
     /**
