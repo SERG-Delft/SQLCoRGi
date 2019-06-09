@@ -130,6 +130,10 @@ public class JoinWhereExpressionGenerator {
         }
     }
 
+    private Expression nullReduction() {
+        return null;
+    }
+
     private List<Join> transformJoins(List<Join> joins, List<JoinType> labels) {
         if (labels.size() != joins.size()) {
             throw new IllegalStateException("The size of the list of joins must be "
@@ -147,8 +151,9 @@ public class JoinWhereExpressionGenerator {
         }
 
         return transformedJoins;
-
     }
+
+
 
     private Join transformJoin(Join join, JoinType joinType) {
         return setJoinType(genericCopyOfJoin(join), joinType);
@@ -208,25 +213,24 @@ public class JoinWhereExpressionGenerator {
                 joins.get(i).getOnExpression().accept(onExpressionVisitor);
                 join = joins.get(i);
                 OuterIncrementRelation oiRel = getOuterIncrementRelation(tables, join);
-
-                if (!intersection(mvoi, oiRel.getRoiRelations()).isEmpty()) {
-                    mvoi.addAll(oiRel.getLoiRelations());
-                    labels.set(i, JoinType.LEFT);
-                } else if (!intersection(mvoi, oiRel.getLoiRelations()).isEmpty()) {
-                    mvoi.addAll(oiRel.getRoiRelations());
-                    labels.set(i, JoinType.RIGHT);
-                }
-            }
-        }
-
-        for (int i = 0; i < labels.size(); i++) {
-            if (labels.get(i) == null) {
-                labels.set(i, JoinType.INNER);
+                labels.set(i, getLabel(mvoi, oiRel));
             }
         }
 
         System.out.println(joinType + " " + joins.get(index).toString() + labels);
         return labels;
+    }
+
+    private JoinType getLabel(Set<String> mvoi, OuterIncrementRelation oiRel) {
+        if (!intersection(mvoi, oiRel.getRoiRelations()).isEmpty()) {
+            mvoi.addAll(oiRel.getLoiRelations());
+            return JoinType.LEFT;
+        } else if (!intersection(mvoi, oiRel.getLoiRelations()).isEmpty()) {
+            mvoi.addAll(oiRel.getRoiRelations());
+            return JoinType.RIGHT;
+        } else {
+            return JoinType.INNER;
+        }
     }
 
     private static<T> Set<T> intersection(Set<T> set1, Set<T> set2) {
