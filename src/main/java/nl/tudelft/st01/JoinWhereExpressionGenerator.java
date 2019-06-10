@@ -232,17 +232,17 @@ public class JoinWhereExpressionGenerator {
         List<Column> loiColumns = oiRel.getLoiRelColumns();
         List<Column> roiColumns = oiRel.getRoiRelColumns();
 
-        return new AndExpression(
+        return concatenate(
                 createIsNullExpressions(loiColumns, true),
-                createIsNullExpressions(roiColumns, nullable));
+                createIsNullExpressions(roiColumns, nullable), false);
     }
 
     private Expression getRightOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
         List<Column> loiColumns = oiRel.getLoiRelColumns();
         List<Column> roiColumns = oiRel.getRoiRelColumns();
-        return new AndExpression(
+        return concatenate(
                 createIsNullExpressions(roiColumns, true),
-                createIsNullExpressions(loiColumns, nullable));
+                createIsNullExpressions(loiColumns, nullable), false);
     }
 
     private List<Join> transformJoins(List<Join> joins, List<JoinType> labels) {
