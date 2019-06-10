@@ -188,6 +188,63 @@ public class JoinWhereExpressionGenerator {
         return results;
     }
 
+    private Set<JoinWhereItem> generateLeftJoinRules(List<Join> joins, int index, Expression where,
+                                                     OuterIncrementRelation oir) {
+        List<JoinType> labelsLeft = label(JoinType.LEFT, joins, index);
+        Set<JoinWhereItem> out = new HashSet<>();
+        List<Join> tJoinsLoi = transformJoins(joins, labelsLeft);
+
+        Expression reducedWhereLoi = nullReduction(where, oir, JoinType.LEFT, false);
+        Expression reducedWhereLoiNull = nullReduction(where, oir, JoinType.LEFT, true);
+
+        // If the on condition only contains columns from one table, roirels will be empty or null.
+        if (oir.getRoiRelColumns() == null || oir.getRoiRelColumns().isEmpty()) {
+            Join join = genericCopyOfJoin(tJoinsLoi.get(index));
+            join.setRight(true);
+            tJoinsLoi.set(index, join);
+            Expression not = new NotExpression(new Parenthesis(join.getOnExpression()));
+            out.add(new JoinWhereItem(tJoinsLoi, concatenate(concatenate(not, getRightOuterIncrement(oir, false), true), reducedWhereLoi, true)));
+
+        } else {
+            Expression loi = getLeftOuterIncrement(oir, false);
+            Expression loiNull = getLeftOuterIncrement(oir, true);
+
+            out.add(new JoinWhereItem(tJoinsLoi, concatenate(loi, reducedWhereLoi, true)));
+            out.add(new JoinWhereItem(tJoinsLoi, concatenate(loiNull, reducedWhereLoiNull, true)));
+        }
+
+        return out;
+    }
+
+    private Set<JoinWhereItem> generateRightJoinRules(List<Join> joins, int index, Expression where,
+                                                     OuterIncrementRelation oir) {
+        List<JoinType> labelsRight = label(JoinType.RIGHT, joins, index);
+        Set<JoinWhereItem> out = new HashSet<>();
+
+        List<Join> tJoinsRoi = transformJoins(joins, labelsRight);
+
+        Expression reducedWhereRoi = nullReduction(where, oir, JoinType.RIGHT, false);
+        Expression reducedWhereRoiNull = nullReduction(where, oir, JoinType.RIGHT, true);
+
+        if (oir.getLoiRelColumns() == null || oir.getLoiRelColumns().isEmpty()) {
+            Join join = genericCopyOfJoin(tJoinsRoi.get(index));
+            join.setLeft(true);
+            tJoinsRoi.set(index, join);
+            Expression not = new NotExpression(new Parenthesis(join.getOnExpression()));
+            out.add(new JoinWhereItem(tJoinsRoi, concatenate(concatenate(not, getLeftOuterIncrement(oir, false), true), reducedWhereRoi, true)));
+
+        } else {
+            Expression roi = getRightOuterIncrement(oir, false);
+            Expression roiNull = getRightOuterIncrement(oir, true);
+
+            out.add(new JoinWhereItem(tJoinsRoi, concatenate(roi, reducedWhereRoi, true)));
+            out.add(new JoinWhereItem(tJoinsRoi, concatenate(roiNull, reducedWhereRoiNull, true)));
+        }
+
+        return out;
+    }
+
+
     private List<Join> setAllToInner(List<Join> joins) {
         List<Join> outJoins = new ArrayList<>();
         for (Join join : joins) {
