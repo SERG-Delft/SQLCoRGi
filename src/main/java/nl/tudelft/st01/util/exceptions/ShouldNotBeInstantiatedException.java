@@ -1,7 +1,7 @@
 package nl.tudelft.st01.util.exceptions;
 
 /**
- *  Exception that can be used to alert users that an item cannot be null.
+ *  Exception that can be used to alert programmers that a class should not be instantiated.
  */
 public class ShouldNotBeInstantiatedException extends RuntimeException {
 

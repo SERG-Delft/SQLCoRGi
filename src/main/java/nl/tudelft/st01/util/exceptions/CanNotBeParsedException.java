@@ -1,15 +1,15 @@
 package nl.tudelft.st01.util.exceptions;
 
 /**
- *  Exception that can be used to alert users that a list cannot be empty.
+ *  Exception that can be used to alert users that a certain input cannot be parsed by our parser.
  */
-public class ListCanNotBeEmptyException extends RuntimeException {
+public class CanNotBeParsedException extends RuntimeException {
 
     /**
      * Parameterless Constructor.
      */
 
-    public ListCanNotBeEmptyException() {
+    public CanNotBeParsedException() {
 
     }
 
@@ -18,7 +18,7 @@ public class ListCanNotBeEmptyException extends RuntimeException {
      *
      * @param message - Message to pass along to the Exception
      */
-    public ListCanNotBeEmptyException(String message) {
+    public CanNotBeParsedException(String message) {
         super(message);
     }
 }

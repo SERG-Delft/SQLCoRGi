@@ -5,7 +5,10 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
+import nl.tudelft.st01.util.exceptions.CanNotBeNullException;
+import nl.tudelft.st01.util.exceptions.CanNotBeParsedException;
 import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
+import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 
 import java.util.HashSet;
@@ -33,21 +36,18 @@ public final class Generator {
         Set<String> result = new HashSet<>();
 
         if (query == null) {
-            System.err.println("Input cannot be null.");
-            return result;
+            throw new CanNotBeNullException("Input cannot be null.");
         }
 
         Statement statement;
         try {
             statement = CCJSqlParserUtil.parse(query);
         } catch (JSQLParserException e) {
-            System.err.println("Input query could not be parsed.");
-            return result;
+            throw new CanNotBeParsedException("Input query could not be parsed.");
         }
 
         if (!(statement instanceof Select)) {
-            System.err.println("Only SELECT statements are supported.");
-            return result;
+            throw new UnsupportedInputException("Only SELECT statements are supported.");
         }
 
         SelectBody selectBody = ((Select) statement).getSelectBody();

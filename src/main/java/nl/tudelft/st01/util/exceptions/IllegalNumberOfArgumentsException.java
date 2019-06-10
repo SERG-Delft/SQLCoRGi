@@ -1,7 +1,7 @@
 package nl.tudelft.st01.util.exceptions;
 
 /**
- *  Exception that can be used to alert users that an item cannot be null.
+ *  Exception that can be used to alert users that there is something wrong with the amount of arguments.
  */
 public class IllegalNumberOfArgumentsException extends RuntimeException {
 
