@@ -20,6 +20,7 @@ import java.util.TreeSet;
  */
 public class AggregateFunctionsGenerator {
     private static final String COUNT_STRING = "COUNT";
+    private static final String ERROR_MSG = "Input should not be null, but it is!";
 
     /**
      * Main, public method that generates the rules for the aggregate functions.
@@ -85,6 +86,10 @@ public class AggregateFunctionsGenerator {
      * @return - select item in the above specified form
      */
     private PlainSelect firstRule(PlainSelect plainSelect) {
+        if (plainSelect == null) {
+            throw new IllegalStateException();
+        }
+
         // Get a deep copy of the plainSelect
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, false);
 
@@ -124,6 +129,10 @@ public class AggregateFunctionsGenerator {
      * @return - select item with the having part added
      */
     private PlainSelect secondRule(PlainSelect plainSelect) {
+        if (plainSelect == null) {
+            throw new IllegalStateException(ERROR_MSG);
+        }
+
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
 
         // Create COUNT(*) object
@@ -146,6 +155,10 @@ public class AggregateFunctionsGenerator {
      * @return - query object representing the third rule for the aggregator
      */
     private PlainSelect thirdRule(PlainSelect plainSelect, Function function) {
+        if (plainSelect == null || function == null) {
+            throw new IllegalStateException(ERROR_MSG);
+        }
+
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
 
         // Create COUNT(*) object
@@ -180,6 +193,10 @@ public class AggregateFunctionsGenerator {
      * @return - query object representing the fourth rule for the aggregator
      */
     private PlainSelect fourthRule(PlainSelect plainSelect, Function function) {
+        if (plainSelect == null || function == null) {
+            throw new IllegalStateException(ERROR_MSG);
+        }
+
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
 
         // Retrieve column in function
