@@ -41,14 +41,14 @@ public final class CompareOutput {
             value = "DM_DEFAULT_ENCODING",
             justification = "Encoding for FileReader can be specified, so this needs to be suppressed")
     public static void main(String[] args) {
-        String basePath = "./src/test/java/nl/tudelft/st01/queries/query_resources/";
+        String basePath = ".\\src\\main\\resources\\database";
 
-        String suitecrmInput = "suitecrm_input.txt";
-        String suitecrmOutput = "suitecrm_output.json";
-        String espocrmInput = "espocrm_input.txt";
-        String espocrmOutput = "espocrm_output.json";
-        String erpnextInput = "erpnext_input.txt";
-        String erpnextOutput = "erpnext_output.json";
+        String suitecrmInput = "\\input_queries\\suitecrm.sql";
+        String suitecrmOutput = "\\output_json\\suitecrm.json";
+        String espocrmInput = "\\input_queries\\espocrm.sql";
+        String espocrmOutput = "\\output_json\\espocrm.json";
+        String erpnextInput = "\\input_queries\\erpnext.sql";
+        String erpnextOutput = "\\output_json\\erpnext.json";
 
         String[] input = {basePath + erpnextInput, basePath + suitecrmInput, basePath + espocrmInput};
         String[] output = {basePath + erpnextOutput, basePath + suitecrmOutput, basePath + espocrmOutput};
