@@ -10,6 +10,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import nl.tudelft.st01.query.JoinWhereItem;
+import nl.tudelft.st01.query.OuterIncrementRelation;
 import nl.tudelft.st01.visitors.ExpressionTraverserVisitor;
 import nl.tudelft.st01.visitors.join.OnExpressionVisitor;
 
@@ -27,7 +28,7 @@ import java.util.TreeSet;
 /**
  * This class allows for mutating a given query such that a set of mutated queries is returned.
  */
-public class JoinWhereExpressionGenerator {
+public class JoinRulesGenerator {
     private enum JoinType {
         LEFT, RIGHT, INNER
     }
@@ -40,12 +41,6 @@ public class JoinWhereExpressionGenerator {
      * @param plainSelect The statement for which the joins have to be mutated.
      * @return A set of mutated queries in string format.
      */
-    public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
-        Set<String> result = generate(plainSelect);
-
-        return result;
-    }
-
     public Set<String> generate(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
         Expression where = plainSelect.getWhere();

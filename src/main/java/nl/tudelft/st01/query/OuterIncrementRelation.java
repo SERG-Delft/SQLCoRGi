@@ -1,4 +1,4 @@
-package nl.tudelft.st01;
+package nl.tudelft.st01.query;
 
 import net.sf.jsqlparser.schema.Column;
 
@@ -19,28 +19,12 @@ public class OuterIncrementRelation {
         this.roiRelColumns = roiRelColumns;
     }
 
-    public void setLoiRelations(Set<String> loiRelations) {
-        this.loiRelations = loiRelations;
-    }
-
-    public void setRoiRelations(Set<String> roiRelations) {
-        this.roiRelations = roiRelations;
-    }
-
     public List<Column> getLoiRelColumns() {
         return loiRelColumns;
     }
 
-    public void setLoiRelColumns(List<Column> loiRelColumns) {
-        this.loiRelColumns = loiRelColumns;
-    }
-
     public List<Column> getRoiRelColumns() {
         return roiRelColumns;
-    }
-
-    public void setRoiRelColumns(List<Column> roiRelColumns) {
-        this.roiRelColumns = roiRelColumns;
     }
 
     public Set<String> getLoiRelations() {

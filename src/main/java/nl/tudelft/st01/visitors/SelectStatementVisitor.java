@@ -7,14 +7,14 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 import nl.tudelft.st01.AggregateFunctionsGenerator;
 import nl.tudelft.st01.GroupByGenerator;
-import nl.tudelft.st01.JoinWhereExpressionGenerator;
+import nl.tudelft.st01.JoinRulesGenerator;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static nl.tudelft.st01.JoinWhereExpressionGenerator.genericCopyOfJoin;
+import static nl.tudelft.st01.JoinRulesGenerator.genericCopyOfJoin;
 
 /**
  * A visitor used for generating coverage targets of a SELECT statement.
@@ -144,8 +144,8 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleJoins(PlainSelect plainSelect) {
-        JoinWhereExpressionGenerator joinWhereExpressionGenerator = new JoinWhereExpressionGenerator();
-        Set<String> out = joinWhereExpressionGenerator.generateJoinWhereExpressions(plainSelect);
+        JoinRulesGenerator joinRulesGenerator = new JoinRulesGenerator();
+        Set<String> out = joinRulesGenerator.generate(plainSelect);
 
         output.addAll(out);
     }
