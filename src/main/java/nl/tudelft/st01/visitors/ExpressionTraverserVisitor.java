@@ -166,26 +166,12 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     }
 
-    public List<Column> getOnColumns() {
-        return onColumns;
-    }
-
     public void setOnColumns(List<Column> onColumns) {
         this.onColumns = onColumns;
     }
 
     public Expression getExpression() {
         return expression;
-    }
-
-    /**
-     * Evaluates whether the tables set or the columns set contains the given table.
-     *
-     * @param column The column to check.
-     * @return True if either set contains the column, false otherwise.
-     */
-    private boolean contains(Column column) {
-        return columnsContain(nullColumns, column) || tablesContain(column);
     }
 
     /**
