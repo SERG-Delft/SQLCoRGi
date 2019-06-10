@@ -142,13 +142,24 @@ public class JoinWhereExpressionGenerator {
 
         List<JoinWhereItem> results = new ArrayList<>();
 
-        List<JoinType> labels;
+        List<JoinType> labelsLeft;
+        List<JoinType> labelsRight;
         for (int i = 0; i < joins.size(); i++) {
             // TODO: differentiate between multitable and singletable on expressions.
             OuterIncrementRelation oir = outerIncrementRelations.get(i);
 
-            labels = label(JoinType.LEFT, joins, i);
-            List<Join> tJoinsLoi = transformJoins(joins, labels);
+            if (oir.getLoiRelColumns() == null || oir.getLoiRelColumns().isEmpty()) {
+                if (oir.getRoiRelColumns() == null || oir.getRoiRelColumns().isEmpty()) {
+                    continue;
+                } else {
+
+                }
+            }
+
+            labelsLeft = label(JoinType.LEFT, joins, i);
+            labelsRight = label(JoinType.RIGHT, joins, i);
+
+            List<Join> tJoinsLoi = transformJoins(joins, labelsLeft);
 
             Expression loi = getLeftOuterIncrement(oir, false);
             Expression loiNull = getLeftOuterIncrement(oir, true);
@@ -158,8 +169,7 @@ public class JoinWhereExpressionGenerator {
             results.add(new JoinWhereItem(tJoinsLoi, concatenate(loi, reducedWhereLoi, true)));
             results.add(new JoinWhereItem(tJoinsLoi, concatenate(loiNull, reducedWhereLoiNull, true)));
 
-            labels = label(JoinType.RIGHT, joins, i);
-            List<Join> tJoinsRoi = transformJoins(joins, labels);
+            List<Join> tJoinsRoi = transformJoins(joins, labelsRight);
 
             Expression roi = getRightOuterIncrement(oir, false);
             Expression roiNull = getRightOuterIncrement(oir, true);
@@ -627,8 +637,7 @@ public class JoinWhereExpressionGenerator {
 
             return new AndExpression(createIsNullExpressions(columns, isNull), parenthesis);
         }
-
-        throw new IllegalStateException("The columns list cannot be empty.");
+        return null;
     }
 
     /**
