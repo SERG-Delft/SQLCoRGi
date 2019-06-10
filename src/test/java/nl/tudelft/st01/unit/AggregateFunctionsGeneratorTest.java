@@ -33,10 +33,13 @@ public class AggregateFunctionsGeneratorTest {
     private final String director = "Director";
     private final String result1 = "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1";
     private final String result2 = "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director HAVING COUNT(*) > 1";
-    private final String result3 = "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director HAVING COUNT(*) > COUNT(NrOfVisitors) AND "
-            + "COUNT(DISTINCT NrOfVisitors) > 1";
+    private final String result3 = "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director"
+        + " HAVING COUNT(*) > COUNT(NrOfVisitors) AND COUNT(DISTINCT NrOfVisitors) > 1";
     private final String result4 = "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director "
             + "HAVING COUNT(NrOfVisitors) > COUNT(DISTINCT NrOfVisitors) AND COUNT(DISTINCT NrOfVisitors) > 1";
+
+    private static final String ERROR_MSG = "Input should not be null, but it is!";
+
 
 
     /**
@@ -84,7 +87,19 @@ public class AggregateFunctionsGeneratorTest {
     }
 
     /**
-     *  First rule is tested here. It should return a simple count(*) with all columns.
+     *  Calls firstRule with null as input. This should be caught by the method
+     */
+    @Test
+    public void firstRuleBadWeatherTest() {
+        assertThatThrownBy(() -> {
+            aggregateFunctionsGenerator.firstRule(null);
+        }).isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(ERROR_MSG);
+    }
+
+    /**
+     *  Second rule is tested here. It should return a query that checks if there are at least some
+     *  tuples returned.
      */
     @Test
     public void secondRuleTest() {
@@ -92,7 +107,18 @@ public class AggregateFunctionsGeneratorTest {
     }
 
     /**
-     *  First rule is tested here. It should return a simple count(*) with all columns.
+     *  Calls secondRule with null as input. This should be caught by the method.
+     */
+    @Test
+    public void secondRuleBadWeatherTest() {
+        assertThatThrownBy(() -> {
+            aggregateFunctionsGenerator.secondRule(null);
+        }).isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(ERROR_MSG);
+    }
+
+    /**
+     *  Third rule is tested here. It should return a query aimed at the GROUP BY clause.
      */
     @Test
     public void thirdRuleTest() {
@@ -100,10 +126,54 @@ public class AggregateFunctionsGeneratorTest {
     }
 
     /**
-     *  First rule is tested here. It should return a simple count(*) with all columns.
+     *  Calls thirdRule with first only the function input null, then the plainselect input null, then both.
+     *  This should all be caught by the method.
+     */
+    @Test
+    public void thirdRuleBadWeatherTest() {
+        assertThatThrownBy(() -> {
+            aggregateFunctionsGenerator.thirdRule(plainSelect1, null);
+        }).isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(ERROR_MSG);
+
+        assertThatThrownBy(() -> {
+            aggregateFunctionsGenerator.thirdRule(null, function1);
+        }).isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(ERROR_MSG);
+
+        assertThatThrownBy(() -> {
+            aggregateFunctionsGenerator.thirdRule(null, null);
+        }).isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(ERROR_MSG);
+    }
+
+    /**
+     *  Fourth rule is tested here. It should also return a query aimed at the GROUP BY clause.
      */
     @Test
     public void fourthRuleTest() {
         assertThat(aggregateFunctionsGenerator.fourthRule(plainSelect1, function1).toString()).isEqualTo(result4);
+    }
+
+    /**
+     *  Calls fourthRule with first only the function input null, then the plainselect input null, then both.
+     *  This should all be caught by the method.
+     */
+    @Test
+    public void fourthRuleBadWeatherTest() {
+        assertThatThrownBy(() -> {
+            aggregateFunctionsGenerator.fourthRule(plainSelect1, null);
+        }).isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(ERROR_MSG);
+
+        assertThatThrownBy(() -> {
+            aggregateFunctionsGenerator.fourthRule(null, function1);
+        }).isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(ERROR_MSG);
+
+        assertThatThrownBy(() -> {
+            aggregateFunctionsGenerator.fourthRule(null, null);
+        }).isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(ERROR_MSG);
     }
 }

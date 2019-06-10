@@ -87,7 +87,7 @@ public class AggregateFunctionsGenerator {
      */
     private PlainSelect firstRule(PlainSelect plainSelect) {
         if (plainSelect == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(ERROR_MSG);
         }
 
         // Get a deep copy of the plainSelect
