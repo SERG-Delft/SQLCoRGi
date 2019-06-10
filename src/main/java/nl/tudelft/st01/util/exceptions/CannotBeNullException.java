@@ -6,6 +6,14 @@ package nl.tudelft.st01.util.exceptions;
 public class CannotBeNullException extends RuntimeException {
 
     /**
+     * Parameterless Constructor.
+     */
+
+    public CanNotBeNullException() {
+
+    }
+
+    /**
      * Constructor that accepts a message.
      *
      * @param message - Message to pass along to the Exception

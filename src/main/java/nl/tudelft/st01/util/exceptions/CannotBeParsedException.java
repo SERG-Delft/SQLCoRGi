@@ -6,6 +6,14 @@ package nl.tudelft.st01.util.exceptions;
 public class CannotBeParsedException extends RuntimeException {
 
     /**
+     * Parameterless Constructor.
+     */
+
+    public CanNotBeParsedException() {
+
+    }
+
+    /**
      * Constructor that accepts a message.
      *
      * @param message - Message to pass along to the Exception
