@@ -20,7 +20,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.fail;
 
 /**
  * Unit tests for the {@link Generator}.
@@ -32,7 +31,8 @@ public class AggregateFunctionsGeneratorTest {
     private Function function1 = new Function();
     private final String director = "Director";
     private final String result1 = "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1";
-    private final String result2 = "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director HAVING COUNT(*) > 1";
+    private final String result2 = "SELECT Director, AVG(NrOfVisitors) FROM Movies"
+        + " GROUP BY Director HAVING COUNT(*) > 1";
     private final String result3 = "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director"
         + " HAVING COUNT(*) > COUNT(NrOfVisitors) AND COUNT(DISTINCT NrOfVisitors) > 1";
     private final String result4 = "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director "
@@ -44,9 +44,12 @@ public class AggregateFunctionsGeneratorTest {
 
     /**
      * Creates the following query as a PlainSelect object:
-     *      "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director"
+     *      "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director".
      */
     @BeforeEach
+    // Since this setUp method has the @BeforeEach tag, it is definitely used (quite a lot, actually) but
+    //      PMD doesn't seem to notice this. Thus, we have to suppress this rule here.
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void setUp() {
         plainSelect1 = new PlainSelect();
 
@@ -74,8 +77,6 @@ public class AggregateFunctionsGeneratorTest {
         List<Expression> expressions2 = Arrays.asList(new Column(director));
         groupByElement.setGroupByExpressions(expressions2);
         plainSelect1.setGroupByElement(groupByElement);
-
-
     }
 
     /**
