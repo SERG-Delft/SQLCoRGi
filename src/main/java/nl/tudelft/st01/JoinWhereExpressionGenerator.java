@@ -32,11 +32,7 @@ public class JoinWhereExpressionGenerator {
     private enum JoinType {
         LEFT, RIGHT, INNER
     }
-
-    private Map<String, List<Column>> map;
-
-    private Expression whereExpression;
-
+    
     private List<OuterIncrementRelation> outerIncrementRelations;
 
     /**
@@ -46,52 +42,8 @@ public class JoinWhereExpressionGenerator {
      * @return A set of mutated queries in string format.
      */
     public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
-//        generate(plainSelect);
-//        this.whereExpression = plainSelect.getWhere();
         Set<String> result = generate(plainSelect);
 
-//
-//        List<Join> joins = plainSelect.getJoins();
-//        List<JoinWhereItem> joinWhereItems;
-//        Join join;
-//
-//        PlainSelect out = plainSelect;
-//        Expression whereCondition = plainSelect.getWhere();
-//
-//        if (joins != null && !joins.isEmpty()) {
-//            map = new HashMap<>();
-//            OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
-//
-//            List<Join> temp = new ArrayList<>();
-//            for (int i = 0; i < joins.size(); i++) {
-//                join = joins.get(i);
-//
-//                if (join.isSimple()) {
-//                    continue;
-//                } else if (join.getOnExpression() == null) {
-//                    throw new IllegalStateException("The ON condition cannot be null");
-//                }
-//
-//                join.getOnExpression().accept(onExpressionVisitor);
-//                joinWhereItems = generateJoinMutations(join);
-//                for (JoinWhereItem joinWhereItem : joinWhereItems) {
-//                    temp.addAll(joins);
-//                    temp.set(i, joinWhereItem.getJoin());
-//
-//                    out.setJoins(temp);
-//                    out.setWhere(joinWhereItem.getJoinWhere());
-//
-//                    result.add(out.toString());
-//                    out.setWhere(whereCondition);
-//                    out.setJoins(joins);
-//                    temp.clear();
-//                }
-//                map.clear();
-//            }
-//        }
-//
-//        plainSelect.setWhere(whereCondition);
-//        plainSelect.setJoins(joins);
         return result;
     }
 
@@ -144,7 +96,6 @@ public class JoinWhereExpressionGenerator {
 
         for (int i = 0; i < joins.size(); i++) {
             OuterIncrementRelation oir = outerIncrementRelations.get(i);
-
 
             if (oir.getLoiRelColumns() != null && !oir.getLoiRelColumns().isEmpty()) {
                 results.addAll(generateLeftJoinRules(joins, i, whereCondition, oir));
@@ -218,7 +169,6 @@ public class JoinWhereExpressionGenerator {
 
         return out;
     }
-
 
     private List<Join> setAllToInner(List<Join> joins) {
         List<Join> outJoins = new ArrayList<>();
@@ -404,104 +354,6 @@ public class JoinWhereExpressionGenerator {
     }
 
     /**
-     * Mutates the given {@link Join} such that it returns a list of {@link JoinWhereItem}s.
-     *
-     * @param join The join that should be mutated.
-     * @return A list of mutated joins and their corresponding where expressions.
-     */
-    private List<JoinWhereItem> generateJoinMutations(Join join) {
-        List<JoinWhereItem> result;
-
-        if (map.size() == 1) {
-            result = handleJoinSingleTableOnCondition(join, map);
-        } else {
-            result = handleJoinMultipleTablesOnCondition(join, map);
-        }
-        return result;
-    }
-
-    /**
-     * When the map contains more than one table, then generate to corresponding mutations.
-     *
-     * @param join The join that has to be mutated.
-     * @param map The map where each table is mapped to its columns.
-     * @return List of JoinWhere items with the mutated results.
-     */
-    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
-    private List<JoinWhereItem> handleJoinMultipleTablesOnCondition(Join join, Map<String, List<Column>> map) {
-        JoinOnConditionColumns joinOnConditionColumns = new JoinOnConditionColumns();
-
-        for (Map.Entry<String, List<Column>> s : map.entrySet()) {
-            List<Column> columns = map.get(s.getKey());
-
-            if (!s.getKey().equals(join.getRightItem().toString().toLowerCase())) {
-                joinOnConditionColumns.addToLeftColumns(columns);
-            } else {
-                joinOnConditionColumns.addToRightColumns(columns);
-            }
-        }
-
-        return generateJoinWhereItems(joinOnConditionColumns, join);
-    }
-
-    /**
-     * Generates the join where items for the join on condition columns provided.
-     *
-     * @param joinOnConditionColumns The object containing the columns.
-     * @param join The join used.
-     * @return List of a generated JoinWhereItem for each mutation
-     */
-    private List<JoinWhereItem> generateJoinWhereItems(JoinOnConditionColumns joinOnConditionColumns, Join join) {
-        Expression where = whereExpression;
-
-        Join leftJoin = genericCopyOfJoin(join);
-        leftJoin.setLeft(true);
-        Join rightJoin = genericCopyOfJoin(join);
-        rightJoin.setRight(true);
-        Join innerJoin = genericCopyOfJoin(join);
-        innerJoin.setInner(true);
-
-        List<Column> left = joinOnConditionColumns.getLeftColumns();
-        Set<String> leftTables = joinOnConditionColumns.getLeftTables();
-
-        List<Column> right = joinOnConditionColumns.getRightColumns();
-        Set<String> rightTables = joinOnConditionColumns.getRightTables();
-
-        Expression leftColumnsIsNull = createIsNullExpressions(left, true);
-        Expression leftColumnsIsNotNull = createIsNullExpressions(left, false);
-
-        Expression rightColumnsIsNull = createIsNullExpressions(right, true);
-        Expression rightColumnsIsNotNull = createIsNullExpressions(right, false);
-
-        Expression roi = concatenate(leftColumnsIsNull, rightColumnsIsNotNull, false);
-        Expression roiNull = concatenate(leftColumnsIsNull, rightColumnsIsNull, false);
-
-        Expression loi = concatenate(rightColumnsIsNull, leftColumnsIsNotNull, false);
-        Expression loiNull = concatenate(rightColumnsIsNull, leftColumnsIsNull, false);
-
-        Expression rightIsNull = excludeInExpression(right, leftTables, where);
-        Expression rightIsNotNull = excludeInExpression(leftTables, where);
-
-        Expression leftIsNull = excludeInExpression(left, rightTables, where);
-        Expression leftIsNotNull = excludeInExpression(rightTables, where);
-
-        Expression roiJoinNull = concatenate(roiNull, rightIsNull, true);
-        Expression roiJoin = concatenate(roi, rightIsNotNull, true);
-
-        Expression loiJoinNull = concatenate(loiNull, leftIsNull, true);
-        Expression loiJoin = concatenate(loi, leftIsNotNull, true);
-
-        List<JoinWhereItem> result = new ArrayList<>();
-        result.add(new JoinWhereItem(innerJoin, wrapInParentheses(whereExpression)));
-        result.add(new JoinWhereItem(leftJoin, loiJoinNull));
-        result.add(new JoinWhereItem(leftJoin, loiJoin));
-        result.add(new JoinWhereItem(rightJoin, roiJoinNull));
-        result.add(new JoinWhereItem(rightJoin, roiJoin));
-
-        return result;
-    }
-
-    /**
      * Returns the concatenation of two expression. If either of them is null, the other expression is wrapped
      * in parentheses.
      *
@@ -536,113 +388,6 @@ public class JoinWhereExpressionGenerator {
         }
 
         return new Parenthesis(expression);
-    }
-
-    /**
-     * Modifies input expression such that it no longer contains any columns part of the table.
-     *
-     * @param tables The tables from which the columns have to be excluded.
-     * @param expression The expression that should be modified.
-     * @return The modified expression.
-     */
-    private static Expression excludeInExpression(Set<String> tables, Expression expression) {
-        if (expression != null) {
-            ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
-            traverserVisitor.setTables(tables);
-            expression.accept(traverserVisitor);
-
-            return traverserVisitor.getExpression();
-        }
-
-        return null;
-    }
-
-    /**
-     * Modifies input expression such that it no longer contains any columns part of the table.
-     *
-     * @param columns The columns that should be excluded.
-     * @param tables The table from which the columns should be excluded.
-     * @param expression The expression that should be modified.
-     * @return The modified expression.
-     */
-    private static Expression excludeInExpression(List<Column> columns, Set<String> tables, Expression expression) {
-        if (expression != null) {
-            ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
-            traverserVisitor.setTables(tables);
-            traverserVisitor.setNullColumns(columns);
-            expression.accept(traverserVisitor);
-
-            return traverserVisitor.getExpression();
-        }
-
-        return null;
-    }
-
-
-    /**
-     * In case the two tables are joined and the on condition only contains tables from one of the two tables,
-     * then this method will generate the JoinWhereItems corresponding to the test cases that should be generated.
-     *
-     * @param join The join from which the JoinWhereitems have to be generated.
-     * @param map The map where each table is mapped to its columns.
-     * @return List of JoinWhereItems that contain the mutations.
-     */
-    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
-    private static List<JoinWhereItem> handleJoinSingleTableOnCondition(Join join, Map<String, List<Column>> map) {
-        if (map.size() > 1) {
-            throw new IllegalArgumentException("Map may only contain columns from one table");
-        }
-
-        Expression isNotNulls;
-
-        List<JoinWhereItem> result = new ArrayList<>();
-        List<Column> columns;
-
-        Join leftJoin = genericCopyOfJoin(join);
-        leftJoin.setLeft(true);
-        Join rightJoin = genericCopyOfJoin(join);
-        rightJoin.setRight(true);
-        Join innerJoin = genericCopyOfJoin(join);
-        innerJoin.setInner(true);
-
-        Expression coreExpression;
-        AndExpression andExpression;
-        Parenthesis left;
-        NotExpression notExpression;
-        Parenthesis parenthesis;
-
-        for (Map.Entry<String, List<Column>> s : map.entrySet()) {
-            columns = map.get(s.getKey());
-
-            isNotNulls = createIsNullExpressions(columns, false);
-            parenthesis = new Parenthesis();
-            parenthesis.setExpression(join.getOnExpression());
-
-            notExpression = new NotExpression(parenthesis);
-
-            left = new Parenthesis();
-            left.setExpression(notExpression);
-
-            andExpression = new AndExpression(left, isNotNulls);
-
-            if (s.getKey().equals(join.getRightItem().toString().toLowerCase())) {
-                result.add(new JoinWhereItem(rightJoin, andExpression));
-            } else {
-                coreExpression = getCoreExpression(join.getOnExpression());
-
-                Join useJoin;
-                if (coreExpression instanceof IsNullExpression) {
-                    useJoin = innerJoin;
-                } else {
-                    useJoin = leftJoin;
-                }
-
-                result.add(new JoinWhereItem(innerJoin, null));
-                result.add(new JoinWhereItem(useJoin, andExpression));
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -685,22 +430,4 @@ public class JoinWhereExpressionGenerator {
         stack.addAll(columns);
         return createIsNullExpressions(stack, isNull);
     }
-
-    /**
-     * If an expression is nested in parentheses or in a not expression, retrieve the innermost expression that is
-     * not either of these.
-     *
-     * @param expression The expression to evaluate.
-     * @return The innermost expression that is not nested in parenthesis or in a not.
-     */
-    public static Expression getCoreExpression(Expression expression) {
-        if (expression instanceof Parenthesis) {
-            return getCoreExpression(((Parenthesis) expression).getExpression());
-        } else if (expression instanceof NotExpression) {
-            return getCoreExpression(((NotExpression) expression).getExpression());
-        } else {
-            return expression;
-        }
-    }
-
 }
