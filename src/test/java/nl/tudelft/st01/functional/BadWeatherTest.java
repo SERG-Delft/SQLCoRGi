@@ -1,12 +1,10 @@
 package nl.tudelft.st01.functional;
 
 import nl.tudelft.st01.Generator;
-import nl.tudelft.st01.util.exceptions.CanNotBeNullException;
 import nl.tudelft.st01.util.exceptions.CanNotBeParsedException;
 import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
 import org.junit.jupiter.api.Test;
 
-import static nl.tudelft.st01.functional.AssertUtils.verify;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
@@ -21,7 +19,7 @@ public class BadWeatherTest {
     @Test
     public void testInvalidQuery() {
         assertThatExceptionOfType(CanNotBeParsedException.class).isThrownBy(
-                () -> Generator.generateRules("ELECT * ROM invalid WERE statement = 5"));
+            () -> Generator.generateRules("ELECT * ROM invalid WERE statement = 5"));
     }
 
     /**
@@ -30,7 +28,7 @@ public class BadWeatherTest {
     @Test
     public void testNonSelectQuery() {
         assertThatExceptionOfType(UnsupportedInputException.class).isThrownBy(
-                () -> Generator.generateRules("ALTER TABLE Customers ADD Email varchar(255)"));
+            () -> Generator.generateRules("ALTER TABLE Customers ADD Email varchar(255)"));
 
     }
 }
