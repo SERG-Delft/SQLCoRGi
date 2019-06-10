@@ -6,14 +6,6 @@ package nl.tudelft.st01.util.exceptions;
 public class ShouldNotBeInstantiatedException extends RuntimeException {
 
     /**
-     * Parameterless Constructor.
-     */
-
-    public ShouldNotBeInstantiatedException() {
-
-    }
-
-    /**
      * Constructor that accepts a message.
      *
      * @param message - Message to pass along to the Exception
