@@ -46,7 +46,7 @@ public class JoinWhereExpressionGenerator {
      * @return A set of mutated queries in string format.
      */
     public Set<String> generateJoinWhereExpressions(PlainSelect plainSelect) {
-        generate(plainSelect);
+//        generate(plainSelect);
 //        this.whereExpression = plainSelect.getWhere();
         Set<String> result = generate(plainSelect);
 
@@ -190,23 +190,24 @@ public class JoinWhereExpressionGenerator {
     private static Expression nullReduction(Expression expression, OuterIncrementRelation oir, JoinType joinType, boolean nullable) {
         if (expression != null) {
             Set<String> includeTables;
-            List<Column> excludeColumns;
+            List<Column> columns;
 
             if (joinType == JoinType.LEFT) {
                 includeTables = oir.getRoiRelations();
-                excludeColumns = oir.getRoiRelColumns();
+                columns = oir.getRoiRelColumns();
             } else if (joinType == JoinType.RIGHT) {
                 includeTables = oir.getLoiRelations();
-                excludeColumns = oir.getLoiRelColumns();
+                columns = oir.getLoiRelColumns();
             } else {
                 throw new IllegalArgumentException("Join type must be either LEFT or RIGHT");
             }
 
             ExpressionTraverserVisitor traverserVisitor = new ExpressionTraverserVisitor();
             traverserVisitor.setTables(includeTables);
+            traverserVisitor.setOnColumns(columns);
 
             if (nullable) {
-                traverserVisitor.setNullColumns(excludeColumns);
+                traverserVisitor.setNullColumns(columns);
             }
 
             expression.accept(traverserVisitor);
