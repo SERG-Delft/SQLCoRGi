@@ -1,0 +1,24 @@
+package nl.tudelft.st01.util.exceptions;
+
+/**
+ *  Exception that can be used to alert users that an item cannot be null.
+ */
+public class ListCanNotBeEmptyException extends RuntimeException {
+
+    /**
+     * Parameterless Constructor.
+     */
+
+    public ListCanNotBeEmptyException() {
+
+    }
+
+    /**
+     * Constructor that accepts a message.
+     *
+     * @param message - Message to pass along to the Exception
+     */
+    public ListCanNotBeEmptyException(String message) {
+        super(message);
+    }
+}
