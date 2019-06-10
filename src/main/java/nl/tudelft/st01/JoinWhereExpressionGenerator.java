@@ -11,6 +11,8 @@ import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import nl.tudelft.st01.query.JoinOnConditionColumns;
 import nl.tudelft.st01.query.JoinWhereItem;
+import nl.tudelft.st01.util.exceptions.CanNotBeNullException;
+import nl.tudelft.st01.util.exceptions.ListCanNotBeEmptyException;
 import nl.tudelft.st01.visitors.ExpressionTraverserVisitor;
 import nl.tudelft.st01.visitors.join.OnExpressionVisitor;
 
@@ -58,7 +60,7 @@ public class JoinWhereExpressionGenerator {
                 if (join.isSimple()) {
                     continue;
                 } else if (join.getOnExpression() == null) {
-                    throw new IllegalStateException("The ON condition cannot be null");
+                    throw new CanNotBeNullException("The ON condition cannot be null");
                 }
 
                 join.getOnExpression().accept(onExpressionVisitor);
@@ -366,7 +368,7 @@ public class JoinWhereExpressionGenerator {
             return new AndExpression(createIsNullExpressions(columns, isNull), parenthesis);
         }
 
-        throw new IllegalStateException("The columns list cannot be empty.");
+        throw new ListCanNotBeEmptyException("The columns list cannot be empty.");
     }
 
     /**

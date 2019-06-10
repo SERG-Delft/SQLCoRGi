@@ -1,12 +1,15 @@
 package nl.tudelft.st01.util.exceptions;
 
-class CanNotBeNullException extends Exception {
+/**
+ *  Exception that can be used to alert users that an item cannot be null.
+ */
+public class CanNotBeNullException extends RuntimeException {
 
     /**
      * Parameterless Constructor.
      */
 
-    CanNotBeNullException() {
+    public CanNotBeNullException() {
 
     }
 
@@ -15,7 +18,7 @@ class CanNotBeNullException extends Exception {
      *
      * @param message - Message to pass along to the Exception
      */
-    CanNotBeNullException(String message) {
+    public CanNotBeNullException(String message) {
         super(message);
     }
 }
