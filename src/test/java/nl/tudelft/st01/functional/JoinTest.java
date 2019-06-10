@@ -1,6 +1,7 @@
 package nl.tudelft.st01.functional;
 
 import nl.tudelft.st01.Generator;
+import nl.tudelft.st01.util.exceptions.CanNotBeNullException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -315,7 +316,7 @@ public class JoinTest {
      */
     @Test
     public void testJoinNoOnConditionSimpleJoinWithWhereClauseException() {
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
+        assertThatExceptionOfType(CanNotBeNullException.class).isThrownBy(
             () -> Generator.generateRules("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50"));
 
     }

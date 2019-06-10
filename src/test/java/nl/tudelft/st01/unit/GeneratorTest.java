@@ -2,6 +2,10 @@ package nl.tudelft.st01.unit;
 
 import nl.tudelft.st01.Generator;
 
+import nl.tudelft.st01.util.exceptions.CanNotBeNullException;
+import nl.tudelft.st01.util.exceptions.CanNotBeParsedException;
+import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
+import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -30,17 +35,6 @@ public class GeneratorTest {
     private static final String NOT_A_SELECT_STATEMENT_ERROR_MESSAGE = "Only SELECT statements are supported.";
     private static final String CATCH_EXCEPTION_FAIL_MESSAGE = "UnsupportedEncodingException was thrown";
 
-
-    /**
-     * Set-up redirection of standard error stream in order to verify its content.
-     *
-     * @throws UnsupportedEncodingException if the encoding ("UTF-8") is not found - this cannot happen.
-     */
-    @BeforeEach
-    public void setUpStream() throws UnsupportedEncodingException {
-        System.setErr(new PrintStream(errStream, false, UTF8));
-    }
-
     /**
      * Trying to invoke the {@link Generator} constructor should throw an {@link UnsupportedOperationException}.
      *
@@ -54,66 +48,36 @@ public class GeneratorTest {
         generatorConstructor.setAccessible(true);
 
         assertThatThrownBy(
-            () -> generatorConstructor.newInstance()).hasRootCauseInstanceOf(UnsupportedOperationException.class);
+            () -> generatorConstructor.newInstance()).hasRootCauseInstanceOf(ShouldNotBeInstantiatedException.class);
     }
 
     /**
-     * Assert that the right error message is printed when {@code GenerateRules} is called with a null-query.
+     * Assert that the right exception is thrown when {@code GenerateRules} is called with a null-query.
      */
     @Test
     public void testGenerateRulesNullShouldPrintErrorMessage() {
-        Generator.generateRules(null);
-
-        String actualErrorMessage = null;
-        try {
-            actualErrorMessage = errStream.toString(UTF8).trim();
-        } catch (UnsupportedEncodingException e) {
-            fail(CATCH_EXCEPTION_FAIL_MESSAGE);
-        }
-
-        assertThat(actualErrorMessage).isEqualTo(NULL_ERROR_MESSAGE);
+        assertThatExceptionOfType(CanNotBeNullException.class).isThrownBy(
+                () -> Generator.generateRules(null));
     }
 
     /**
-     * Assert that the right error message is printed when {@code GenerateRules} is called with a query that is not
+     * Assert that the right exception is thrown when {@code GenerateRules} is called with a query that is not
      * valid SQL..
      */
     @Test
     public void testGenerateRulesWithInvalidQueryShouldPrintErrorMessage() {
-        Generator.generateRules("This is not a SQL Query");
 
-        String actualErrorMessage = null;
-        try {
-            actualErrorMessage = errStream.toString(UTF8).trim();
-        } catch (UnsupportedEncodingException e) {
-            fail(CATCH_EXCEPTION_FAIL_MESSAGE);
-        }
-
-        assertThat(actualErrorMessage).isEqualTo(NOT_AN_SQL_QUERY_ERROR_MESSAGE);
+        assertThatExceptionOfType(CanNotBeParsedException.class).isThrownBy(
+                () -> Generator.generateRules("This is not a SQL Query"));
     }
 
     /**
-     * Assert that the right error message is printed when {@code GenerateRules} is called with a non-select statement.
+     * Assert that the right exception is thrown when {@code GenerateRules} is called with a non-select statement.
      */
     @Test
     public void testGenerateRulesWithNonSelectQueryShouldPrintErrorMessage() {
-        Generator.generateRules("UPDATE Table1 SET column = value WHERE condition IS NOT NULL;");
 
-        String actualErrorMessage = null;
-        try {
-            actualErrorMessage = errStream.toString(UTF8).trim();
-        } catch (UnsupportedEncodingException e) {
-            fail(CATCH_EXCEPTION_FAIL_MESSAGE);
-        }
-
-        assertThat(actualErrorMessage).isEqualTo(NOT_A_SELECT_STATEMENT_ERROR_MESSAGE);
-    }
-
-    /**
-     * Reverts the redirection of standard error stream back to the normal {@code System.err}.
-     */
-    @AfterEach
-    public void tearDownStream() {
-        System.setErr(System.err);
+        assertThatExceptionOfType(UnsupportedInputException.class).isThrownBy(
+                () -> Generator.generateRules("UPDATE Table1 SET column = value WHERE condition IS NOT NULL;"));
     }
 }
