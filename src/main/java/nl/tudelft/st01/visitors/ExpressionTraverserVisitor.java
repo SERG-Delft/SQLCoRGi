@@ -177,6 +177,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
     /**
      * Check whether the columns list contain the given column or if the column belongs to the table.
      *
+     * @param columns The columns list that should be used.
      * @param column The column that should be checked.
      * @return True if the column is in the list or if it belongs to the table.
      */

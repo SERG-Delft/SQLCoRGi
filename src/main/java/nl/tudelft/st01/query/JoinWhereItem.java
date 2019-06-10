@@ -30,6 +30,12 @@ public class JoinWhereItem {
         this.joinWhere = joinWhere;
     }
 
+    /**
+     * Creates a new {@code JoinWhereItem} linking a given JOIN to a WHERE expression.
+     *
+     * @param joins a list of {@code Join}s that should be linked to {@code joinWhere}.
+     * @param joinWhere the WHERE expression that should be linked to {@code join}.
+     */
     public JoinWhereItem(List<Join> joins, Expression joinWhere) {
         this.joins = joins;
         this.joinWhere = joinWhere;

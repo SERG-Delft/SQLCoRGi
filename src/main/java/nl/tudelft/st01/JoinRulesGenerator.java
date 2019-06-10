@@ -80,7 +80,7 @@ public class JoinRulesGenerator {
                 join.getOnExpression().accept(onExpressionVisitor);
                 out.add(getOuterIncrementRelation(map, join));
                 map.clear();
-            } else if (!join.isSimple()){
+            } else if (!join.isSimple()) {
                 throw new IllegalStateException("The ON condition cannot be null");
             }
         }
@@ -94,6 +94,7 @@ public class JoinRulesGenerator {
      * @param plainSelect The plainselect for which the rules should be derived from.
      * @return A set of {@link JoinWhereItem}s from which the actual rules can be derived.
      */
+    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
     private Set<JoinWhereItem> handleJoins(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
         Expression whereCondition = plainSelect.getWhere();
@@ -297,7 +298,7 @@ public class JoinRulesGenerator {
 
         List<Join> transformedJoins = new ArrayList<>();
 
-        while(joinIterator.hasNext() && joinTypeIterator.hasNext()) {
+        while (joinIterator.hasNext() && joinTypeIterator.hasNext()) {
             Join tJoin = transformJoin(joinIterator.next(), joinTypeIterator.next());
             transformedJoins.add(tJoin);
         }
@@ -401,7 +402,8 @@ public class JoinRulesGenerator {
      * @param <T> Generic type to ensure that both sets contain elements of the same type.
      * @return The intersection of the sets.
      */
-    private static<T> Set<T> intersection(Set<T> set1, Set<T> set2) {
+    @SuppressWarnings("checkstyle:nowhitespacebefore")
+    private static <T> Set<T> intersection(Set<T> set1, Set<T> set2) {
         Set set = new HashSet();
         set.addAll(set1);
         set.retainAll(set2);
@@ -422,13 +424,13 @@ public class JoinRulesGenerator {
         List<Column> loiRelColumns = new ArrayList<>();
         List<Column> roiRelColumns = new ArrayList<>();
 
-        for (String key : map.keySet()) {
-            if (key.equals(join.getRightItem().toString().toLowerCase())) {
-                loirels.add(key);
-                loiRelColumns.addAll(map.get(key));
+        for (Map.Entry<String, List<Column>> entry : map.entrySet()) {
+            if (entry.getKey().equals(join.getRightItem().toString().toLowerCase())) {
+                loirels.add(entry.getKey());
+                loiRelColumns.addAll(entry.getValue());
             } else {
-                roirels.add(key);
-                roiRelColumns.addAll(map.get(key));
+                roirels.add(entry.getKey());
+                roiRelColumns.addAll(entry.getValue());
             }
         }
 
