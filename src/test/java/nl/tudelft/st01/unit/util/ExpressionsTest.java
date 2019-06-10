@@ -1,6 +1,7 @@
 package nl.tudelft.st01.unit.util;
 
 import nl.tudelft.st01.util.Expressions;
+import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
@@ -26,7 +27,7 @@ public class ExpressionsTest {
 
         Throwable thrown = catchThrowable(constructor::newInstance);
 
-        assertThat(thrown).hasRootCauseInstanceOf(UnsupportedOperationException.class);
+        assertThat(thrown).hasRootCauseInstanceOf(ShouldNotBeInstantiatedException.class);
     }
 
 }

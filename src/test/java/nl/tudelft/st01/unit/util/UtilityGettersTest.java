@@ -4,6 +4,7 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.util.UtilityGetters;
+import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
@@ -30,7 +31,7 @@ public class UtilityGettersTest {
 
         assertThatThrownBy(
             () -> utilityGettersConstructor.newInstance()
-        ).hasRootCauseInstanceOf(UnsupportedOperationException.class);
+        ).hasRootCauseInstanceOf(ShouldNotBeInstantiatedException.class);
     }
 
     /**
