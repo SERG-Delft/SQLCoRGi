@@ -1,5 +1,4 @@
-package nl.tudelft.st01.queries;
-
+package nl.tudelft.st01.sqlfpcws;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import nl.tudelft.st01.Generator;
@@ -17,6 +16,17 @@ import java.util.Set;
  * Checks output of our tool against predefined output from another tool.
  */
 public final class CompareOutput {
+
+    private static final String RESOURCE_BASE_PATH = ".\\src\\main\\resources\\database";
+
+    private static final String SUITECRM_INPUT_PATH = RESOURCE_BASE_PATH + "\\input_queries\\suitecrm.sql";
+    private static final String ESPOCRM_INPUT_PATH = RESOURCE_BASE_PATH + "\\input_queries\\espocrm.sql";
+    private static final String ERPNEXT_INPUT_PATH = RESOURCE_BASE_PATH + "\\input_queries\\erpnext.sql";
+
+    private static final String SUITECRM_OUTPUT_PATH = RESOURCE_BASE_PATH + "\\output_json\\suitecrm.sql";
+    private static final String ESPOCRM_OUTPUT_PATH = RESOURCE_BASE_PATH + "\\output_json\\espocrm.sql";
+    private static final String ERPNEXT_OUTPUT_PATH = RESOURCE_BASE_PATH + "\\output_json\\erpnext.sql";
+
     private static final String DOUBLE_NEWLINE = "\n\n";
     private static final int AMOUNT_OF_QUERY_SETS = 3;
 
@@ -41,17 +51,8 @@ public final class CompareOutput {
             value = "DM_DEFAULT_ENCODING",
             justification = "Encoding for FileReader can be specified, so this needs to be suppressed")
     public static void main(String[] args) {
-        String basePath = ".\\src\\main\\resources\\database";
-
-        String suitecrmInput = "\\input_queries\\suitecrm.sql";
-        String suitecrmOutput = "\\output_json\\suitecrm.json";
-        String espocrmInput = "\\input_queries\\espocrm.sql";
-        String espocrmOutput = "\\output_json\\espocrm.json";
-        String erpnextInput = "\\input_queries\\erpnext.sql";
-        String erpnextOutput = "\\output_json\\erpnext.json";
-
-        String[] input = {basePath + erpnextInput, basePath + suitecrmInput, basePath + espocrmInput};
-        String[] output = {basePath + erpnextOutput, basePath + suitecrmOutput, basePath + espocrmOutput};
+        String[] input = {ERPNEXT_INPUT_PATH, SUITECRM_INPUT_PATH, ESPOCRM_INPUT_PATH};
+        String[] output = {ERPNEXT_OUTPUT_PATH + SUITECRM_OUTPUT_PATH, ESPOCRM_OUTPUT_PATH};
 
         Scanner sc = null;
         JSONParser parser = new JSONParser();
