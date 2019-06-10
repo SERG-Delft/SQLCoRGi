@@ -65,6 +65,12 @@ public class JoinRulesGenerator {
         return result;
     }
 
+    /**
+     * Takes in the list of joins and determines the outer increment relations (OIR) for each of them,
+     * this is stored in an {@link OuterIncrementRelation} object.
+     * @param joins The joins for which the OIRs have to be determined.
+     * @return A list of OIRs. The order of the input joins is the same as the order of the list of OIRs.
+     */
     private List<OuterIncrementRelation> generateOIRsForEachJoin(List<Join> joins) {
         Map<String, List<Column>> map = new HashMap<>();
         List<OuterIncrementRelation> out = new ArrayList<>();
@@ -82,6 +88,12 @@ public class JoinRulesGenerator {
         return out;
     }
 
+    /**
+     * Takes in a plainselect and derives the correct list of joins and its respective outer increment.
+     * These are stored in {@link JoinWhereItem}s.
+     * @param plainSelect The plainselect for which the rules should be derived from.
+     * @return A set of {@link JoinWhereItem}s from which the actual rules can be derived.
+     */
     private Set<JoinWhereItem> handleJoins(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
         Expression whereCondition = plainSelect.getWhere();
@@ -104,10 +116,18 @@ public class JoinRulesGenerator {
         plainSelect.setWhere(whereCondition);
         plainSelect.setJoins(joins);
 
-
         return results;
     }
 
+    /**
+     * Generates the {@link JoinWhereItem}s for the given list of transformed joins in case the
+     * transformed join in question is a left join.
+     * @param joins The list of transformed joins.
+     * @param index The index of the transformed join in question.
+     * @param where The where expression of the original {@link PlainSelect}
+     * @param oir The {@link OuterIncrementRelation} corresponding to the join in question.
+     * @return A set of {@link JoinWhereItem}s.
+     */
     private Set<JoinWhereItem> generateLeftJoinRules(List<Join> joins, int index, Expression where,
                                                      OuterIncrementRelation oir) {
         List<JoinType> labelsLeft = label(JoinType.LEFT, joins, index);
@@ -117,14 +137,15 @@ public class JoinRulesGenerator {
         Expression reducedWhereLoi = nullReduction(where, oir, JoinType.LEFT, false);
         Expression reducedWhereLoiNull = nullReduction(where, oir, JoinType.LEFT, true);
 
-        // If the on condition only contains columns from one table, roirels will be empty or null.
         if (oir.getRoiRelColumns() == null || oir.getRoiRelColumns().isEmpty()) {
             Join join = genericCopyOfJoin(tJoinsLoi.get(index));
             join.setRight(true);
-            tJoinsLoi.set(index, join);
-            Expression not = new NotExpression(new Parenthesis(join.getOnExpression()));
-            out.add(new JoinWhereItem(tJoinsLoi, concatenate(concatenate(not, getRightOuterIncrement(oir, false), true), reducedWhereLoi, true)));
 
+            tJoinsLoi.set(index, join);
+
+            Expression not = new NotExpression(new Parenthesis(join.getOnExpression()));
+            out.add(new JoinWhereItem(tJoinsLoi, concatenate(concatenate(not,
+                    getRightOuterIncrement(oir, false), true), reducedWhereLoi, true)));
         } else {
             Expression loi = getLeftOuterIncrement(oir, false);
             Expression loiNull = getLeftOuterIncrement(oir, true);
@@ -136,6 +157,15 @@ public class JoinRulesGenerator {
         return out;
     }
 
+    /**
+     * Generates the {@link JoinWhereItem}s for the given list of transformed joins in case the
+     * transformed join in question is a right join.
+     * @param joins The list of transformed joins.
+     * @param index The index of the transformed join in question.
+     * @param where The where expression of the original {@link PlainSelect}
+     * @param oir The {@link OuterIncrementRelation} corresponding to the join in question.
+     * @return A set of {@link JoinWhereItem}s.
+     */
     private Set<JoinWhereItem> generateRightJoinRules(List<Join> joins, int index, Expression where,
                                                      OuterIncrementRelation oir) {
         List<JoinType> labelsRight = label(JoinType.RIGHT, joins, index);
@@ -151,7 +181,8 @@ public class JoinRulesGenerator {
             join.setLeft(true);
             tJoinsRoi.set(index, join);
             Expression not = new NotExpression(new Parenthesis(join.getOnExpression()));
-            out.add(new JoinWhereItem(tJoinsRoi, concatenate(concatenate(not, getLeftOuterIncrement(oir, false), true), reducedWhereRoi, true)));
+            out.add(new JoinWhereItem(tJoinsRoi, concatenate(concatenate(not,
+                    getLeftOuterIncrement(oir, false), true), reducedWhereRoi, true)));
 
         } else {
             Expression roi = getRightOuterIncrement(oir, false);
@@ -164,6 +195,11 @@ public class JoinRulesGenerator {
         return out;
     }
 
+    /**
+     * Takes in a list of joins and sets each join's type to inner only.
+     * @param joins The joins for which the type has to be set to inner.
+     * @return A list of joins set to inner.
+     */
     private List<Join> setAllToInner(List<Join> joins) {
         List<Join> outJoins = new ArrayList<>();
         for (Join join : joins) {
@@ -173,7 +209,18 @@ public class JoinRulesGenerator {
         return outJoins;
     }
 
-    private static Expression nullReduction(Expression expression, OuterIncrementRelation oir, JoinType joinType, boolean nullable) {
+    /**
+     * Reduced the given expression such that it no longer contains any columns that should be excluded.
+     * (E.g. in most cases of an IS NULL expression)
+     * @param expression The expression to reduce.
+     * @param oir The {@link OuterIncrementRelation} corresponding to
+     *            the join for which the expression has to be reduced.
+     * @param joinType The type of the join.
+     * @param nullable True if the outer increment relations are nullable, false otherwise.
+     * @return The reduced expression.
+     */
+    private static Expression nullReduction(Expression expression, OuterIncrementRelation oir,
+                                            JoinType joinType, boolean nullable) {
         if (expression != null) {
             Set<String> includeTables;
             List<Column> columns;
@@ -204,6 +251,12 @@ public class JoinRulesGenerator {
         return null;
     }
 
+    /**
+     * Takes in the outer increment relation and creates its left outer increment.
+     * @param oiRel The outer increment relation from which the outer increment should be derived.
+     * @param nullable True if the right outer increment relations are nullable, false otherwise.
+     * @return The left outer increment.
+     */
     private Expression getLeftOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
         List<Column> loiColumns = oiRel.getLoiRelColumns();
         List<Column> roiColumns = oiRel.getRoiRelColumns();
@@ -213,6 +266,12 @@ public class JoinRulesGenerator {
                 createIsNullExpressions(roiColumns, nullable), false);
     }
 
+    /**
+     * Takes in the outer increment relation and creates its right outer increment.
+     * @param oiRel The outer increment relation from which the outer increment should be derived.
+     * @param nullable True if the left outer increment relations are nullable, false otherwise.
+     * @return The right outer increment.
+     */
     private Expression getRightOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
         List<Column> loiColumns = oiRel.getLoiRelColumns();
         List<Column> roiColumns = oiRel.getRoiRelColumns();
@@ -221,6 +280,12 @@ public class JoinRulesGenerator {
                 createIsNullExpressions(loiColumns, nullable), false);
     }
 
+    /**
+     * Transform the given list of joins such that they are transformed into the join types in label.
+     * @param joins The joins to be transformed.
+     * @param labels The types the joins should be transformed into.
+     * @return The list of transformed joins.
+     */
     private List<Join> transformJoins(List<Join> joins, List<JoinType> labels) {
         if (labels.size() != joins.size()) {
             throw new IllegalStateException("The size of the list of joins must be "
@@ -240,10 +305,22 @@ public class JoinRulesGenerator {
         return transformedJoins;
     }
 
+    /**
+     * Transforms a single join into the given type.
+     * @param join The join to transform.
+     * @param joinType The type the join should be transformed into.
+     * @return The transformed join.
+     */
     private Join transformJoin(Join join, JoinType joinType) {
         return setJoinType(genericCopyOfJoin(join), joinType);
     }
 
+    /**
+     * Set the join to the given type.
+     * @param join The join for which the type should be set.
+     * @param joinType The join type to which the join should be set.
+     * @return A join with the given type.
+     */
     private Join setJoinType(Join join, JoinType joinType) {
         switch (joinType) {
             case LEFT:
@@ -262,6 +339,13 @@ public class JoinRulesGenerator {
         return join;
     }
 
+    /**
+     * Labels all joins in the list. The types are set such that the impossible combinations are excluded.
+     * @param joinType The join type of the current join to inspect.
+     * @param joins The list of all joins.
+     * @param index The index of the current join.
+     * @return A list of join types, which are used to make sure that all joins are configured correctly.
+     */
     private List<JoinType> label(JoinType joinType, List<Join> joins, int index) {
         if (index >= joins.size()) {
             throw new IllegalArgumentException("The index cannot be larger than the size of the given list of joins.");
@@ -285,14 +369,20 @@ public class JoinRulesGenerator {
         for (int i = 0; i < joins.size(); i++) {
             if (labels.get(i) == null) {
                 OuterIncrementRelation oiRel = outerIncrementRelations.get(i);
-                labels.set(i, getLabel(mvoi, oiRel));
+                labels.set(i, determineLabel(mvoi, oiRel));
             }
         }
 
         return labels;
     }
 
-    private JoinType getLabel(Set<String> mvoi, OuterIncrementRelation oiRel) {
+    /**
+     * Determines the label of the join based on its outer increment relations.
+     * @param mvoi The list, MissingValues outer increments.
+     * @param oiRel The outer increment corresponding to the join for the label should be set.
+     * @return The correct join type.
+     */
+    private JoinType determineLabel(Set<String> mvoi, OuterIncrementRelation oiRel) {
         if (!intersection(mvoi, oiRel.getRoiRelations()).isEmpty()) {
             mvoi.addAll(oiRel.getLoiRelations());
             return JoinType.LEFT;
@@ -304,6 +394,13 @@ public class JoinRulesGenerator {
         }
     }
 
+    /**
+     * Determines the intersection of the two given set and returns it without altering any of the given sets.
+     * @param set1 The first set.
+     * @param set2 Yhe second set.
+     * @param <T> Generic type to ensure that both sets contain elements of the same type.
+     * @return The intersection of the sets.
+     */
     private static<T> Set<T> intersection(Set<T> set1, Set<T> set2) {
         Set set = new HashSet();
         set.addAll(set1);
@@ -312,6 +409,12 @@ public class JoinRulesGenerator {
         return set;
     }
 
+    /**
+     * Determines the outer increment relation given the join and the tables and columns extracted from it.
+     * @param map The map containing the tables mapped to the columns.
+     * @param join The join from which the map is derived.
+     * @return The outer increment relation derived from the map and join.
+     */
     private OuterIncrementRelation getOuterIncrementRelation(Map<String, List<Column>> map, Join join) {
         Set<String> loirels = new HashSet<>();
         Set<String> roirels = new HashSet<>();
