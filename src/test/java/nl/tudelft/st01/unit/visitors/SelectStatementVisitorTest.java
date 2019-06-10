@@ -1,6 +1,6 @@
 package nl.tudelft.st01.unit.visitors;
 
-import nl.tudelft.st01.util.exceptions.CanNotBeNullException;
+import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ public class SelectStatementVisitorTest {
      */
     @Test
     public void testConstructorWithNullSetThrowsException() {
-        assertThatExceptionOfType(CanNotBeNullException.class).isThrownBy(
+        assertThatExceptionOfType(CannotBeNullException.class).isThrownBy(
             () -> new SelectStatementVisitor(null)
         );
     }
@@ -35,7 +35,7 @@ public class SelectStatementVisitorTest {
         Set<String> nonEmptySet = new HashSet<>();
         nonEmptySet.add("");
 
-        assertThatExceptionOfType(CanNotBeNullException.class).isThrownBy(
+        assertThatExceptionOfType(CannotBeNullException.class).isThrownBy(
             () -> new SelectStatementVisitor(nonEmptySet)
         ).withMessage(EXCEPTION_MESSAGE);
     }

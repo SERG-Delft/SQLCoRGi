@@ -5,8 +5,8 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
-import nl.tudelft.st01.util.exceptions.CanNotBeNullException;
-import nl.tudelft.st01.util.exceptions.CanNotBeParsedException;
+import nl.tudelft.st01.util.exceptions.CannotBeNullException;
+import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
 import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
 import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
@@ -32,21 +32,21 @@ public final class Generator {
      * @param query the query for which coverage rules should be generated.
      * @return the rules that are generated for the input query.
      */
-    // It's more neat to throw a CanNotBeParsedException instead of printing something. PMD doesn't like it, so
+    // It's neater to throw a CannotBeParsedException instead of printing something. PMD doesn't like it, so
     // we have to suppress the warning that we should not throw a new exception in a catch block.
     @SuppressWarnings({"PMD.PreserveStackTrace"})
     public static Set<String> generateRules(String query) {
         Set<String> result = new HashSet<>();
 
         if (query == null) {
-            throw new CanNotBeNullException("Input cannot be null.");
+            throw new CannotBeNullException("Input cannot be null.");
         }
 
         Statement statement;
         try {
             statement = CCJSqlParserUtil.parse(query);
         } catch (JSQLParserException e) {
-            throw new CanNotBeParsedException("Input query could not be parsed.");
+            throw new CannotBeParsedException("Input query could not be parsed.");
         }
 
         if (!(statement instanceof Select)) {

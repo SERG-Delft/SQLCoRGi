@@ -1,7 +1,7 @@
 package nl.tudelft.st01.functional;
 
 import nl.tudelft.st01.Generator;
-import nl.tudelft.st01.util.exceptions.CanNotBeParsedException;
+import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
 import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ public class BadWeatherTest {
      */
     @Test
     public void testInvalidQuery() {
-        assertThatExceptionOfType(CanNotBeParsedException.class).isThrownBy(
+        assertThatExceptionOfType(CannotBeParsedException.class).isThrownBy(
             () -> Generator.generateRules("ELECT * ROM invalid WERE statement = 5"));
     }
 

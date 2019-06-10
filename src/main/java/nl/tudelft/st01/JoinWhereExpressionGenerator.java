@@ -11,7 +11,7 @@ import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import nl.tudelft.st01.query.JoinOnConditionColumns;
 import nl.tudelft.st01.query.JoinWhereItem;
-import nl.tudelft.st01.util.exceptions.CanNotBeNullException;
+import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 import nl.tudelft.st01.util.exceptions.IllegalNumberOfArgumentsException;
 import nl.tudelft.st01.util.exceptions.ListCanNotBeEmptyException;
 import nl.tudelft.st01.visitors.ExpressionTraverserVisitor;
@@ -61,7 +61,7 @@ public class JoinWhereExpressionGenerator {
                 if (join.isSimple()) {
                     continue;
                 } else if (join.getOnExpression() == null) {
-                    throw new CanNotBeNullException("The ON condition cannot be null");
+                    throw new CannotBeNullException("The ON condition cannot be null");
                 }
 
                 join.getOnExpression().accept(onExpressionVisitor);
@@ -289,7 +289,7 @@ public class JoinWhereExpressionGenerator {
     @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
     private static List<JoinWhereItem> handleJoinSingleTableOnCondition(Join join, Map<String, List<Column>> map) {
         if (map.size() > 1) {
-            throw new IllegalNumberOfArgumentsException("Map may only contain columns from one table");
+            throw new IllegalArgumentException("Map may only contain columns from one table");
         }
 
         Expression isNotNulls;

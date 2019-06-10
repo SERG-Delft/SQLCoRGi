@@ -2,8 +2,8 @@ package nl.tudelft.st01.unit;
 
 import nl.tudelft.st01.Generator;
 
-import nl.tudelft.st01.util.exceptions.CanNotBeNullException;
-import nl.tudelft.st01.util.exceptions.CanNotBeParsedException;
+import nl.tudelft.st01.util.exceptions.CannotBeNullException;
+import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
 import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
 import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ public class GeneratorTest {
      */
     @Test
     public void testGenerateRulesNullShouldPrintErrorMessage() {
-        assertThatExceptionOfType(CanNotBeNullException.class).isThrownBy(
+        assertThatExceptionOfType(CannotBeNullException.class).isThrownBy(
             () -> Generator.generateRules(null));
     }
 
@@ -50,7 +50,7 @@ public class GeneratorTest {
     @Test
     public void testGenerateRulesWithInvalidQueryShouldPrintErrorMessage() {
 
-        assertThatExceptionOfType(CanNotBeParsedException.class).isThrownBy(
+        assertThatExceptionOfType(CannotBeParsedException.class).isThrownBy(
             () -> Generator.generateRules("This is not a SQL Query"));
     }
 
