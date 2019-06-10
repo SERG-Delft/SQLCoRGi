@@ -117,7 +117,9 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             List<Join> joins = copy.getJoins();
             if (joins != null) {
                 for (Join join : joins) {
-                    setJoinToInner(join);
+                    if (!join.isSimple()) {
+                        setJoinToInner(join);
+                    }
                 }
             }
 
@@ -182,7 +184,9 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             List<Join> joins = copy.getJoins();
             if (joins != null) {
                 for (Join join : joins) {
-                    setJoinToInner(join);
+                    if (!join.isSimple()) {
+                        setJoinToInner(join);
+                    }
                 }
             }
             copy.setHaving(null);
