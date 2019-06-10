@@ -3,6 +3,7 @@ package nl.tudelft.st01.util;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import nl.tudelft.st01.util.cloner.ExpressionCloner;
+import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
 
 /**
  * Provides utility functions for JSQLParser query objects.
@@ -13,7 +14,7 @@ public final class Expressions {
      * No instances of this class can be created.
      */
     private Expressions() {
-        throw new UnsupportedOperationException();
+        throw new ShouldNotBeInstantiatedException();
     }
 
     /**

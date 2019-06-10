@@ -5,6 +5,7 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
+import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 
 import java.util.HashSet;
@@ -19,7 +20,7 @@ public final class Generator {
      * No instance of this class should be created.
      */
     private Generator() {
-        throw new UnsupportedOperationException();
+        throw new ShouldNotBeInstantiatedException();
     }
 
     /**
