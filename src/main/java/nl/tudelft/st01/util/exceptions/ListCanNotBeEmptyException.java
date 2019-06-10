@@ -8,7 +8,6 @@ public class ListCanNotBeEmptyException extends RuntimeException {
     /**
      * Parameterless Constructor.
      */
-
     public ListCanNotBeEmptyException() {
 
     }
