@@ -14,6 +14,7 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -55,20 +56,44 @@ public class BulkRuleGenerator {
         this.sqlJson = new SQLjson();
     }
 
+    public int getAmountOfQueries() {
+        return queriesToParse.size();
+    }
+
+    public int getAmountOfTablesInSchema() {
+        return schema.selectNodes(SCHEMA_TABLE_XPATH).size();
+    }
+
+    public int getAmountOfColumnsInSchema() {
+        return schema.selectNodes(SCHEMA_COLUMN_XPATH).size();
+    }
+
+    public long getEstimatedGenerationDurationInMilliSeconds() {
+        return RULE_GENERATOR_INTERVAL * (long)getAmountOfQueries();
+    }
+
     private void setUpQueriesToParse(String sqlInputPath) {
-        try (Stream<String> stream = Files.lines(Paths.get(this.getClass().getResource(sqlInputPath).toURI()))) {
+        try (Stream<String> stream = Files.lines(Paths.get(sqlInputPath))) {
             queriesToParse = stream
                     .filter(query -> !query.isEmpty())
                     .collect(Collectors.toList());
-        } catch (IOException | URISyntaxException e) {
-            System.err.println("Could not open schema file: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("SQL queries could not be read in correctly: " + e.getMessage());
             queriesToParse = new ArrayList<>();
+        }
+
+        for (String query : queriesToParse) {
+            try {
+                CCJSqlParserUtil.parse(query);
+            } catch (JSQLParserException e) {
+                System.err.println("Query could not be parsed: " + e.getMessage());
+            }
         }
     }
 
     private void setUpSchemaDocument(String xmlSchemaPath) {
         try {
-            schema = new SAXReader().read(this.getClass().getResourceAsStream(xmlSchemaPath));
+            schema = new SAXReader().read(new File(xmlSchemaPath));
         } catch (DocumentException e) {
             System.err.println("Schema could not be parsed: " + e.getMessage());
             schema = DocumentHelper.createDocument();
@@ -143,24 +168,5 @@ public class BulkRuleGenerator {
 
 
         return tableNames;
-    }
-
-    public String statisticsString() {
-        StringBuilder sBuilder = new StringBuilder();
-
-        long queries = queriesToParse.size();
-        long tables = schema.selectNodes(SCHEMA_TABLE_XPATH).size();
-        long columns = schema.selectNodes(SCHEMA_COLUMN_XPATH).size();
-        long duration = RULE_GENERATOR_INTERVAL * 1000000 * queries;
-
-        LocalDateTime finishTime = LocalDateTime.now().plusNanos(duration);
-        String formattedFinishTime = finishTime.format(DateTimeFormatter.ISO_DATE_TIME);
-
-        sBuilder.append("- Number of queries provided: " + queries + "\n")
-                .append("- Number of tables in schema: " + tables + "\n")
-                .append("- Number of columns in schema: " + columns + "\n")
-                .append("- Estimated completion time: " + formattedFinishTime + "\n");
-
-        return sBuilder.toString();
     }
 }
