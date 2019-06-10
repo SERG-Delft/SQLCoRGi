@@ -106,7 +106,7 @@ public class JoinWhereExpressionGenerator {
         outerIncrementRelations = generateOIRsForEachJoin(plainSelect.getJoins());
 
         if (!outerIncrementRelations.isEmpty()) {
-            List<JoinWhereItem> items = handleJoins(plainSelect);
+            Set<JoinWhereItem> items = handleJoins(plainSelect);
             for (JoinWhereItem j : items) {
                 plainSelect.setJoins(j.getJoins());
                 plainSelect.setWhere(j.getJoinWhere());
@@ -136,54 +136,29 @@ public class JoinWhereExpressionGenerator {
         return out;
     }
 
-    private List<JoinWhereItem> handleJoins(PlainSelect plainSelect) {
+    private Set<JoinWhereItem> handleJoins(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
         Expression whereCondition = plainSelect.getWhere();
 
-        List<JoinWhereItem> results = new ArrayList<>();
+        Set<JoinWhereItem> results = new HashSet<>();
 
-        List<JoinType> labelsLeft;
-        List<JoinType> labelsRight;
         for (int i = 0; i < joins.size(); i++) {
-            // TODO: differentiate between multitable and singletable on expressions.
             OuterIncrementRelation oir = outerIncrementRelations.get(i);
 
-            if (oir.getLoiRelColumns() == null || oir.getLoiRelColumns().isEmpty()) {
-                if (oir.getRoiRelColumns() == null || oir.getRoiRelColumns().isEmpty()) {
-                    continue;
-                } else {
 
-                }
+            if (oir.getLoiRelColumns() != null && !oir.getLoiRelColumns().isEmpty()) {
+                results.addAll(generateLeftJoinRules(joins, i, whereCondition, oir));
             }
 
-            labelsLeft = label(JoinType.LEFT, joins, i);
-            labelsRight = label(JoinType.RIGHT, joins, i);
-
-            List<Join> tJoinsLoi = transformJoins(joins, labelsLeft);
-
-            Expression loi = getLeftOuterIncrement(oir, false);
-            Expression loiNull = getLeftOuterIncrement(oir, true);
-            Expression reducedWhereLoi = nullReduction(whereCondition, oir, JoinType.LEFT, false);
-            Expression reducedWhereLoiNull = nullReduction(whereCondition, oir, JoinType.LEFT, true);
-
-            results.add(new JoinWhereItem(tJoinsLoi, concatenate(loi, reducedWhereLoi, true)));
-            results.add(new JoinWhereItem(tJoinsLoi, concatenate(loiNull, reducedWhereLoiNull, true)));
-
-            List<Join> tJoinsRoi = transformJoins(joins, labelsRight);
-
-            Expression roi = getRightOuterIncrement(oir, false);
-            Expression roiNull = getRightOuterIncrement(oir, true);
-            Expression reducedWhereRoi = nullReduction(whereCondition, oir, JoinType.RIGHT, false);
-            Expression reducedWhereRoiNull = nullReduction(whereCondition, oir, JoinType.RIGHT, true);
-
-            results.add(new JoinWhereItem(tJoinsRoi, concatenate(roi, reducedWhereRoi, true)));
-            results.add(new JoinWhereItem(tJoinsRoi, concatenate(roiNull, reducedWhereRoiNull, true)));
+            if (oir.getRoiRelColumns() != null && !oir.getRoiRelColumns().isEmpty()) {
+                results.addAll(generateRightJoinRules(joins, i, whereCondition, oir));
+                results.add(new JoinWhereItem(setAllToInner(joins), wrapInParentheses(whereCondition)));
+            }
         }
 
         plainSelect.setWhere(whereCondition);
         plainSelect.setJoins(joins);
 
-        results.add(new JoinWhereItem(setAllToInner(joins), wrapInParentheses(whereCondition)));
 
         return results;
     }
