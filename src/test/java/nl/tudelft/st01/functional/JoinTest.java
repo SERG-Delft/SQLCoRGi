@@ -232,7 +232,7 @@ public class JoinTest {
      * A test for evaluating whether a redundant IS NOT NULL expression is included even though its table's id is not.
      */
     @Test
-    public void testJoinWithWhereContainsIsNullOfNonExcludedColumn() {
+    public void testJoinWithWhereContainsIsNotNullOfNonExcludedColumn() {
         containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.length IS NOT NULL)",
 
@@ -243,6 +243,40 @@ public class JoinTest {
                         + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)"
+        );
+    }
+
+    /**
+     * A test for evaluating whether the IS NULL expression is included even though its table's id is too.
+     */
+    @Test
+    public void testJoinWithWhereContainsIsNullOfNonExcludedColumn() {
+        containsAtLeast(
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE a.length IS NULL",
+
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE (a.id IS NULL) AND (b.id IS NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id "
+                        + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id "
+                        + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length IS NULL)",
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length IS NULL)"
+        );
+    }
+
+    /**
+     * A test for evaluating whether the IS NULL expression is excluded even of a column that should be excluded.
+     */
+    @Test
+    public void testJoinWithWhereNotContainsIsNullOfExcludedColumn() {
+        containsAtLeast(
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE a.id IS NULL",
+
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE (a.id IS NULL) AND (b.id IS NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id WHERE (b.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id IS NULL)"
         );
     }
 
