@@ -187,6 +187,8 @@ public class BulkRuleGenerator {
      * @param query The query for which the schema should be filtered.
      * @return A filtered {@link Document}.
      */
+    // Suppresses 'Unchecked Cast', because Java cannot infer the type of the selectNodes method, but it must be a List
+    // Nodes, as can be found in its documentation.
     @SuppressWarnings("unchecked")
     private Document filterSchema(String query) {
         List<String> tableNames = getInvolvedTableFromQuery(query);

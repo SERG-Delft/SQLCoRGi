@@ -7,15 +7,13 @@ import nl.tudelft.st01.sqlfpcws.json.JSONEntries;
 import nl.tudelft.st01.sqlfpcws.json.SQLRules;
 
 import java.io.BufferedReader;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
 import java.util.ArrayList;
-
 import java.util.List;
-
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,7 +26,7 @@ public final class CompareOutput {
     private static final String RESOURCE_BASE_PATH = "./src/main/resources/database";
 
     private static final String SUITECRM_INPUT_PATH = RESOURCE_BASE_PATH + "/input_queries/suitecrm.sql";
-    private static final String ESPOCRM_INPUT_PATH = RESOURCE_BASE_PATH + "//input_queries/espocrm.sql";
+    private static final String ESPOCRM_INPUT_PATH = RESOURCE_BASE_PATH + "/input_queries/espocrm.sql";
     private static final String ERPNEXT_INPUT_PATH = RESOURCE_BASE_PATH + "/input_queries/erpnext.sql";
 
     private static final String SUITECRM_OUTPUT_PATH = RESOURCE_BASE_PATH + "/output_json/suitecrm.json";
