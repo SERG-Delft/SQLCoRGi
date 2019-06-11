@@ -158,8 +158,6 @@ public class JoinRulesGenerator {
             Join join = genericCopyOfJoin(tJoinsLoi.get(index));
             join.setRight(true);
 
-            //List<OuterIncrementRelation> oirs = updateOIOnExpressionSingleTable(JoinType.RIGHT, index, oir);
-
             labelsLeft = label(JoinType.RIGHT, joins, index, outerIncrementRelations);
             tJoinsLoi = transformJoins(joins, labelsLeft);
             tJoinsLoi.set(index, join);
@@ -168,9 +166,6 @@ public class JoinRulesGenerator {
             out.add(new JoinWhereItem(tJoinsLoi, concatenate(concatenate(not,
                     getRightOuterIncrement(oir, false), true), reducedWhereLoi, true)));
         } else {
-//            if (tablesInOnExpression.get(index) == OIREmpty.LEFT) {
-//                oir.setLoiRelations(new HashSet<>());
-//            }
             Expression loi = getLeftOuterIncrement(oir, false);
             Expression loiNull = getLeftOuterIncrement(oir, true);
 
@@ -207,9 +202,7 @@ public class JoinRulesGenerator {
             Join join = genericCopyOfJoin(tJoinsRoi.get(index));
             join.setLeft(true);
 
-            List<OuterIncrementRelation> oirs = updateOIOnExpressionSingleTable(JoinType.LEFT, index, oir);
-
-            labelsRight = label(JoinType.LEFT, joins, index, oirs);
+            labelsRight = label(JoinType.LEFT, joins, index, outerIncrementRelations);
             tJoinsRoi = transformJoins(joins, labelsRight);
             tJoinsRoi.set(index, join);
 
@@ -217,9 +210,6 @@ public class JoinRulesGenerator {
             out.add(new JoinWhereItem(tJoinsRoi, concatenate(concatenate(not,
                     getLeftOuterIncrement(oir, false), true), reducedWhereRoi, true)));
         } else {
-//            if (tablesInOnExpression.get(index) == OIREmpty.RIGHT) {
-//                oir.setLoiRelations(new HashSet<>());
-//            }
             Expression roi = getRightOuterIncrement(oir, false);
             Expression roiNull = getRightOuterIncrement(oir, true);
 
@@ -239,29 +229,6 @@ public class JoinRulesGenerator {
         }
 
         return includes;
-    }
-
-    private List<OuterIncrementRelation> updateOIOnExpressionSingleTable(JoinType joinType, int index,
-                                                                         OuterIncrementRelation oir) {
-        Set<String> oirels = new HashSet<>();
-        oirels.add(fromItem.toString());
-
-        Set<String> preceed = new HashSet<>();
-        for (int i = 0; i < index; i++) {
-            preceed.addAll(oir.getRoiRelations());
-            preceed.addAll(oir.getLoiRelations());
-        }
-        List<OuterIncrementRelation> oirs = new ArrayList<>();
-
-        if (joinType == JoinType.RIGHT) {
-            oir.setRoiRelations(preceed);
-        } else if (joinType == JoinType.LEFT) {
-            oir.setLoiRelations(preceed);
-        }
-        oirs.addAll(outerIncrementRelations);
-        oirs.set(index, oir);
-
-        return oirs;
     }
 
     /**
