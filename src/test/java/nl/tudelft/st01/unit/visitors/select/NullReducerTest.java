@@ -360,4 +360,92 @@ class NullReducerTest {
         assertThat(nullReducer.isUpdateChild()).isFalse();
     }
 
+    /**
+     * Tests whether {@link NullReducer#visit(WhenClause)} leaves a WHEN case of a CASE expression intact if it is
+     * not modified.
+     */
+    @Test
+    void testVisitWhenClause() {
+
+        WhenClause whenClause = new WhenClause();
+
+        Column whenExpression = new Column(COLUMN_A);
+        whenClause.setWhenExpression(whenExpression);
+
+        NullValue thenExpression = new NullValue();
+        whenClause.setThenExpression(thenExpression);
+
+        nullReducer.visit(whenClause);
+
+        assertThat(whenClause.getWhenExpression()).isSameAs(whenExpression);
+        assertThat(whenClause.getThenExpression()).isSameAs(thenExpression);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(WhenClause)} replaces the WHEN clause of a case from a CASE expression
+     * if its subexpression signals that it must be updated.
+     */
+    @Test
+    void testVisitWhenClauseUpdateWhen() {
+
+        nulls.add(COLUMN_A);
+
+        WhenClause whenClause = new WhenClause();
+
+        Column column = new Column(COLUMN_A);
+        LongValue longValue = new LongValue(0);
+        AndExpression andExpression = new AndExpression(column, longValue);
+
+        whenClause.setWhenExpression(andExpression);
+        whenClause.setThenExpression(new NullValue());
+
+        nullReducer.visit(whenClause);
+
+        assertThat(whenClause.getWhenExpression()).isSameAs(longValue);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(WhenClause)} signals the CASE expression to which the visited WHEN
+     * case belongs that it should be removed if the WHEN clause becomes invalid.
+     */
+    @Test
+    void testVisitWhenClauseRemoveWhen() {
+
+        nulls.add(COLUMN_A);
+
+        WhenClause whenClause = new WhenClause();
+
+        whenClause.setWhenExpression(new Column(COLUMN_A));
+        whenClause.setThenExpression(new NullValue());
+
+        nullReducer.visit(whenClause);
+
+        assertThat(nullReducer.isUpdateChild()).isTrue();
+        assertThat(nullReducer.getChild()).isNull();
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(WhenClause)} signals the CASE expression to which the visited WHEN
+     * case belongs that it should be removed if the THEN clause becomes invalid.
+     */
+    @Test
+    void testVisitWhenClauseRemoveThen() {
+
+        nulls.add(COLUMN_A);
+
+        WhenClause whenClause = new WhenClause();
+
+        whenClause.setWhenExpression(new NullValue());
+        whenClause.setThenExpression(new Column(COLUMN_A));
+
+        nullReducer.visit(whenClause);
+
+        assertThat(nullReducer.isUpdateChild()).isTrue();
+        assertThat(nullReducer.getChild()).isNull();
+    }
+
 }
