@@ -18,92 +18,97 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * Class that tests {@link SQLFpcWS}.
+ */
+// Suppresses the Checkstyle MultipleStringLiterals warning as these duplicate strings are necessary for readability.
+@SuppressWarnings("checkstyle:MultipleStringLiterals")
 @PrepareForTest(SQLFpcWS.class)
 @RunWith(PowerMockRunner.class)
 public class SQLFpcWSTest {
 
     private SQLFpcWSSoapProxy mockWebService;
 
-    private static String SERVER_XML_REPLY =
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<sqlfpc>\n" +
-            "   <version>1.3.180.91</version>\n" +
-            "   <sql>SELECT * FROM tableA WHERE TableA.var = 0 OR TableA.Id = 1</sql>\n" +
-            "   <fpcrules>\n" +
-            "      <fpcrule>\n" +
-            "         <id>1</id>\n" +
-            "         <category>S</category>\n" +
-            "         <type>B</type>\n" +
-            "         <subtype>B+F</subtype>\n" +
-            "         <location>1.1.[TableA.var = 0]</location>\n" +
-            "         <sql>SELECT * FROM tableA WHERE (TableA.var = 1) AND NOT(TableA.Id = 1)</sql>\n" +
-            "         <description>--Some row in the table such that:\n" +
-            "--The WHERE condition fulfills:\n" +
-            "  --(B+) TableA.var = 1\n" +
-            "  --(F) TableA.Id = 1 is FALSE</description>\n" +
-            "      </fpcrule>\n" +
-            "      <fpcrule>\n" +
-            "         <id>2</id>\n" +
-            "         <category>S</category>\n" +
-            "         <type>B</type>\n" +
-            "         <subtype>B=F</subtype>\n" +
-            "         <location>1.1.[TableA.var = 0]</location>\n" +
-            "         <sql>SELECT * FROM tableA WHERE (TableA.var = 0) AND NOT(TableA.Id = 1)</sql>\n" +
-            "         <description>--Some row in the table such that:\n" +
-            "--The WHERE condition fulfills:\n" +
-            "  --(B=) TableA.var = 0\n" +
-            "  --(F) TableA.Id = 1 is FALSE</description>\n" +
-            "      </fpcrule>\n" +
-            "      <fpcrule>\n" +
-            "         <id>3</id>\n" +
-            "         <category>S</category>\n" +
-            "         <type>B</type>\n" +
-            "         <subtype>B-F</subtype>\n" +
-            "         <location>1.1.[TableA.var = 0]</location>\n" +
-            "         <sql>SELECT * FROM tableA WHERE (TableA.var = -1) AND NOT(TableA.Id = 1)</sql>\n" +
-            "         <description>--Some row in the table such that:\n" +
-            "--The WHERE condition fulfills:\n" +
-            "  --(B-) TableA.var = -1\n" +
-            "  --(F) TableA.Id = 1 is FALSE</description>\n" +
-            "      </fpcrule>\n" +
-            "      <fpcrule>\n" +
-            "         <id>4</id>\n" +
-            "         <category>S</category>\n" +
-            "         <type>N</type>\n" +
-            "         <subtype>NF</subtype>\n" +
-            "         <location>1.1.[TableA.var]</location>\n" +
-            "         <sql>SELECT * FROM tableA WHERE (TableA.var IS NULL) AND NOT(TableA.Id = 1)</sql>\n" +
-            "         <description>--Some row in the table such that:\n" +
-            "--The WHERE condition fulfills:\n" +
-            "  --(N) TableA.var is NULL\n" +
-            "  --(F) TableA.Id = 1 is FALSE</description>\n" +
-            "      </fpcrule>\n" +
-            "      <fpcrule>\n" +
-            "         <id>5</id>\n" +
-            "         <category>S</category>\n" +
-            "         <type>T</type>\n" +
-            "         <subtype>FF</subtype>\n" +
-            "         <location>1.2.[TableA.Id = 1]</location>\n" +
-            "         <sql>SELECT * FROM tableA WHERE NOT(TableA.Id = 1) AND NOT(TableA.var = 0)</sql>\n" +
-            "         <description>--Some row in the table such that:\n" +
-            "--The WHERE condition fulfills:\n" +
-            "  --(F) TableA.Id = 1 is FALSE\n" +
-            "  --(F) TableA.var = 0 is FALSE</description>\n" +
-            "      </fpcrule>\n" +
-            "      <fpcrule>\n" +
-            "         <id>6</id>\n" +
-            "         <category>S</category>\n" +
-            "         <type>T</type>\n" +
-            "         <subtype>TF</subtype>\n" +
-            "         <location>1.2.[TableA.Id = 1]</location>\n" +
-            "         <sql>SELECT * FROM tableA WHERE (TableA.Id = 1) AND NOT(TableA.var = 0)</sql>\n" +
-            "         <description>--Some row in the table such that:\n" +
-            "--The WHERE condition fulfills:\n" +
-            "  --(T) TableA.Id = 1 is TRUE\n" +
-            "  --(F) TableA.var = 0 is FALSE</description>\n" +
-            "      </fpcrule>\n" +
-            "   </fpcrules>\n" +
-            "</sqlfpc>";
+    private static final String SERVER_XML_REPLY =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                    + "<sqlfpc>\n"
+                    + "   <version>1.3.180.91</version>\n"
+                    + "   <sql>SELECT * FROM tableA WHERE TableA.var = 0 OR TableA.Id = 1</sql>\n"
+                    + "   <fpcrules>\n"
+                    + "      <fpcrule>\n"
+                    + "         <id>1</id>\n"
+                    + "         <category>S</category>\n"
+                    + "         <type>B</type>\n"
+                    + "         <subtype>B+F</subtype>\n"
+                    + "         <location>1.1.[TableA.var = 0]</location>\n"
+                    + "         <sql>SELECT * FROM tableA WHERE (TableA.var = 1) AND NOT(TableA.Id = 1)</sql>\n"
+                    + "         <description>--Some row in the table such that:\n"
+                    + "--The WHERE condition fulfills:\n"
+                    + "  --(B+) TableA.var = 1\n"
+                    + "  --(F) TableA.Id = 1 is FALSE</description>\n"
+                    + "      </fpcrule>\n"
+                    + "      <fpcrule>\n"
+                    + "         <id>2</id>\n"
+                    + "         <category>S</category>\n"
+                    + "         <type>B</type>\n"
+                    + "         <subtype>B=F</subtype>\n"
+                    + "         <location>1.1.[TableA.var = 0]</location>\n"
+                    + "         <sql>SELECT * FROM tableA WHERE (TableA.var = 0) AND NOT(TableA.Id = 1)</sql>\n"
+                    + "         <description>--Some row in the table such that:\n"
+                    + "--The WHERE condition fulfills:\n"
+                    + "  --(B=) TableA.var = 0\n"
+                    + "  --(F) TableA.Id = 1 is FALSE</description>\n"
+                    + "      </fpcrule>\n"
+                    + "      <fpcrule>\n"
+                    + "         <id>3</id>\n"
+                    + "         <category>S</category>\n"
+                    + "         <type>B</type>\n"
+                    + "         <subtype>B-F</subtype>\n"
+                    + "         <location>1.1.[TableA.var = 0]</location>\n"
+                    + "         <sql>SELECT * FROM tableA WHERE (TableA.var = -1) AND NOT(TableA.Id = 1)</sql>\n"
+                    + "         <description>--Some row in the table such that:\n"
+                    + "--The WHERE condition fulfills:\n"
+                    + "  --(B-) TableA.var = -1\n"
+                    + "  --(F) TableA.Id = 1 is FALSE</description>\n"
+                    + "      </fpcrule>\n"
+                    + "      <fpcrule>\n"
+                    + "         <id>4</id>\n"
+                    + "         <category>S</category>\n"
+                    + "         <type>N</type>\n"
+                    + "         <subtype>NF</subtype>\n"
+                    + "         <location>1.1.[TableA.var]</location>\n"
+                    + "         <sql>SELECT * FROM tableA WHERE (TableA.var IS NULL) AND NOT(TableA.Id = 1)</sql>\n"
+                    + "         <description>--Some row in the table such that:\n"
+                    + "--The WHERE condition fulfills:\n"
+                    + "  --(N) TableA.var is NULL\n"
+                    + "  --(F) TableA.Id = 1 is FALSE</description>\n"
+                    + "      </fpcrule>\n"
+                    + "      <fpcrule>\n"
+                    + "         <id>5</id>\n"
+                    + "         <category>S</category>\n"
+                    + "         <type>T</type>\n"
+                    + "         <subtype>FF</subtype>\n"
+                    + "         <location>1.2.[TableA.Id = 1]</location>\n"
+                    + "         <sql>SELECT * FROM tableA WHERE NOT(TableA.Id = 1) AND NOT(TableA.var = 0)</sql>\n"
+                    + "         <description>--Some row in the table such that:\n"
+                    + "--The WHERE condition fulfills:\n"
+                    + "  --(F) TableA.Id = 1 is FALSE\n"
+                    + "  --(F) TableA.var = 0 is FALSE</description>\n"
+                    + "      </fpcrule>\n"
+                    + "      <fpcrule>\n"
+                    + "         <id>6</id>\n"
+                    + "         <category>S</category>\n"
+                    + "         <type>T</type>\n"
+                    + "         <subtype>TF</subtype>\n"
+                    + "         <location>1.2.[TableA.Id = 1]</location>\n"
+                    + "         <sql>SELECT * FROM tableA WHERE (TableA.Id = 1) AND NOT(TableA.var = 0)</sql>\n"
+                    + "         <description>--Some row in the table such that:\n"
+                    + "--The WHERE condition fulfills:\n"
+                    + "  --(T) TableA.Id = 1 is TRUE\n"
+                    + "  --(F) TableA.var = 0 is FALSE</description>\n"
+                    + "      </fpcrule>\n"
+                    + "   </fpcrules>\n"
+                    + "</sqlfpc>";
 
     /**
      * Sets up the {@link SQLFpcWSSoapProxy} mock object that will be used to mock the response from the SQLFpc web
@@ -117,6 +122,8 @@ public class SQLFpcWSTest {
     /**
      * Tests whether {@code getCoverageTargets} returns the correct queries. The XML response from the SQLFpc web
      * service is mocked in order for the test to work independently of a working internet connection.
+     *
+     * @throws Exception because of the use of {@link PowerMockito}.
      */
     @Test
     public void testGetCoverageTargetsNormalQuery() throws Exception {
@@ -124,11 +131,11 @@ public class SQLFpcWSTest {
 
         String dbSchema =
                 " <schema dbms=\"MySQL\">\n"
-                + "     <table name=\"TableA\">\n"
-                + "         <column name=\"id\" type=\"VARCHAR\" size=\"50\" key=\"true\" notnull=\"true\"/>\n"
-                + "         <column name=\"var\" type=\"VARCHAR\" size=\"255\" default=\"NULL\"/>\n"
-                + "     </table>\n"
-                + " </schema>";
+                        + "     <table name=\"TableA\">\n"
+                        + "         <column name=\"id\" type=\"VARCHAR\" size=\"50\" key=\"true\" notnull=\"true\"/>\n"
+                        + "         <column name=\"var\" type=\"VARCHAR\" size=\"255\" default=\"NULL\"/>\n"
+                        + "     </table>\n"
+                        + " </schema>";
 
         String options = "";
 
@@ -151,6 +158,8 @@ public class SQLFpcWSTest {
      * Tests whether {@code getCoverageTargets} correctly returns an empty list for a query that generates no targets.
      * The XML response from the SQLFpc web service is mocked in order for the test to work independently of a working
      * internet connection.
+     *
+     * @throws Exception because of the use of {@link PowerMockito}.
      */
     @Test
     public void testGetCoverageNoResults() throws Exception {
@@ -165,12 +174,12 @@ public class SQLFpcWSTest {
         String options = "";
 
         String serverXMLReply =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<sqlfpc>\n" +
-                "   <version>1.3.180.91</version>\n" +
-                "   <sql>SELECT * FROM tableB</sql>\n" +
-                "   <fpcrules />\n" +
-                "</sqlfpc>";
+                          "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                        + "<sqlfpc>\n"
+                        + "   <version>1.3.180.91</version>\n"
+                        + "   <sql>SELECT * FROM tableB</sql>\n"
+                        + "   <fpcrules />\n"
+                        + "</sqlfpc>";
 
         when(mockWebService.getRules(any(), any(), any())).thenReturn(serverXMLReply);
         PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
