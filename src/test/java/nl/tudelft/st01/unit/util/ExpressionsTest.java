@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 /**
  * Tests the {@link Expressions} utility class.
  */
-public class ExpressionsTest {
+class ExpressionsTest {
 
     /**
      * Verifies that {@link Expressions} cannot be instantiated.
@@ -20,7 +20,7 @@ public class ExpressionsTest {
      * @throws NoSuchMethodException should not happen.
      */
     @Test
-    public void testInstantiationForbidden() throws NoSuchMethodException {
+    void testInstantiationForbidden() throws NoSuchMethodException {
 
         Constructor<Expressions> constructor = Expressions.class.getDeclaredConstructor();
         constructor.setAccessible(true);
@@ -38,14 +38,6 @@ public class ExpressionsTest {
 
         Join innerJoin = new Join();
         innerJoin.setInner(true);
-        innerJoin.setLeft(false);
-        innerJoin.setRight(false);
-        innerJoin.setOuter(false);
-        innerJoin.setSimple(false);
-        innerJoin.setNatural(false);
-        innerJoin.setSemi(false);
-        innerJoin.setCross(false);
-        innerJoin.setFull(false);
 
         Join join = new Join();
         join.setLeft(true);
