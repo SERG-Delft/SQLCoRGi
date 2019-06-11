@@ -87,12 +87,12 @@ pages:
   
 # Optional security and license checks
 include:
-  # Static SingleQueryMain Security Testing (SAST)
+  # Static Application Security Testing (SAST)
   # works with most languages
   # https://docs.gitlab.com/ee/user/application_security/sast/index.html
   template: SAST.gitlab-ci.yml
 
-  # Dynamic SingleQueryMain Security Testing (DAST)
+  # Dynamic Application Security Testing (DAST)
   # tests security of web facing applications
   # Needs DAST_WEBSITE variable e.g. DAST_WEBSITE: https://example.com
   # https://docs.gitlab.com/ee/user/application_security/dast/index.html
