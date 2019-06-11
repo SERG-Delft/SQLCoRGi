@@ -82,10 +82,11 @@ public class JoinRulesGenerator {
      */
     private List<OuterIncrementRelation> generateOIRsForEachJoin(List<Join> joins) {
         Map<String, List<Column>> map = new HashMap<>();
+
         if (outerIncrementRelations == null) {
             outerIncrementRelations = new ArrayList<>();
         }
-        List<OuterIncrementRelation> out = new ArrayList<>();
+
         OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
         for (Join join : joins) {
             if (join.getOnExpression() != null) {
@@ -220,6 +221,13 @@ public class JoinRulesGenerator {
         return out;
     }
 
+    /**
+     * In case the labelled join type is INNER, the {@link OuterIncrementRelation} must be included.
+     *
+     * @param labels The label for each join.
+     * @param oirs The list of {@link OuterIncrementRelation}s corresponding to the joins.
+     * @return A list of OIRs that must be included.
+     */
     private List<OuterIncrementRelation> getAllIncludesInner(List<JoinType> labels, List<OuterIncrementRelation> oirs) {
         List<OuterIncrementRelation> includes = new ArrayList<>();
         for (int i = 0; i < labels.size(); i++) {
@@ -393,6 +401,7 @@ public class JoinRulesGenerator {
      * @param joinType The join type of the current join to inspect.
      * @param joins The list of all joins.
      * @param index The index of the current join.
+     * @param oirs The list of {@link OuterIncrementRelation}s used to label the joins.
      * @return A list of join types, which are used to make sure that all joins are configured correctly.
      */
     private List<JoinType> label(JoinType joinType, List<Join> joins, int index, List<OuterIncrementRelation> oirs) {
@@ -430,6 +439,7 @@ public class JoinRulesGenerator {
      *
      * @param mvoi The list, MissingValues outer increments.
      * @param oiRel The outer increment corresponding to the join for the label should be set.
+     * @param joinType RIGHT if the roirel should be set, LEFT if the loirel should be set.
      * @return The correct join type.
      */
     private JoinType determineLabel(Set<String> mvoi, OuterIncrementRelation oiRel, JoinType joinType) {
@@ -441,11 +451,11 @@ public class JoinRulesGenerator {
                 mvoi.addAll(oiRel.getRoiRelations());
                 return JoinType.RIGHT;
             }
-        } else if (joinType == JoinType.LEFT){
+        } else if (joinType == JoinType.LEFT) {
             if (!intersection(mvoi, oiRel.getLoiRelations()).isEmpty()) {
                 mvoi.addAll(oiRel.getRoiRelations());
                 return JoinType.RIGHT;
-            }else if (!intersection(mvoi, oiRel.getRoiRelations()).isEmpty()) {
+            } else if (!intersection(mvoi, oiRel.getRoiRelations()).isEmpty()) {
                 mvoi.addAll(oiRel.getLoiRelations());
                 return JoinType.LEFT;
             }

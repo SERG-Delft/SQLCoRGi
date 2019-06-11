@@ -5,10 +5,15 @@ import org.junit.jupiter.api.Test;
 import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
 import static nl.tudelft.st01.functional.AssertUtils.verify;
 
+/*
+    This warning has been suppressed. Even though the tests may generate the same partial results, they should
+    not be replaced with variables. The tests include an assert, so the warning is false positive.
+ */
 /**
  * This test class is related to {@link JoinTest}.
  * The functionality of nested joins is tested and evaluated.
  */
+@SuppressWarnings({"checkstyle:multiplestringliterals","PMD.JUnitTestsShouldIncludeAssert"})
 public class NestedJoinsTest {
 
     /**
@@ -16,7 +21,7 @@ public class NestedJoinsTest {
      */
     @Test
     public void testNestedJoinCorrectJoinConfigurationTwoJoins() {
-        verify("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id",
+        verify("SELECT * FROM a RIGHT JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id",
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id "
                         + "WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
@@ -42,7 +47,7 @@ public class NestedJoinsTest {
      */
     @Test
     public void testNestedJoinCorrectJoinConfigurationThreeJoins() {
-        verify("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id",
+        verify("SELECT * FROM a INNER JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id LEFT JOIN d ON d.id = a.id"
                         + " WHERE (d.id IS NULL) AND (a.id IS NOT NULL)",
@@ -70,6 +75,7 @@ public class NestedJoinsTest {
                         + " WHERE (b.id IS NULL) AND (c.id IS NULL)"
         );
     }
+
     /**
      * This test verifies whether the correct columns are excluded depending on the join configuration. In case of an
      * INNER JOIN in the configuration, the tables used in said join must be included. Unless the tables from said join
@@ -80,7 +86,7 @@ public class NestedJoinsTest {
      */
     @Test
     public void testNestedJoinNullReductionSingleTableOINonOIRColumnIncluded() {
-        containsAtLeast("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id "
+        containsAtLeast("SELECT * FROM a LEFT JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id "
                         + "INNER JOIN d on d.id = a.id WHERE c.length > 1 OR b.length > 1 OR a.length > 1 "
                         + "OR d.length > 1",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id "
@@ -95,7 +101,8 @@ public class NestedJoinsTest {
                         + "WHERE ((c.id IS NULL) AND (b.id IS NOT NULL)) "
                         + "AND (b.length > 1 OR a.length > 1 OR d.length > 1)",
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id "
-                        + "WHERE ((c.id IS NULL) AND (b.id IS NULL)) AND (b.length > 1 OR a.length > 1 OR d.length > 1)",
+                        + "WHERE ((c.id IS NULL) AND (b.id IS NULL)) "
+                        + "AND (b.length > 1 OR a.length > 1 OR d.length > 1)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id RIGHT JOIN c ON c.id = b.id LEFT JOIN d ON d.id = a.id "
                         + "WHERE ((b.id IS NULL) AND (c.id IS NOT NULL)) AND (c.length > 1)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id RIGHT JOIN c ON c.id = b.id LEFT JOIN d ON d.id = a.id "
@@ -123,7 +130,7 @@ public class NestedJoinsTest {
      */
     @Test
     public void testNestedJoinNullReductionMultiTableOINonOIRColumnIncluded() {
-        containsAtLeast("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id AND c.id = a.id "
+        containsAtLeast("SELECT * FROM a LEFT JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id AND c.id = a.id "
                         + "WHERE c.length > 1 OR b.length > 1 OR a.length > 1",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id AND c.id = a.id "
                         + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length > 1)",
@@ -155,7 +162,7 @@ public class NestedJoinsTest {
      */
     @Test
     public void testNestedJoinNullReductionSingleTableOIExcludeOIRColumns() {
-        containsAtLeast("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id "
+        containsAtLeast("SELECT * FROM a INNER JOIN b ON b.id = a.id RIGHT JOIN c ON c.id = b.id "
                         + "WHERE c.id > 1 OR b.id > 1 OR a.id > 1",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id "
                         + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.id > 1)",
@@ -182,7 +189,7 @@ public class NestedJoinsTest {
      */
     @Test
     public void testNestedJoinOnConditionColumnsFromOneTable1() {
-        verify("SELECT * FROM a INNER JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id",
+        verify("SELECT * FROM a RIGHT JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON a.id > 0 LEFT JOIN c ON c.id = a.id "
                         + "WHERE (c.id IS NULL) AND (a.id IS NOT NULL)",
@@ -203,7 +210,7 @@ public class NestedJoinsTest {
      */
     @Test
     public void testNestedJoinOnConditionColumnsFromOneTable2() {
-        verify("SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
+        verify("SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id "
                         + "WHERE (c.id IS NULL) AND (a.id IS NOT NULL)",
@@ -224,7 +231,7 @@ public class NestedJoinsTest {
      */
     @Test
     public void testNestedJoinOnConditionColumnsFromOneTable3() {
-        verify("SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
+        verify("SELECT * FROM a LEFT JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id "
                         + "WHERE (c.id IS NULL) AND (a.id IS NOT NULL)",
@@ -245,7 +252,7 @@ public class NestedJoinsTest {
      */
     @Test
     public void testNestedJoinOnConditionColumnsFromOneTable4() {
-        verify("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id",
+        verify("SELECT * FROM a INNER JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id "
                         + "WHERE (d.id IS NULL) AND (a.id IS NOT NULL)",
@@ -268,9 +275,13 @@ public class NestedJoinsTest {
         );
     }
 
+    /**
+     * This test verifies whether the correct join configuration is used, even when the on condition only
+     * contains columns from one table. Case: multiple on condition with columns from only one table.
+     */
     @Test
     public void testNestedJoinOnConditionColumnsFromOneTableMultipleCases() {
-        verify("SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 INNER JOIN d on d.id > 0",
+        verify("SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 RIGHT JOIN d on d.id > 0",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id > 0",
                 "SELECT * FROM a LEFT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 "
                         + "WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
