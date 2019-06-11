@@ -104,7 +104,6 @@ class NullReducerTest {
         assertThat(minorThan.getRightExpression()).isSameAs(longValue);
 
         assertThat(nullReducer.isUpdateChild()).isFalse();
-        assertThat(nullReducer.getChild()).isNull();
     }
 
     /**
@@ -143,6 +142,61 @@ class NullReducerTest {
 
         assertThat(nullReducer.isUpdateChild()).isTrue();
         assertThat(nullReducer.getChild()).isNull();
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(NotExpression)} leaves the NOT expression unchanged, and does not
+     * signal its parent to remove it.
+     */
+    @Test
+    void testVisitNotUnchanged() {
+
+        DateValue dateValue = new DateValue("'2000-01-01'");
+        NotExpression notExpression = new NotExpression(dateValue);
+
+        nullReducer.visit(notExpression);
+
+        assertThat(notExpression.getExpression()).isSameAs(dateValue);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(NotExpression)} signals the parent of the NOT expression to remove it
+     * if its subexpression needs to be removed.
+     */
+    @Test
+    void testVisitNotRemoveSub() {
+
+        nulls.add(COLUMN_A);
+
+        Column column = new Column(COLUMN_A);
+        NotExpression notExpression = new NotExpression(column);
+
+        nullReducer.visit(notExpression);
+
+        assertThat(nullReducer.isUpdateChild()).isTrue();
+        assertThat(nullReducer.getChild()).isNull();
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(NotExpression)} does not signal the parent of the NOT expression if its
+     * subexpression needs to be updated.
+     */
+    @Test
+    void testVisitNotUpdateSub() {
+
+        nulls.add(COLUMN_A);
+
+        NumericBind numericBind = new NumericBind();
+        AndExpression andExpression = new AndExpression(new Column(COLUMN_A), numericBind);
+        NotExpression notExpression = new NotExpression(andExpression);
+
+        nullReducer.visit(notExpression);
+
+        assertThat(notExpression.getExpression()).isSameAs(numericBind);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
     }
 
 }

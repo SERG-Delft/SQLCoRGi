@@ -131,7 +131,7 @@ public class NullReducer extends ExpressionVisitorAdapter {
         notExpression.getExpression().accept(this);
         if (this.updateChild && this.child != null) {
             notExpression.setExpression(this.child);
-            this.child = notExpression;
+            this.updateChild = false;
         }
     }
 
