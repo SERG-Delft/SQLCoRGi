@@ -45,4 +45,11 @@ public class OuterIncrementRelation {
         return roiRelations;
     }
 
+    public void setLoiRelations(Set<String> loiRelations) {
+        this.loiRelations = loiRelations;
+    }
+
+    public void setRoiRelations(Set<String> roiRelations) {
+        this.roiRelations = roiRelations;
+    }
 }
