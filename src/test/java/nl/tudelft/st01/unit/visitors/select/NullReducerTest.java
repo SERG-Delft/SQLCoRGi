@@ -1,9 +1,11 @@
 package nl.tudelft.st01.unit.visitors.select;
 
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.NullValue;
+import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
+import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.visitors.select.NullReducer;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Contains tests for {@link NullReducer}.
  */
+// Justification: For some methods it's necessary to check the status of multiple subexpressions, and that of the
+// NullReducer itself.
+@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 class NullReducerTest {
 
     private static final String COLUMN_A = "a";
@@ -77,6 +82,67 @@ class NullReducerTest {
         nullReducer.visit(andExpression);
 
         assertThat(nullReducer.getRoot(andExpression)).isSameAs(nullValue);
+    }
+
+    /**
+     * Tests whether {@code NullReducer#visitBinaryExpression(BinaryExpression)} leaves binary expressions unchanged
+     * if it does not contain attributes that need to be removed.
+     */
+    @Test
+    void testVisitBinaryNoChange() {
+
+        Column column = new Column(COLUMN_A);
+        LongValue longValue = new LongValue(1);
+
+        MinorThan minorThan = new MinorThan();
+        minorThan.setLeftExpression(column);
+        minorThan.setRightExpression(longValue);
+
+        nullReducer.visit(minorThan);
+
+        assertThat(minorThan.getLeftExpression()).isSameAs(column);
+        assertThat(minorThan.getRightExpression()).isSameAs(longValue);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
+        assertThat(nullReducer.getChild()).isNull();
+    }
+
+    /**
+     * Tests whether {@code NullReducer#visitBinaryExpression(BinaryExpression)} signals the parent of the binary
+     * expression to remove it if its left subexpression needs to be removed.
+     */
+    @Test
+    void testVisitBinaryRemoveLeft() {
+
+        nulls.add(COLUMN_A);
+
+        GreaterThan greaterThan = new GreaterThan();
+        greaterThan.setLeftExpression(new Column(COLUMN_A));
+        greaterThan.setRightExpression(new StringValue(COLUMN_A));
+
+        nullReducer.visit(greaterThan);
+
+        assertThat(nullReducer.isUpdateChild()).isTrue();
+        assertThat(nullReducer.getChild()).isNull();
+    }
+
+    /**
+     * Tests whether {@code NullReducer#visitBinaryExpression(BinaryExpression)} signals the parent of the binary
+     * expression to remove it if its right subexpression needs to be removed.
+     */
+    @Test
+    void testVisitBinaryRemoveRight() {
+
+        nulls.add(COLUMN_A);
+
+        Addition addition = new Addition();
+        addition.setLeftExpression(new DoubleValue("1.0"));
+        addition.setRightExpression(new Column(COLUMN_A));
+
+        nullReducer.visit(addition);
+
+        assertThat(nullReducer.isUpdateChild()).isTrue();
+        assertThat(nullReducer.getChild()).isNull();
     }
 
 }
