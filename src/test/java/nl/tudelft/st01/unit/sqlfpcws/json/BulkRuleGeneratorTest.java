@@ -1,12 +1,9 @@
 package nl.tudelft.st01.unit.sqlfpcws.json;
 
-import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 import nl.tudelft.st01.sqlfpcws.json.BulkRuleGenerator;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,8 +12,6 @@ import java.net.Socket;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -46,7 +41,6 @@ public class BulkRuleGeneratorTest {
         BulkRuleGenerator bulkRuleGenerator = new BulkRuleGenerator(SQL_INPUT_PATH, XML_SCHEMA_PATH, JSON_OUTPUT_PATH);
 
 
-
         assertThat(bulkRuleGenerator.getNumberOfQueries()).isEqualTo(NUMBER_OF_QUERIES);
     }
 
@@ -67,12 +61,6 @@ public class BulkRuleGeneratorTest {
     @Test
     public void testGenerateOutputJSONShouldBeCorrect() throws InterruptedException {
         BulkRuleGenerator bulkRuleGenerator = new BulkRuleGenerator(SQL_INPUT_PATH, XML_SCHEMA_PATH, JSON_OUTPUT_PATH);
-
-        List<String> test = new ArrayList<>();
-        
-
-
-        Mockito.when(SQLFpcWS.getCoverageTargets("", "", "")).thenReturn()
 
         String expectedJSONContent =
                 "{\n" +
