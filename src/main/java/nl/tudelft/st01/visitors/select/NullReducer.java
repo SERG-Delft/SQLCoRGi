@@ -208,4 +208,15 @@ public class NullReducer extends ExpressionVisitorAdapter {
         expr.getThenExpression().accept(this);
     }
 
+    public Collection<String> getNulls() {
+        return nulls;
+    }
+
+    public Expression getChild() {
+        return child;
+    }
+
+    public boolean isUpdateChild() {
+        return updateChild;
+    }
 }
