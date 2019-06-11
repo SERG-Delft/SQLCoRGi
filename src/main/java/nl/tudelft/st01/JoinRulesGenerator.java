@@ -68,6 +68,7 @@ public class JoinRulesGenerator {
     /**
      * Takes in the list of joins and determines the outer increment relations (OIR) for each of them,
      * this is stored in an {@link OuterIncrementRelation} object.
+     *
      * @param joins The joins for which the OIRs have to be determined.
      * @return A list of OIRs. The order of the input joins is the same as the order of the list of OIRs.
      */
@@ -91,6 +92,7 @@ public class JoinRulesGenerator {
     /**
      * Takes in a plainselect and derives the correct list of joins and its respective outer increment.
      * These are stored in {@link JoinWhereItem}s.
+     *
      * @param plainSelect The plainselect for which the rules should be derived from.
      * @return A set of {@link JoinWhereItem}s from which the actual rules can be derived.
      */
@@ -123,6 +125,7 @@ public class JoinRulesGenerator {
     /**
      * Generates the {@link JoinWhereItem}s for the given list of transformed joins in case the
      * transformed join in question is a left join.
+     *
      * @param joins The list of transformed joins.
      * @param index The index of the transformed join in question.
      * @param where The where expression of the original {@link PlainSelect}
@@ -161,6 +164,7 @@ public class JoinRulesGenerator {
     /**
      * Generates the {@link JoinWhereItem}s for the given list of transformed joins in case the
      * transformed join in question is a right join.
+     *
      * @param joins The list of transformed joins.
      * @param index The index of the transformed join in question.
      * @param where The where expression of the original {@link PlainSelect}
@@ -198,6 +202,7 @@ public class JoinRulesGenerator {
 
     /**
      * Takes in a list of joins and sets each join's type to inner only.
+     *
      * @param joins The joins for which the type has to be set to inner.
      * @return A list of joins set to inner.
      */
@@ -213,6 +218,7 @@ public class JoinRulesGenerator {
     /**
      * Reduced the given expression such that it no longer contains any columns that should be excluded.
      * (E.g. in most cases of an IS NULL expression)
+     *
      * @param expression The expression to reduce.
      * @param oir The {@link OuterIncrementRelation} corresponding to
      *            the join for which the expression has to be reduced.
@@ -254,6 +260,7 @@ public class JoinRulesGenerator {
 
     /**
      * Takes in the outer increment relation and creates its left outer increment.
+     *
      * @param oiRel The outer increment relation from which the outer increment should be derived.
      * @param nullable True if the right outer increment relations are nullable, false otherwise.
      * @return The left outer increment.
@@ -269,6 +276,7 @@ public class JoinRulesGenerator {
 
     /**
      * Takes in the outer increment relation and creates its right outer increment.
+     *
      * @param oiRel The outer increment relation from which the outer increment should be derived.
      * @param nullable True if the left outer increment relations are nullable, false otherwise.
      * @return The right outer increment.
@@ -283,6 +291,7 @@ public class JoinRulesGenerator {
 
     /**
      * Transform the given list of joins such that they are transformed into the join types in label.
+     *
      * @param joins The joins to be transformed.
      * @param labels The types the joins should be transformed into.
      * @return The list of transformed joins.
@@ -308,6 +317,7 @@ public class JoinRulesGenerator {
 
     /**
      * Transforms a single join into the given type.
+     *
      * @param join The join to transform.
      * @param joinType The type the join should be transformed into.
      * @return The transformed join.
@@ -318,6 +328,7 @@ public class JoinRulesGenerator {
 
     /**
      * Set the join to the given type.
+     *
      * @param join The join for which the type should be set.
      * @param joinType The join type to which the join should be set.
      * @return A join with the given type.
@@ -342,6 +353,7 @@ public class JoinRulesGenerator {
 
     /**
      * Labels all joins in the list. The types are set such that the impossible combinations are excluded.
+     *
      * @param joinType The join type of the current join to inspect.
      * @param joins The list of all joins.
      * @param index The index of the current join.
@@ -379,6 +391,7 @@ public class JoinRulesGenerator {
 
     /**
      * Determines the label of the join based on its outer increment relations.
+     *
      * @param mvoi The list, MissingValues outer increments.
      * @param oiRel The outer increment corresponding to the join for the label should be set.
      * @return The correct join type.
@@ -397,6 +410,7 @@ public class JoinRulesGenerator {
 
     /**
      * Determines the intersection of the two given set and returns it without altering any of the given sets.
+     *
      * @param set1 The first set.
      * @param set2 Yhe second set.
      * @param <T> Generic type to ensure that both sets contain elements of the same type.
@@ -413,6 +427,7 @@ public class JoinRulesGenerator {
 
     /**
      * Determines the outer increment relation given the join and the tables and columns extracted from it.
+     *
      * @param map The map containing the tables mapped to the columns.
      * @param join The join from which the map is derived.
      * @return The outer increment relation derived from the map and join.

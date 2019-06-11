@@ -7,7 +7,10 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -63,13 +66,15 @@ public final class Generator {
      * @param args unused.
      */
     public static void main(String[] args) {
-        String query = "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id";
+        String query = "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id INNER JOIN d on d.id = a.id WHERE c.length > 1 OR b.length > 1 OR a.length > 1 OR d.length > 1";
         //String query = "SELECT * FROM a join b on a.id = b.id WHERE a.id > 50";
 
         Set<String> result = generateRules(query);
-
+        List<String> res = new ArrayList<>();
+        res.addAll(result);
+        Collections.sort(res);
         System.out.println("Result:");
-        for (String s : result) {
+        for (String s : res) {
             System.out.println("\"" + s + "\",");
         }
     }

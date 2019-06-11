@@ -14,14 +14,18 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  * The functionality of nested joins is tested and evaluated.
  */
 public class NetedJoinsTest {
+
+    /**
+     * This test evaluates whether the nested joins are transformed to the correct join type.
+     */
     @Test
     public void testNestedJoinCorrectJoinConfiguration() {
         verify("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id",
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id "
-                    + "WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
+                        + "WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id "
-                + "WHERE (b.id IS NULL) AND (a.id IS NULL)",
+                        + "WHERE (b.id IS NULL) AND (a.id IS NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id "
                         + "WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id "
@@ -35,6 +39,16 @@ public class NetedJoinsTest {
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id RIGHT JOIN c ON c.id = b.id "
                         + "WHERE (b.id IS NULL) AND (c.id IS NULL)");
     }
+
+    @Test
+    public void testNestedJoinNullReductionSingleTableOINonOIRColumnIncluded() {
+//        containsAtLeast("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id"
+//                + "WHERE a.length > 1 OR b.length > 1",
+//                );
+
+    }
+
+
 
 
 }
