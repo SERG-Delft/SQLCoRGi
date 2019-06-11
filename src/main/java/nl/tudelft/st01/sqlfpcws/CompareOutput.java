@@ -25,15 +25,15 @@ import java.util.stream.Stream;
  */
 public final class CompareOutput {
 
-    private static final String RESOURCE_BASE_PATH = ".\\src\\main\\resources\\database";
+    private static final String RESOURCE_BASE_PATH = "./src/main/resources/database";
 
-    private static final String SUITECRM_INPUT_PATH = RESOURCE_BASE_PATH + "\\input_queries\\suitecrm.sql";
-    private static final String ESPOCRM_INPUT_PATH = RESOURCE_BASE_PATH + "\\input_queries\\espocrm.sql";
-    private static final String ERPNEXT_INPUT_PATH = RESOURCE_BASE_PATH + "\\input_queries\\erpnext.sql";
+    private static final String SUITECRM_INPUT_PATH = RESOURCE_BASE_PATH + "/input_queries/suitecrm.sql";
+    private static final String ESPOCRM_INPUT_PATH = RESOURCE_BASE_PATH + "//input_queries/espocrm.sql";
+    private static final String ERPNEXT_INPUT_PATH = RESOURCE_BASE_PATH + "/input_queries/erpnext.sql";
 
-    private static final String SUITECRM_OUTPUT_PATH = RESOURCE_BASE_PATH + "\\output_json\\suitecrm.json";
-    private static final String ESPOCRM_OUTPUT_PATH = RESOURCE_BASE_PATH + "\\output_json\\espocrm.json";
-    private static final String ERPNEXT_OUTPUT_PATH = RESOURCE_BASE_PATH + "\\output_json\\erpnext.json";
+    private static final String SUITECRM_OUTPUT_PATH = RESOURCE_BASE_PATH + "/output_json/suitecrm.json";
+    private static final String ESPOCRM_OUTPUT_PATH = RESOURCE_BASE_PATH + "/output_json/espocrm.json";
+    private static final String ERPNEXT_OUTPUT_PATH = RESOURCE_BASE_PATH + "/output_json/erpnext.json";
 
     private static final String DOUBLE_NEWLINE = "\n\n";
     private static final int AMOUNT_OF_QUERY_SETS = 3;

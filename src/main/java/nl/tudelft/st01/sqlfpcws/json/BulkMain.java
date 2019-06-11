@@ -11,10 +11,10 @@ public final class BulkMain {
 
     private static final String DATABASE = "espocrm";
 
-    private static final String RESOURCE_PATH = ".\\src\\main\\resources\\database";
-    private static final String SQL_INPUT_PATH = RESOURCE_PATH + "\\input_queries\\" + DATABASE + ".sql";
-    private static final String XML_SCHEMA_PATH = RESOURCE_PATH + "\\schema_xml\\" + DATABASE + ".xml";
-    private static final String JSON_OUTPUT_PATH = RESOURCE_PATH + "\\output_json\\" + DATABASE + ".json";
+    private static final String RESOURCE_PATH = "./src/main/resources/database";
+    private static final String SQL_INPUT_PATH = RESOURCE_PATH + "/input_queries/" + DATABASE + ".sql";
+    private static final String XML_SCHEMA_PATH = RESOURCE_PATH + "/schema_xml/" + DATABASE + ".xml";
+    private static final String JSON_OUTPUT_PATH = RESOURCE_PATH + "/output_json/" + DATABASE + ".json";
 
     private static final int NANO_TO_MILLI = 1000000;
 
