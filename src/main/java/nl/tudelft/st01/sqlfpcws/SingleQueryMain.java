@@ -10,7 +10,7 @@ public final class SingleQueryMain {
     /**
      * No instance of this class should be created.
      */
-    protected SingleQueryMain() throws UnsupportedOperationException {
+    protected SingleQueryMain() {
         throw new UnsupportedOperationException();
     }
 
@@ -23,7 +23,7 @@ public final class SingleQueryMain {
         String sqlQuery = "SELECT * FROM staff WHERE staff.name = 'Maurício Aniche'";
 
         String dbSchema = " <schema dbms=\"MySQL\">\n"
-                        + "     <table staff=\"tableA\">\n"
+                        + "     <table name=\"staff\">\n"
                         + "         <column name=\"id\" type=\"VARCHAR\" size=\"50\" key=\"true\" notnull=\"true\"/>\n"
                         + "         <column name=\"name\" type=\"VARCHAR\" size=\"255\" default=\"NULL\"/>\n"
                         + "     </table>\n"

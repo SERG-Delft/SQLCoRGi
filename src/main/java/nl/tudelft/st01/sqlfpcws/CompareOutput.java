@@ -31,7 +31,7 @@ public final class CompareOutput {
     private static final int AMOUNT_OF_QUERY_SETS = 3;
 
     /**
-     * Constructor for the class.
+     * No instance of this class should be created.
      */
     private CompareOutput() {
         throw new UnsupportedOperationException();
@@ -40,7 +40,7 @@ public final class CompareOutput {
     /**
      * Runs the comparison between the JSON file and our output.
      *
-     * @param args - command line arguments - are ignored in the code
+     * @param args - command line arguments - are ignored in the code.
      */
     // Suppress IllegalCatch is there to make sure we can catch all exceptions and still continue
     //      comparing the rest of the queries
@@ -52,7 +52,7 @@ public final class CompareOutput {
             justification = "Encoding for FileReader can be specified, so this needs to be suppressed")
     public static void main(String[] args) {
         String[] input = {ERPNEXT_INPUT_PATH, SUITECRM_INPUT_PATH, ESPOCRM_INPUT_PATH};
-        String[] output = {ERPNEXT_OUTPUT_PATH + SUITECRM_OUTPUT_PATH, ESPOCRM_OUTPUT_PATH};
+        String[] output = {ERPNEXT_OUTPUT_PATH, SUITECRM_OUTPUT_PATH, ESPOCRM_OUTPUT_PATH};
 
         Scanner sc = null;
         JSONParser parser = new JSONParser();
@@ -76,7 +76,7 @@ public final class CompareOutput {
             while (iterator.hasNext() && sc.hasNextLine()) {
                 JSONArray expectedQueries = (JSONArray) iterator.next().get("pathList");
                 String nextQuery = sc.nextLine();
-                Set<String> ourResults = null;
+                Set<String> ourResults;
                 totalCounter++;
                 try {
                     ourResults = Generator.generateRules(nextQuery);

@@ -18,12 +18,15 @@ import java.util.List;
  */
 public final class SQLFpcWS {
 
+    public static final String ERROR_XPATH = "/sqlfpc/error";
+    private static final String SQL_TARGET_XPATH = "/sqlfpc/fpcrules/fpcrule/sql";
+
+    /**
+     * No instance of this class should be created.
+     */
     private SQLFpcWS() {
         throw new UnsupportedOperationException();
     }
-
-    private static final String ERROR_XPATH = "/sqlfpc/error";
-    private static final String SQL_TARGET_XPATH = "/sqlfpc/fpcrules/fpcrule/sql";
 
     /**
      * Calls the {@code getRules} method of the SQLFpc web service with a specified query, the schema and optional
@@ -71,12 +74,12 @@ public final class SQLFpcWS {
         }
 
         Node error = xmlResponse.selectSingleNode(ERROR_XPATH);
-        if(error != null) {
+        if (error != null) {
             System.err.println("SQL Query could not be parsed: " + error.getText());
             return result;
         }
 
-        List<Node> sqlRules = (List<Node>)xmlResponse.selectNodes(SQL_TARGET_XPATH);
+        List<Node> sqlRules = (List<Node>) xmlResponse.selectNodes(SQL_TARGET_XPATH);
         for (Node sqlRule : sqlRules) {
             result.add(sqlRule.getText());
         }

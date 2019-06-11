@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * This class contains the main that uses the SQLFpc web service to generate coverage targets for multiple sql queries.
  */
+@SuppressWarnings("checkstyle:MultipleStringLiterals")
 public final class BulkMain {
 
     private static final String DATABASE = "espocrm";
@@ -15,10 +16,12 @@ public final class BulkMain {
     private static final String XML_SCHEMA_PATH = RESOURCE_PATH + "\\schema_xml\\" + DATABASE + ".xml";
     private static final String JSON_OUTPUT_PATH = RESOURCE_PATH + "\\output_json\\" + DATABASE + ".json";
 
+    private static final int NANO_TO_MILLI = 1000000;
+
     /**
      * No instance of this class should be created.
      */
-    protected BulkMain() throws UnsupportedOperationException {
+    protected BulkMain() {
         throw new UnsupportedOperationException();
     }
 
@@ -26,11 +29,12 @@ public final class BulkMain {
      * Main method that demonstrates the use of the {@link BulkRuleGenerator}.
      *
      * @param args unused.
+     * @throws InterruptedException if {@code Thread.sleep()} is interrupted.
      */
     public static void main(String[] args) throws InterruptedException {
         BulkRuleGenerator bulkRuleGenerator = new BulkRuleGenerator(SQL_INPUT_PATH, XML_SCHEMA_PATH, JSON_OUTPUT_PATH);
 
-        long durationNanoSeconds = 1000000L * bulkRuleGenerator.getEstimatedGenerationDurationInMilliSeconds();
+        long durationNanoSeconds = NANO_TO_MILLI * bulkRuleGenerator.getEstimatedGenerationDurationInMilliSeconds();
         LocalDateTime finishTime = LocalDateTime.now().plusNanos(durationNanoSeconds);
         String formattedFinishTime = finishTime.format(DateTimeFormatter.ISO_DATE_TIME);
 
