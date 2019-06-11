@@ -67,7 +67,7 @@
 
     </properties>
 
-    
+
     <dependencies>
         <dependency>
             <groupId>com.github.jsqlparser</groupId>
