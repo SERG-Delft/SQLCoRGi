@@ -188,5 +188,4 @@ public class SQLFpcWSTest {
 
         assertThat(result).hasSize(0);
     }
-
 }

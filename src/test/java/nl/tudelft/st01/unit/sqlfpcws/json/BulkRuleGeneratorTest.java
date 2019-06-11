@@ -33,7 +33,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 @RunWith(PowerMockRunner.class)
 public class BulkRuleGeneratorTest {
 
-    private static final String RESOURCE_PATH = ".\\src\\test\\resources\\";
+    private static final String RESOURCE_PATH = "./src/test/resources/";
     private static final String SQL_INPUT_PATH = RESOURCE_PATH + "input.sql";
     private static final String XML_SCHEMA_PATH = RESOURCE_PATH + "schema.xml";
     private static final String JSON_OUTPUT_PATH = RESOURCE_PATH + "output.json";
