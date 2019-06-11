@@ -211,4 +211,32 @@ public class NetedJoinsTest {
                 "SELECT * FROM a RIGHT JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id WHERE (NOT (b.id > 0)) AND (b.id IS NOT NULL)"
         );
     }
+
+    @Test
+    public void testNestedJoinOnConditionColumnsFromOneTable4() {
+        verify("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id","SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id",
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id WHERE (d.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id WHERE (d.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id WHERE (b.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 RIGHT JOIN d ON d.id = a.id WHERE (a.id IS NULL) AND (d.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 RIGHT JOIN d ON d.id = a.id WHERE (a.id IS NULL) AND (d.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id RIGHT JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id WHERE (NOT (c.id > 0)) AND (c.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)");
+    }
+
+    @Test
+    public void testNestedJoinOnConditionColumnsFromOneTableMultipleCases() {
+        verify("SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 inner join d on d.id > 0",
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id > 0",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 WHERE (b.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 RIGHT JOIN d ON d.id > 0 WHERE (NOT (d.id > 0)) AND (d.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id RIGHT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 WHERE (NOT (c.id > 0)) AND (c.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 WHERE (a.id IS NULL) AND (b.id IS NULL)"
+        );
+
+    }
 }
