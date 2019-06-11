@@ -9,7 +9,7 @@ import static nl.tudelft.st01.functional.AssertUtils.verify;
  * This test class is related to {@link JoinTest}.
  * The functionality of nested joins is tested and evaluated.
  */
-public class NetedJoinsTest {
+public class NestedJoinsTest {
 
     /**
      * This test evaluates whether the nested joins are transformed to the correct join type.
@@ -176,67 +176,114 @@ public class NetedJoinsTest {
         );
     }
 
+    /**
+     * This test verifies whether the correct join configuration is used, even when the on condition only
+     * contains columns from one table. Case: only the from item is used in the first on condition.
+     */
     @Test
     public void testNestedJoinOnConditionColumnsFromOneTable1() {
         verify("SELECT * FROM a INNER JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id",
-                "SELECT * FROM a INNER JOIN b ON a.id > 0 LEFT JOIN c ON c.id = a.id WHERE (c.id IS NULL) AND (a.id IS NOT NULL)",
-                "SELECT * FROM a INNER JOIN b ON a.id > 0 LEFT JOIN c ON c.id = a.id WHERE (c.id IS NULL) AND (a.id IS NULL)",
-                "SELECT * FROM a LEFT JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id WHERE (NOT (a.id > 0)) AND (a.id IS NOT NULL)",
-                "SELECT * FROM a LEFT JOIN b ON a.id > 0 RIGHT JOIN c ON c.id = a.id WHERE (a.id IS NULL) AND (c.id IS NOT NULL)",
-                "SELECT * FROM a LEFT JOIN b ON a.id > 0 RIGHT JOIN c ON c.id = a.id WHERE (a.id IS NULL) AND (c.id IS NULL)"
+                "SELECT * FROM a INNER JOIN b ON a.id > 0 LEFT JOIN c ON c.id = a.id "
+                        + "WHERE (c.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a INNER JOIN b ON a.id > 0 LEFT JOIN c ON c.id = a.id "
+                        + "WHERE (c.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id "
+                        + "WHERE (NOT (a.id > 0)) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id > 0 RIGHT JOIN c ON c.id = a.id "
+                        + "WHERE (a.id IS NULL) AND (c.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id > 0 RIGHT JOIN c ON c.id = a.id "
+                        + "WHERE (a.id IS NULL) AND (c.id IS NULL)"
         );
     }
 
+    /**
+     * This test verifies whether the correct join configuration is used, even when the on condition only
+     * contains columns from one table. Case: only the right item is used in the first on condition.
+     */
     @Test
     public void testNestedJoinOnConditionColumnsFromOneTable2() {
         verify("SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
-                "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id WHERE (c.id IS NULL) AND (a.id IS NOT NULL)",
-                "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id WHERE (c.id IS NULL) AND (a.id IS NULL)",
-                "SELECT * FROM a LEFT JOIN b ON b.id > 0 RIGHT JOIN c ON c.id = a.id WHERE (a.id IS NULL) AND (c.id IS NOT NULL)",
-                "SELECT * FROM a LEFT JOIN b ON b.id > 0 RIGHT JOIN c ON c.id = a.id WHERE (a.id IS NULL) AND (c.id IS NULL)",
-                "SELECT * FROM a RIGHT JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id WHERE (NOT (b.id > 0)) AND (b.id IS NOT NULL)"
+                "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id "
+                        + "WHERE (c.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id "
+                        + "WHERE (c.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id > 0 RIGHT JOIN c ON c.id = a.id "
+                        + "WHERE (a.id IS NULL) AND (c.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id > 0 RIGHT JOIN c ON c.id = a.id "
+                        + "WHERE (a.id IS NULL) AND (c.id IS NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id "
+                        + "WHERE (NOT (b.id > 0)) AND (b.id IS NOT NULL)"
         );
     }
 
+    /**
+     * This test verifies whether the correct join configuration is used, even when the on condition only
+     * contains columns from one table. Case: only the right item is used in the second on condition.
+     */
     @Test
     public void testNestedJoinOnConditionColumnsFromOneTable3() {
         verify("SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
-                "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id WHERE (c.id IS NULL) AND (a.id IS NOT NULL)",
-                "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id WHERE (c.id IS NULL) AND (a.id IS NULL)",
-                "SELECT * FROM a LEFT JOIN b ON b.id > 0 RIGHT JOIN c ON c.id = a.id WHERE (a.id IS NULL) AND (c.id IS NOT NULL)",
-                "SELECT * FROM a LEFT JOIN b ON b.id > 0 RIGHT JOIN c ON c.id = a.id WHERE (a.id IS NULL) AND (c.id IS NULL)",
-                "SELECT * FROM a RIGHT JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id WHERE (NOT (b.id > 0)) AND (b.id IS NOT NULL)"
+                "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id "
+                        + "WHERE (c.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id "
+                        + "WHERE (c.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id > 0 RIGHT JOIN c ON c.id = a.id "
+                        + "WHERE (a.id IS NULL) AND (c.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id > 0 RIGHT JOIN c ON c.id = a.id "
+                        + "WHERE (a.id IS NULL) AND (c.id IS NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id "
+                        + "WHERE (NOT (b.id > 0)) AND (b.id IS NOT NULL)"
         );
     }
 
+    /**
+     * This test verifies whether the correct join configuration is used, even when the on condition only
+     * contains columns from one table. Case: only the right item is used in the third on condition.
+     */
     @Test
     public void testNestedJoinOnConditionColumnsFromOneTable4() {
-        verify("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id","SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id",
-                "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id WHERE (d.id IS NULL) AND (a.id IS NOT NULL)",
-                "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id WHERE (d.id IS NULL) AND (a.id IS NULL)",
-                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
-                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id WHERE (b.id IS NULL) AND (a.id IS NULL)",
-                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 RIGHT JOIN d ON d.id = a.id WHERE (a.id IS NULL) AND (d.id IS NOT NULL)",
-                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 RIGHT JOIN d ON d.id = a.id WHERE (a.id IS NULL) AND (d.id IS NULL)",
-                "SELECT * FROM a LEFT JOIN b ON b.id = a.id RIGHT JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id WHERE (NOT (c.id > 0)) AND (c.id IS NOT NULL)",
-                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
-                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)");
+        verify("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id",
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id",
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id "
+                        + "WHERE (d.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id "
+                        + "WHERE (d.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id "
+                        + "WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id "
+                        + "WHERE (b.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 RIGHT JOIN d ON d.id = a.id "
+                        + "WHERE (a.id IS NULL) AND (d.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 RIGHT JOIN d ON d.id = a.id "
+                        + "WHERE (a.id IS NULL) AND (d.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id RIGHT JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id "
+                        + "WHERE (NOT (c.id > 0)) AND (c.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id "
+                        + "WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id "
+                        + "WHERE (a.id IS NULL) AND (b.id IS NULL)"
+        );
     }
 
     @Test
     public void testNestedJoinOnConditionColumnsFromOneTableMultipleCases() {
-        verify("SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 inner join d on d.id > 0",
+        verify("SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 INNER JOIN d on d.id > 0",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id > 0",
-                "SELECT * FROM a LEFT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
-                "SELECT * FROM a LEFT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 WHERE (b.id IS NULL) AND (a.id IS NULL)",
-                "SELECT * FROM a LEFT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 RIGHT JOIN d ON d.id > 0 WHERE (NOT (d.id > 0)) AND (d.id IS NOT NULL)",
-                "SELECT * FROM a LEFT JOIN b ON a.id = b.id RIGHT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 WHERE (NOT (c.id > 0)) AND (c.id IS NOT NULL)",
-                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
-                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 WHERE (a.id IS NULL) AND (b.id IS NULL)"
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 "
+                        + "WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 "
+                        + "WHERE (b.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 RIGHT JOIN d ON d.id > 0 "
+                        + "WHERE (NOT (d.id > 0)) AND (d.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id RIGHT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 "
+                        + "WHERE (NOT (c.id > 0)) AND (c.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 "
+                        + "WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 "
+                        + "WHERE (a.id IS NULL) AND (b.id IS NULL)"
         );
-
     }
 }
