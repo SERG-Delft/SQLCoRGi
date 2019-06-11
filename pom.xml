@@ -34,7 +34,7 @@
         <clover.version>4.3.1</clover.version>
 
         <jsqlparser.version>2.0</jsqlparser.version>
-
+        
         <junit.jupiter.version>5.4.2</junit.jupiter.version>
 
         <assertj.core.version>3.11.1</assertj.core.version>
@@ -64,6 +64,8 @@
         <javax.mail.version>1.6.2</javax.mail.version>
         <jaxen.version>1.2.0</jaxen.version>
         <wsdl4j.version>1.5.1</wsdl4j.version>
+        <slf4j-api.version>1.5.5</slf4j-api.version>
+        <slf4j-simple.version>1.5.5</slf4j-simple.version>
 
     </properties>
 
@@ -204,6 +206,18 @@
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
             <version>${wsdl4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j-simple.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j-api.version}</version>
         </dependency>
 
         <dependency>
