@@ -138,8 +138,10 @@ public class JoinRulesGenerator {
         Set<JoinWhereItem> out = new HashSet<>();
         List<Join> tJoinsLoi = transformJoins(joins, labelsLeft);
 
-        Expression reducedWhereLoi = nullReduction(where, oir, JoinType.LEFT, false);
-        Expression reducedWhereLoiNull = nullReduction(where, oir, JoinType.LEFT, true);
+        List<OuterIncrementRelation> includes = getAllIncludesInner(labelsLeft, outerIncrementRelations);
+
+        Expression reducedWhereLoi = nullReduction(where, JoinType.LEFT, oir, includes, false);
+        Expression reducedWhereLoiNull = nullReduction(where,  JoinType.LEFT, oir, includes, true);
 
         if (oir.getRoiRelColumns() == null || oir.getRoiRelColumns().isEmpty()) {
             Join join = genericCopyOfJoin(tJoinsLoi.get(index));
@@ -178,8 +180,10 @@ public class JoinRulesGenerator {
 
         List<Join> tJoinsRoi = transformJoins(joins, labelsRight);
 
-        Expression reducedWhereRoi = nullReduction(where, oir, JoinType.RIGHT, false);
-        Expression reducedWhereRoiNull = nullReduction(where, oir, JoinType.RIGHT, true);
+        List<OuterIncrementRelation> includes = getAllIncludesInner(labelsRight, outerIncrementRelations);
+
+        Expression reducedWhereRoi = nullReduction(where, JoinType.RIGHT, oir, includes, false);
+        Expression reducedWhereRoiNull = nullReduction(where,  JoinType.RIGHT, oir, includes, true);
 
         if (oir.getLoiRelColumns() == null || oir.getLoiRelColumns().isEmpty()) {
             Join join = genericCopyOfJoin(tJoinsRoi.get(index));
@@ -200,6 +204,16 @@ public class JoinRulesGenerator {
         return out;
     }
 
+    private List<OuterIncrementRelation> getAllIncludesInner(List<JoinType> labels, List<OuterIncrementRelation> oirs) {
+        List<OuterIncrementRelation> includes = new ArrayList<>();
+        for (int i = 0; i < labels.size(); i++) {
+            if (labels.get(i) == JoinType.INNER) {
+                includes.add(outerIncrementRelations.get(i));
+            }
+        }
+
+        return includes;
+    }
     /**
      * Takes in a list of joins and sets each join's type to inner only.
      *
@@ -220,24 +234,29 @@ public class JoinRulesGenerator {
      * (E.g. in most cases of an IS NULL expression)
      *
      * @param expression The expression to reduce.
-     * @param oir The {@link OuterIncrementRelation} corresponding to
-     *            the join for which the expression has to be reduced.
      * @param joinType The type of the join.
+     * @param oir The {@link OuterIncrementRelation} corresponding to the join that has to be evaluated.
+     * @param oirs The list of {@link OuterIncrementRelation}s that should be included when the expression is reduced.
      * @param nullable True if the outer increment relations are nullable, false otherwise.
      * @return The reduced expression.
      */
-    private static Expression nullReduction(Expression expression, OuterIncrementRelation oir,
-                                            JoinType joinType, boolean nullable) {
+    private static Expression nullReduction(Expression expression, JoinType joinType, OuterIncrementRelation oir,
+                                            List<OuterIncrementRelation> oirs, boolean nullable) {
         if (expression != null) {
-            Set<String> includeTables;
-            List<Column> columns;
+            Set<String> includeTables = new HashSet<>();
+            List<Column> columns = new ArrayList<>();
+
+            for (OuterIncrementRelation o : oirs) {
+                includeTables.addAll(o.getLoiRelations());
+                includeTables.addAll(o.getRoiRelations());
+            }
 
             if (joinType == JoinType.LEFT) {
-                includeTables = oir.getRoiRelations();
-                columns = oir.getRoiRelColumns();
+                includeTables.addAll(oir.getRoiRelations());
+                columns.addAll(oir.getRoiRelColumns());
             } else if (joinType == JoinType.RIGHT) {
-                includeTables = oir.getLoiRelations();
-                columns = oir.getLoiRelColumns();
+                includeTables.addAll(oir.getLoiRelations());
+                columns.addAll(oir.getLoiRelColumns());
             } else {
                 throw new IllegalArgumentException("Join type must be either LEFT or RIGHT");
             }
