@@ -64,8 +64,7 @@ public final class Generator {
      */
     public static void main(String[] args) {
 
-        String query = "SELECT * FROM t WHERE\n" +
-                "(a > 3 OR NOT (a = 3 AND NOT (a = 2))) AND (c = 1 AND NOT (c = 2 AND NOT (c = 22 AND NOT (a = 30 AND c = 3))))";
+        String query = "SELECT * FROM t WHERE a < 10 AND a > 0";
 
         Set<String> result = generateRules(query);
 
