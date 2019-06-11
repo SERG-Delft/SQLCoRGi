@@ -13,7 +13,9 @@ import nl.tudelft.st01.visitors.select.NullReducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -250,6 +252,110 @@ class NullReducerTest {
         nullReducer.visit(subSelect);
 
         verifyNoMoreInteractions(subSelect);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(CaseExpression)} is left intact if its subexpressions are unchanged.
+     */
+    @Test
+    void testVisitCaseExpression() {
+
+        CaseExpression caseExpression = new CaseExpression();
+
+        NullValue switchExpression = new NullValue();
+        caseExpression.setSwitchExpression(switchExpression);
+
+        WhenClause whenClause = mock(WhenClause.class);
+        List<WhenClause> whenClauses = new ArrayList<>(1);
+        whenClauses.add(whenClause);
+        caseExpression.setWhenClauses(whenClauses);
+
+        NullValue elseExpression = new NullValue();
+        caseExpression.setElseExpression(elseExpression);
+
+        nullReducer.visit(caseExpression);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
+
+        assertThat(caseExpression.getSwitchExpression()).isSameAs(switchExpression);
+        assertThat(caseExpression.getWhenClauses()).isSameAs(whenClauses);
+        assertThat(caseExpression.getWhenClauses().size()).isEqualTo(whenClauses.size());
+        assertThat(caseExpression.getElseExpression()).isSameAs(elseExpression);
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(CaseExpression)} signals the removal of a CASE expression to its parent
+     * if there are no WHEN clauses left.
+     */
+    @Test
+    void testVisitCaseExpressionRemoveWhenClause() {
+
+        nulls.add(COLUMN_A);
+
+        CaseExpression caseExpression = new CaseExpression();
+
+        WhenClause whenClause = new WhenClause();
+        whenClause.setWhenExpression(new Column(COLUMN_A));
+        whenClause.setThenExpression(new NullValue());
+
+        List<WhenClause> whenClauses = new ArrayList<>(1);
+        whenClauses.add(whenClause);
+
+        caseExpression.setWhenClauses(whenClauses);
+
+        nullReducer.visit(caseExpression);
+
+        assertThat(nullReducer.isUpdateChild()).isTrue();
+        assertThat(nullReducer.getChild()).isNull();
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(CaseExpression)} signals the removal of a CASE expression to its parent
+     * if its switch is invalidated.
+     */
+    @Test
+    void testVisitCaseExpressionRemoveSwitch() {
+
+        nulls.add(COLUMN_A);
+
+        CaseExpression caseExpression = new CaseExpression();
+
+        WhenClause whenClause = mock(WhenClause.class);
+        List<WhenClause> whenClauses = new ArrayList<>(1);
+        whenClauses.add(whenClause);
+        caseExpression.setWhenClauses(whenClauses);
+
+        caseExpression.setSwitchExpression(new Column(COLUMN_A));
+
+        nullReducer.visit(caseExpression);
+
+        assertThat(nullReducer.isUpdateChild()).isTrue();
+        assertThat(nullReducer.getChild()).isNull();
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(CaseExpression)} updates the ELSE of a CASE expression if the
+     * after visiting it the update signal is set.
+     */
+    @Test
+    void testVisitCaseExpressionRemoveElse() {
+
+        nulls.add(COLUMN_A);
+
+        CaseExpression caseExpression = new CaseExpression();
+
+        WhenClause whenClause = mock(WhenClause.class);
+        List<WhenClause> whenClauses = new ArrayList<>(1);
+        whenClauses.add(whenClause);
+        caseExpression.setWhenClauses(whenClauses);
+
+        caseExpression.setElseExpression(new Column(COLUMN_A));
+
+        nullReducer.visit(caseExpression);
+
+        assertThat(caseExpression.getElseExpression()).isNull();
 
         assertThat(nullReducer.isUpdateChild()).isFalse();
     }
