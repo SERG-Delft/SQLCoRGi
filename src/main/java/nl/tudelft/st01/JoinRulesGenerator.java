@@ -34,7 +34,12 @@ public class JoinRulesGenerator {
         LEFT, RIGHT, INNER
     }
 
+    private enum OIREmpty {
+        LEFT, RIGHT, NONE
+    }
+
     private List<OuterIncrementRelation> outerIncrementRelations;
+    private List<OIREmpty> tablesInOnExpression = new ArrayList<>();
     private FromItem fromItem;
 
     /**
@@ -77,19 +82,22 @@ public class JoinRulesGenerator {
      */
     private List<OuterIncrementRelation> generateOIRsForEachJoin(List<Join> joins) {
         Map<String, List<Column>> map = new HashMap<>();
+        if (outerIncrementRelations == null) {
+            outerIncrementRelations = new ArrayList<>();
+        }
         List<OuterIncrementRelation> out = new ArrayList<>();
         OnExpressionVisitor onExpressionVisitor = new OnExpressionVisitor(map);
         for (Join join : joins) {
             if (join.getOnExpression() != null) {
                 join.getOnExpression().accept(onExpressionVisitor);
-                out.add(getOuterIncrementRelation(map, join));
+                outerIncrementRelations.add(getOuterIncrementRelation(map, join));
                 map.clear();
             } else if (!join.isSimple()) {
                 throw new IllegalStateException("The ON condition cannot be null");
             }
         }
 
-        return out;
+        return outerIncrementRelations;
     }
 
     /**
@@ -146,13 +154,13 @@ public class JoinRulesGenerator {
         Expression reducedWhereLoi = nullReduction(where, JoinType.LEFT, oir, includes, false);
         Expression reducedWhereLoiNull = nullReduction(where,  JoinType.LEFT, oir, includes, true);
 
-        if (oir.getRoiRelColumns() == null || oir.getRoiRelations().isEmpty()) {
+        if (tablesInOnExpression.get(index) == OIREmpty.RIGHT) {
             Join join = genericCopyOfJoin(tJoinsLoi.get(index));
             join.setRight(true);
 
-            List<OuterIncrementRelation> oirs = updateOIOnExpressionSingleTable(JoinType.RIGHT, index, oir);
+            //List<OuterIncrementRelation> oirs = updateOIOnExpressionSingleTable(JoinType.RIGHT, index, oir);
 
-            labelsLeft = label(JoinType.RIGHT, joins, index, oirs);
+            labelsLeft = label(JoinType.RIGHT, joins, index, outerIncrementRelations);
             tJoinsLoi = transformJoins(joins, labelsLeft);
             tJoinsLoi.set(index, join);
 
@@ -160,6 +168,9 @@ public class JoinRulesGenerator {
             out.add(new JoinWhereItem(tJoinsLoi, concatenate(concatenate(not,
                     getRightOuterIncrement(oir, false), true), reducedWhereLoi, true)));
         } else {
+//            if (tablesInOnExpression.get(index) == OIREmpty.LEFT) {
+//                oir.setLoiRelations(new HashSet<>());
+//            }
             Expression loi = getLeftOuterIncrement(oir, false);
             Expression loiNull = getLeftOuterIncrement(oir, true);
 
@@ -192,7 +203,7 @@ public class JoinRulesGenerator {
         Expression reducedWhereRoi = nullReduction(where, JoinType.RIGHT, oir, includes, false);
         Expression reducedWhereRoiNull = nullReduction(where,  JoinType.RIGHT, oir, includes, true);
 
-        if (oir.getLoiRelColumns() == null || oir.getLoiRelColumns().isEmpty()) {
+        if (tablesInOnExpression.get(index) == OIREmpty.LEFT) {
             Join join = genericCopyOfJoin(tJoinsRoi.get(index));
             join.setLeft(true);
 
@@ -205,9 +216,10 @@ public class JoinRulesGenerator {
             Expression not = new NotExpression(new Parenthesis(join.getOnExpression()));
             out.add(new JoinWhereItem(tJoinsRoi, concatenate(concatenate(not,
                     getLeftOuterIncrement(oir, false), true), reducedWhereRoi, true)));
-
-
         } else {
+//            if (tablesInOnExpression.get(index) == OIREmpty.RIGHT) {
+//                oir.setLoiRelations(new HashSet<>());
+//            }
             Expression roi = getRightOuterIncrement(oir, false);
             Expression roiNull = getRightOuterIncrement(oir, true);
 
@@ -234,12 +246,17 @@ public class JoinRulesGenerator {
         Set<String> oirels = new HashSet<>();
         oirels.add(fromItem.toString());
 
+        Set<String> preceed = new HashSet<>();
+        for (int i = 0; i < index; i++) {
+            preceed.addAll(oir.getRoiRelations());
+            preceed.addAll(oir.getLoiRelations());
+        }
         List<OuterIncrementRelation> oirs = new ArrayList<>();
 
-        if (joinType == JoinType.RIGHT && !oir.getLoiRelations().contains(fromItem.toString())) {
-            oir.setRoiRelations(oirels);
-        } else if (joinType == JoinType.LEFT && !oir.getRoiRelations().contains(fromItem.toString())) {
-            oir.setLoiRelations(oirels);
+        if (joinType == JoinType.RIGHT) {
+            oir.setRoiRelations(preceed);
+        } else if (joinType == JoinType.LEFT) {
+            oir.setLoiRelations(preceed);
         }
         oirs.addAll(outerIncrementRelations);
         oirs.set(index, oir);
@@ -509,6 +526,32 @@ public class JoinRulesGenerator {
                 roirels.add(entry.getKey());
                 roiRelColumns.addAll(entry.getValue());
             }
+        }
+
+        if (roirels.isEmpty()) {
+            roirels.add(fromItem.toString());
+
+            if (outerIncrementRelations != null && !outerIncrementRelations.isEmpty()) {
+                for (OuterIncrementRelation o : outerIncrementRelations) {
+                    roirels.addAll(o.getLoiRelations());
+                    roirels.addAll(o.getRoiRelations());
+                }
+            }
+            roirels.removeAll(intersection(roirels, loirels));
+            tablesInOnExpression.add(OIREmpty.RIGHT);
+        } else if (loirels.isEmpty()) {
+            loirels.add(join.getRightItem().toString());
+
+            if (outerIncrementRelations != null && !outerIncrementRelations.isEmpty()) {
+                for (OuterIncrementRelation o : outerIncrementRelations) {
+                    loirels.addAll(o.getLoiRelations());
+                    loirels.addAll(o.getRoiRelations());
+                }
+            }
+            loirels.removeAll(intersection(roirels, loirels));
+            tablesInOnExpression.add(OIREmpty.LEFT);
+        } else {
+            tablesInOnExpression.add(OIREmpty.NONE);
         }
 
         return new OuterIncrementRelation(loirels, roirels, loiRelColumns, roiRelColumns);
