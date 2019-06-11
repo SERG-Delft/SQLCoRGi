@@ -7,6 +7,7 @@ import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import nl.tudelft.st01.query.JoinWhereItem;
@@ -34,6 +35,7 @@ public class JoinRulesGenerator {
     }
 
     private List<OuterIncrementRelation> outerIncrementRelations;
+    private FromItem fromItem;
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
@@ -49,6 +51,7 @@ public class JoinRulesGenerator {
             return new HashSet<>();
         }
 
+        fromItem = plainSelect.getFromItem();
         outerIncrementRelations = generateOIRsForEachJoin(plainSelect.getJoins());
 
         if (!outerIncrementRelations.isEmpty()) {
@@ -134,7 +137,7 @@ public class JoinRulesGenerator {
      */
     private Set<JoinWhereItem> generateLeftJoinRules(List<Join> joins, int index, Expression where,
                                                      OuterIncrementRelation oir) {
-        List<JoinType> labelsLeft = label(JoinType.LEFT, joins, index);
+        List<JoinType> labelsLeft = label(JoinType.LEFT, joins, index, outerIncrementRelations);
         Set<JoinWhereItem> out = new HashSet<>();
         List<Join> tJoinsLoi = transformJoins(joins, labelsLeft);
 
@@ -143,10 +146,14 @@ public class JoinRulesGenerator {
         Expression reducedWhereLoi = nullReduction(where, JoinType.LEFT, oir, includes, false);
         Expression reducedWhereLoiNull = nullReduction(where,  JoinType.LEFT, oir, includes, true);
 
-        if (oir.getRoiRelColumns() == null || oir.getRoiRelColumns().isEmpty()) {
+        if (oir.getRoiRelColumns() == null || oir.getRoiRelations().isEmpty()) {
             Join join = genericCopyOfJoin(tJoinsLoi.get(index));
             join.setRight(true);
 
+            List<OuterIncrementRelation> oirs = updateOIOnExpressionSingleTable(JoinType.RIGHT, index, oir);
+
+            labelsLeft = label(JoinType.RIGHT, joins, index, oirs);
+            tJoinsLoi = transformJoins(joins, labelsLeft);
             tJoinsLoi.set(index, join);
 
             Expression not = new NotExpression(new Parenthesis(join.getOnExpression()));
@@ -175,7 +182,7 @@ public class JoinRulesGenerator {
      */
     private Set<JoinWhereItem> generateRightJoinRules(List<Join> joins, int index, Expression where,
                                                      OuterIncrementRelation oir) {
-        List<JoinType> labelsRight = label(JoinType.RIGHT, joins, index);
+        List<JoinType> labelsRight = label(JoinType.RIGHT, joins, index, outerIncrementRelations);
         Set<JoinWhereItem> out = new HashSet<>();
 
         List<Join> tJoinsRoi = transformJoins(joins, labelsRight);
@@ -188,10 +195,17 @@ public class JoinRulesGenerator {
         if (oir.getLoiRelColumns() == null || oir.getLoiRelColumns().isEmpty()) {
             Join join = genericCopyOfJoin(tJoinsRoi.get(index));
             join.setLeft(true);
+
+            List<OuterIncrementRelation> oirs = updateOIOnExpressionSingleTable(JoinType.LEFT, index, oir);
+
+            labelsRight = label(JoinType.LEFT, joins, index, oirs);
+            tJoinsRoi = transformJoins(joins, labelsRight);
             tJoinsRoi.set(index, join);
+
             Expression not = new NotExpression(new Parenthesis(join.getOnExpression()));
             out.add(new JoinWhereItem(tJoinsRoi, concatenate(concatenate(not,
                     getLeftOuterIncrement(oir, false), true), reducedWhereRoi, true)));
+
 
         } else {
             Expression roi = getRightOuterIncrement(oir, false);
@@ -208,12 +222,31 @@ public class JoinRulesGenerator {
         List<OuterIncrementRelation> includes = new ArrayList<>();
         for (int i = 0; i < labels.size(); i++) {
             if (labels.get(i) == JoinType.INNER) {
-                includes.add(outerIncrementRelations.get(i));
+                includes.add(oirs.get(i));
             }
         }
 
         return includes;
     }
+
+    private List<OuterIncrementRelation> updateOIOnExpressionSingleTable(JoinType joinType, int index,
+                                                                         OuterIncrementRelation oir) {
+        Set<String> oirels = new HashSet<>();
+        oirels.add(fromItem.toString());
+
+        List<OuterIncrementRelation> oirs = new ArrayList<>();
+
+        if (joinType == JoinType.RIGHT && !oir.getLoiRelations().contains(fromItem.toString())) {
+            oir.setRoiRelations(oirels);
+        } else if (joinType == JoinType.LEFT && !oir.getRoiRelations().contains(fromItem.toString())) {
+            oir.setLoiRelations(oirels);
+        }
+        oirs.addAll(outerIncrementRelations);
+        oirs.set(index, oir);
+
+        return oirs;
+    }
+
     /**
      * Takes in a list of joins and sets each join's type to inner only.
      *
@@ -378,7 +411,7 @@ public class JoinRulesGenerator {
      * @param index The index of the current join.
      * @return A list of join types, which are used to make sure that all joins are configured correctly.
      */
-    private List<JoinType> label(JoinType joinType, List<Join> joins, int index) {
+    private List<JoinType> label(JoinType joinType, List<Join> joins, int index, List<OuterIncrementRelation> oirs) {
         if (index >= joins.size()) {
             throw new IllegalArgumentException("The index cannot be larger than the size of the given list of joins.");
         }
@@ -386,7 +419,7 @@ public class JoinRulesGenerator {
         Set<String> mvoi = new HashSet<>();
         List<JoinType> labels = Arrays.asList(new JoinType[joins.size()]);
 
-        OuterIncrementRelation currOiRel = outerIncrementRelations.get(index);
+        OuterIncrementRelation currOiRel = oirs.get(index);
 
         switch (joinType) {
             case LEFT:  mvoi.addAll(currOiRel.getLoiRelations());
@@ -401,7 +434,7 @@ public class JoinRulesGenerator {
         for (int i = 0; i < joins.size(); i++) {
             if (labels.get(i) == null) {
                 OuterIncrementRelation oiRel = outerIncrementRelations.get(i);
-                labels.set(i, determineLabel(mvoi, oiRel));
+                labels.set(i, determineLabel(mvoi, oiRel, joinType));
             }
         }
 
@@ -415,16 +448,26 @@ public class JoinRulesGenerator {
      * @param oiRel The outer increment corresponding to the join for the label should be set.
      * @return The correct join type.
      */
-    private JoinType determineLabel(Set<String> mvoi, OuterIncrementRelation oiRel) {
-        if (!intersection(mvoi, oiRel.getRoiRelations()).isEmpty()) {
-            mvoi.addAll(oiRel.getLoiRelations());
-            return JoinType.LEFT;
-        } else if (!intersection(mvoi, oiRel.getLoiRelations()).isEmpty()) {
-            mvoi.addAll(oiRel.getRoiRelations());
-            return JoinType.RIGHT;
-        } else {
-            return JoinType.INNER;
+    private JoinType determineLabel(Set<String> mvoi, OuterIncrementRelation oiRel, JoinType joinType) {
+        if (joinType == JoinType.RIGHT) {
+            if (!intersection(mvoi, oiRel.getRoiRelations()).isEmpty()) {
+                mvoi.addAll(oiRel.getLoiRelations());
+                return JoinType.LEFT;
+            } else if (!intersection(mvoi, oiRel.getLoiRelations()).isEmpty()) {
+                mvoi.addAll(oiRel.getRoiRelations());
+                return JoinType.RIGHT;
+            }
+        } else if (joinType == JoinType.LEFT){
+            if (!intersection(mvoi, oiRel.getLoiRelations()).isEmpty()) {
+                mvoi.addAll(oiRel.getRoiRelations());
+                return JoinType.RIGHT;
+            }else if (!intersection(mvoi, oiRel.getRoiRelations()).isEmpty()) {
+                mvoi.addAll(oiRel.getLoiRelations());
+                return JoinType.LEFT;
+            }
         }
+
+        return JoinType.INNER;
     }
 
     /**
@@ -462,9 +505,15 @@ public class JoinRulesGenerator {
             if (entry.getKey().equals(join.getRightItem().toString().toLowerCase())) {
                 loirels.add(entry.getKey());
                 loiRelColumns.addAll(entry.getValue());
+                if (map.keySet().size() == 1 && !loirels.contains(fromItem.toString())) {
+                    roirels.add(fromItem.toString());
+                }
             } else {
                 roirels.add(entry.getKey());
                 roiRelColumns.addAll(entry.getValue());
+                if (map.keySet().size() == 1 && !roirels.contains(fromItem.toString())) {
+                    loirels.add(fromItem.toString());
+                }
             }
         }
 
