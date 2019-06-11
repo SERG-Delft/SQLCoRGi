@@ -505,15 +505,9 @@ public class JoinRulesGenerator {
             if (entry.getKey().equals(join.getRightItem().toString().toLowerCase())) {
                 loirels.add(entry.getKey());
                 loiRelColumns.addAll(entry.getValue());
-                if (map.keySet().size() == 1 && !loirels.contains(fromItem.toString())) {
-                    roirels.add(fromItem.toString());
-                }
             } else {
                 roirels.add(entry.getKey());
                 roiRelColumns.addAll(entry.getValue());
-                if (map.keySet().size() == 1 && !roirels.contains(fromItem.toString())) {
-                    loirels.add(fromItem.toString());
-                }
             }
         }
 

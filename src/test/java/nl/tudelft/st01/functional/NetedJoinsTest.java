@@ -141,7 +141,7 @@ public class NetedJoinsTest {
                         + "WHERE (b.id IS NULL) AND (c.id IS NULL)"
         );
     }
-    
+
     @Test
     public void testNestedJoinOnConditionColumnsFromOneTable1() {
         verify("SELECT * FROM a INNER JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id",

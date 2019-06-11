@@ -66,8 +66,7 @@ public final class Generator {
      * @param args unused.
      */
     public static void main(String[] args) {
-        String query = "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id INNER JOIN d on d.id = a.id WHERE c.length > 1 OR b.length > 1 OR a.length > 1 OR d.length > 1";
-        //String query = "SELECT * FROM a join b on a.id = b.id WHERE a.id > 50";
+        String query = "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0";
 
         Set<String> result = generateRules(query);
         List<String> res = new ArrayList<>();
