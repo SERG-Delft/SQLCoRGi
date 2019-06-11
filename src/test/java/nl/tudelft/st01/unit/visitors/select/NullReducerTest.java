@@ -6,6 +6,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.visitors.select.NullReducer;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -19,15 +20,25 @@ class NullReducerTest {
 
     private static final String COLUMN_A = "a";
 
+    private HashSet<String> nulls;
+    private NullReducer nullReducer;
+
+    /**
+     * Creates a {@link NullReducer} using a new {@link HashSet}.
+     */
+    @BeforeEach
+    void setUp() {
+        nulls = new HashSet<>();
+        nullReducer = new NullReducer(nulls);
+    }
+
     /**
      * Tests whether the constructor correctly initializes a {@link NullReducer}.
      */
     @Test
     void testConstructor() {
-        HashSet<String> nulls = new HashSet<>();
-        nulls.add(COLUMN_A);
 
-        NullReducer nullReducer = new NullReducer(nulls);
+        nulls.add(COLUMN_A);
 
         assertThat(nullReducer.getNulls()).isSameAs(nulls);
         assertThat(nullReducer.getChild()).isNull();
@@ -40,8 +51,6 @@ class NullReducerTest {
      */
     @Test
     void testGetRootSame() {
-
-        NullReducer nullReducer = new NullReducer(new HashSet<>());
 
         EqualsTo equalsTo = new EqualsTo();
         equalsTo.setLeftExpression(new Column(COLUMN_A));
@@ -59,9 +68,7 @@ class NullReducerTest {
     @Test
     void testGetRootDifferent() {
 
-        HashSet<String> nulls = new HashSet<>();
         nulls.add(COLUMN_A);
-        NullReducer nullReducer = new NullReducer(nulls);
 
         NullValue nullValue = new NullValue();
         AndExpression andExpression = new AndExpression(new Column(COLUMN_A), nullValue);
