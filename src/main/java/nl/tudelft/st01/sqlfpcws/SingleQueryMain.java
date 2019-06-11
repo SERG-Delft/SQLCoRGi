@@ -2,12 +2,23 @@ package nl.tudelft.st01.sqlfpcws;
 
 import java.util.List;
 
+/**
+ * This class contains the main that uses the SQLFpc web service to generate coverage targets for a single query.
+ */
 public final class SingleQueryMain {
 
+    /**
+     * No instance of this class should be created.
+     */
     protected SingleQueryMain() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Main method for manual invocation of the SQLFpc web service.
+     *
+     * @param args unused.
+     */
     public static void main(String[] args) {
         String sqlQuery = "SELECT * FROM staff WHERE staff.name = 'Maurício Aniche'";
 
