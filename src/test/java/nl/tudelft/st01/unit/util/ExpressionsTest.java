@@ -8,7 +8,6 @@ import java.lang.reflect.Constructor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.Mockito.*;
 
 /**
  * Tests the {@link Expressions} utility class.
