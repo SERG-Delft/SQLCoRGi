@@ -23,11 +23,13 @@ public final class BulkMain {
         LocalDateTime finishTime = LocalDateTime.now().plusNanos(durationNanoSeconds);
         String formattedFinishTime = finishTime.format(DateTimeFormatter.ISO_DATE_TIME);
 
-        System.out.println("Generating bulk coverage targets for file: " + DATABASE
+        System.out.println(
+                "Generating bulk coverage targets for file: " + DATABASE
                 + "- Number of queries provided: " + bulkRuleGenerator.getAmountOfQueries() + "\n"
                 + "- Number of tables in schema: " + bulkRuleGenerator.getAmountOfTablesInSchema() + "\n"
                 + "- Number of columns in schema: " + bulkRuleGenerator.getAmountOfColumnsInSchema() + "\n"
-                + "- Estimated completion time: " + formattedFinishTime + "\n");
+                + "- Estimated completion time: " + formattedFinishTime + "\n"
+        );
 
         bulkRuleGenerator.generate();
 

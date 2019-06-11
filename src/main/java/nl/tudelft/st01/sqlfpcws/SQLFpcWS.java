@@ -11,6 +11,11 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Utility class that can be used to invoke the SQLFpc web service.
+ *
+ * @see <a href="https://in2test.lsi.uniovi.es/sqlfpcws/helpfpcws.aspx#specification">Web service specification</a>
+ */
 public final class SQLFpcWS {
 
     private SQLFpcWS() {
@@ -20,6 +25,15 @@ public final class SQLFpcWS {
     private static final String ERROR_XPATH = "/sqlfpc/error";
     private static final String SQL_TARGET_XPATH = "/sqlfpc/fpcrules/fpcrule/sql";
 
+    /**
+     * Calls the {@code getRules} method of the SQLFpc web service with a specified query, the schema and optional
+     * parameters.
+     *
+     * @param sqlQuery  the query for which coverage targets need to be generated.
+     * @param schema    the schema (in XML format) of the database on which the query operates.
+     * @param options   the optional parameters (in XML format)
+     * @return A list of coverage targets.
+     */
     public static List<String> getCoverageTargets(String sqlQuery, String schema, String options) {
         SQLFpcWSSoapProxy proxy = new SQLFpcWSSoapProxy();
         List<String> result;
@@ -37,6 +51,12 @@ public final class SQLFpcWS {
         return result;
     }
 
+    /**
+     * Parses the XML response from the {@code getRules} method of the SQLFpc web service and extracts the SQL targets.
+     *
+     * @param xmlResponseString the XML-formatted response from SQLFpc.
+     * @return A list of the coverage targets.
+     */
     @SuppressWarnings("unchecked")
     private static List<String> extractSQLTargetsFromXMLResponse(String xmlResponseString) {
         ArrayList<String> result = new ArrayList<>();
