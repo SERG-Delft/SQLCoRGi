@@ -87,7 +87,7 @@ public class BulkRuleGenerator {
      *
      * @return the number of columns.
      */
-    public int getAmountOfColumnsInSchema() {
+    public int getNumberOfColumnsInSchema() {
         return schema.selectNodes(SCHEMA_COLUMN_XPATH).size();
     }
 

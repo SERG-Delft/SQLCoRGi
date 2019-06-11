@@ -42,7 +42,7 @@ public final class BulkMain {
                     "Generating bulk coverage targets for file: " + DATABASE
                         + "- Number of queries provided: " + bulkRuleGenerator.getNumberOfQueries() + "\n"
                         + "- Number of tables in schema: " + bulkRuleGenerator.getNumberOfTablesInSchema() + "\n"
-                        + "- Number of columns in schema: " + bulkRuleGenerator.getAmountOfColumnsInSchema() + "\n"
+                        + "- Number of columns in schema: " + bulkRuleGenerator.getNumberOfColumnsInSchema() + "\n"
                         + "- Estimated completion time: " + formattedFinishTime + "\n"
         );
 
