@@ -251,16 +251,41 @@ class ConditionTest {
     }
 
     /**
-     * A test case with a negated BETWEEN condition containing `String` values.
+     * Tests whether the generator does not generate contradicting conditions, e.g. 'a IS NULL AND a = 3'.
      */
     @Test
-    void testStringBetweenConditionNegated() {
-        verify("SELECT * FROM Table1 WHERE x NOT BETWEEN 'hello' AND 'world'",
+    void testMultipleConditionsOnSameAttribute() {
+        verify("SELECT * FROM t WHERE a > 3 AND a < 20 OR a = -10",
 
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 'hello' AND 'world'",
-                "SELECT * FROM Table1 WHERE x BETWEEN 'hello' AND 'world'",
-                "SELECT * FROM Table1 WHERE x = 'hello'",
-                "SELECT * FROM Table1 WHERE x = 'world'",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                "SELECT * FROM t WHERE ((a = 2) AND (a < 20)) AND NOT (a = -10)",
+                "SELECT * FROM t WHERE ((a = 3) AND (a < 20)) AND NOT (a = -10)",
+                "SELECT * FROM t WHERE ((a = 4) AND (a < 20)) AND NOT (a = -10)",
+                "SELECT * FROM t WHERE (a IS NULL)",
+                "SELECT * FROM t WHERE ((a > 3) AND (a = 19)) AND NOT (a = -10)",
+                "SELECT * FROM t WHERE ((a > 3) AND (a = 20)) AND NOT (a = -10)",
+                "SELECT * FROM t WHERE ((a > 3) AND (a = 21)) AND NOT (a = -10)",
+                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = 9)",
+                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = 10)",
+                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = 11)");
+    }
+
+    /**
+     * Tests whether the generator does not generate contradicting conditions, e.g. 'a IS NULL AND a = 3'.
+     */
+    @Test
+    void testMultipleConditionsOnMultipleAttribute() {
+        verify("SELECT * FROM t WHERE a > 3 AND b < 20 AND a <> 15",
+
+                "SELECT * FROM t WHERE ((a = 2) AND (b < 20)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a = 3) AND (b < 20)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a = 4) AND (b < 20)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a IS NULL) AND (b < 20))",
+                "SELECT * FROM t WHERE (a > 3 AND b < 20) AND (a = 14)",
+                "SELECT * FROM t WHERE (a > 3 AND b < 20) AND (a = 15)",
+                "SELECT * FROM t WHERE (a > 3 AND b < 20) AND (a = 16)",
+                "SELECT * FROM t WHERE ((a > 3) AND (b = 19)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a > 3) AND (b = 20)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a > 3) AND (b = 21)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a > 3) AND (b IS NULL)) AND (a <> 15)");
     }
 }
