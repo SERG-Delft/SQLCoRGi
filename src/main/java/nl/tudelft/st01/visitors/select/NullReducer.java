@@ -152,7 +152,7 @@ public class NullReducer extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(SubSelect subSelect) {
-        // TODO: Stop here?
+        // Stop here.
     }
 
     @Override
