@@ -5,6 +5,7 @@ import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
+import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.visitors.select.NullReducer;
@@ -197,6 +198,42 @@ class NullReducerTest {
         assertThat(notExpression.getExpression()).isSameAs(numericBind);
 
         assertThat(nullReducer.isUpdateChild()).isFalse();
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(IsNullExpression)} does not signal the parent of an IS NULL expression
+     * to remove it.
+     */
+    @Test
+    void testVisitIsNull() {
+
+        nulls.add(COLUMN_A);
+
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(new Column(COLUMN_A));
+
+        nullReducer.visit(isNullExpression);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(IsNullExpression)} signals the parent of an IS NOT NULL expression
+     * to remove it if its column is in {@code nulls}.
+     */
+    @Test
+    void testVisitIsNotNullRemove() {
+
+        nulls.add(COLUMN_A);
+
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setNot(true);
+        isNullExpression.setLeftExpression(new Column(COLUMN_A));
+
+        nullReducer.visit(isNullExpression);
+
+        assertThat(nullReducer.isUpdateChild()).isTrue();
+        assertThat(nullReducer.getChild()).isNull();
     }
 
 }
