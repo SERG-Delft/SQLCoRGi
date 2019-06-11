@@ -1,7 +1,8 @@
-package nl.tudelft.st01.visitors.select;
+package nl.tudelft.st01.unit.visitors.select;
 
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.schema.Column;
+import nl.tudelft.st01.visitors.select.NullAttributeFinder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
