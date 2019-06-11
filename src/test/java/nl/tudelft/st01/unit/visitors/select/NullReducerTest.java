@@ -3,6 +3,7 @@ package nl.tudelft.st01.unit.visitors.select;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class NullReducerTest {
 
     private static final String COLUMN_A = "a";
+    private static final String COLUMN_B = "b";
 
     private Set<String> nulls;
     private NullReducer nullReducer;
@@ -91,8 +93,166 @@ class NullReducerTest {
     }
 
     /**
+     * Tests whether {@code NullReducer#visitLogicalOperator(BinaryExpression)} leaves a logical operator unchanged
+     * if neither its left nor right subexpressions needed to be changed.
+     */
+    @Test
+    void testVisitLogicalOperator() {
+
+        Column column = new Column(COLUMN_A);
+        NullValue nullValue = new NullValue();
+
+        OrExpression orExpression = new OrExpression(column, nullValue);
+
+        nullReducer.visit(orExpression);
+
+        assertThat(orExpression.getLeftExpression()).isSameAs(column);
+        assertThat(orExpression.getRightExpression()).isSameAs(nullValue);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
+    }
+
+    /**
+     * Tests whether {@code NullReducer#visitLogicalOperator(BinaryExpression)} updates the left subexpression of a
+     * logical operator when instructed by the update child signal.
+     */
+    @Test
+    void testVisitLogicalOperatorUpdateLeft() {
+
+        nulls.add(COLUMN_A);
+
+        Column column = new Column(COLUMN_A);
+        NullValue nullValue = new NullValue();
+
+        OrExpression orExpression = new OrExpression(column, nullValue);
+
+        LongValue longValue = new LongValue(1);
+        AndExpression andExpression = new AndExpression(orExpression, longValue);
+
+        nullReducer.visit(andExpression);
+
+        assertThat(andExpression.getLeftExpression()).isSameAs(nullValue);
+        assertThat(andExpression.getRightExpression()).isSameAs(longValue);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
+    }
+
+    /**
+     * Tests whether {@code NullReducer#visitLogicalOperator(BinaryExpression)} updates the right subexpression of a
+     * logical operator when instructed by the update child signal.
+     */
+    @Test
+    void testVisitLogicalOperatorUpdateRight() {
+
+        nulls.add(COLUMN_A);
+
+        Column column = new Column(COLUMN_A);
+        NullValue nullValue = new NullValue();
+        StringValue stringValue = new StringValue(COLUMN_A);
+
+        OrExpression orExpression = new OrExpression(column, stringValue);
+
+        OrExpression root = new OrExpression(nullValue, orExpression);
+
+        nullReducer.visit(root);
+
+        assertThat(root.getLeftExpression()).isSameAs(nullValue);
+        assertThat(root.getRightExpression()).isSameAs(stringValue);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
+    }
+
+    /**
+     * Tests whether {@code NullReducer#visitLogicalOperator(BinaryExpression)} updates both subexpressions of a
+     * logical operator when instructed by the update child signal.
+     */
+    @Test
+    void testVisitLogicalOperatorUpdateBoth() {
+
+        nulls.add(COLUMN_A);
+        nulls.add(COLUMN_B);
+
+        Column columnA = new Column(COLUMN_A);
+        LongValue leftLong = new LongValue(0);
+        OrExpression left = new OrExpression(columnA, leftLong);
+
+        Column columnB = new Column(COLUMN_B);
+        LongValue rightLong = new LongValue(1);
+        OrExpression right = new OrExpression(rightLong, columnB);
+
+        AndExpression andExpression = new AndExpression(left, right);
+
+        nullReducer.visit(andExpression);
+
+        assertThat(andExpression.getLeftExpression()).isSameAs(leftLong);
+        assertThat(andExpression.getRightExpression()).isSameAs(rightLong);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
+    }
+
+    /**
+     * Tests whether {@code NullReducer#visitLogicalOperator(BinaryExpression)} tells the parent of the logical
+     * operator to replace it with its right child it if its left child has to be removed.
+     */
+    @Test
+    void testVisitLogicalOperatorRemoveLeft() {
+
+        nulls.add(COLUMN_A);
+
+        Column column = new Column(COLUMN_A);
+        NullValue nullValue = new NullValue();
+
+        AndExpression andExpression = new AndExpression(column, nullValue);
+
+        nullReducer.visit(andExpression);
+
+        assertThat(nullReducer.isUpdateChild()).isTrue();
+        assertThat(nullReducer.getChild()).isSameAs(nullValue);
+    }
+
+    /**
+     * Tests whether {@code NullReducer#visitLogicalOperator(BinaryExpression)} tells the parent of the logical
+     * operator to replace it with its left child it if its right child has to be removed.
+     */
+    @Test
+    void testVisitLogicalOperatorRemoveRight() {
+
+        nulls.add(COLUMN_B);
+
+        Column column = new Column(COLUMN_B);
+        NullValue nullValue = new NullValue();
+
+        OrExpression orExpression = new OrExpression(nullValue, column);
+
+        nullReducer.visit(orExpression);
+
+        assertThat(nullReducer.isUpdateChild()).isTrue();
+        assertThat(nullReducer.getChild()).isSameAs(nullValue);
+    }
+
+    /**
+     * Tests whether {@code NullReducer#visitLogicalOperator(BinaryExpression)} tells the parent of a logical
+     * expression whose subexpressions need to be removed to remove the logical operator.
+     */
+    @Test
+    void testVisitLogicalOperatorRemoveBoth() {
+
+        nulls.add(COLUMN_A);
+        nulls.add(COLUMN_B);
+
+        Column columnA = new Column(COLUMN_A);
+        Column columnB = new Column(COLUMN_B);
+        OrExpression orExpression = new OrExpression(columnA, columnB);
+
+        nullReducer.visit(orExpression);
+
+        assertThat(nullReducer.isUpdateChild()).isTrue();
+        assertThat(nullReducer.getChild()).isNull();
+    }
+
+    /**
      * Tests whether {@code NullReducer#visitBinaryExpression(BinaryExpression)} leaves binary expressions unchanged
-     * if it does not contain attributes that need to be removed.
+     * if they do not contain attributes that need to be removed.
      */
     @Test
     void testVisitBinaryNoChange() {
