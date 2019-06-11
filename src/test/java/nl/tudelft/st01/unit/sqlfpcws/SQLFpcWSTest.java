@@ -1,16 +1,30 @@
-package nl.tudelft.st01.unit;
+package nl.tudelft.st01.unit.sqlfpcws;
 
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
+
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.assertj.core.api.Assumptions.assumeThat;
 import static org.assertj.core.api.Assumptions.assumeThatCode;
 
 
 public class SQLFpcWSTest {
+
+    public static final String SQLFPCWS_ADDRESS = "in2test.lsi.uniovi.es";
+    public static final int SQLFPCWS_PORT = 80;
+
+    public void webServiceIsReachable() throws IOException {
+        Socket socket = new Socket(SQLFPCWS_ADDRESS, SQLFPCWS_PORT);
+        socket.close();
+    }
 
     /**
      * Tests whether {@code getCoverageTargets} returns the correct queries if it is able to connect to the SQLFpc web
@@ -29,9 +43,7 @@ public class SQLFpcWSTest {
 
         String options = "";
 
-        assumeThatCode(
-                () -> SQLFpcWS.getCoverageTargets(sqlQuery, dbSchema, options)
-        ).doesNotThrowAnyException();
+        assumeThatCode(this::webServiceIsReachable).doesNotThrowAnyException();
 
         List<String> result = SQLFpcWS.getCoverageTargets(sqlQuery, dbSchema, options);
 
@@ -63,9 +75,7 @@ public class SQLFpcWSTest {
 
         String options = "";
 
-        assumeThatCode(
-                () -> SQLFpcWS.getCoverageTargets(sqlQuery, dbSchema, options)
-        ).doesNotThrowAnyException();
+        assumeThatCode(this::webServiceIsReachable).doesNotThrowAnyException();
 
         List<String> result = SQLFpcWS.getCoverageTargets(sqlQuery, dbSchema, options);
 
