@@ -15,7 +15,7 @@ public class NetedJoinsTest {
      * This test evaluates whether the nested joins are transformed to the correct join type.
      */
     @Test
-    public void testNestedJoinCorrectJoinConfiguration() {
+    public void testNestedJoinCorrectJoinConfigurationTwoJoins() {
         verify("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id",
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id "
@@ -33,9 +33,43 @@ public class NetedJoinsTest {
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id RIGHT JOIN c ON c.id = b.id "
                         + "WHERE (b.id IS NULL) AND (c.id IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id RIGHT JOIN c ON c.id = b.id "
-                        + "WHERE (b.id IS NULL) AND (c.id IS NULL)");
+                        + "WHERE (b.id IS NULL) AND (c.id IS NULL)"
+        );
     }
 
+    /**
+     * This test evaluates whether the nested joins are transformed to the correct join type.
+     */
+    @Test
+    public void testNestedJoinCorrectJoinConfigurationThreeJoins() {
+        verify("SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id",
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id",
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id LEFT JOIN d ON d.id = a.id"
+                        + " WHERE (d.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id LEFT JOIN d ON d.id = a.id"
+                        + " WHERE (d.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id"
+                        + " WHERE (c.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a INNER JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id"
+                        + " WHERE (c.id IS NULL) AND (b.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id"
+                        + " WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id"
+                        + " WHERE (b.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id RIGHT JOIN d ON d.id = a.id"
+                        + " WHERE (a.id IS NULL) AND (d.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id RIGHT JOIN d ON d.id = a.id"
+                        + " WHERE (a.id IS NULL) AND (d.id IS NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id LEFT JOIN d ON d.id = a.id"
+                        + " WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id LEFT JOIN d ON d.id = a.id"
+                        + " WHERE (a.id IS NULL) AND (b.id IS NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id RIGHT JOIN c ON c.id = b.id LEFT JOIN d ON d.id = a.id"
+                        + " WHERE (b.id IS NULL) AND (c.id IS NOT NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON b.id = a.id RIGHT JOIN c ON c.id = b.id LEFT JOIN d ON d.id = a.id"
+                        + " WHERE (b.id IS NULL) AND (c.id IS NULL)"
+        );
+    }
     /**
      * This test verifies whether the correct columns are excluded depending on the join configuration. In case of an
      * INNER JOIN in the configuration, the tables used in said join must be included. Unless the tables from said join
