@@ -1,40 +1,129 @@
 package nl.tudelft.st01.unit.sqlfpcws;
 
+import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.assertj.core.api.Assumptions.assumeThat;
-import static org.assertj.core.api.Assumptions.assumeThatCode;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-
+@PrepareForTest(SQLFpcWS.class)
+@RunWith(PowerMockRunner.class)
 public class SQLFpcWSTest {
 
-    public static final String SQLFPCWS_ADDRESS = "in2test.lsi.uniovi.es";
-    public static final int SQLFPCWS_PORT = 80;
+    private SQLFpcWSSoapProxy mockWebService;
 
-    public void webServiceIsReachable() throws IOException {
-        Socket socket = new Socket(SQLFPCWS_ADDRESS, SQLFPCWS_PORT);
-        socket.close();
+    private static String SERVER_XML_REPLY =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<sqlfpc>\n" +
+            "   <version>1.3.180.91</version>\n" +
+            "   <sql>SELECT * FROM tableA WHERE TableA.var = 0 OR TableA.Id = 1</sql>\n" +
+            "   <fpcrules>\n" +
+            "      <fpcrule>\n" +
+            "         <id>1</id>\n" +
+            "         <category>S</category>\n" +
+            "         <type>B</type>\n" +
+            "         <subtype>B+F</subtype>\n" +
+            "         <location>1.1.[TableA.var = 0]</location>\n" +
+            "         <sql>SELECT * FROM tableA WHERE (TableA.var = 1) AND NOT(TableA.Id = 1)</sql>\n" +
+            "         <description>--Some row in the table such that:\n" +
+            "--The WHERE condition fulfills:\n" +
+            "  --(B+) TableA.var = 1\n" +
+            "  --(F) TableA.Id = 1 is FALSE</description>\n" +
+            "      </fpcrule>\n" +
+            "      <fpcrule>\n" +
+            "         <id>2</id>\n" +
+            "         <category>S</category>\n" +
+            "         <type>B</type>\n" +
+            "         <subtype>B=F</subtype>\n" +
+            "         <location>1.1.[TableA.var = 0]</location>\n" +
+            "         <sql>SELECT * FROM tableA WHERE (TableA.var = 0) AND NOT(TableA.Id = 1)</sql>\n" +
+            "         <description>--Some row in the table such that:\n" +
+            "--The WHERE condition fulfills:\n" +
+            "  --(B=) TableA.var = 0\n" +
+            "  --(F) TableA.Id = 1 is FALSE</description>\n" +
+            "      </fpcrule>\n" +
+            "      <fpcrule>\n" +
+            "         <id>3</id>\n" +
+            "         <category>S</category>\n" +
+            "         <type>B</type>\n" +
+            "         <subtype>B-F</subtype>\n" +
+            "         <location>1.1.[TableA.var = 0]</location>\n" +
+            "         <sql>SELECT * FROM tableA WHERE (TableA.var = -1) AND NOT(TableA.Id = 1)</sql>\n" +
+            "         <description>--Some row in the table such that:\n" +
+            "--The WHERE condition fulfills:\n" +
+            "  --(B-) TableA.var = -1\n" +
+            "  --(F) TableA.Id = 1 is FALSE</description>\n" +
+            "      </fpcrule>\n" +
+            "      <fpcrule>\n" +
+            "         <id>4</id>\n" +
+            "         <category>S</category>\n" +
+            "         <type>N</type>\n" +
+            "         <subtype>NF</subtype>\n" +
+            "         <location>1.1.[TableA.var]</location>\n" +
+            "         <sql>SELECT * FROM tableA WHERE (TableA.var IS NULL) AND NOT(TableA.Id = 1)</sql>\n" +
+            "         <description>--Some row in the table such that:\n" +
+            "--The WHERE condition fulfills:\n" +
+            "  --(N) TableA.var is NULL\n" +
+            "  --(F) TableA.Id = 1 is FALSE</description>\n" +
+            "      </fpcrule>\n" +
+            "      <fpcrule>\n" +
+            "         <id>5</id>\n" +
+            "         <category>S</category>\n" +
+            "         <type>T</type>\n" +
+            "         <subtype>FF</subtype>\n" +
+            "         <location>1.2.[TableA.Id = 1]</location>\n" +
+            "         <sql>SELECT * FROM tableA WHERE NOT(TableA.Id = 1) AND NOT(TableA.var = 0)</sql>\n" +
+            "         <description>--Some row in the table such that:\n" +
+            "--The WHERE condition fulfills:\n" +
+            "  --(F) TableA.Id = 1 is FALSE\n" +
+            "  --(F) TableA.var = 0 is FALSE</description>\n" +
+            "      </fpcrule>\n" +
+            "      <fpcrule>\n" +
+            "         <id>6</id>\n" +
+            "         <category>S</category>\n" +
+            "         <type>T</type>\n" +
+            "         <subtype>TF</subtype>\n" +
+            "         <location>1.2.[TableA.Id = 1]</location>\n" +
+            "         <sql>SELECT * FROM tableA WHERE (TableA.Id = 1) AND NOT(TableA.var = 0)</sql>\n" +
+            "         <description>--Some row in the table such that:\n" +
+            "--The WHERE condition fulfills:\n" +
+            "  --(T) TableA.Id = 1 is TRUE\n" +
+            "  --(F) TableA.var = 0 is FALSE</description>\n" +
+            "      </fpcrule>\n" +
+            "   </fpcrules>\n" +
+            "</sqlfpc>";
+
+    /**
+     * Sets up the {@link SQLFpcWSSoapProxy} mock object that will be used to mock the response from the SQLFpc web
+     * service.
+     */
+    @Before
+    public void setUpMock() {
+        mockWebService = mock(SQLFpcWSSoapProxy.class);
     }
 
     /**
-     * Tests whether {@code getCoverageTargets} returns the correct queries if it is able to connect to the SQLFpc web
-     * service.
+     * Tests whether {@code getCoverageTargets} returns the correct queries. The XML response from the SQLFpc web
+     * service is mocked in order for the test to work independently of a working internet connection.
      */
     @Test
-    public void testGetCoverageTargetsNormalQuery() {
+    public void testGetCoverageTargetsNormalQuery() throws Exception {
         String sqlQuery = "SELECT * FROM tableA WHERE TableA.var = 0 OR TableA.Id = 1";
 
-        String dbSchema = " <schema dbms=\"MySQL\">\n"
+        String dbSchema =
+                " <schema dbms=\"MySQL\">\n"
                 + "     <table name=\"TableA\">\n"
                 + "         <column name=\"id\" type=\"VARCHAR\" size=\"50\" key=\"true\" notnull=\"true\"/>\n"
                 + "         <column name=\"var\" type=\"VARCHAR\" size=\"255\" default=\"NULL\"/>\n"
@@ -43,11 +132,10 @@ public class SQLFpcWSTest {
 
         String options = "";
 
-        assumeThatCode(this::webServiceIsReachable).doesNotThrowAnyException();
+        when(mockWebService.getRules(any(), any(), any())).thenReturn(SERVER_XML_REPLY);
+        PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
 
         List<String> result = SQLFpcWS.getCoverageTargets(sqlQuery, dbSchema, options);
-
-        assumeThat(result.size()).isGreaterThan(0);
 
         assertThat(result).containsExactlyInAnyOrder(
                 "SELECT * FROM tableA WHERE (TableA.var = 0) AND NOT(TableA.Id = 1)",
@@ -60,11 +148,12 @@ public class SQLFpcWSTest {
     }
 
     /**
-     * Tests whether {@code getCoverageTargets} correctly returns an empty list for a query with no coverage targets,
-     * if it is able to connect to the SQLFpc.
+     * Tests whether {@code getCoverageTargets} correctly returns an empty list for a query that generates no targets.
+     * The XML response from the SQLFpc web service is mocked in order for the test to work independently of a working
+     * internet connection.
      */
     @Test
-    public void testGetCoverageNoResults() {
+    public void testGetCoverageNoResults() throws Exception {
         String sqlQuery = "SELECT * FROM tableB";
 
         String dbSchema = " <schema dbms=\"MySQL\">\n"
@@ -75,7 +164,16 @@ public class SQLFpcWSTest {
 
         String options = "";
 
-        assumeThatCode(this::webServiceIsReachable).doesNotThrowAnyException();
+        String serverXMLReply =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<sqlfpc>\n" +
+                "   <version>1.3.180.91</version>\n" +
+                "   <sql>SELECT * FROM tableB</sql>\n" +
+                "   <fpcrules />\n" +
+                "</sqlfpc>";
+
+        when(mockWebService.getRules(any(), any(), any())).thenReturn(serverXMLReply);
+        PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
 
         List<String> result = SQLFpcWS.getCoverageTargets(sqlQuery, dbSchema, options);
 

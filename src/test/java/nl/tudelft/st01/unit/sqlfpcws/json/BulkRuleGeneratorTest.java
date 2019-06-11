@@ -1,9 +1,14 @@
 package nl.tudelft.st01.unit.sqlfpcws.json;
 
+import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 import nl.tudelft.st01.sqlfpcws.json.BulkRuleGenerator;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,11 +17,17 @@ import java.net.Socket;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assumptions.assumeThatCode;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+
+@PrepareForTest(SQLFpcWS.class)
+@RunWith(PowerMockRunner.class)
 public class BulkRuleGeneratorTest {
 
     private static final String RESOURCE_PATH = ".\\src\\test\\resources\\";
@@ -40,7 +51,6 @@ public class BulkRuleGeneratorTest {
     public void testEmptyLineInInputFileIsIgnored() {
         BulkRuleGenerator bulkRuleGenerator = new BulkRuleGenerator(SQL_INPUT_PATH, XML_SCHEMA_PATH, JSON_OUTPUT_PATH);
 
-
         assertThat(bulkRuleGenerator.getNumberOfQueries()).isEqualTo(NUMBER_OF_QUERIES);
     }
 
@@ -58,9 +68,19 @@ public class BulkRuleGeneratorTest {
         assertThat(bulkRuleGenerator.getNumberOfColumnsInSchema()).isEqualTo(NUMBER_OF_COLUMNS);
     }
 
-    @Test
+    @org.junit.Test
     public void testGenerateOutputJSONShouldBeCorrect() throws InterruptedException {
         BulkRuleGenerator bulkRuleGenerator = new BulkRuleGenerator(SQL_INPUT_PATH, XML_SCHEMA_PATH, JSON_OUTPUT_PATH);
+
+        mockStatic(SQLFpcWS.class);
+
+        List<String> TableB = new ArrayList<>();
+        TableB.add("SELECT * FROM TableB WHERE (TableB.Var = 2)");
+        TableB.add("SELECT * FROM TableB WHERE (TableB.Var = 1)");
+        TableB.add("SELECT * FROM TableB WHERE (TableB.Var = 0)");
+        TableB.add("SELECT * FROM TableB WHERE (TableB.Var IS NULL)");
+
+        when(SQLFpcWS.getCoverageTargets(any(), any(), any())).thenReturn(new ArrayList<>()).thenReturn(TableB);
 
         String expectedJSONContent =
                 "{\n" +
@@ -81,9 +101,7 @@ public class BulkRuleGeneratorTest {
                 "  ]\n" +
                 "}";
 
-        assumeThatCode(this::webServiceIsReachable).doesNotThrowAnyException();
-
-        assertThatCode(() -> bulkRuleGenerator.generate()).doesNotThrowAnyException();
+        bulkRuleGenerator.generate();
 
         File jsonFile = new File(JSON_OUTPUT_PATH);
 
