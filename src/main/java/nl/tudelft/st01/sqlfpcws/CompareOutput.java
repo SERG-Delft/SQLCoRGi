@@ -1,16 +1,24 @@
 package nl.tudelft.st01.sqlfpcws;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import nl.tudelft.st01.Generator;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.Gson;
 
-import java.io.File;
-import java.io.FileReader;
-import java.util.Iterator;
-import java.util.Scanner;
+import nl.tudelft.st01.Generator;
+import nl.tudelft.st01.sqlfpcws.json.JSONEntries;
+import nl.tudelft.st01.sqlfpcws.json.SQLRules;
+
+import java.io.BufferedReader;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+import java.util.List;
+
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Checks output of our tool against predefined output from another tool.
@@ -23,9 +31,9 @@ public final class CompareOutput {
     private static final String ESPOCRM_INPUT_PATH = RESOURCE_BASE_PATH + "\\input_queries\\espocrm.sql";
     private static final String ERPNEXT_INPUT_PATH = RESOURCE_BASE_PATH + "\\input_queries\\erpnext.sql";
 
-    private static final String SUITECRM_OUTPUT_PATH = RESOURCE_BASE_PATH + "\\output_json\\suitecrm.sql";
-    private static final String ESPOCRM_OUTPUT_PATH = RESOURCE_BASE_PATH + "\\output_json\\espocrm.sql";
-    private static final String ERPNEXT_OUTPUT_PATH = RESOURCE_BASE_PATH + "\\output_json\\erpnext.sql";
+    private static final String SUITECRM_OUTPUT_PATH = RESOURCE_BASE_PATH + "\\output_json\\suitecrm.json";
+    private static final String ESPOCRM_OUTPUT_PATH = RESOURCE_BASE_PATH + "\\output_json\\espocrm.json";
+    private static final String ERPNEXT_OUTPUT_PATH = RESOURCE_BASE_PATH + "\\output_json\\erpnext.json";
 
     private static final String DOUBLE_NEWLINE = "\n\n";
     private static final int AMOUNT_OF_QUERY_SETS = 3;
@@ -42,72 +50,73 @@ public final class CompareOutput {
      *
      * @param args - command line arguments - are ignored in the code.
      */
-    // Suppress IllegalCatch is there to make sure we can catch all exceptions and still continue
-    //      comparing the rest of the queries
-    // Suppress AvoidInstantiatingObjectsInLoops is needed to make sure we're reading all the different files
-    // Suppress AvoidFileStream is needed to make sure we're able to read files
-    @SuppressWarnings({"checkstyle:illegalcatch", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidFileStream"})
-    @SuppressFBWarnings(
-            value = "DM_DEFAULT_ENCODING",
-            justification = "Encoding for FileReader can be specified, so this needs to be suppressed")
+    // Suppress IllegalCatch is there to make sure we can catch all exceptions and still continue comparing the rest of
+    // the queries.
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public static void main(String[] args) {
         String[] input = {ERPNEXT_INPUT_PATH, SUITECRM_INPUT_PATH, ESPOCRM_INPUT_PATH};
         String[] output = {ERPNEXT_OUTPUT_PATH, SUITECRM_OUTPUT_PATH, ESPOCRM_OUTPUT_PATH};
 
-        Scanner sc = null;
-        JSONParser parser = new JSONParser();
-        Object object = null;
+        Gson gson = new Gson();
+
         int wrongCounter = 0;
         int totalCounter = 0;
 
         for (int i = 0; i < AMOUNT_OF_QUERY_SETS; i++) {
-            try {
-                sc = new Scanner(new File(input[i]), "UTF-8");
-                object = parser.parse(new FileReader(output[i]));
-
-            } catch (Exception e) {
-                e.printStackTrace();
+            List<String> queries;
+            try (Stream<String> stream = Files.lines(Paths.get(input[i]))) {
+                queries = stream
+                        .filter(query -> !query.isEmpty())
+                        .collect(Collectors.toList());
+            } catch (IOException e) {
+                System.err.println("SQL queries could not be read in correctly: " + e.getMessage());
+                queries = new ArrayList<>();
             }
 
-            JSONObject jsonObject = (JSONObject) object;
-            JSONArray entries = (JSONArray) jsonObject.get("entries");
-            Iterator<JSONObject> iterator = entries.iterator();
+            JSONEntries jsonEntries;
+            List<SQLRules> entries;
+            try (BufferedReader jsonReader = Files.newBufferedReader(Paths.get(output[i]), StandardCharsets.UTF_8)) {
+                jsonEntries = gson.fromJson(jsonReader, JSONEntries.class);
+                entries = jsonEntries.getEntries();
+            } catch (IOException e) {
+                System.err.println("JSON file could not be read in correctly: " + e.getMessage());
+                entries = new ArrayList<>();
+            }
 
-            while (iterator.hasNext() && sc.hasNextLine()) {
-                JSONArray expectedQueries = (JSONArray) iterator.next().get("pathList");
-                String nextQuery = sc.nextLine();
-                Set<String> ourResults;
+            int jobSize = Math.min(queries.size(), entries.size());
+            for (int query = 0; query < jobSize; query++) {
+                String currentQuery = queries.get(query);
+                List<String> expectedTargets = entries.get(query).getPathList();
                 totalCounter++;
+
+                Set<String> ourTargets;
                 try {
-                    ourResults = Generator.generateRules(nextQuery);
+                    ourTargets = Generator.generateRules(currentQuery);
                 } catch (Exception e) {
-                    System.out.println(nextQuery);
+                    System.out.println(currentQuery);
                     System.out.println("The query on the previous line caused the following exception: "
                             + e.getMessage() + DOUBLE_NEWLINE);
                     continue;
                 }
-                int ourResultSize = ourResults.size();
-                int expectedResultSize = expectedQueries.size();
 
-                if (ourResultSize != expectedResultSize) {
+                int ourTargetSize = ourTargets.size();
+                int expectedTargetSize = expectedTargets.size();
+
+                if (ourTargetSize != expectedTargetSize) {
                     System.out.println(wrongCounter + ") The following query is not yet handled correctly: ");
-                    System.out.println(nextQuery);
-                    System.out.printf("Expected %d rules, got %d%n", expectedResultSize, ourResultSize);
+                    System.out.println(currentQuery);
+                    System.out.printf("Expected %d rules, got %d%n", expectedTargetSize, ourTargetSize);
                     System.out.println("These queries were expected:");
-                    for (Object expectedQuery : expectedQueries) {
-                        System.out.println(expectedQuery.toString());
+                    for (String expectedQuery : expectedTargets) {
+                        System.out.println(expectedQuery);
                     }
                     System.out.println(DOUBLE_NEWLINE);
                     wrongCounter++;
                 }
             }
-
-            System.out.println("FINISHED!! we handled " + (totalCounter - wrongCounter)
-                    + " queries out of " + totalCounter + " correctly!");
         }
 
-        if (sc != null) {
-            sc.close();
-        }
+        System.out.println("Comparison complete! " + (totalCounter - wrongCounter) + " queries out of " + totalCounter
+                + " generated the same number of targets as SQLFpc!");
     }
 }

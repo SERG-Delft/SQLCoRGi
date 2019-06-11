@@ -25,4 +25,8 @@ public class JSONEntries {
     public void addEntry(SQLRules rules) {
         entries.add(rules);
     }
+
+    public List<SQLRules> getEntries() {
+        return entries;
+    }
 }

@@ -4,19 +4,12 @@ import java.util.List;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * This class represents the rules in the JSON output of the {@code BulkMainGenerator}.
  *
  * {@link com.google.gson.Gson} is used to enable easy JSON (de)serialization.
  */
-// Suppresses PMD warning UnusedPrivateField and Spotbugs warning URF_UNREAD_FIELD, because the fields are in fact used,
-// but not by the class, but for JSON (de)serialization.
-@SuppressWarnings("PMD.UnusedPrivateField")
-@SuppressFBWarnings(
-        value = "URF_UNREAD_FIELD",
-        justification = "Field is used for JSON (de)serialization")
 public class SQLRules {
 
     @SerializedName("queryNo")
@@ -36,5 +29,13 @@ public class SQLRules {
     public SQLRules(Integer queryNo, List<String> pathList) {
         this.queryNo = queryNo;
         this.pathList = pathList;
+    }
+
+    public Integer getQueryNo() {
+        return queryNo;
+    }
+
+    public List<String> getPathList() {
+        return pathList;
     }
 }
