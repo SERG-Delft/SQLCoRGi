@@ -2,6 +2,7 @@ package nl.tudelft.st01.functional;
 
 import org.junit.jupiter.api.Test;
 
+import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
 import static nl.tudelft.st01.functional.AssertUtils.verify;
 
 /**
@@ -274,7 +275,7 @@ class ConditionTest {
      */
     @Test
     void testMultipleConditionsOnMultipleAttribute() {
-        verify("SELECT * FROM t WHERE a > 3 AND b < 20 AND a <> 15",
+        containsAtLeast("SELECT * FROM t WHERE a > 3 AND b < 20 AND a <> 15",
 
                 "SELECT * FROM t WHERE ((a = 2) AND (b < 20)) AND (a <> 15)",
                 "SELECT * FROM t WHERE ((a = 3) AND (b < 20)) AND (a <> 15)",
