@@ -8,6 +8,7 @@ import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.SubSelect;
 import nl.tudelft.st01.visitors.select.NullReducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 /**
  * Contains tests for {@link NullReducer}.
@@ -234,6 +237,21 @@ class NullReducerTest {
 
         assertThat(nullReducer.isUpdateChild()).isTrue();
         assertThat(nullReducer.getChild()).isNull();
+    }
+
+    /**
+     * Tests whether {@link NullReducer#visit(SubSelect)} is treated as a leaf.
+     */
+    @Test
+    void testVisitSubSelect() {
+
+        SubSelect subSelect = mock(SubSelect.class);
+
+        nullReducer.visit(subSelect);
+
+        verifyNoMoreInteractions(subSelect);
+
+        assertThat(nullReducer.isUpdateChild()).isFalse();
     }
 
 }
