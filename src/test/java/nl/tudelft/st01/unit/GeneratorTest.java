@@ -31,7 +31,8 @@ public class GeneratorTest {
         generatorConstructor.setAccessible(true);
 
         assertThatThrownBy(
-            () -> generatorConstructor.newInstance()).hasRootCauseInstanceOf(ShouldNotBeInstantiatedException.class);
+            () -> generatorConstructor.newInstance()
+        ).hasRootCauseInstanceOf(ShouldNotBeInstantiatedException.class);
     }
 
     /**
