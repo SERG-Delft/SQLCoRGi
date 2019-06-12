@@ -27,16 +27,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class AggregateFunctionsGeneratorTest {
 
     @Jailbreak private AggregateFunctionsGenerator aggregateFunctionsGenerator = new AggregateFunctionsGenerator();
-    private PlainSelect plainSelect1 = new PlainSelect();
-    private Function function1 = new Function();
+    private PlainSelect plainSelect1;
+    private Function function1;
     private final String director = "Director";
-    private final String result1 = "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1";
-    private final String result2 = "SELECT Director, AVG(NrOfVisitors) FROM Movies"
-        + " GROUP BY Director HAVING COUNT(*) > 1";
-    private final String result3 = "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director"
-        + " HAVING COUNT(*) > COUNT(NrOfVisitors) AND COUNT(DISTINCT NrOfVisitors) > 1";
-    private final String result4 = "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director "
-            + "HAVING COUNT(NrOfVisitors) > COUNT(DISTINCT NrOfVisitors) AND COUNT(DISTINCT NrOfVisitors) > 1";
 
     private static final String ERROR_MSG = "Input should not be null, but it is!";
 
@@ -59,6 +52,7 @@ public class AggregateFunctionsGeneratorTest {
 
         // AVG(NrOfVisitors)
         SelectExpressionItem selectExpressionItem2 = new SelectExpressionItem();
+        function1 = new Function();
         function1.setName("AVG");
         List<Expression> expressions1 = Arrays.asList(new Column("NrOfVisitors"));
         ExpressionList expressionList = new ExpressionList();
