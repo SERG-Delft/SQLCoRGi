@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Unit tests for the {@link Generator}.
@@ -29,11 +28,7 @@ public class AggregateFunctionsGeneratorTest {
     @Jailbreak private AggregateFunctionsGenerator aggregateFunctionsGenerator = new AggregateFunctionsGenerator();
     private PlainSelect plainSelect1;
     private Function function1;
-    private final String director = "Director";
-
-    private static final String ERROR_MSG = "Input should not be null, but it is!";
-
-
+    private static final String DIRECTOR = "Director";
 
     /**
      * Creates the following query as a PlainSelect object:
@@ -48,7 +43,7 @@ public class AggregateFunctionsGeneratorTest {
 
         // SELECT Director
         SelectExpressionItem selectExpressionItem1 = new SelectExpressionItem();
-        selectExpressionItem1.setExpression(new Column(director));
+        selectExpressionItem1.setExpression(new Column(DIRECTOR));
 
         // AVG(NrOfVisitors)
         SelectExpressionItem selectExpressionItem2 = new SelectExpressionItem();
@@ -68,7 +63,7 @@ public class AggregateFunctionsGeneratorTest {
 
         // GROUP BY Director
         GroupByElement groupByElement = new GroupByElement();
-        List<Expression> expressions2 = Arrays.asList(new Column(director));
+        List<Expression> expressions2 = Arrays.asList(new Column(DIRECTOR));
         groupByElement.setGroupByExpressions(expressions2);
         plainSelect1.setGroupByElement(groupByElement);
     }
