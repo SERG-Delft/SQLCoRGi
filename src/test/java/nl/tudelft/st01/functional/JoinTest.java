@@ -7,15 +7,15 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
 import static nl.tudelft.st01.functional.AssertUtils.verify;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 /**
  * This class tests if the coverage targets for queries with JOINS are generated correctly.
  *
  * Suppresses the checkstyle multipleStringLiterals violation, because some output sets have queries in common.
  */
-@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "checkstyle:multipleStringLiterals"})
-public class JoinTest {
+@SuppressWarnings("checkstyle:multipleStringLiterals")
+class JoinTest {
 
     /**
      * Parametrized test for a simple query with different join types with a single join condition which involves
@@ -25,7 +25,7 @@ public class JoinTest {
      */
     @ParameterizedTest(name = "[{index}] Join type: {0}")
     @CsvSource({"INNER", "RIGHT", "LEFT", "FULL"})
-    public void testJoinsOnOneEqualityConditionWithNullableColumns(String joinType) {
+    void testJoinsOnOneEqualityConditionWithNullableColumns(String joinType) {
         verify("SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull",
 
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull",
@@ -77,7 +77,7 @@ public class JoinTest {
      */
     @ParameterizedTest(name = "[{index}] On Conditions type: {0}")
     @CsvSource({"<", ">", "=", "<=", ">=", "<>"})
-    public void testOnConditionsInJoins(String on) {
+    void testOnConditionsInJoins(String on) {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull",
 
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull",
@@ -96,7 +96,7 @@ public class JoinTest {
      * This case, the left one.
      */
     @Test
-    public void testJoinOnConditionFromSingleTableLeftNullable() {
+    void testJoinOnConditionFromSingleTableLeftNullable() {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL",
 
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL",
@@ -109,7 +109,7 @@ public class JoinTest {
      * This case, the left one.
      */
     @Test
-    public void testJoinOnConditionFromSingleTableLeftComparison() {
+    void testJoinOnConditionFromSingleTableLeftComparison() {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull > 5",
 
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull > 5",
@@ -122,7 +122,7 @@ public class JoinTest {
      * This case, the right one.
      */
     @Test
-    public void testJoinOnConditionFromSingleTableRightNullable() {
+    void testJoinOnConditionFromSingleTableRightNullable() {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableB.CanBeNull IS NULL",
 
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableB.CanBeNull IS NULL WHERE"
@@ -134,7 +134,7 @@ public class JoinTest {
      * This case, the right one.
      */
     @Test
-    public void testJoinOnConditionFromSingleTableRightComparison() {
+    void testJoinOnConditionFromSingleTableRightComparison() {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableB.CanBeNull > 5",
 
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableB.CanBeNull > 5 WHERE (NOT (TableB.CanBeNull > 5))"
@@ -148,7 +148,7 @@ public class JoinTest {
      */
     @ParameterizedTest(name = "[{index}] Join type: {0}")
     @CsvSource({"INNER", "RIGHT", "LEFT", "FULL"})
-    public void testJoinsOnOneEqualityConditionWithNullableColumnsAndWHEREClause(String joinType) {
+    void testJoinsOnOneEqualityConditionWithNullableColumnsAndWHEREClause(String joinType) {
         verify("SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.Var = TableB.Var "
                         + "WHERE TableA.Value > 1",
 
@@ -175,7 +175,7 @@ public class JoinTest {
     @ParameterizedTest
     @CsvSource({"a.id < b.id", "a.id <> b.id", "b.length = a.length",
             "a.id IS NULL", "b.length IS NULL", "a.size BETWEEN 50.0 AND b.length"})
-    public void testJoinWithWhereColumnsExcludedIfSideIsNull(String where) {
+    void testJoinWithWhereColumnsExcludedIfSideIsNull(String where) {
         containsAtLeast("SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE " + where,
 
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE (" + where + ")",
@@ -197,7 +197,7 @@ public class JoinTest {
      * and appended to the correct join type.
      */
     @Test
-    public void testJoinWithWhereLogicalToUnary() {
+    void testJoinWithWhereLogicalToUnary() {
         containsAtLeast(
             "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE a.length < 60 AND b.id > 40",
 
@@ -215,7 +215,7 @@ public class JoinTest {
      * A test for evaluating whether LIKE expressions are handled correctly.
      */
     @Test
-    public void testJoinWithWhereLike() {
+    void testJoinWithWhereLike() {
         containsAtLeast(
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id WHERE a.name LIKE 'a%'",
 
@@ -233,7 +233,7 @@ public class JoinTest {
      * A test for evaluating whether a redundant IS NOT NULL expression is included even though its table's id is not.
      */
     @Test
-    public void testJoinWithWhereContainsIsNullOfNonExcludedColumn() {
+    void testJoinWithWhereContainsIsNullOfNonExcludedColumn() {
         containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.length IS NOT NULL)",
 
@@ -251,7 +251,7 @@ public class JoinTest {
      * A test for evaluating whether IN expressions are handled correctly.
      */
     @Test
-    public void testJoinWithWhereIn() {
+    void testJoinWithWhereIn() {
         containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE b.length IN (1, 3, 4)",
 
@@ -268,7 +268,7 @@ public class JoinTest {
      * A test for evaluating whether the logical expression is not modified when it should not be.
      */
     @Test
-    public void testJoinWithUnaffectedWhereLogical() {
+    void testJoinWithUnaffectedWhereLogical() {
         containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE a.id = 10 AND a.length = 30",
 
@@ -286,7 +286,7 @@ public class JoinTest {
      * A test for evaluating whether BETWEEN expression are not modified when they should not be.
      */
     @Test
-    public void testJoinWithUnaffectedWhereBetween() {
+    void testJoinWithUnaffectedWhereBetween() {
         containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE a.length BETWEEN 10 AND 40",
 
@@ -307,18 +307,6 @@ public class JoinTest {
     public void testJoinNoOnConditionSimpleJoin() {
         verify("SELECT * FROM a, b");
     }
-
-    /**
-     * A test for verifying that no targets are generated and an exception is thrown for queries with a simple join,
-     * with an additional where and having clause.
-     */
-    @Test
-    public void testJoinNoOnConditionSimpleJoinWithWhereClauseException() {
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-            () -> Generator.generateRules("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50")
-        );
-    }
-
 
     /**
      * Tests whether the {@code JoinWhereExpressionGenerator} supports {@code ON} clauses that contain more than two

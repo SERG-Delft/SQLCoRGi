@@ -14,13 +14,7 @@ import nl.tudelft.st01.query.JoinWhereItem;
 import nl.tudelft.st01.visitors.ExpressionTraverserVisitor;
 import nl.tudelft.st01.visitors.join.OnExpressionVisitor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * This class allows for mutating a given query such that a set of mutated queries is returned.
