@@ -1,15 +1,11 @@
 package nl.tudelft.st01.functional;
 
-import nl.tudelft.st01.Generator;
-import nl.tudelft.st01.util.exceptions.CannotBeNullException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
 import static nl.tudelft.st01.functional.AssertUtils.verify;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * This class tests if the coverage targets for queries with JOINS are generated correctly.
