@@ -31,7 +31,7 @@ public class UtilityGettersTest {
 
         assertThatThrownBy(
             () -> utilityGettersConstructor.newInstance()
-        ).hasRootCauseInstanceOf(ShouldNotBeInstantiatedException.class);
+        ).hasRootCauseInstanceOf(UnsupportedOperationException.class);
     }
 
     /**

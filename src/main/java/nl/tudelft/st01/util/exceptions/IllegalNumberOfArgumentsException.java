@@ -1,14 +1,13 @@
 package nl.tudelft.st01.util.exceptions;
 
 /**
- *  Exception that can be used to alert users that there is something wrong with the amount of arguments.
+ *  Exception that can be used to alert users that there is something wrong with the number of arguments.
  */
 public class IllegalNumberOfArgumentsException extends RuntimeException {
 
     /**
-     * Parameterless Constructor.
+     * Parameterless Constructor for the IllegalNumberOfArgumentsException class.
      */
-
     public IllegalNumberOfArgumentsException() {
 
     }

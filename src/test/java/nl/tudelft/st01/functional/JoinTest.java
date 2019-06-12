@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
 import static nl.tudelft.st01.functional.AssertUtils.verify;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * This class tests if the coverage targets for queries with JOINS are generated correctly.
@@ -316,7 +317,8 @@ class JoinTest {
     @Test
     public void testJoinNoOnConditionSimpleJoinWithWhereClauseException() {
         assertThatExceptionOfType(CannotBeNullException.class).isThrownBy(
-            () -> Generator.generateRules("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50"));
+            () -> Generator.generateRules("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50")
+        );
 
     }
 

@@ -40,7 +40,8 @@ public class GeneratorTest {
     @Test
     public void testGenerateRulesNullShouldPrintErrorMessage() {
         assertThatExceptionOfType(CannotBeNullException.class).isThrownBy(
-            () -> Generator.generateRules(null));
+            () -> Generator.generateRules(null)
+        );
     }
 
     /**
@@ -51,7 +52,8 @@ public class GeneratorTest {
     public void testGenerateRulesWithInvalidQueryShouldPrintErrorMessage() {
 
         assertThatExceptionOfType(CannotBeParsedException.class).isThrownBy(
-            () -> Generator.generateRules("This is not a SQL Query"));
+            () -> Generator.generateRules("This is not a SQL Query")
+        );
     }
 
     /**
@@ -61,6 +63,7 @@ public class GeneratorTest {
     public void testGenerateRulesWithNonSelectQueryShouldPrintErrorMessage() {
 
         assertThatExceptionOfType(UnsupportedInputException.class).isThrownBy(
-            () -> Generator.generateRules("UPDATE Table1 SET column = value WHERE condition IS NOT NULL;"));
+            () -> Generator.generateRules("UPDATE Table1 SET column = value WHERE condition IS NOT NULL;")
+        );
     }
 }

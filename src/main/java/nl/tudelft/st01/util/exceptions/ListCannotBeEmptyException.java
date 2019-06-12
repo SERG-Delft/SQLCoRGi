@@ -3,12 +3,12 @@ package nl.tudelft.st01.util.exceptions;
 /**
  *  Exception that can be used to alert users that a list cannot be empty.
  */
-public class ListCanNotBeEmptyException extends RuntimeException {
+public class ListCannotBeEmptyException extends RuntimeException {
 
     /**
-     * Parameterless Constructor.
+     * Parameterless Constructor for the ListCannotBeEmptyException class.
      */
-    public ListCanNotBeEmptyException() {
+    public ListCannotBeEmptyException() {
 
     }
 
@@ -17,7 +17,7 @@ public class ListCanNotBeEmptyException extends RuntimeException {
      *
      * @param message - Message to pass along to the Exception
      */
-    public ListCanNotBeEmptyException(String message) {
+    public ListCannotBeEmptyException(String message) {
         super(message);
     }
 }

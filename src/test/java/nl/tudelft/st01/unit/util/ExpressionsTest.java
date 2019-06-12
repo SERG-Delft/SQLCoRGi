@@ -28,7 +28,7 @@ class ExpressionsTest {
 
         Throwable thrown = catchThrowable(constructor::newInstance);
 
-        assertThat(thrown).hasRootCauseInstanceOf(ShouldNotBeInstantiatedException.class);
+        assertThat(thrown).hasRootCauseInstanceOf(UnsupportedOperationException.class);
     }
 
     /**

@@ -12,7 +12,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import nl.tudelft.st01.query.JoinOnConditionColumns;
 import nl.tudelft.st01.query.JoinWhereItem;
 import nl.tudelft.st01.util.exceptions.CannotBeNullException;
-import nl.tudelft.st01.util.exceptions.ListCanNotBeEmptyException;
+import nl.tudelft.st01.util.exceptions.ListCannotBeEmptyException;
 import nl.tudelft.st01.visitors.ExpressionTraverserVisitor;
 import nl.tudelft.st01.visitors.join.OnExpressionVisitor;
 
@@ -362,7 +362,7 @@ public class JoinWhereExpressionGenerator {
             return new AndExpression(createIsNullExpressions(columns, isNull), parenthesis);
         }
 
-        throw new ListCanNotBeEmptyException("The columns list cannot be empty.");
+        throw new ListCannotBeEmptyException("The columns list cannot be empty.");
     }
 
     /**

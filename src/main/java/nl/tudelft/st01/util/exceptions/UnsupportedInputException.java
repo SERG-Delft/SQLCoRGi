@@ -6,9 +6,8 @@ package nl.tudelft.st01.util.exceptions;
 public class UnsupportedInputException extends RuntimeException {
 
     /**
-     * Parameterless Constructor.
+     * Parameterless Constructor for the UnsupportedInputException class.
      */
-
     public UnsupportedInputException() {
 
     }

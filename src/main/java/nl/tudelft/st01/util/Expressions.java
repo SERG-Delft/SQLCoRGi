@@ -15,7 +15,7 @@ public final class Expressions {
      * No instances of this class can be created.
      */
     private Expressions() {
-        throw new ShouldNotBeInstantiatedException();
+        throw new UnsupportedOperationException();
     }
 
     /**

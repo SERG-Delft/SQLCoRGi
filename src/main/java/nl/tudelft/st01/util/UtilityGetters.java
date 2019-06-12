@@ -10,6 +10,8 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
 
+import javax.naming.ldap.UnsolicitedNotification;
+
 /**
  * Utility class that can be used to quickly create statements with COUNT(*), COUNT(DISTINCT __).
  */
@@ -21,7 +23,7 @@ public final class UtilityGetters {
      * No instance of this class should be created.
      */
     private UtilityGetters() {
-        throw new ShouldNotBeInstantiatedException();
+        throw new UnsupportedOperationException();
     }
 
     /**
