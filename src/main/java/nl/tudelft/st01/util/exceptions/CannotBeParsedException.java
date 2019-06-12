@@ -17,7 +17,6 @@ public class CannotBeParsedException extends RuntimeException {
      *
      * @param message - Message to pass along to the Exception
      */
-
     public CannotBeParsedException(String message) {
         super(message);
     }
