@@ -8,9 +8,6 @@ import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
-import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
-
-import javax.naming.ldap.UnsolicitedNotification;
 
 /**
  * Utility class that can be used to quickly create statements with COUNT(*), COUNT(DISTINCT __).

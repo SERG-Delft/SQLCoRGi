@@ -4,7 +4,6 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.statement.select.Join;
 import nl.tudelft.st01.util.cloner.ExpressionCloner;
-import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
 
 /**
  * Provides utility functions for JSQLParser query objects.

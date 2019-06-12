@@ -2,7 +2,6 @@ package nl.tudelft.st01.unit.util;
 
 import net.sf.jsqlparser.statement.select.Join;
 import nl.tudelft.st01.util.Expressions;
-import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
