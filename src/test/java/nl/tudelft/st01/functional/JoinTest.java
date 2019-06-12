@@ -2,6 +2,7 @@ package nl.tudelft.st01.functional;
 
 import nl.tudelft.st01.Generator;
 import nl.tudelft.st01.util.exceptions.CannotBeNullException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -315,12 +316,16 @@ class JoinTest {
      * with an additional where and having clause.
      */
     @Test
-    public void testJoinNoOnConditionSimpleJoinWithWhereClauseException() {
-        assertThatExceptionOfType(CannotBeNullException.class).isThrownBy(
-            () -> Generator.generateRules("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50")
-        );
+    public void testJoinNoOnConditionSimpleJoinWithWhereClause() {
+        verify("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50",
 
+                "SELECT * FROM a, b WHERE a.id = b.id HAVING a.length = 50",
+                "SELECT * FROM a, b WHERE a.id = b.id HAVING a.length = 51",
+                "SELECT * FROM a, b WHERE a.id = b.id HAVING a.length = 49",
+               "SELECT * FROM a, b WHERE a.id = b.id HAVING a.length IS NULL");
     }
+
+
 
 
     /**
