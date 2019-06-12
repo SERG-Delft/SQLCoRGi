@@ -12,8 +12,8 @@ import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static nl.tudelft.st01.util.cloner.ExpressionCloner.copy;
 import static nl.tudelft.st01.util.Expressions.createEqualsTo;
+import static nl.tudelft.st01.util.cloner.ExpressionCloner.copy;
 
 /**
  * A visitor for select expressions, i.e. {@code WHERE} and {@code HAVING} clauses in {@code SELECT} statements.
@@ -59,7 +59,6 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      *
      * @param expression an {@link OrExpression} or {@link AndExpression}.
      */
-    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void generateCompoundMutations(BinaryExpression expression) {
 
         Expression left = expression.getLeftExpression();

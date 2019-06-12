@@ -2,6 +2,7 @@ package nl.tudelft.st01.util;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.statement.select.Join;
 import nl.tudelft.st01.util.cloner.ExpressionCloner;
 import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
 
@@ -30,6 +31,23 @@ public final class Expressions {
         equalsExpression.setRightExpression(ExpressionCloner.copy(rightExpression));
 
         return equalsExpression;
+    }
+
+    /**
+     * Changes the given {@link Join} to an inner join.
+     *
+     * @param join the {@code Join} that has to become an inner join.
+     */
+    public static void setJoinToInner(Join join) {
+        join.setInner(true);
+        join.setRight(false);
+        join.setLeft(false);
+        join.setOuter(false);
+        join.setSemi(false);
+        join.setCross(false);
+        join.setSimple(false);
+        join.setNatural(false);
+        join.setFull(false);
     }
 
 }
