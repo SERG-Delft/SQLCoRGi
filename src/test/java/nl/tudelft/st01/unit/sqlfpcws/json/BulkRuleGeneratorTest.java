@@ -1,9 +1,12 @@
 package nl.tudelft.st01.unit.sqlfpcws.json;
 
+import net.sf.jsqlparser.JSQLParserException;
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 import nl.tudelft.st01.sqlfpcws.json.BulkRuleGenerator;
 
+import org.dom4j.DocumentException;
 import org.junit.After;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
@@ -20,6 +23,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -70,6 +74,62 @@ public class BulkRuleGeneratorTest {
         BulkRuleGenerator bulkRuleGenerator = new BulkRuleGenerator(SQL_INPUT_PATH, XML_SCHEMA_PATH, JSON_OUTPUT_PATH);
 
         assertThat(bulkRuleGenerator.getNumberOfColumnsInSchema()).isEqualTo(NUMBER_OF_COLUMNS);
+    }
+
+    /**
+     * Asserts that the XML schema is parsed correctly and so exactly 3 columns should been known.
+     */
+    @Test
+    public void testGetEstimatedGenerationDurationInMilliSeconds() {
+        BulkRuleGenerator bulkRuleGenerator = new BulkRuleGenerator(SQL_INPUT_PATH, XML_SCHEMA_PATH, JSON_OUTPUT_PATH);
+
+        long timeRequired = 2000;
+
+        assertThat(bulkRuleGenerator.getEstimatedGenerationDurationInMilliSeconds()).isEqualTo(timeRequired);
+    }
+
+    @Test
+    @Disabled("Exceptions have not yet been implemented")
+    // TODO: implement exceptions!
+    public void testCorrectExceptionIsThrownForNonExistingInputFile() {
+        String wrongInputPath = RESOURCE_PATH + "nonExistingFile.sql";
+
+        assertThatExceptionOfType(IOException.class).isThrownBy(
+                () -> new BulkRuleGenerator(wrongInputPath, XML_SCHEMA_PATH, JSON_OUTPUT_PATH)
+        );
+    }
+
+    @Test
+    @Disabled("Exceptions have not yet been implemented")
+    // TODO: implement exceptions!
+    public void testCorrectExceptionIsThrownForInvalidSQLQuery() {
+        String fileWithInvalidQuery = RESOURCE_PATH + "invalidQuery.sql";
+
+        assertThatExceptionOfType(JSQLParserException.class).isThrownBy(
+                () -> new BulkRuleGenerator(fileWithInvalidQuery, XML_SCHEMA_PATH, JSON_OUTPUT_PATH)
+        );
+    }
+
+    @Test
+    @Disabled("Exceptions have not yet been implemented")
+    // TODO: implement exceptions!
+    public void testCorrectExceptionIsThrownForInvalidXMLSchema() {
+        String fileWithInvalidSchema = RESOURCE_PATH + "invalidSchema.xml";
+
+        assertThatExceptionOfType(DocumentException.class).isThrownBy(
+                () -> new BulkRuleGenerator(SQL_INPUT_PATH, fileWithInvalidSchema, JSON_OUTPUT_PATH)
+        );
+    }
+
+    @Test
+    @Disabled("Exceptions have not yet been implemented")
+    // TODO: implement exceptions!
+    public void testCorrectExceptionIsThrownForInvalidJSONOutputPath() {
+        String invalidJSONPath = RESOURCE_PATH + "nonExistingFolder/outputFile.json";
+
+        assertThatExceptionOfType(IOException.class).isThrownBy(
+                () -> new BulkRuleGenerator(SQL_INPUT_PATH, XML_SCHEMA_PATH, invalidJSONPath)
+        );
     }
 
     /**

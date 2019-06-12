@@ -54,7 +54,8 @@ public class GeneratorTest {
         generatorConstructor.setAccessible(true);
 
         assertThatThrownBy(
-            () -> generatorConstructor.newInstance()).hasRootCauseInstanceOf(UnsupportedOperationException.class);
+            () -> generatorConstructor.newInstance()
+        ).hasRootCauseInstanceOf(UnsupportedOperationException.class);
     }
 
     /**
