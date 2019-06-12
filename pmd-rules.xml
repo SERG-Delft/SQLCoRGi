@@ -23,8 +23,10 @@
         <exclude name="JUnit4TestShouldUseTestAnnotation"/>
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
         <exclude name="JUnitTestContainsTooManyAsserts"/>
+        <exclude name="JUnitTestsShouldIncludeAssert"/>
         <exclude name="JUnitUseExpected"/>
         <exclude name="SystemPrintln"/>
+        <exclude name="UnusedPrivateMethod" />
         <exclude name="UseVarargs" />
     </rule>
     <rule ref="category/java/bestpractices.xml/JUnitTestContainsTooManyAsserts">

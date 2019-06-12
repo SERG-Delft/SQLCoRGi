@@ -713,8 +713,6 @@ class ExpressionClonerTest {
      *
      * @return a stream of binary expressions.
      */
-    // Justification: This method is in fact used.
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static Stream<Arguments> provideBinaryExpressions() {
 
         LikeExpression notLike = new LikeExpression();
@@ -761,8 +759,6 @@ class ExpressionClonerTest {
      *
      * @return a stream of values.
      */
-    // Justification: This method is in fact used.
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static Stream<Arguments> provideValues() {
 
         ValueListExpression valueListExpression = new ValueListExpression();

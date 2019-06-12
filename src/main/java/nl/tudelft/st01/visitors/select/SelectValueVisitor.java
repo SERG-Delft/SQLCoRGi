@@ -46,7 +46,7 @@ public class SelectValueVisitor extends ExpressionVisitorAdapter {
      *
      * @param numericValue the numeric value taken from the original expression.
      */
-    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.UnusedPrivateMethod"})
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void generateNumericCases(NumericValue numericValue) {
         for (int i = -1; i <= 1; ++i) {
             EqualsTo equalsTo = new EqualsTo();

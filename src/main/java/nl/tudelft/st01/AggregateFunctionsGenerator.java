@@ -37,19 +37,21 @@ public class AggregateFunctionsGenerator {
                 SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
                 if (selectExpressionItem.getExpression() instanceof Function) {
                     // Here we know the selectItem is a function (AVG, SUM, MAX etc.)
-                    //      so we can start adding the rules for it.
+                    // so we can start adding the rules for it.
                     Function func = (Function) selectExpressionItem.getExpression();
 
-                    // check for COUNT(*)
+                    // Check for COUNT(*)
                     if (func.isAllColumns()) {
-                        outputAfterAggregator.add(firstRule(plainSelect).toString());
-                        outputAfterAggregator.add(secondRule(plainSelect).toString());
+                        if (plainSelect.getGroupBy() != null) {
+                            outputAfterAggregator.add(firstRule(plainSelect).toString());
+                            outputAfterAggregator.add(secondRule(plainSelect).toString());
+                        }
 
                         // Skip the rest of this iteration.
                         continue;
                     }
 
-                    // check for a query without Group By
+                    // Check for a query without Group By
                     if (plainSelect.getGroupBy() != null) {
                         outputAfterAggregator.add(firstRule(plainSelect).toString());
                         outputAfterAggregator.add(secondRule(plainSelect).toString());
@@ -59,7 +61,7 @@ public class AggregateFunctionsGenerator {
                         continue;
                     }
 
-                    // check for an aggregator that is NOT Count
+                    // Check for an aggregator that is NOT Count
                     if (!func.getName().equals(COUNT_STRING)) {
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
                         outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
@@ -67,7 +69,7 @@ public class AggregateFunctionsGenerator {
                         continue;
                     }
 
-                    // handle COUNT operator
+                    // Handle COUNT operator
                     outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
                 }
             }
