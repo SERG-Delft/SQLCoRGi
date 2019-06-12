@@ -84,18 +84,8 @@ public class AggregateFunctionsGeneratorTest {
      */
     @Test
     public void firstRuleTest() {
-        assertThat(aggregateFunctionsGenerator.firstRule(plainSelect1).toString()).isEqualTo(result1);
-    }
-
-    /**
-     *  Calls firstRule with null as input. This should be caught by the method
-     */
-    @Test
-    public void firstRuleBadWeatherTest() {
-        assertThatThrownBy(() -> {
-            aggregateFunctionsGenerator.firstRule(null);
-        }).isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(ERROR_MSG);
+        assertThat(aggregateFunctionsGenerator.firstRule(plainSelect1).toString()).isEqualTo("SELECT COUNT(*) FROM "
+            + "Movies HAVING COUNT(DISTINCT Director) > 1");
     }
 
     /**
@@ -104,18 +94,8 @@ public class AggregateFunctionsGeneratorTest {
      */
     @Test
     public void secondRuleTest() {
-        assertThat(aggregateFunctionsGenerator.secondRule(plainSelect1).toString()).isEqualTo(result2);
-    }
-
-    /**
-     *  Calls secondRule with null as input. This should be caught by the method.
-     */
-    @Test
-    public void secondRuleBadWeatherTest() {
-        assertThatThrownBy(() -> {
-            aggregateFunctionsGenerator.secondRule(null);
-        }).isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(ERROR_MSG);
+        assertThat(aggregateFunctionsGenerator.secondRule(plainSelect1).toString()).isEqualTo("SELECT Director, "
+                + "AVG(NrOfVisitors) FROM Movies GROUP BY Director HAVING COUNT(*) > 1");
     }
 
     /**
@@ -123,29 +103,10 @@ public class AggregateFunctionsGeneratorTest {
      */
     @Test
     public void thirdRuleTest() {
-        assertThat(aggregateFunctionsGenerator.thirdRule(plainSelect1, function1).toString()).isEqualTo(result3);
-    }
-
-    /**
-     *  Calls thirdRule with first only the function input null, then the plainselect input null, then both.
-     *  This should all be caught by the method.
-     */
-    @Test
-    public void thirdRuleBadWeatherTest() {
-        assertThatThrownBy(() -> {
-            aggregateFunctionsGenerator.thirdRule(plainSelect1, null);
-        }).isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(ERROR_MSG);
-
-        assertThatThrownBy(() -> {
-            aggregateFunctionsGenerator.thirdRule(null, function1);
-        }).isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(ERROR_MSG);
-
-        assertThatThrownBy(() -> {
-            aggregateFunctionsGenerator.thirdRule(null, null);
-        }).isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(ERROR_MSG);
+        assertThat(aggregateFunctionsGenerator.thirdRule(plainSelect1, function1).toString()).isEqualTo(
+                "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director"
+                + " HAVING COUNT(*) > COUNT(NrOfVisitors) AND COUNT(DISTINCT NrOfVisitors) > 1"
+        );
     }
 
     /**
@@ -153,28 +114,9 @@ public class AggregateFunctionsGeneratorTest {
      */
     @Test
     public void fourthRuleTest() {
-        assertThat(aggregateFunctionsGenerator.fourthRule(plainSelect1, function1).toString()).isEqualTo(result4);
-    }
-
-    /**
-     *  Calls fourthRule with first only the function input null, then the plainselect input null, then both.
-     *  This should all be caught by the method.
-     */
-    @Test
-    public void fourthRuleBadWeatherTest() {
-        assertThatThrownBy(() -> {
-            aggregateFunctionsGenerator.fourthRule(plainSelect1, null);
-        }).isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(ERROR_MSG);
-
-        assertThatThrownBy(() -> {
-            aggregateFunctionsGenerator.fourthRule(null, function1);
-        }).isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(ERROR_MSG);
-
-        assertThatThrownBy(() -> {
-            aggregateFunctionsGenerator.fourthRule(null, null);
-        }).isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(ERROR_MSG);
+        assertThat(aggregateFunctionsGenerator.fourthRule(plainSelect1, function1).toString()).isEqualTo(
+                "SELECT Director, AVG(NrOfVisitors) FROM Movies GROUP BY Director "
+                + "HAVING COUNT(NrOfVisitors) > COUNT(DISTINCT NrOfVisitors) AND COUNT(DISTINCT NrOfVisitors) > 1"
+        );
     }
 }
