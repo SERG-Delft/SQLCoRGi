@@ -8,7 +8,7 @@ import net.sf.jsqlparser.expression.LongValue;
 public class NumericLongValue extends LongValue implements NumericValue {
 
     /**
-     * Creates a new {@code NumericLongValue} instance, which is equivalent to its {@link LongValue} counterpart,
+     * Creates a new {@link NumericLongValue} instance, which is equivalent to its {@link LongValue} counterpart,
      * but provides additional functionality.
      *
      * @param value a string representing the value of the long.
