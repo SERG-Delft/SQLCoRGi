@@ -8,6 +8,7 @@ import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 import nl.tudelft.st01.AggregateFunctionsGenerator;
 import nl.tudelft.st01.GroupByGenerator;
 import nl.tudelft.st01.JoinWhereExpressionGenerator;
+import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 import nl.tudelft.st01.visitors.select.NullAttributeFinder;
 import nl.tudelft.st01.visitors.select.NullReducer;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
