@@ -1,5 +1,6 @@
 package nl.tudelft.st01.unit.util;
 
+import net.sf.jsqlparser.statement.select.Join;
 import nl.tudelft.st01.util.Expressions;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 /**
  * Tests the {@link Expressions} utility class.
  */
-public class ExpressionsTest {
+class ExpressionsTest {
 
     /**
      * Verifies that {@link Expressions} cannot be instantiated.
@@ -19,7 +20,7 @@ public class ExpressionsTest {
      * @throws NoSuchMethodException should not happen.
      */
     @Test
-    public void testInstantiationForbidden() throws NoSuchMethodException {
+    void testInstantiationForbidden() throws NoSuchMethodException {
 
         Constructor<Expressions> constructor = Expressions.class.getDeclaredConstructor();
         constructor.setAccessible(true);
@@ -27,6 +28,23 @@ public class ExpressionsTest {
         Throwable thrown = catchThrowable(constructor::newInstance);
 
         assertThat(thrown).hasRootCauseInstanceOf(UnsupportedOperationException.class);
+    }
+
+    /**
+     * Tests whether {@link Expressions#setJoinToInner(Join)} sets a {@link Join} to {@code INNER}.
+     */
+    @Test
+    void testSetJoinToInner() {
+
+        Join innerJoin = new Join();
+        innerJoin.setInner(true);
+
+        Join join = new Join();
+        join.setLeft(true);
+
+        Expressions.setJoinToInner(join);
+
+        assertThat(join).isEqualToComparingFieldByField(innerJoin);
     }
 
 }
