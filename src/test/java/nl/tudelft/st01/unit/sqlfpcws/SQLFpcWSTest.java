@@ -1,19 +1,29 @@
 package nl.tudelft.st01.unit.sqlfpcws;
 
 import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
+import net.sf.jsqlparser.JSQLParserException;
+import nl.tudelft.st01.Generator;
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 
+import nl.tudelft.st01.sqlfpcws.json.BulkRuleGenerator;
+import org.dom4j.DocumentException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.lang.reflect.Constructor;
+import java.rmi.RemoteException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,6 +38,15 @@ import static org.mockito.Mockito.when;
 public class SQLFpcWSTest {
 
     private SQLFpcWSSoapProxy mockWebService;
+
+    public static final String NO_OPTIONAL_ARGS = "";
+    
+    private static final String DATABASE_SCHEMA =
+            " <schema dbms=\"MySQL\">\n"
+                    + "     <table name=\"TableB\">\n"
+                    + "         <column name=\"id\" type=\"VARCHAR\" size=\"25\" key=\"true\" notnull=\"true\"/>\n"
+                    + "     </table>\n"
+                    + " </schema>";
 
     private static final String SERVER_XML_REPLY =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -120,6 +139,23 @@ public class SQLFpcWSTest {
     }
 
     /**
+     * Trying to invoke the {@link SQLFpcWS} constructor should throw an {@link UnsupportedOperationException}.
+     * <p>
+     * Java Reflection is used because the {@link SQLFpcWS} constructor is private.
+     *
+     * @throws NoSuchMethodException if the {@link SQLFpcWS} constructor is not found - this cannot happen.
+     */
+    @org.junit.jupiter.api.Test
+    public void testConstructorThrowsException() throws NoSuchMethodException {
+        Constructor<SQLFpcWS> sqlFpcWSConstructorConstructor = SQLFpcWS.class.getDeclaredConstructor();
+        sqlFpcWSConstructorConstructor.setAccessible(true);
+
+        assertThatThrownBy(
+                () -> sqlFpcWSConstructorConstructor.newInstance()
+        ).hasRootCauseInstanceOf(UnsupportedOperationException.class);
+    }
+
+    /**
      * Tests whether {@code getCoverageTargets} returns the correct queries. The XML response from the SQLFpc web
      * service is mocked in order for the test to work independently of a working internet connection.
      *
@@ -137,12 +173,10 @@ public class SQLFpcWSTest {
                         + "     </table>\n"
                         + " </schema>";
 
-        String options = "";
-
         when(mockWebService.getRules(any(), any(), any())).thenReturn(SERVER_XML_REPLY);
         PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
 
-        List<String> result = SQLFpcWS.getCoverageTargets(sqlQuery, dbSchema, options);
+        List<String> result = SQLFpcWS.getCoverageTargets(sqlQuery, dbSchema, NO_OPTIONAL_ARGS);
 
         assertThat(result).containsExactlyInAnyOrder(
                 "SELECT * FROM tableA WHERE (TableA.var = 0) AND NOT(TableA.Id = 1)",
@@ -165,16 +199,8 @@ public class SQLFpcWSTest {
     public void testGetCoverageNoResults() throws Exception {
         String sqlQuery = "SELECT * FROM tableB";
 
-        String dbSchema = " <schema dbms=\"MySQL\">\n"
-                + "     <table name=\"TableB\">\n"
-                + "         <column name=\"id\" type=\"VARCHAR\" size=\"25\" key=\"true\" notnull=\"true\"/>\n"
-                + "     </table>\n"
-                + " </schema>";
-
-        String options = "";
-
         String serverXMLReply =
-                          "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                         + "<sqlfpc>\n"
                         + "   <version>1.3.180.91</version>\n"
                         + "   <sql>SELECT * FROM tableB</sql>\n"
@@ -184,8 +210,61 @@ public class SQLFpcWSTest {
         when(mockWebService.getRules(any(), any(), any())).thenReturn(serverXMLReply);
         PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
 
-        List<String> result = SQLFpcWS.getCoverageTargets(sqlQuery, dbSchema, options);
+        List<String> result = SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS);
 
         assertThat(result).hasSize(0);
+    }
+
+    @org.junit.jupiter.api.Test
+    @Disabled("Exceptions have not yet been implemented")
+    // TODO: implement exceptions!
+    public void testCorrectExceptionIsThrownWhenSQLFpcReturnsInvalidXML() throws Exception {
+        String sqlQuery = "SELECT * FROM tableB";
+
+        String invalidXMLServerReply =
+                "<sqlfpc>\n"
+                        + "   <version>1.3.180.91</version>\n"
+                        + "   <sql>SELECT * FROM tableB</sql>\n"
+                        + "   <fpcrules>\n"
+                        + "</sqlfpc>";
+
+        when(mockWebService.getRules(any(), any(), any())).thenReturn(invalidXMLServerReply);
+        PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
+
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+                () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
+        );
+    }
+
+    /**
+     * Tests whether {@code getCoverageTargets} throws the correct exception when the SQLFpc server is not reachable.
+     * The SQLFpc web service is mocked in order to fake a non-reachable server - i.e. the {@code getRules} method will
+     * always return a {@link RemoteException}.
+     *
+     * @throws Exception because of the use of {@link PowerMockito}.
+     */
+    @Test
+    @Ignore("Exceptions have not yet been implemented")
+    // TODO: implement exceptions!
+    public void testCorrectExceptionIsThrownWhenServerIsNotReachable() throws Exception {
+        String sqlQuery = "SELECT * FROM tableA WHERE TableA.id = 'value'";
+
+        when(mockWebService.getRules(any(), any(), any())).thenThrow(RemoteException.class);
+        PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
+
+        assertThatExceptionOfType(RemoteException.class).isThrownBy(
+                () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
+        );
+    }
+
+    @org.junit.jupiter.api.Test
+    @Disabled("Exceptions have not yet been implemented")
+    // TODO: implement exceptions!
+    public void testCorrectExceptionIsThrownWhenSQLQueryIsNotValidForSQLFpc() {
+        String sqlQuery = "SELECT * FROM tableA LIMIT 0, 1";
+
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+                () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
+        );
     }
 }
