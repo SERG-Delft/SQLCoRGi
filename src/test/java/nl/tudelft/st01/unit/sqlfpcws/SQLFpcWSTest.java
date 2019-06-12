@@ -1,12 +1,9 @@
 package nl.tudelft.st01.unit.sqlfpcws;
 
 import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
-import net.sf.jsqlparser.JSQLParserException;
-import nl.tudelft.st01.Generator;
+
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 
-import nl.tudelft.st01.sqlfpcws.json.BulkRuleGenerator;
-import org.dom4j.DocumentException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -151,7 +148,7 @@ public class SQLFpcWSTest {
         sqlFpcWSConstructorConstructor.setAccessible(true);
 
         assertThatThrownBy(
-                () -> sqlFpcWSConstructorConstructor.newInstance()
+            () -> sqlFpcWSConstructorConstructor.newInstance()
         ).hasRootCauseInstanceOf(UnsupportedOperationException.class);
     }
 
@@ -215,6 +212,14 @@ public class SQLFpcWSTest {
         assertThat(result).hasSize(0);
     }
 
+    /**
+     * Tests whether {@code getCoverageTargets} throws the proper exception when the XML response from the server is
+     * not syntactically valid.
+     * The XML response from the SQLFpc web service is mocked in order for the test to work independently of a working
+     * internet connection.
+     *
+     * @throws Exception because of the use of {@link PowerMockito}.
+     */
     @org.junit.jupiter.api.Test
     @Disabled("Exceptions have not yet been implemented")
     // TODO: implement exceptions!
@@ -232,7 +237,7 @@ public class SQLFpcWSTest {
         PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-                () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
+            () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
         );
     }
 
@@ -253,10 +258,13 @@ public class SQLFpcWSTest {
         PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
 
         assertThatExceptionOfType(RemoteException.class).isThrownBy(
-                () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
+            () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
         );
     }
 
+    /**
+     * Assert that the correct exception is thrown when SQLFpc returns an error about the syntax of the SQL query.
+     */
     @org.junit.jupiter.api.Test
     @Disabled("Exceptions have not yet been implemented")
     // TODO: implement exceptions!
@@ -264,7 +272,7 @@ public class SQLFpcWSTest {
         String sqlQuery = "SELECT * FROM tableA LIMIT 0, 1";
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-                () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
+            () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
         );
     }
 }

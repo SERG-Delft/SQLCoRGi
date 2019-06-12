@@ -46,6 +46,8 @@ public class BulkRuleGeneratorTest {
     public static final int NUMBER_OF_TABLES = 2;
     public static final int NUMBER_OF_COLUMNS = 3;
 
+    public static final int TIME_REQUIRED_MS = 2000;
+
     /**
      * Asserts that the empty line in the input file is ignored and so exactly 2 queries are read in.
      */
@@ -77,17 +79,19 @@ public class BulkRuleGeneratorTest {
     }
 
     /**
-     * Asserts that the XML schema is parsed correctly and so exactly 3 columns should been known.
+     * Asserts that estimated time to generate targets for the submitted queries is correct.
      */
     @Test
     public void testGetEstimatedGenerationDurationInMilliSeconds() {
         BulkRuleGenerator bulkRuleGenerator = new BulkRuleGenerator(SQL_INPUT_PATH, XML_SCHEMA_PATH, JSON_OUTPUT_PATH);
 
-        long timeRequired = 2000;
-
-        assertThat(bulkRuleGenerator.getEstimatedGenerationDurationInMilliSeconds()).isEqualTo(timeRequired);
+        assertThat(bulkRuleGenerator.getEstimatedGenerationDurationInMilliSeconds()).isEqualTo(TIME_REQUIRED_MS);
     }
 
+    /**
+     * Asserts that the correct exception is thrown when non-existing file is supplied to the {@link BulkRuleGenerator}
+     * constructor.
+     */
     @Test
     @Disabled("Exceptions have not yet been implemented")
     // TODO: implement exceptions!
@@ -95,10 +99,13 @@ public class BulkRuleGeneratorTest {
         String wrongInputPath = RESOURCE_PATH + "nonExistingFile.sql";
 
         assertThatExceptionOfType(IOException.class).isThrownBy(
-                () -> new BulkRuleGenerator(wrongInputPath, XML_SCHEMA_PATH, JSON_OUTPUT_PATH)
+            () -> new BulkRuleGenerator(wrongInputPath, XML_SCHEMA_PATH, JSON_OUTPUT_PATH)
         );
     }
 
+    /**
+     * Asserts that the correct exception is thrown when the input file contains invalid SQL queries.
+     */
     @Test
     @Disabled("Exceptions have not yet been implemented")
     // TODO: implement exceptions!
@@ -106,10 +113,13 @@ public class BulkRuleGeneratorTest {
         String fileWithInvalidQuery = RESOURCE_PATH + "invalidQuery.sql";
 
         assertThatExceptionOfType(JSQLParserException.class).isThrownBy(
-                () -> new BulkRuleGenerator(fileWithInvalidQuery, XML_SCHEMA_PATH, JSON_OUTPUT_PATH)
+            () -> new BulkRuleGenerator(fileWithInvalidQuery, XML_SCHEMA_PATH, JSON_OUTPUT_PATH)
         );
     }
 
+    /**
+     * Asserts that the correct exception is thrown when the supplied xml schema is not syntactically valid.
+     */
     @Test
     @Disabled("Exceptions have not yet been implemented")
     // TODO: implement exceptions!
@@ -117,10 +127,14 @@ public class BulkRuleGeneratorTest {
         String fileWithInvalidSchema = RESOURCE_PATH + "invalidSchema.xml";
 
         assertThatExceptionOfType(DocumentException.class).isThrownBy(
-                () -> new BulkRuleGenerator(SQL_INPUT_PATH, fileWithInvalidSchema, JSON_OUTPUT_PATH)
+            () -> new BulkRuleGenerator(SQL_INPUT_PATH, fileWithInvalidSchema, JSON_OUTPUT_PATH)
         );
     }
 
+    /**
+     * Asserts that the correct exception is thrown when an output file in a non-existent path is supplied to the
+     * {@link BulkRuleGenerator} constructor.
+     */
     @Test
     @Disabled("Exceptions have not yet been implemented")
     // TODO: implement exceptions!
@@ -128,7 +142,7 @@ public class BulkRuleGeneratorTest {
         String invalidJSONPath = RESOURCE_PATH + "nonExistingFolder/outputFile.json";
 
         assertThatExceptionOfType(IOException.class).isThrownBy(
-                () -> new BulkRuleGenerator(SQL_INPUT_PATH, XML_SCHEMA_PATH, invalidJSONPath)
+            () -> new BulkRuleGenerator(SQL_INPUT_PATH, XML_SCHEMA_PATH, invalidJSONPath)
         );
     }
 
