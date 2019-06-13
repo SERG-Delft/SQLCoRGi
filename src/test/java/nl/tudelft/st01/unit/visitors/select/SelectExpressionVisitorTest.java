@@ -181,6 +181,47 @@ public class SelectExpressionVisitorTest {
     }
 
     /**
+     * Assert.
+     */
+    @Test
+    public void visitBetweenWithStringValueTest() {
+        Between between = new Between();
+        StringValue left = new StringValue("z");
+        StringValue start = new StringValue("aaa");
+        StringValue end = new StringValue("azz");
+        between.setLeftExpression(left);
+        between.setBetweenExpressionStart(start);
+        between.setBetweenExpressionEnd(end);
+
+        Between notBetween = new Between();
+        notBetween.setNot(true);
+        notBetween.setLeftExpression(left);
+        notBetween.setBetweenExpressionStart(start);
+        notBetween.setBetweenExpressionEnd(end);
+
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(left);
+
+        EqualsTo equalsToStart = new EqualsTo();
+        equalsToStart.setLeftExpression(left);
+        equalsToStart.setRightExpression(start);
+
+        EqualsTo equalsToEnd = new EqualsTo();
+        equalsToEnd.setLeftExpression(left);
+        equalsToEnd.setRightExpression(end);
+
+        selectExpressionVisitor.visit(between);
+
+        compareFieldByField(output,
+                equalsToEnd,
+                notBetween,
+                isNullExpression,
+                equalsToStart,
+                between
+        );
+    }
+
+    /**
      * Assert that the {@code visit} method for an {@code InExpression} generates the correct output.
      */
     @Test
