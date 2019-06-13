@@ -11,16 +11,12 @@ import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import nl.tudelft.st01.query.JoinOnConditionColumns;
 import nl.tudelft.st01.query.JoinWhereItem;
+import nl.tudelft.st01.util.exceptions.CannotBeNullException;
+import nl.tudelft.st01.util.exceptions.ListCannotBeEmptyException;
 import nl.tudelft.st01.visitors.ExpressionTraverserVisitor;
 import nl.tudelft.st01.visitors.join.OnExpressionVisitor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * This class allows for mutating a given query such that a set of mutated queries is returned.
@@ -58,7 +54,7 @@ public class JoinWhereExpressionGenerator {
                 if (join.isSimple()) {
                     continue;
                 } else if (join.getOnExpression() == null) {
-                    throw new IllegalStateException("The ON condition cannot be null");
+                    throw new CannotBeNullException("The ON condition cannot be null");
                 }
 
                 join.getOnExpression().accept(onExpressionVisitor);
@@ -366,7 +362,7 @@ public class JoinWhereExpressionGenerator {
             return new AndExpression(createIsNullExpressions(columns, isNull), parenthesis);
         }
 
-        throw new IllegalStateException("The columns list cannot be empty.");
+        throw new ListCannotBeEmptyException("The columns list cannot be empty.");
     }
 
     /**

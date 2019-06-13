@@ -21,6 +21,7 @@ import java.util.TreeSet;
 public class AggregateFunctionsGenerator {
     private static final String COUNT_STRING = "COUNT";
 
+
     /**
      * Main, public method that generates the rules for the aggregate functions.
      *
@@ -36,19 +37,21 @@ public class AggregateFunctionsGenerator {
                 SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
                 if (selectExpressionItem.getExpression() instanceof Function) {
                     // Here we know the selectItem is a function (AVG, SUM, MAX etc.)
-                    //      so we can start adding the rules for it.
+                    // so we can start adding the rules for it.
                     Function func = (Function) selectExpressionItem.getExpression();
 
-                    // check for COUNT(*)
+                    // Check for COUNT(*)
                     if (func.isAllColumns()) {
-                        outputAfterAggregator.add(firstRule(plainSelect).toString());
-                        outputAfterAggregator.add(secondRule(plainSelect).toString());
+                        if (plainSelect.getGroupBy() != null) {
+                            outputAfterAggregator.add(firstRule(plainSelect).toString());
+                            outputAfterAggregator.add(secondRule(plainSelect).toString());
+                        }
 
                         // Skip the rest of this iteration.
                         continue;
                     }
 
-                    // check for a query without Group By
+                    // Check for a query without Group By
                     if (plainSelect.getGroupBy() != null) {
                         outputAfterAggregator.add(firstRule(plainSelect).toString());
                         outputAfterAggregator.add(secondRule(plainSelect).toString());
@@ -58,7 +61,7 @@ public class AggregateFunctionsGenerator {
                         continue;
                     }
 
-                    // check for an aggregator that is NOT Count
+                    // Check for an aggregator that is NOT Count
                     if (!func.getName().equals(COUNT_STRING)) {
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
                         outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
@@ -66,7 +69,7 @@ public class AggregateFunctionsGenerator {
                         continue;
                     }
 
-                    // handle COUNT operator
+                    // Handle COUNT operator
                     outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
                 }
             }
@@ -85,6 +88,7 @@ public class AggregateFunctionsGenerator {
      * @return - select item in the above specified form
      */
     private PlainSelect firstRule(PlainSelect plainSelect) {
+
         // Get a deep copy of the plainSelect
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, false);
 
@@ -124,6 +128,7 @@ public class AggregateFunctionsGenerator {
      * @return - select item with the having part added
      */
     private PlainSelect secondRule(PlainSelect plainSelect) {
+
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
 
         // Create COUNT(*) object
@@ -146,6 +151,7 @@ public class AggregateFunctionsGenerator {
      * @return - query object representing the third rule for the aggregator
      */
     private PlainSelect thirdRule(PlainSelect plainSelect, Function function) {
+
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
 
         // Create COUNT(*) object
@@ -180,6 +186,7 @@ public class AggregateFunctionsGenerator {
      * @return - query object representing the fourth rule for the aggregator
      */
     private PlainSelect fourthRule(PlainSelect plainSelect, Function function) {
+
         PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
 
         // Retrieve column in function
