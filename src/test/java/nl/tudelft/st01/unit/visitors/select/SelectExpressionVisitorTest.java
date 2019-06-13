@@ -75,7 +75,7 @@ public class SelectExpressionVisitorTest {
 
         selectExpressionVisitor.visit(isNullExpression);
 
-        compareFieldByField(output, isNotNullExpression, isNullExpression);
+        compareFieldByField(output, isNullExpression, isNotNullExpression);
     }
 
     /**
@@ -120,12 +120,12 @@ public class SelectExpressionVisitorTest {
         selectExpressionVisitor.visit(between);
 
         compareFieldByField(output,
-                notBetween,
-                isNullExpression,
-                endPlusOne,
-                equalsToEnd,
-                equalsToStart,
                 between,
+                equalsToEnd,
+                isNullExpression,
+                equalsToStart,
+                notBetween,
+                endPlusOne,
                 startMinusOne
         );
     }
@@ -172,13 +172,13 @@ public class SelectExpressionVisitorTest {
         selectExpressionVisitor.visit(between);
 
         compareFieldByField(output,
-                between,
                 isNullExpression,
-                notBetween,
                 endPlusOne,
                 equalsToStart,
-                startMinusOne,
-                equalsToEnd
+                equalsToEnd,
+                between,
+                notBetween,
+                startMinusOne
         );
     }
 
@@ -217,10 +217,10 @@ public class SelectExpressionVisitorTest {
 
         compareFieldByField(output,
                 notBetween,
-                equalsToEnd,
-                equalsToStart,
+                between,
                 isNullExpression,
-                between
+                equalsToStart,
+                equalsToEnd
         );
     }
 
@@ -250,7 +250,7 @@ public class SelectExpressionVisitorTest {
 
         selectExpressionVisitor.visit(inExpression);
 
-        compareFieldByField(output, inExpression, notInExpression, isNullExpression);
+        compareFieldByField(output, notInExpression, isNullExpression, inExpression);
     }
 
     /**
@@ -274,6 +274,6 @@ public class SelectExpressionVisitorTest {
 
         selectExpressionVisitor.visit(likeExpression);
 
-        compareFieldByField(output, notLikeExpression, likeExpression, isNullExpression);
+        compareFieldByField(output, isNullExpression, likeExpression, notLikeExpression);
     }
 }
