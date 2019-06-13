@@ -7,7 +7,6 @@ import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 import nl.tudelft.st01.util.exceptions.CannotBeNullException;
-import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +25,7 @@ public class SelectExpressionVisitorTest {
 
     private List<Expression> output;
     private SelectExpressionVisitor selectExpressionVisitor;
-    
+
     /**
      * Set-up a {@code SelectExpressionVisitor} with an empty {@code ArrayList}.
      */
@@ -35,7 +34,7 @@ public class SelectExpressionVisitorTest {
         output = new ArrayList<>();
         selectExpressionVisitor = new SelectExpressionVisitor(output);
     }
-    
+
     /**
      * Test whether initializing a {@code SelectExpressionVisitor} with {@code null} throws the correct exception.
      */
@@ -45,7 +44,7 @@ public class SelectExpressionVisitorTest {
             new SelectExpressionVisitor(null);
         }).isInstanceOf(CannotBeNullException.class).hasMessageContaining(EXCEPTION_MESSAGE);
     }
-    
+
     /**
      * Test whether initializing a {@code SelectExpressionVisitor}
      * with a non-empty {@code output} throws the correct exception.
@@ -54,7 +53,7 @@ public class SelectExpressionVisitorTest {
     public void constructorNonEmptyOutputTest() {
         List<Expression> output = new ArrayList<>();
         output.add(new GreaterThan());
-        
+
         assertThatThrownBy(() -> {
             new SelectExpressionVisitor(output);
         }).isInstanceOf(CannotBeNullException.class).hasMessageContaining(EXCEPTION_MESSAGE);
