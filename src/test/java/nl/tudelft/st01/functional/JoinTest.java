@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
-import static nl.tudelft.st01.functional.AssertUtils.verify;
+import static nl.tudelft.st01.AssertUtils.containsAtLeast;
+import static nl.tudelft.st01.AssertUtils.verify;
 
 /**
  * This class tests if the coverage targets for queries with JOINS are generated correctly.

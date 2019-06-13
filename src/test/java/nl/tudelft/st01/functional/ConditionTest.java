@@ -2,8 +2,8 @@ package nl.tudelft.st01.functional;
 
 import org.junit.jupiter.api.Test;
 
-import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
-import static nl.tudelft.st01.functional.AssertUtils.verify;
+import static nl.tudelft.st01.AssertUtils.containsAtLeast;
+import static nl.tudelft.st01.AssertUtils.verify;
 
 /**
  * This class tests if the coverage targets for queries with WHERE clauses are generated correctly.
