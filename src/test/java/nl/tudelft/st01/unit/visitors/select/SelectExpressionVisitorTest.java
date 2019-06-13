@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static nl.tudelft.st01.AssertUtils.compareFieldByField;
 
 /**
  * Unit tests for the {@code SelectExpressionVisitorTest}.
@@ -73,10 +74,7 @@ public class SelectExpressionVisitorTest {
 
         selectExpressionVisitor.visit(isNullExpression);
 
-        assertThat(output).containsOnly(
-                isNullExpression,
-                isNotNullExpression
-        );
+        compareFieldByField(output, isNotNullExpression, isNullExpression);
     }
 
     /**
@@ -99,10 +97,7 @@ public class SelectExpressionVisitorTest {
         isNullExpression.setLeftExpression(leftValue);
         
         selectExpressionVisitor.visit(likeExpression);
-        assertThat(output).containsOnly(
-                likeExpression,
-                notLikeExpression,
-                isNullExpression
-        );
+
+        compareFieldByField(output, isNullExpression, notLikeExpression, likeExpression);
     }
 }
