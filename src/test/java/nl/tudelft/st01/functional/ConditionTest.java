@@ -248,9 +248,9 @@ class ConditionTest {
                 "SELECT * FROM Table1 WHERE NOT name LIKE 'John%'",
                 "SELECT * FROM Table1 WHERE name IS NULL");
     }
-    
+
     /**
-     * A test case with an LIKE condition.
+     * A test case with an ILIKE condition.
      */
     @Test
     void testIlikeCondition() {
@@ -259,7 +259,7 @@ class ConditionTest {
                 "SELECT * FROM Table1 WHERE name ILIKE 'john%'",
                 // JSQLParser generates "NOT name LIKE" instead of "name NOT LIKE", they are however identical in
                 // behavior, therefore we stick with the behavior used in JSQLParser
-                "SELECT * FROM Table1 WHERE NOT name ILIKE 'John%'",
+                "SELECT * FROM Table1 WHERE NOT name ILIKE 'john%'",
                 "SELECT * FROM Table1 WHERE name IS NULL");
     }
 
