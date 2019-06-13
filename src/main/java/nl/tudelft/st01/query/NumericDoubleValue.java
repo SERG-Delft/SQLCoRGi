@@ -8,7 +8,7 @@ import net.sf.jsqlparser.expression.DoubleValue;
 public class NumericDoubleValue extends DoubleValue implements NumericValue {
 
     /**
-     * Creates a new {@link NumericDoubleValue} instance, which is equivalent to its {@link DoubleValue} counterpart,
+     * Creates a new {@code NumericDoubleValue} instance, which is equivalent to its {@link DoubleValue} counterpart,
      * but provides additional functionality.
      *
      * @param value a string representing the value of the double.

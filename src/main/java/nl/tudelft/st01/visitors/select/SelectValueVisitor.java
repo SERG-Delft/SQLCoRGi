@@ -28,7 +28,7 @@ public class SelectValueVisitor extends ExpressionVisitorAdapter {
      * Creates a new visitor which can be used to generate mutations of values in select operators. Mutations are
      * written to {@code output};
      *
-     * @param column the {@link Column} that is compared to the visited value.
+     * @param column the {@code Column} that is compared to the visited value.
      * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
      */
     public SelectValueVisitor(Column column, List<Expression> output) {

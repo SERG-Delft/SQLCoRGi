@@ -11,8 +11,6 @@ import java.util.List;
  */
 public class JoinWhereItem {
 
-
-
     private List<Join> joins;
     private Join join;
 
@@ -20,10 +18,10 @@ public class JoinWhereItem {
     private Expression joinWhere;
 
     /**
-     * Creates a new {@link JoinWhereItem} linking a given JOIN to a WHERE expression.
+     * Creates a new {@code JoinWhereItem} linking a given JOIN to a WHERE expression.
      *
-     * @param join a {@link Join} that should be linked to {@link JoinWhereItem}.
-     * @param joinWhere the WHERE {@link Expression} that should be linked to the {@link Join}.
+     * @param join a {@code Join} that should be linked to {@code JoinWhereItem}.
+     * @param joinWhere the WHERE {@code Expression} that should be linked to the {@code Join}.
      */
     public JoinWhereItem(Join join, Expression joinWhere) {
         this.join = join;
@@ -31,10 +29,10 @@ public class JoinWhereItem {
     }
 
     /**
-     * Creates a new {@link JoinWhereItem} linking a given JOIN to a WHERE expression.
+     * Creates a new {@code JoinWhereItem} linking a given JOIN to a WHERE expression.
      *
-     * @param joins a list of {@link Join}s that should be linked to {@link JoinWhereItem}.
-     * @param joinWhere the WHERE expression that should be linked to {@link Join}.
+     * @param joins a list of {@code Join}s that should be linked to {@code JoinWhereItem}.
+     * @param joinWhere the WHERE expression that should be linked to {@code Join}.
      */
     public JoinWhereItem(List<Join> joins, Expression joinWhere) {
         this.joins = joins;

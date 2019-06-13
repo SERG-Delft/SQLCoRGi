@@ -38,8 +38,8 @@ public class SelectCloner implements SelectVisitor, SelectItemVisitor, FromItemV
     /**
      * Creates a new instance of this class, which uses the provided cloners.
      *
-     * @param expressionCloner the {@link ExpressionCloner} to use.
-     * @param orderByCloner the {@link OrderByCloner} to use.
+     * @param expressionCloner the {@code ExpressionCloner} to use.
+     * @param orderByCloner the {@code OrderByCloner} to use.
      */
     SelectCloner(ExpressionCloner expressionCloner, OrderByCloner orderByCloner) {
         this.expressionCloner = expressionCloner;
