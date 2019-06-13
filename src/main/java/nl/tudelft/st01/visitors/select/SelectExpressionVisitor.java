@@ -5,6 +5,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.SubSelect;
 import nl.tudelft.st01.query.NumericDoubleValue;
 import nl.tudelft.st01.query.NumericLongValue;
 import nl.tudelft.st01.util.exceptions.CannotBeNullException;
@@ -233,6 +234,11 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         IsNullExpression isNullExpressionOut = new IsNullExpression();
         isNullExpressionOut.setLeftExpression(copy(likeExpression.getLeftExpression()));
         output.add(isNullExpressionOut);
+    }
+
+    @Override
+    public void visit(SubSelect subSelect) {
+        // Don't do anything here.
     }
 
 }
