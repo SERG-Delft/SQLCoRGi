@@ -24,11 +24,7 @@ public final class CoverageRulesGenerator {
     * @return List of MC/DC coverage rules as strings.
     */
     public static List<String> generateRules(String query) {
-        Set<String> result = Generator.generateRules(query);
-        List<String> resultAsList = new ArrayList<>();
-        resultAsList.addAll(result);
-
-        return resultAsList;
+        return new ArrayList<>(Generator.generateRules(query));
     }
 
 }

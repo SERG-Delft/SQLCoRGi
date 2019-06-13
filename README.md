@@ -21,14 +21,14 @@ You can clone our repo and then run the application.
 Here is an example of how you would use this tool:
 
 ```java
-import path.to.CoverageRulesGenerator;
+import nl.tudelft.st01.CoverageRulesGenerator;
 
 // ...
 
 String query = "Select Name, Address FROM Customers WHERE balance > 1000";
 List<String> coverageTargets = CoverageRulesGenerator.generateRules(query);
 
-// Do wit coverageTargets what you want
+// Do with coverageTargets what you want
 ```
 
 ## Useful Links / Resources
