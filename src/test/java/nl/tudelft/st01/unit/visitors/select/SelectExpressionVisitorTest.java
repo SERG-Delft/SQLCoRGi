@@ -1,10 +1,9 @@
 package nl.tudelft.st01.unit.visitors.select;
 
+import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
-import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
+import net.sf.jsqlparser.expression.operators.relational.*;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,14 +72,12 @@ public class SelectExpressionVisitorTest {
 
         selectExpressionVisitor.visit(isNullExpression);
 
-        assertThat(output).containsOnly(
-                isNullExpression,
-                isNotNullExpression
-        );
+        assertThat(output.get(0)).isEqualToComparingFieldByFieldRecursively(isNullExpression);
+        assertThat(output.get(1)).isEqualToComparingFieldByFieldRecursively(isNotNullExpression);
     }
 
     /**
-     * Assert that the {@code visit} method for an {@code InExpression} generates the correct output.
+     * Assert that the {@code visit} method for an {@code LikeExpression} generates the correct output.
      */
     @Test
     public void visitLikeExpressionTest() {
@@ -89,20 +86,19 @@ public class SelectExpressionVisitorTest {
         StringValue rightValue = new StringValue("project");
         likeExpression.setLeftExpression(leftValue);
         likeExpression.setRightExpression(rightValue);
-        
+
         LikeExpression notLikeExpression = new LikeExpression();
         notLikeExpression.setNot();
         notLikeExpression.setLeftExpression(leftValue);
         notLikeExpression.setRightExpression(rightValue);
-        
+
         IsNullExpression isNullExpression = new IsNullExpression();
         isNullExpression.setLeftExpression(leftValue);
-        
+
         selectExpressionVisitor.visit(likeExpression);
-        assertThat(output).containsOnly(
-                likeExpression,
-                notLikeExpression,
-                isNullExpression
-        );
+
+        assertThat(output.get(0)).isEqualToComparingFieldByFieldRecursively(likeExpression);
+        assertThat(output.get(1)).isEqualToComparingFieldByFieldRecursively(notLikeExpression);
+        assertThat(output.get(2)).isEqualToComparingFieldByFieldRecursively(isNullExpression);
     }
 }
