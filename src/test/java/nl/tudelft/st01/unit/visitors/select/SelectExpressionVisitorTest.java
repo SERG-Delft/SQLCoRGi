@@ -4,6 +4,8 @@ import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.*;
+import nl.tudelft.st01.query.NumericDoubleValue;
+import nl.tudelft.st01.query.NumericLongValue;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,6 +76,108 @@ public class SelectExpressionVisitorTest {
         selectExpressionVisitor.visit(isNullExpression);
 
         compareFieldByField(output, isNotNullExpression, isNullExpression);
+    }
+
+    /**
+     * Assert.
+     */
+    @Test
+    public void visitBetweenWithDoubleValueTest() {
+        Between between = new Between();
+        StringValue left = new StringValue("y");
+        NumericDoubleValue start = new NumericDoubleValue("1");
+        NumericDoubleValue end = new NumericDoubleValue("12");
+        between.setLeftExpression(left);
+        between.setBetweenExpressionStart(start);
+        between.setBetweenExpressionEnd(end);
+
+        Between notBetween = new Between();
+        notBetween.setNot(true);
+        notBetween.setLeftExpression(left);
+        notBetween.setBetweenExpressionStart(start);
+        notBetween.setBetweenExpressionEnd(end);
+
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(left);
+
+        EqualsTo equalsToStart = new EqualsTo();
+        equalsToStart.setLeftExpression(left);
+        equalsToStart.setRightExpression(start);
+
+        EqualsTo equalsToEnd = new EqualsTo();
+        equalsToEnd.setLeftExpression(left);
+        equalsToEnd.setRightExpression(end);
+
+        EqualsTo startMinusOne = new EqualsTo();
+        startMinusOne.setLeftExpression(left);
+        startMinusOne.setRightExpression(start.add(-1));
+
+        EqualsTo endPlusOne = new EqualsTo();
+        endPlusOne.setLeftExpression(left);
+        endPlusOne.setRightExpression(end.add(1));
+
+        selectExpressionVisitor.visit(between);
+
+        compareFieldByField(output,
+                notBetween,
+                equalsToEnd,
+                endPlusOne,
+                between,
+                equalsToStart,
+                startMinusOne,
+                isNullExpression
+        );
+    }
+
+    /**
+     * Assert.
+     */
+    @Test
+    public void visitBetweenWithLongValueTest() {
+        Between between = new Between();
+        StringValue left = new StringValue("y");
+        NumericLongValue start = new NumericLongValue("1");
+        NumericLongValue end = new NumericLongValue("12");
+        between.setLeftExpression(left);
+        between.setBetweenExpressionStart(start);
+        between.setBetweenExpressionEnd(end);
+
+        Between notBetween = new Between();
+        notBetween.setNot(true);
+        notBetween.setLeftExpression(left);
+        notBetween.setBetweenExpressionStart(start);
+        notBetween.setBetweenExpressionEnd(end);
+
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(left);
+
+        EqualsTo equalsToStart = new EqualsTo();
+        equalsToStart.setLeftExpression(left);
+        equalsToStart.setRightExpression(start);
+
+        EqualsTo equalsToEnd = new EqualsTo();
+        equalsToEnd.setLeftExpression(left);
+        equalsToEnd.setRightExpression(end);
+
+        EqualsTo startMinusOne = new EqualsTo();
+        startMinusOne.setLeftExpression(left);
+        startMinusOne.setRightExpression(start.add(-1));
+
+        EqualsTo endPlusOne = new EqualsTo();
+        endPlusOne.setLeftExpression(left);
+        endPlusOne.setRightExpression(end.add(1));
+
+        selectExpressionVisitor.visit(between);
+
+        compareFieldByField(output,
+                startMinusOne,
+                equalsToEnd,
+                notBetween,
+                isNullExpression,
+                endPlusOne,
+                equalsToStart,
+                between
+        );
     }
 
     /**
