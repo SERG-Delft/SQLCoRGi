@@ -77,6 +77,37 @@ public class SelectExpressionVisitorTest {
     }
 
     /**
+     * Assert that the {@code visit} method for an {@code InExpression} generates the correct output.
+     */
+    @Test
+    public void visitInExpressionTest() {
+        InExpression inExpression = new InExpression();
+        StringValue left = new StringValue("x");
+        ExpressionList right = new ExpressionList();
+        List<Expression> itemList = new ArrayList<>();
+        DoubleValue item = new DoubleValue("28");
+
+        itemList.add(item);
+        right.setExpressions(itemList);
+        inExpression.setLeftExpression(left);
+        inExpression.setRightItemsList(right);
+
+        InExpression notInExpression = new InExpression();
+        notInExpression.setNot(true);
+        notInExpression.setLeftExpression(left);
+        notInExpression.setRightItemsList(right);
+
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(left);
+
+        selectExpressionVisitor.visit(inExpression);
+
+        assertThat(output.get(0)).isEqualToComparingFieldByFieldRecursively(inExpression);
+        assertThat(output.get(1)).isEqualToComparingFieldByFieldRecursively(notInExpression);
+        assertThat(output.get(2)).isEqualToComparingFieldByFieldRecursively(isNullExpression);
+    }
+
+    /**
      * Assert that the {@code visit} method for an {@code LikeExpression} generates the correct output.
      */
     @Test
