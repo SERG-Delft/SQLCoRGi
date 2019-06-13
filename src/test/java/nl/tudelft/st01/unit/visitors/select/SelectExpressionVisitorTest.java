@@ -121,12 +121,12 @@ public class SelectExpressionVisitorTest {
 
         compareFieldByField(output,
                 notBetween,
-                equalsToEnd,
+                isNullExpression,
                 endPlusOne,
-                between,
+                equalsToEnd,
                 equalsToStart,
-                startMinusOne,
-                isNullExpression
+                between,
+                startMinusOne
         );
     }
 
@@ -172,13 +172,13 @@ public class SelectExpressionVisitorTest {
         selectExpressionVisitor.visit(between);
 
         compareFieldByField(output,
-                startMinusOne,
-                equalsToEnd,
-                notBetween,
+                between,
                 isNullExpression,
+                notBetween,
                 endPlusOne,
                 equalsToStart,
-                between
+                startMinusOne,
+                equalsToEnd
         );
     }
 
@@ -216,10 +216,10 @@ public class SelectExpressionVisitorTest {
         selectExpressionVisitor.visit(between);
 
         compareFieldByField(output,
-                equalsToEnd,
                 notBetween,
-                isNullExpression,
+                equalsToEnd,
                 equalsToStart,
+                isNullExpression,
                 between
         );
     }
@@ -250,7 +250,7 @@ public class SelectExpressionVisitorTest {
 
         selectExpressionVisitor.visit(inExpression);
 
-        compareFieldByField(output, notInExpression, inExpression, isNullExpression);
+        compareFieldByField(output, inExpression, notInExpression, isNullExpression);
     }
 
     /**
@@ -274,6 +274,6 @@ public class SelectExpressionVisitorTest {
 
         selectExpressionVisitor.visit(likeExpression);
 
-        compareFieldByField(output, isNullExpression, notLikeExpression, likeExpression);
+        compareFieldByField(output, notLikeExpression, likeExpression, isNullExpression);
     }
 }
