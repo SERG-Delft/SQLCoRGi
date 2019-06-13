@@ -2,7 +2,6 @@ package nl.tudelft.st01;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  *  Entry point for our tool. Use this to interact with the generator.
