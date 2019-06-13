@@ -108,6 +108,8 @@ public class JoinRulesGenerator {
      * @param plainSelect The plainselect for which the rules should be derived from.
      * @return A set of {@link JoinWhereItem}s from which the actual rules can be derived.
      */
+    // This warning is suppressed, because new objects have to be instantiated in the for loop.
+    // Each object should be instantiated individually and should not have the same reference.
     @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
     private Set<JoinWhereItem> handleJoins(PlainSelect plainSelect) {
         List<Join> joins = plainSelect.getJoins();
