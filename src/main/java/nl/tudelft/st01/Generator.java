@@ -5,6 +5,10 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
+import nl.tudelft.st01.util.exceptions.CannotBeNullException;
+import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
+import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
+import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 
 import java.util.ArrayList;
@@ -22,7 +26,7 @@ public final class Generator {
      * No instance of this class should be created.
      */
     private Generator() {
-        throw new UnsupportedOperationException();
+        throw new ShouldNotBeInstantiatedException();
     }
 
     /**
@@ -31,25 +35,25 @@ public final class Generator {
      * @param query the query for which coverage rules should be generated.
      * @return the rules that are generated for the input query.
      */
+    // It's neater to throw a CannotBeParsedException instead of printing something. PMD doesn't like it, so
+    // we have to suppress the warning that we should not throw a new exception in a catch block.
+    @SuppressWarnings({"PMD.PreserveStackTrace"})
     public static Set<String> generateRules(String query) {
         Set<String> result = new HashSet<>();
 
         if (query == null) {
-            System.err.println("Input cannot be null.");
-            return result;
+            throw new CannotBeNullException("Input cannot be null.");
         }
 
         Statement statement;
         try {
             statement = CCJSqlParserUtil.parse(query);
         } catch (JSQLParserException e) {
-            System.err.println("Input query could not be parsed.");
-            return result;
+            throw new CannotBeParsedException("Input query could not be parsed.");
         }
 
         if (!(statement instanceof Select)) {
-            System.err.println("Only SELECT statements are supported.");
-            return result;
+            throw new UnsupportedInputException("Only SELECT statements are supported.");
         }
 
         SelectBody selectBody = ((Select) statement).getSelectBody();
@@ -68,13 +72,15 @@ public final class Generator {
     public static void main(String[] args) {
         String query = "SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 inner join d on d.id > 0";
 
+        String query = "SELECT * FROM t WHERE a < 10 AND a > 0";
+
         Set<String> result = generateRules(query);
         List<String> res = new ArrayList<>();
         res.addAll(result);
         Collections.sort(res);
         System.out.println("Result:");
-        for (String s : res) {
-            System.out.println("\"" + s + "\",");
+        for (String s : result) {
+            System.out.println(s);
         }
     }
 

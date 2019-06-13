@@ -7,9 +7,13 @@ import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.query.NumericDoubleValue;
 import nl.tudelft.st01.query.NumericLongValue;
+import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static nl.tudelft.st01.util.Expressions.createEqualsTo;
+import static nl.tudelft.st01.util.cloner.ExpressionCloner.copy;
 
 /**
  * A visitor for select expressions, i.e. {@code WHERE} and {@code HAVING} clauses in {@code SELECT} statements.
@@ -26,7 +30,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      */
     public SelectExpressionVisitor(List<Expression> output) {
         if (output == null || !output.isEmpty()) {
-            throw new IllegalArgumentException(
+            throw new CannotBeNullException(
                 "A SelectExpressionVisitor requires an empty, non-null set to which it can write generated expressions."
             );
         }
@@ -55,7 +59,6 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      *
      * @param expression an {@link OrExpression} or {@link AndExpression}.
      */
-    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void generateCompoundMutations(BinaryExpression expression) {
 
         Expression left = expression.getLeftExpression();
@@ -78,7 +81,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
             neutralExpression = new NotExpression(neutralExpression);
         }
         for (Expression decisionExpression : leftOut) {
-            this.output.add(new AndExpression(new Parenthesis(decisionExpression), neutralExpression));
+            this.output.add(copy(new AndExpression(new Parenthesis(decisionExpression), neutralExpression)));
         }
 
         neutralExpression = left instanceof Parenthesis ? left : new Parenthesis(left);
@@ -86,7 +89,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
             neutralExpression = new NotExpression(neutralExpression);
         }
         for (Expression decisionExpression : rightOut) {
-            this.output.add(new AndExpression(neutralExpression, new Parenthesis(decisionExpression)));
+            this.output.add(copy(new AndExpression(neutralExpression, new Parenthesis(decisionExpression))));
         }
     }
 
@@ -118,14 +121,10 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(IsNullExpression isNullExpression) {
 
-        IsNullExpression isNullExpressionOut = new IsNullExpression();
-        isNullExpressionOut.setLeftExpression(isNullExpression.getLeftExpression());
-        isNullExpressionOut.setNot(isNullExpression.isNot());
-        output.add(isNullExpressionOut);
+        output.add(copy(isNullExpression));
 
-        IsNullExpression isNullExpressionToggled = new IsNullExpression();
-        isNullExpressionToggled.setLeftExpression(isNullExpression.getLeftExpression());
-        isNullExpressionToggled.setNot(!isNullExpression.isNot());
+        IsNullExpression isNullExpressionToggled = (IsNullExpression) copy(isNullExpression);
+        isNullExpressionToggled.setNot(!isNullExpressionToggled.isNot());
         output.add(isNullExpressionToggled);
     }
 
@@ -146,112 +145,94 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
     /**
      * Generates test queries for 'BETWEEN' expressions.
+     *
      * @param between a 'BETWEEN' expression.
      */
     @Override
     public void visit(Between between) {
 
-        output.add(between);
-
         Expression left = between.getLeftExpression();
         Expression start = between.getBetweenExpressionStart();
         Expression end = between.getBetweenExpressionEnd();
 
-        Between betweenFlipped = new Between();
-        betweenFlipped.setLeftExpression(left);
-        betweenFlipped.setBetweenExpressionStart(start);
-        betweenFlipped.setBetweenExpressionEnd(end);
-        betweenFlipped.setNot(!between.isNot());
-        output.add(betweenFlipped);
+        output.add(createEqualsTo(left, start));
 
-        EqualsTo leftBoundaryOffTest = generateEqualsTo(left, start);
-        output.add(leftBoundaryOffTest);
+        output.add(createEqualsTo(left, end));
 
         if (start instanceof LongValue) {
             NumericLongValue longValue = new NumericLongValue(start.toString());
-            EqualsTo leftBoundaryOnTest = generateEqualsTo(left, longValue.add(-1));
-            output.add(leftBoundaryOnTest);
+            EqualsTo leftOffPoint = createEqualsTo(left, longValue.add(-1));
+            output.add(leftOffPoint);
         } else if (start instanceof DoubleValue) {
             NumericDoubleValue doubleValue = new NumericDoubleValue(start.toString());
-            EqualsTo leftBoundaryOnTest = generateEqualsTo(left, doubleValue.add(-1));
-            output.add(leftBoundaryOnTest);
+            EqualsTo leftOffPoint = createEqualsTo(left, doubleValue.add(-1));
+            output.add(leftOffPoint);
         }
-
-        EqualsTo rightBoundaryOnTest = generateEqualsTo(left, end);
-        output.add(rightBoundaryOnTest);
 
         if (end instanceof LongValue) {
             NumericLongValue longValue = new NumericLongValue(end.toString());
-            EqualsTo rightBoundaryOffTest = generateEqualsTo(left, longValue.add(1));
-            output.add(rightBoundaryOffTest);
+            EqualsTo rightOffPoint = createEqualsTo(left, longValue.add(1));
+            output.add(rightOffPoint);
         } else if (end instanceof DoubleValue) {
             NumericDoubleValue doubleValue = new NumericDoubleValue(end.toString());
-            EqualsTo rightBoundaryOffTest = generateEqualsTo(left, doubleValue.add(1));
-            output.add(rightBoundaryOffTest);
+            EqualsTo rightOffPoint = createEqualsTo(left, doubleValue.add(1));
+            output.add(rightOffPoint);
         }
 
+        Between betweenNormal = (Between) copy(between);
+        betweenNormal.setNot(false);
+        output.add(betweenNormal);
+
+        Between betweenFlipped = (Between) copy(between);
+        betweenFlipped.setNot(true);
+        output.add(betweenFlipped);
+
         IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(left);
+        isNullExpression.setLeftExpression(copy(left));
         output.add(isNullExpression);
     }
 
     /**
      * Generates test queries for 'IN' expressions.
+     *
      * @param inExpression an 'IN' expression.
      */
     @Override
     public void visit(InExpression inExpression) {
 
-        output.add(inExpression);
+        output.add(copy(inExpression));
 
-        InExpression inExpressionFlipped = new InExpression();
-        inExpressionFlipped.setLeftExpression(inExpression.getLeftExpression());
-        inExpressionFlipped.setRightItemsList(inExpression.getRightItemsList());
-        inExpressionFlipped.setNot(!inExpression.isNot());
+        InExpression inExpressionFlipped = (InExpression) copy(inExpression);
+        inExpressionFlipped.setNot(!inExpressionFlipped.isNot());
         output.add(inExpressionFlipped);
 
         IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(inExpression.getLeftExpression());
+        isNullExpression.setLeftExpression(copy(inExpression.getLeftExpression()));
         output.add(isNullExpression);
     }
 
     /**
      * Generates test queries for 'LIKE' expressions.
+     *
      * @param likeExpression a LIKE expression.
      */
     @Override
     public void visit(LikeExpression likeExpression) {
 
-        output.add(likeExpression);
+        output.add(copy(likeExpression));
 
         LikeExpression likeExpressionFlipped = new LikeExpression();
-        likeExpressionFlipped.setLeftExpression(likeExpression.getLeftExpression());
-        likeExpressionFlipped.setRightExpression(likeExpression.getRightExpression());
+        likeExpressionFlipped.setLeftExpression(copy(likeExpression.getLeftExpression()));
+        likeExpressionFlipped.setRightExpression(copy(likeExpression.getRightExpression()));
 
-        // The LikeExpression class' setNot function does not accept any parameters, unlike others.
-        // Therefore an if statement is used to check wether to create a NOT expression.
         if (!likeExpression.isNot()) {
             likeExpressionFlipped.setNot();
         }
-
         output.add(likeExpressionFlipped);
 
         IsNullExpression isNullExpressionOut = new IsNullExpression();
-        isNullExpressionOut.setLeftExpression(likeExpression.getLeftExpression());
+        isNullExpressionOut.setLeftExpression(copy(likeExpression.getLeftExpression()));
         output.add(isNullExpressionOut);
     }
 
-    /**
-     * Generates an `EqualsTo` expression.
-     * @param leftExpression the left side of the expression
-     * @param rightExpression the right side of the expression
-     * @return the generated `EqualsTo` expression.
-     */
-    private EqualsTo generateEqualsTo(Expression leftExpression, Expression rightExpression) {
-        EqualsTo equalsExpression = new EqualsTo();
-        equalsExpression.setLeftExpression(leftExpression);
-        equalsExpression.setRightExpression(rightExpression);
-
-        return equalsExpression;
-    }
 }
