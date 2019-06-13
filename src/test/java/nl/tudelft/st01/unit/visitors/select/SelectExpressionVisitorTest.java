@@ -13,8 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * Unit tests for the {@code SelectExpressionVisitorTest}.
@@ -77,6 +76,33 @@ public class SelectExpressionVisitorTest {
         assertThat(output).containsOnly(
                 isNullExpression,
                 isNotNullExpression
+        );
+    }
+
+    /**
+     * Assert that the {@code visit} method for an {@code InExpression} generates the correct output.
+     */
+    @Test
+    public void visitLikeExpressionTest() {
+        LikeExpression likeExpression = new LikeExpression();
+        StringValue leftValue = new StringValue("x");
+        StringValue rightValue = new StringValue("project");
+        likeExpression.setLeftExpression(leftValue);
+        likeExpression.setRightExpression(rightValue);
+        
+        LikeExpression notLikeExpression = new LikeExpression();
+        notLikeExpression.setNot();
+        notLikeExpression.setLeftExpression(leftValue);
+        notLikeExpression.setRightExpression(rightValue);
+        
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(leftValue);
+        
+        selectExpressionVisitor.visit(likeExpression);
+        assertThat(output).containsOnly(
+                likeExpression,
+                notLikeExpression,
+                isNullExpression
         );
     }
 }
