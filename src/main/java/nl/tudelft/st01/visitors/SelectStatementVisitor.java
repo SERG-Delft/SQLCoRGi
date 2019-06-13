@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static nl.tudelft.st01.SubqueryGenerator.mutateSubqueries;
+import static nl.tudelft.st01.SubqueryGenerator.coverSubqueries;
 import static nl.tudelft.st01.util.Expressions.setJoinToInner;
 import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
 
@@ -70,7 +70,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * @param plainSelect the plainSelect that needs to be covered.
      */
     private void handleSubqueries(PlainSelect plainSelect) {
-        this.output.addAll(mutateSubqueries(plainSelect));
+        this.output.addAll(coverSubqueries((PlainSelect) copy(plainSelect)));
     }
 
     /**

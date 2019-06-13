@@ -64,8 +64,7 @@ public final class Generator {
      */
     public static void main(String[] args) {
 
-        String query = "SELECT * FROM ((SELECT * FROM t1 WHERE a1 != 1) JOIN (SELECT * FROM t2 WHERE a2 != 2))"
-            + " JOIN ((SELECT * FROM t3 WHERE a3 != 3) JOIN (SELECT * FROM t4 WHERE a4 != 4))";
+        String query = "SELECT * FROM t WHERE a IN (SELECT * FROM t2 WHERE a2 > 1)";
 
         Set<String> result = generateRules(query);
 

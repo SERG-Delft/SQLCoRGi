@@ -1,7 +1,9 @@
 package nl.tudelft.st01;
 
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.*;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
+import nl.tudelft.st01.visitors.subqueries.SubqueryFinder;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -26,7 +28,7 @@ public final class SubqueryGenerator {
      * @param plainSelect the plainSelect to cover.
      * @return a set of coverage rules in string form.
      */
-    public static Set<String> mutateSubqueries(PlainSelect plainSelect) {
+    public static Set<String> coverSubqueries(PlainSelect plainSelect) {
 
         List<SubSelect> fromSubSelects = new LinkedList<>(extractSubqueriesFromFromItem(plainSelect.getFromItem()));
 
@@ -44,7 +46,24 @@ public final class SubqueryGenerator {
             rules.addAll(subRules);
         }
 
-        // TODO: find subselects in where and have, remove 1 per mutation and add exists for every generated rule
+        // TODO: find subselects in where and have
+
+        SubqueryFinder subqueryFinder = new SubqueryFinder();
+
+        Expression where = plainSelect.getWhere();
+        if (where != null) {
+            where.accept(subqueryFinder);
+            Set<String> whereSubs = subqueryFinder.getSubqueries();
+        }
+
+        Expression having = plainSelect.getHaving();
+        if (having != null) {
+            having.accept(subqueryFinder);
+            Set<String> havingSubs = subqueryFinder.getSubqueries();
+        }
+
+        // TODO: Remove subqueries, check left and right of AND/ORs and propagate removal if needed
+
 
         return rules;
     }
