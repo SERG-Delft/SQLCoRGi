@@ -39,7 +39,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
      * Creates a new instance of this class, which uses the provided {@link SelectCloner} for {@link SubSelect}s.
      *
      * @param selectCloner the {@code SelectCloner} to use.
-     * @param orderByCloner the {@code OrderByCloner} to use.
+     * @param orderByCloner the {@link OrderByCloner} to use.
      */
     ExpressionCloner(SelectCloner selectCloner, OrderByCloner orderByCloner) {
         this.selectCloner = selectCloner;
@@ -408,7 +408,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
     }
 
     /**
-     * Only deep copies the {@code selectBody} and {@code Alias} fields of the given {@link SubSelect}.
+     * Only deep copies the {@link SelectBody} and {@link Alias} fields of the given {@link SubSelect}.
      *
      * @param subSelect the {@code SubSelect} to be copied.
      */

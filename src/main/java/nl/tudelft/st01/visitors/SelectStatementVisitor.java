@@ -211,8 +211,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      */
     private void handleJoins(PlainSelect plainSelect) {
         JoinRulesGenerator joinRulesGenerator = new JoinRulesGenerator();
-        Set<String> out = joinRulesGenerator.generate(plainSelect);
-        Set<String> out = joinWhereExpressionGenerator.generateJoinWhereExpressions((PlainSelect) copy(plainSelect));
+        Set<String> out = joinRulesGenerator.generate((PlainSelect) copy(plainSelect));
 
         output.addAll(out);
     }

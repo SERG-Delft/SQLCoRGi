@@ -1,5 +1,6 @@
 package nl.tudelft.st01.functional;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -232,7 +233,7 @@ class JoinTest {
      * A test for evaluating whether a redundant IS NOT NULL expression is included even though its table's id is not.
      */
     @Test
-    void testJoinWithWhereContainsIsNullOfNonExcludedColumn() {
+    void testJoinWithWhereContainsIsNotNullOfNonExcludedColumn() {
         containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.length IS NOT NULL)",
 
@@ -250,7 +251,7 @@ class JoinTest {
      * A test for evaluating whether the IS NULL expression is included even though its table's id is too.
      */
     @Test
-    public void testJoinWithWhereContainsIsNullOfNonExcludedColumn() {
+    void testJoinWithWhereContainsIsNullOfNonExcludedColumn() {
         containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE a.length IS NULL",
 
@@ -268,7 +269,7 @@ class JoinTest {
      * A test for evaluating whether the IS NULL expression is excluded even of a column that should be excluded.
      */
     @Test
-    public void testJoinWithWhereNotContainsIsNullOfExcludedColumn() {
+    void testJoinWithWhereNotContainsIsNullOfExcludedColumn() {
         containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE a.id IS NULL",
 
@@ -337,7 +338,7 @@ class JoinTest {
      * A test for verifying that no targets are generated for queries with a simple join.
      */
     @Test
-    public void testJoinNoOnConditionSimpleJoin() {
+    void testJoinNoOnConditionSimpleJoin() {
         verify("SELECT * FROM a, b");
     }
 
@@ -346,7 +347,7 @@ class JoinTest {
      * with an additional where and having clause.
      */
     @Test
-    public void testJoinNoOnConditionSimpleJoinWithWhereClause() {
+    void testJoinNoOnConditionSimpleJoinWithWhereClause() {
         verify("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50",
 
                 "SELECT * FROM a, b WHERE a.id = b.id HAVING a.length = 50",

@@ -72,12 +72,8 @@ public final class Generator {
     public static void main(String[] args) {
         String query = "SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 inner join d on d.id > 0";
 
-        String query = "SELECT * FROM t WHERE a < 10 AND a > 0";
-
         Set<String> result = generateRules(query);
-        List<String> res = new ArrayList<>();
-        res.addAll(result);
-        Collections.sort(res);
+     
         System.out.println("Result:");
         for (String s : result) {
             System.out.println(s);
