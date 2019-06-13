@@ -11,10 +11,7 @@ import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
 import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -73,7 +70,7 @@ public final class Generator {
         String query = "SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 inner join d on d.id > 0";
 
         Set<String> result = generateRules(query);
-     
+
         System.out.println("Result:");
         for (String s : result) {
             System.out.println(s);

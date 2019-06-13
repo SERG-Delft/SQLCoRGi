@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static nl.tudelft.st01.JoinRulesGenerator.genericCopyOfJoin;
 import static nl.tudelft.st01.util.Expressions.setJoinToInner;
 import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
 
