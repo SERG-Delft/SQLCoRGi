@@ -9,7 +9,7 @@ public class IllegalNumberOfArgumentsException extends RuntimeException {
      * Parameterless Constructor for the IllegalNumberOfArgumentsException class.
      */
     public IllegalNumberOfArgumentsException() {
-
+        // Parameterless Constructor for the IllegalNumberOfArgumentsException class.
     }
 
     /**

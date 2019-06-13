@@ -9,7 +9,7 @@ public class CannotBeNullException extends RuntimeException {
      * Parameterless Constructor for the CannotBeNullException class.
      */
     public CannotBeNullException() {
-
+       // Parameterless Constructor for the CannotBeNullException class.
     }
 
     /**

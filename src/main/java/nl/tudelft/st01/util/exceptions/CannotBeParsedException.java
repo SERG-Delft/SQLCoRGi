@@ -9,7 +9,7 @@ public class CannotBeParsedException extends RuntimeException {
      * Parameterless Constructor for the CannotBeParsedException class.
      */
     public CannotBeParsedException() {
-
+        // Parameterless Constructor for the CannotBeParsedException class.
     }
 
     /**

@@ -9,7 +9,7 @@ public class UnsupportedInputException extends RuntimeException {
      * Parameterless Constructor for the UnsupportedInputException class.
      */
     public UnsupportedInputException() {
-
+        // Parameterless Constructor for the UnsupportedInputException class.
     }
 
     /**

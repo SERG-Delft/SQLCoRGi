@@ -9,7 +9,7 @@ public class ListCannotBeEmptyException extends RuntimeException {
      * Parameterless Constructor for the ListCannotBeEmptyException class.
      */
     public ListCannotBeEmptyException() {
-
+        // Parameterless Constructor for the ListCannotBeEmptyException class.
     }
 
     /**

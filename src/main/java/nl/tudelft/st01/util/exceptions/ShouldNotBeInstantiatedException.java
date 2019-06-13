@@ -9,7 +9,7 @@ public class ShouldNotBeInstantiatedException extends RuntimeException {
      * Parameterless Constructor for the ShouldNotBeInstantiatedException class..
      */
     public ShouldNotBeInstantiatedException() {
-
+        // Parameterless Constructor for the ShouldNotBeInstantiatedException class.
     }
 
     /**
