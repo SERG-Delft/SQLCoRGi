@@ -472,6 +472,8 @@ public class JoinRulesGenerator {
      * @param <T> Generic type to ensure that both sets contain elements of the same type.
      * @return The intersection of the sets.
      */
+    // This warning is suppressed due to contradicting checkstyle warnings.
+    // Neither with nor without a white space is accepted between <T> and static.
     @SuppressWarnings("checkstyle:nowhitespacebefore")
     private static <T> Set<T> intersection(Set<T> set1, Set<T> set2) {
         Set set = new HashSet();
