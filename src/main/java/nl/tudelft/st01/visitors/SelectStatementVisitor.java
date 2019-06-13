@@ -5,6 +5,7 @@ import net.sf.jsqlparser.statement.select.*;
 import nl.tudelft.st01.AggregateFunctionsGenerator;
 import nl.tudelft.st01.GroupByGenerator;
 import nl.tudelft.st01.JoinWhereExpressionGenerator;
+import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 import nl.tudelft.st01.visitors.select.NullAttributeFinder;
 import nl.tudelft.st01.visitors.select.NullReducer;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
@@ -33,7 +34,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      */
     public SelectStatementVisitor(Set<String> output) {
         if (output == null || !output.isEmpty()) {
-            throw new IllegalArgumentException(
+            throw new CannotBeNullException(
                 "A SelectStatementVisitor requires an empty, non-null set to which it can output generated rules."
             );
         }

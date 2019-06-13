@@ -7,6 +7,7 @@ import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.query.NumericDoubleValue;
 import nl.tudelft.st01.query.NumericLongValue;
+import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      */
     public SelectExpressionVisitor(List<Expression> output) {
         if (output == null || !output.isEmpty()) {
-            throw new IllegalArgumentException(
+            throw new CannotBeNullException(
                 "A SelectExpressionVisitor requires an empty, non-null set to which it can write generated expressions."
             );
         }
