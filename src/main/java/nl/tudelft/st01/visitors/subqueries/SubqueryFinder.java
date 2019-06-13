@@ -21,7 +21,7 @@ public class SubqueryFinder extends ExpressionVisitorAdapter {
 
     public Set<String> getSubqueries() {
         Set<String> temp = this.subqueries;
-        temp = new HashSet<>();
+        this.subqueries = new HashSet<>();
         return temp;
     }
 
