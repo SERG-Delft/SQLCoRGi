@@ -79,7 +79,8 @@ public class SelectExpressionVisitorTest {
     }
 
     /**
-     * Assert.
+     * Assert that the {@code visit} method for an
+     * {@code BetweenExpression} with Double values generates the correct output.
      */
     @Test
     public void visitBetweenWithDoubleValueTest() {
@@ -130,7 +131,8 @@ public class SelectExpressionVisitorTest {
     }
 
     /**
-     * Assert.
+     * Assert that the {@code visit} method for an
+     * {@code BetweenExpression} with Long values generates the correct output.
      */
     @Test
     public void visitBetweenWithLongValueTest() {
@@ -181,7 +183,8 @@ public class SelectExpressionVisitorTest {
     }
 
     /**
-     * Assert.
+     * Assert that the {@code visit} method for an
+     * {@code BetweenExpression} with String values generates the correct output.
      */
     @Test
     public void visitBetweenWithStringValueTest() {
