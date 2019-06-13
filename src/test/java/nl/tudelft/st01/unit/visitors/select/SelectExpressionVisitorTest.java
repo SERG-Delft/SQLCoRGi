@@ -102,9 +102,7 @@ public class SelectExpressionVisitorTest {
 
         selectExpressionVisitor.visit(inExpression);
 
-        assertThat(output.get(0)).isEqualToComparingFieldByFieldRecursively(inExpression);
-        assertThat(output.get(1)).isEqualToComparingFieldByFieldRecursively(notInExpression);
-        assertThat(output.get(2)).isEqualToComparingFieldByFieldRecursively(isNullExpression);
+        compareFieldByField(output, notInExpression, inExpression, isNullExpression);
     }
 
     /**
