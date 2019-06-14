@@ -1,4 +1,4 @@
-# Coverage Rules Generator
+# Coverage Rule Generator
 
 <!---
 e.g. https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/CS/CP19-CS-01/cool-project/badges/master/pipeline.svg
