@@ -31,7 +31,7 @@ import java.util.TreeSet;
  */
 public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
     private List<Column> nullColumns;
-
+    private List<Column> onColumns;
     private Set<String> tables;
 
     private Expression expression;
@@ -75,14 +75,12 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
             If it is an IS NULL expression, then there is a contradiction, so it should be excluded.
          */
         Column column = (Column) isNullExpression.getLeftExpression();
-        if (contains(column)) {
-            expression = null;
-        } else if (!isNullExpression.isNot() && !tablesContain(column)) {
-            expression = null;
-        } else {
-            expression = isNullExpression;
-        }
 
+        if (tablesContain(column) && !columnsContain(onColumns, column)) {
+            expression = isNullExpression;
+        } else {
+            expression = null;
+        }
     }
 
     @Override
@@ -112,10 +110,10 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(Column column) {
-        if (tablesContain(column) || columnsContain(column)) {
-            expression = null;
-        } else {
+        if (tablesContain(column) && !columnsContain(nullColumns, column)) {
             expression = column;
+        } else {
+            expression = null;
         }
     }
 
@@ -168,29 +166,24 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
 
     }
 
+    public void setOnColumns(List<Column> onColumns) {
+        this.onColumns = onColumns;
+    }
+
     public Expression getExpression() {
         return expression;
     }
 
     /**
-     * Evaluates whether the tables set or the columns set contains the given table.
-     *
-     * @param column The column to check.
-     * @return True if either set contains the column, false otherwise.
-     */
-    private boolean contains(Column column) {
-        return columnsContain(column) || tablesContain(column);
-    }
-
-    /**
      * Check whether the columns list contain the given column or if the column belongs to the table.
      *
+     * @param columns The columns list that should be used.
      * @param column The column that should be checked.
      * @return True if the column is in the list or if it belongs to the table.
      */
-    private boolean columnsContain(Column column) {
-        if (nullColumns != null && !nullColumns.isEmpty()) {
-            for (Column c : nullColumns) {
+    private boolean columnsContain(List<Column> columns, Column column) {
+        if (columns != null && !columns.isEmpty()) {
+            for (Column c : columns) {
                 if (c.toString().toLowerCase().equals(column.toString().toLowerCase())) {
                     return true;
                 }

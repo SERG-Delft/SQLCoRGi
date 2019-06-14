@@ -408,7 +408,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
     }
 
     /**
-     * Only deep copies the {@code selectBody} and {@code Alias} fields of the given {@link SubSelect}.
+     * Only deep copies the {@code selectBody} and {@code alias} fields of the given {@link SubSelect}.
      *
      * @param subSelect the {@code SubSelect} to be copied.
      */
