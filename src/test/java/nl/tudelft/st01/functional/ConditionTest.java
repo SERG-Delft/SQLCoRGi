@@ -236,7 +236,7 @@ class ConditionTest {
     }
 
     /**
-     * A test case with an LIKE condition.
+     * A test case with a LIKE condition.
      */
     @Test
     void testLikeCondition() {
@@ -264,7 +264,7 @@ class ConditionTest {
     }
 
     /**
-     * A test case with an LIKE condition.
+     * A test case with a negated LIKE condition.
      */
     @Test
     void testLikeConditionNegated() {
