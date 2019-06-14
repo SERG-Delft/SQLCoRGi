@@ -1,4 +1,4 @@
-# Project Name
+# Coverage Rule Generator
 
 <!---
 e.g. https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/CS/CP19-CS-01/cool-project/badges/master/pipeline.svg
@@ -7,56 +7,39 @@ e.g. https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/CS/CP19-CS-01/cool-project/b
 [![build status](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/ST/cp19-st-01/st-01/badges/master/pipeline.svg)](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/ST/cp19-st-01/st-01/commits/master)
 [![coverage report](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/ST/cp19-st-01/st-01/badges/master/coverage.svg)](https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/ST/cp19-st-01/st-01/commits/master)
 
-Project description
 
 Our time estimates are cumulative, e.g.: If we estimate 2 people will each spend 3 hours on an issue, the estimate is 6 hours.
 
 ## Features
 
-List the features that your project offers
+This tool takes in an SQL query (as a string) and returns MC/DC coverage rules for that query.
+If the query contains an error, this tool will throw an appropriate exception, which clearly indicates what went wrong.
 
-## Getting started
+## Usage
 
-<!---
+Please do the following to use our tool:
+1. Make sure `Java 8+` is installed on your machine
+2. Make sure `Maven 3.3.9+` is installed on your machine
+3. Clone our repository
+4. Open our tool in your favourite IDE
+5. Go to the `CoverageRuleGenerator` class and change the input query string.
+Here is an example of how you would use this:
 
-This section should contain installation, testing, and running instructions for people who want to get started with the project.
+```java
+import nl.tudelft.st01.CoverageRuleGenerator;
 
-- These instructions should work on a clean system.
-- These instructions should work without having to install an IDE.
-- You can specify that the user should have a certain operating system.
+// ...
 
---->
+String query = "Select Name, Address FROM Customers WHERE balance > 1000";
+List<String> coverageTargets = CoverageRulesGenerator.generateRules(query);
 
-## Configuration
-
-<!---
-
-Most projects have properties that can be changed based on the desire of the user or system that it runs on. Thing about properties like:
-- credentials
-- database configuration
-- file paths
-- key bindings
-
-Your project might also have different functionalities that can be turned on/off or have a development/debug window.
-
-These configuration values/key maps should be listed in this section.
-
---->
-
-## Contributing
-
-<!---
-
-Every project has their own set of best practices and conventions. In this section, you should specify what these are for your project, so others who want to contribute to your project know what to expect.
-
-- What kind of code style to use?
-- How to write commits and do branching?
-- How to keep in touch with the team?
-
---->
+// Do with coverageTargets what you want
+```
+6. Enjoy the coverage targets related to the provided query.
+7. (Optionally, add the Checkstyle, PMD and SpotBug plugins to your IDE to simplify your life. We used IntelliJ to develop this tool.)
 
 ## Useful Links / Resources
 
-[SQLFpc Web Tool](https://in2test.lsi.uniovi.es/sqlfpc/SQLFpcWeb.aspx)
-[Link to the spreadsheet](https://docs.google.com/spreadsheets/d/1MvCkE1jT9OSuqwx1zA13ZczDIyj6YJizuWKqK0SITdY/edit#gid=0)
-[Link to the Spanish tool](https://in2test.lsi.uniovi.es/sqlfpc/SQLFpcWeb.aspx)
+[SQLFpc Web Tool](https://in2test.lsi.uniovi.es/sqlfpc/SQLFpcWeb.aspx)  
+[Spreadsheet with example queries and corresponding results](https://docs.google.com/spreadsheets/d/1MvCkE1jT9OSuqwx1zA13ZczDIyj6YJizuWKqK0SITdY/edit#gid=0)  
+

@@ -2,14 +2,20 @@ package nl.tudelft.st01.sqlfpcws.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.util.TablesNamesFinder;
+
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
+import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
+import nl.tudelft.st01.util.exceptions.CannotParseInputSQLFileException;
+import nl.tudelft.st01.util.exceptions.CannotWriteJSONOutputException;
+import nl.tudelft.st01.util.exceptions.InvalidSchemaException;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
@@ -21,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -112,15 +117,14 @@ public class BulkRuleGenerator {
                     .filter(query -> !query.isEmpty())
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            System.err.println("SQL queries could not be read in correctly: " + e.getMessage());
-            queriesToParse = new ArrayList<>();
+            throw new CannotParseInputSQLFileException("SQL queries could not be read in correctly: " + e.getMessage());
         }
 
         for (String query : queriesToParse) {
             try {
                 CCJSqlParserUtil.parse(query);
             } catch (JSQLParserException e) {
-                System.err.println("Query could not be parsed: " + e.getMessage());
+                throw new CannotBeParsedException("Input query is not valid: " + query);
             }
         }
     }
@@ -134,8 +138,7 @@ public class BulkRuleGenerator {
         try {
             schema = new SAXReader().read(new File(xmlSchemaPath));
         } catch (DocumentException e) {
-            System.err.println("Schema could not be parsed: " + e.getMessage());
-            schema = DocumentHelper.createDocument();
+            throw new InvalidSchemaException("Schema is not syntactically valid.");
         }
     }
 
@@ -152,7 +155,7 @@ public class BulkRuleGenerator {
             gson.toJson(sqlJson, jsonWriter);
             jsonWriter.flush();
         } catch (IOException e) {
-            System.err.println("Unable to write to output file: " + e.getMessage());
+            throw new CannotWriteJSONOutputException("Could not save JSON output.");
         }
     }
 
@@ -221,8 +224,7 @@ public class BulkRuleGenerator {
         try {
             statement = CCJSqlParserUtil.parse(query);
         } catch (JSQLParserException e) {
-            System.err.println("Input query could not be parsed: " + e.getMessage());
-            return tableNames;
+            throw new CannotBeParsedException("Input query could not be parsed: " + query);
         }
 
         tableNames = new TablesNamesFinder().getTableList(statement);
