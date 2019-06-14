@@ -262,6 +262,9 @@ public class SQLFpcWSTest {
     /**
      * Assert that the correct exception is thrown when SQLFpc returns an error about the syntax of the SQL query.
      *
+     * The XML response from the SQLFpc web service is mocked in order for the test to work independently of a working
+     * internet connection.
+     *
      * @throws Exception because of the use of {@link PowerMockito}.
      */
     @org.junit.jupiter.api.Test

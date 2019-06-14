@@ -7,10 +7,10 @@ package nl.tudelft.st01.util.exceptions;
 public class SQLFpcException extends RuntimeException {
 
     /**
-     * Parameterless Constructor for the ShouldNotBeInstantiatedException class..
+     * Parameterless Constructor for the SQLFpcException class..
      */
     public SQLFpcException() {
-        // Parameterless Constructor for the ShouldNotBeInstantiatedException class.
+        // Parameterless Constructor for the SQLFpcException class.
     }
 
     /**

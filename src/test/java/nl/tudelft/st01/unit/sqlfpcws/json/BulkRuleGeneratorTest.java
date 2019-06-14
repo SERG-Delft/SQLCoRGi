@@ -133,7 +133,8 @@ public class BulkRuleGeneratorTest {
 
     /**
      * Asserts that the correct exception is thrown when an output file in a non-existent path is supplied to the
-     * {@link BulkRuleGenerator} constructor.
+     * {@link BulkRuleGenerator} constructor. The XML response from the SQLFpc web service is mocked in order for the
+     * test to work independently of a working internet connection.
      *
      * @throws Exception because of the use of {@link PowerMockito}.
      */
