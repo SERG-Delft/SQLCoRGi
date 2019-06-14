@@ -1,15 +1,20 @@
 package nl.tudelft.st01.unit.sqlfpcws.json;
 
-import net.sf.jsqlparser.JSQLParserException;
+import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
+
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 import nl.tudelft.st01.sqlfpcws.json.BulkRuleGenerator;
 
-import org.dom4j.DocumentException;
+
+import nl.tudelft.st01.util.exceptions.CannotParseInputSQLFileException;
+import nl.tudelft.st01.util.exceptions.CannotWriteJSONOutputException;
+import nl.tudelft.st01.util.exceptions.InvalidSchemaException;
+
 import org.junit.After;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -25,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
@@ -93,12 +99,10 @@ public class BulkRuleGeneratorTest {
      * constructor.
      */
     @Test
-    @Disabled("Exceptions have not yet been implemented")
-    // TODO: implement exceptions!
     public void testCorrectExceptionIsThrownForNonExistingInputFile() {
         String wrongInputPath = RESOURCE_PATH + "nonExistingFile.sql";
 
-        assertThatExceptionOfType(IOException.class).isThrownBy(
+        assertThatExceptionOfType(CannotParseInputSQLFileException.class).isThrownBy(
             () -> new BulkRuleGenerator(wrongInputPath, XML_SCHEMA_PATH, JSON_OUTPUT_PATH)
         );
     }
@@ -107,12 +111,10 @@ public class BulkRuleGeneratorTest {
      * Asserts that the correct exception is thrown when the input file contains invalid SQL queries.
      */
     @Test
-    @Disabled("Exceptions have not yet been implemented")
-    // TODO: implement exceptions!
     public void testCorrectExceptionIsThrownForInvalidSQLQuery() {
         String fileWithInvalidQuery = RESOURCE_PATH + "invalidQuery.sql";
 
-        assertThatExceptionOfType(JSQLParserException.class).isThrownBy(
+        assertThatExceptionOfType(CannotParseInputSQLFileException.class).isThrownBy(
             () -> new BulkRuleGenerator(fileWithInvalidQuery, XML_SCHEMA_PATH, JSON_OUTPUT_PATH)
         );
     }
@@ -121,12 +123,10 @@ public class BulkRuleGeneratorTest {
      * Asserts that the correct exception is thrown when the supplied xml schema is not syntactically valid.
      */
     @Test
-    @Disabled("Exceptions have not yet been implemented")
-    // TODO: implement exceptions!
     public void testCorrectExceptionIsThrownForInvalidXMLSchema() {
         String fileWithInvalidSchema = RESOURCE_PATH + "invalidSchema.xml";
 
-        assertThatExceptionOfType(DocumentException.class).isThrownBy(
+        assertThatExceptionOfType(InvalidSchemaException.class).isThrownBy(
             () -> new BulkRuleGenerator(SQL_INPUT_PATH, fileWithInvalidSchema, JSON_OUTPUT_PATH)
         );
     }
@@ -134,15 +134,28 @@ public class BulkRuleGeneratorTest {
     /**
      * Asserts that the correct exception is thrown when an output file in a non-existent path is supplied to the
      * {@link BulkRuleGenerator} constructor.
+     *
+     * @throws Exception because of the use of {@link PowerMockito}.
      */
-    @Test
-    @Disabled("Exceptions have not yet been implemented")
-    // TODO: implement exceptions!
-    public void testCorrectExceptionIsThrownForInvalidJSONOutputPath() {
+    @org.junit.Test
+    public void testCorrectExceptionIsThrownForInvalidJSONOutputPath() throws Exception {
         String invalidJSONPath = RESOURCE_PATH + "nonExistingFolder/outputFile.json";
 
-        assertThatExceptionOfType(IOException.class).isThrownBy(
+        String serverXMLReply =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                        + "<sqlfpc>\n"
+                        + "   <version>1.3.180.91</version>\n"
+                        + "   <sql>SELECT * FROM tableB</sql>\n"
+                        + "   <fpcrules />\n"
+                        + "</sqlfpc>";
+
+        SQLFpcWSSoapProxy mockWebService = mock(SQLFpcWSSoapProxy.class);
+        when(mockWebService.getRules(any(), any(), any())).thenReturn(serverXMLReply);
+        PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
+
+        assertThatExceptionOfType(CannotWriteJSONOutputException.class).isThrownBy(
             () -> new BulkRuleGenerator(SQL_INPUT_PATH, XML_SCHEMA_PATH, invalidJSONPath)
+                    .generate()
         );
     }
 
@@ -206,5 +219,4 @@ public class BulkRuleGeneratorTest {
     public void removeOutputFile() throws IOException {
         Files.deleteIfExists(Paths.get(JSON_OUTPUT_PATH));
     }
-
 }

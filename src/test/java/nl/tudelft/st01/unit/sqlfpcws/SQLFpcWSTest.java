@@ -4,8 +4,10 @@ import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
 
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 
+import nl.tudelft.st01.util.exceptions.SQLFpcException;
+import nl.tudelft.st01.util.exceptions.SQLFpcParseException;
+
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
@@ -220,15 +222,12 @@ public class SQLFpcWSTest {
      *
      * @throws Exception because of the use of {@link PowerMockito}.
      */
-    @org.junit.jupiter.api.Test
-    @Disabled("Exceptions have not yet been implemented")
-    // TODO: implement exceptions!
+    @Test
     public void testCorrectExceptionIsThrownWhenSQLFpcReturnsInvalidXML() throws Exception {
         String sqlQuery = "SELECT * FROM tableB";
 
         String invalidXMLServerReply =
-                "<sqlfpc>\n"
-                        + "   <version>1.3.180.91</version>\n"
+                         "   <version>1.3.180.91</version>\n"
                         + "   <sql>SELECT * FROM tableB</sql>\n"
                         + "   <fpcrules>\n"
                         + "</sqlfpc>";
@@ -236,7 +235,7 @@ public class SQLFpcWSTest {
         when(mockWebService.getRules(any(), any(), any())).thenReturn(invalidXMLServerReply);
         PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+        assertThatExceptionOfType(SQLFpcException.class).isThrownBy(
             () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
         );
     }
@@ -249,15 +248,13 @@ public class SQLFpcWSTest {
      * @throws Exception because of the use of {@link PowerMockito}.
      */
     @Test
-    @Ignore("Exceptions have not yet been implemented")
-    // TODO: implement exceptions!
     public void testCorrectExceptionIsThrownWhenServerIsNotReachable() throws Exception {
         String sqlQuery = "SELECT * FROM tableA WHERE TableA.id = 'value'";
 
         when(mockWebService.getRules(any(), any(), any())).thenThrow(RemoteException.class);
         PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
 
-        assertThatExceptionOfType(RemoteException.class).isThrownBy(
+        assertThatExceptionOfType(SQLFpcException.class).isThrownBy(
             () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
         );
     }
@@ -266,12 +263,21 @@ public class SQLFpcWSTest {
      * Assert that the correct exception is thrown when SQLFpc returns an error about the syntax of the SQL query.
      */
     @org.junit.jupiter.api.Test
-    @Disabled("Exceptions have not yet been implemented")
-    // TODO: implement exceptions!
-    public void testCorrectExceptionIsThrownWhenSQLQueryIsNotValidForSQLFpc() {
+    @Disabled("Couldn't implement as SQLFpc is down...")
+    public void testCorrectExceptionIsThrownWhenSQLQueryIsNotValidForSQLFpc() throws Exception {
         String sqlQuery = "SELECT * FROM tableA LIMIT 0, 1";
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+        String invalidXMLServerReply =
+                          "<sqlfpc>\n"
+                        + "   <version>1.3.180.91</version>\n"
+                        + "   <sql>SELECT * FROM tableB</sql>\n"
+                        + "   <fpcrules>\n"
+                        + "</sqlfpc>";
+
+        when(mockWebService.getRules(any(), any(), any())).thenReturn(invalidXMLServerReply);
+        PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
+
+        assertThatExceptionOfType(SQLFpcParseException.class).isThrownBy(
             () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
         );
     }
