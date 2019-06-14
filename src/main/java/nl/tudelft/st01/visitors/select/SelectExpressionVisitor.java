@@ -221,9 +221,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
         output.add(copy(likeExpression));
 
-        LikeExpression likeExpressionFlipped = new LikeExpression();
-        likeExpressionFlipped.setLeftExpression(copy(likeExpression.getLeftExpression()));
-        likeExpressionFlipped.setRightExpression(copy(likeExpression.getRightExpression()));
+        LikeExpression likeExpressionFlipped = (LikeExpression) copy(likeExpression);
         likeExpressionFlipped.setCaseInsensitive(likeExpression.isCaseInsensitive());
 
         if (!likeExpression.isNot()) {
