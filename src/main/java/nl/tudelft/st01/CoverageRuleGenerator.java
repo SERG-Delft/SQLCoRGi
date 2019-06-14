@@ -6,13 +6,13 @@ import java.util.List;
 /**
  *  Entry point for our tool. Use this to interact with the generator.
  */
-public final class CoverageRulesGenerator {
+public final class CoverageRuleGenerator {
 
     /**
      *  Constructor for the Entry point to our tool. This is not supposed to be instantiated.
-     *  Instead, you just call the static method {@code CoverageRulesGenerator.generateRules()} and enjoy the results.
+     *  Instead, you just call the static method {@code CoverageRuleGenerator.generateRules()} and enjoy the results.
      */
-    private CoverageRulesGenerator() {
+    private CoverageRuleGenerator() {
         throw new UnsupportedOperationException("You are not allowed to instantiate this class.");
     }
 

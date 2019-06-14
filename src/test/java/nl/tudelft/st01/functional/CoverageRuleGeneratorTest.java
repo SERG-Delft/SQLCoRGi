@@ -1,11 +1,9 @@
 package nl.tudelft.st01.functional;
 
-import nl.tudelft.st01.CoverageRulesGenerator;
+import nl.tudelft.st01.CoverageRuleGenerator;
 import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,9 +11,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  *  This test class tests a good flow and a bad flow for the entry point to this tool,
- *  the {@link CoverageRulesGenerator} class.
+ *  the {@link CoverageRuleGenerator} class.
  */
-public class CoverageRulesGeneratorTest {
+public class CoverageRuleGeneratorTest {
 
     /**
      * A test case for the happy flow of the class. This shows what happens when
@@ -23,7 +21,7 @@ public class CoverageRulesGeneratorTest {
      */
     @Test
     public void goodFlowTest() {
-        List<String> result = CoverageRulesGenerator.generateRules(
+        List<String> result = CoverageRuleGenerator.generateRules(
                 "SELECT COUNT(*) FROM Movies WHERE length_minutes < 100"
         );
 
@@ -43,7 +41,7 @@ public class CoverageRulesGeneratorTest {
     @Test
     public void badFlowTest() {
         assertThatExceptionOfType(CannotBeParsedException.class).isThrownBy(
-            () -> CoverageRulesGenerator.generateRules("SELEC * FRO invalid WERE statement = 5")
+            () -> CoverageRuleGenerator.generateRules("SELEC * FRO invalid WERE statement = 5")
         );
     }
 }

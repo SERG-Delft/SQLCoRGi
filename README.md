@@ -15,13 +15,13 @@ Our time estimates are cumulative, e.g.: If we estimate 2 people will each spend
 This tool takes in an SQL query (as a string) and returns MC/DC coverage rules for that query.
 If the query contains an error, this tool will throw an appropriate exception, which clearly indicates what went wrong.
 
-## Getting started
+## Usage
 
 You can clone our repo and then run the application.
 Here is an example of how you would use this tool:
 
 ```java
-import nl.tudelft.st01.CoverageRulesGenerator;
+import nl.tudelft.st01.CoverageRuleGenerator;
 
 // ...
 
