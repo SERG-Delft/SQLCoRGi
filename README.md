@@ -17,8 +17,13 @@ If the query contains an error, this tool will throw an appropriate exception, w
 
 ## Usage
 
-You can clone our repo and then run the application.
-Here is an example of how you would use this tool:
+Please do the following to use our tool:
+1. Make sure `Java 8+` is installed on your machine
+2. Make sure `Maven 3.3.9+` is installed on your machine
+3. Clone our repository
+4. Open our tool in your favourite IDE
+5. Go to the `CoverageRuleGenerator` class and change the input query string.
+Here is an example of how you would use this:
 
 ```java
 import nl.tudelft.st01.CoverageRuleGenerator;
@@ -30,6 +35,8 @@ List<String> coverageTargets = CoverageRulesGenerator.generateRules(query);
 
 // Do with coverageTargets what you want
 ```
+6. Enjoy the coverage targets related to the provided query.
+7. (Optionally, add the Checkstyle, PMD and SpotBug plugins to your IDE to simplify your life. We used IntelliJ to develop this tool.)
 
 ## Useful Links / Resources
 
