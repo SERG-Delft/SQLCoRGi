@@ -1,8 +1,11 @@
 package nl.tudelft.st01.functional;
 
+import nl.tudelft.st01.Generator;
+import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
+import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
 import org.junit.jupiter.api.Test;
 
-import static nl.tudelft.st01.functional.AssertUtils.verify;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * This class exercises several bad weather scenarios for the {@code Generator}.
@@ -10,24 +13,22 @@ import static nl.tudelft.st01.functional.AssertUtils.verify;
 public class BadWeatherTest {
 
     /**
-     * A test case to check if an invalid query returns nothing.
+     * A test case to check if an invalid query results in the correct exception.
      *
-     * Note: Only the query is there, there is nothing in the 'expected' area. This is intentional.
-     * This indicates that there should be no rules generated since the query is invalid.
      */
     @Test
     public void testInvalidQuery() {
-        verify("ELECT * ROM invalid WERE statement = 5");
+        assertThatExceptionOfType(CannotBeParsedException.class).isThrownBy(
+            () -> Generator.generateRules("ELECT * ROM invalid WERE statement = 5"));
     }
 
     /**
-     * A test case to check if a non-select query returns nothing.
-     *
-     * Note: Only the query is there, there is nothing in the 'expected' area. This is intentional.
-     * This indicates that there should be no rules generated since the query is invalid.
+     * A test case to check if a non-select query results in the coorect exception.
      */
     @Test
     public void testNonSelectQuery() {
-        verify("ALTER TABLE Customers ADD Email varchar(255)");
+        assertThatExceptionOfType(UnsupportedInputException.class).isThrownBy(
+            () -> Generator.generateRules("ALTER TABLE Customers ADD Email varchar(255)"));
+
     }
 }

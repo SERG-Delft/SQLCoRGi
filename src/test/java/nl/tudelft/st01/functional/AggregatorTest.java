@@ -26,20 +26,65 @@ public class AggregatorTest {
     }
 
     /**
+     * A test case for the COUNT(_) clause. This query doesn't focus on GROUP BY,
+     * but specifically on the WHERE clause.
+     */
+    @Test
+    public void testCountOnColumnWithWhere() {
+        verify("SELECT COUNT(id) FROM Movies WHERE length_minutes < 100",
+
+            "SELECT COUNT(id) FROM Movies WHERE length_minutes = 101",
+            "SELECT COUNT(id) FROM Movies WHERE length_minutes = 100",
+            "SELECT COUNT(id) FROM Movies WHERE length_minutes = 99",
+            "SELECT COUNT(id) FROM Movies WHERE length_minutes IS NULL",
+            "SELECT COUNT(id) FROM Movies WHERE length_minutes < 100 "
+                + "HAVING COUNT(id) > COUNT(DISTINCT id) AND COUNT(DISTINCT id) > 1");
+    }
+
+    /**
+     * A test case for the COUNT(*) clause. This query doesn't focus on GROUP BY,
+     * but specifically on the WHERE clause.
+     */
+    @Test
+    public void testCountAllWithWhere() {
+        verify("SELECT COUNT(*) FROM Movies WHERE length_minutes < 100",
+
+            "SELECT COUNT(*) FROM Movies WHERE length_minutes = 101",
+            "SELECT COUNT(*) FROM Movies WHERE length_minutes = 100",
+            "SELECT COUNT(*) FROM Movies WHERE length_minutes = 99",
+            "SELECT COUNT(*) FROM Movies WHERE length_minutes IS NULL");
+    }
+
+    /**
+     * A test case for the COUNT(*) clause, which has to be handled differently from a normal
+     * COUNT(column) case since COUNT(*) does not have any columns in them, thus returning
+     * a nullPointer when trying to access them.
+     *
+     * It also focuses on the GROUP BY clause, as this is often paired with Aggregate functions.
+     */
+    @Test
+    public void testCountAllWithGroupBy() {
+        verify("SELECT director, COUNT(*) FROM Movies GROUP BY director",
+
+            "SELECT director, COUNT(*) FROM Movies GROUP BY director HAVING COUNT(*) > 1",
+            "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1");
+    }
+
+    /**
      * A test case for all the aggregators but COUNT since they all need 2 rules.
      * Since there is no Group By statement here, the 2 rules for Group By are not generated.
      *
      * @param func Function name to use in tests
      */
-    @ParameterizedTest(name = "[{index}] Join type: {0}")
+    @ParameterizedTest(name = "[{index}] Aggregate function: {0}")
     @CsvSource({"AVG", "SUM", "MIN", "MAX"})
-    public void testOtherFunctionsNoGroupBy(String func) {
+    public void testOtherAggregateFunctionsNoGroupBy(String func) {
         verify("SELECT " + func + "(Points) FROM Customers",
 
-                "SELECT " + func + "(Points) FROM Customers HAVING COUNT(Points) > COUNT(DISTINCT Points) "
-                + "AND COUNT(DISTINCT Points) > 1",
                 "SELECT " + func + "(Points) FROM Customers "
-                + "HAVING COUNT(*) > COUNT(Points) AND COUNT(DISTINCT Points) > 1");
+                    + "HAVING COUNT(Points) > COUNT(DISTINCT Points) AND COUNT(DISTINCT Points) > 1",
+                "SELECT " + func + "(Points) FROM Customers "
+                    + "HAVING COUNT(*) > COUNT(Points) AND COUNT(DISTINCT Points) > 1");
     }
 
     /**
@@ -52,23 +97,10 @@ public class AggregatorTest {
 
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
                 "SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1",
-                "SELECT Director, AVG(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > COUNT(Length) AND "
-                        + "COUNT(DISTINCT Length) > 1",
                 "SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
-                        + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
-    }
-
-    /**
-     * A test case for the COUNT(*) clause, which has to be handled differently from a normal
-     * COUNT(column) case since COUNT(*) does not have any columns in them, thus returning
-     * a nullPointer when trying to access them.
-     */
-    @Test
-    public void testCountAll() {
-        verify("SELECT director, COUNT(*) FROM Movies GROUP BY director",
-
-                "SELECT director, COUNT(*) FROM Movies GROUP BY director HAVING COUNT(*) > 1",
-                "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT director) > 1");
+                    + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1",
+                "SELECT Director, AVG(Length) FROM Movies GROUP BY Director "
+                    + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
     }
 
     /**
@@ -79,20 +111,21 @@ public class AggregatorTest {
     @Test
     public void testSUMAVGAggregator1column2Aggr() {
         verify("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director",
+
                 // generated for GROUP BY
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director HAVING COUNT(*) > 1",
                 // generated per column used in an aggregator
                 // for Length (used in SUM)
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
-                        + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1",
+                    + "HAVING COUNT(*) > COUNT(Length) AND COUNT(DISTINCT Length) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
-                        + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1",
+                    + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1",
                 // for Score (used in AVG)
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
-                        + "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1",
+                    + "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1",
                 "SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director "
-                        + "HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1");
+                    + "HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1");
     }
 
     /**
@@ -108,9 +141,9 @@ public class AggregatorTest {
                 "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name HAVING COUNT(*) > 1",
                 // Aggregator
                 "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name HAVING COUNT(*) > COUNT(Length) AND "
-                        + "COUNT(DISTINCT Length) > 1",
+                    + "COUNT(DISTINCT Length) > 1",
                 "SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name "
-                        + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
+                    + "HAVING COUNT(Length) > COUNT(DISTINCT Length) AND COUNT(DISTINCT Length) > 1");
     }
 
     /**
@@ -124,11 +157,11 @@ public class AggregatorTest {
         verify("SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers",
 
                 "SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers "
-                + "HAVING COUNT(Points) > COUNT(DISTINCT Points) AND COUNT(DISTINCT Points) > 1",
+                    + "HAVING COUNT(Points) > COUNT(DISTINCT Points) AND COUNT(DISTINCT Points) > 1",
                 "SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers "
-                + "HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1",
+                    + "HAVING COUNT(Score) > COUNT(DISTINCT Score) AND COUNT(DISTINCT Score) > 1",
                 "SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers "
-                + "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1");
+                    + "HAVING COUNT(*) > COUNT(Score) AND COUNT(DISTINCT Score) > 1");
     }
 
     /**
@@ -187,8 +220,8 @@ public class AggregatorTest {
         verify("SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                 + "GROUP BY Director HAVING Director LIKE 'A%'",
 
-            // Copy Of Original Clause
-            "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
+                // Copy Of Original Clause
+                "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                     + "GROUP BY Director HAVING Director LIKE 'A%'",
                 //  WHERE
                 "SELECT Director FROM Movies WHERE title <> 'Finding Nemo' "
