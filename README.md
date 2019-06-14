@@ -12,7 +12,7 @@ Our time estimates are cumulative, e.g.: If we estimate 2 people will each spend
 
 ## Features
 
-This tool takes in an SQL query (in String format) and returns MC/DC coverage rules for that query.
+This tool takes in an SQL query (as a string) and returns MC/DC coverage rules for that query.
 If the query contains an error, this tool will throw an appropriate exception, which clearly indicates what went wrong.
 
 ## Getting started
@@ -34,5 +34,5 @@ List<String> coverageTargets = CoverageRulesGenerator.generateRules(query);
 ## Useful Links / Resources
 
 [SQLFpc Web Tool](https://in2test.lsi.uniovi.es/sqlfpc/SQLFpcWeb.aspx)  
-[Link to the spreadsheet](https://docs.google.com/spreadsheets/d/1MvCkE1jT9OSuqwx1zA13ZczDIyj6YJizuWKqK0SITdY/edit#gid=0)  
-[Link to the Spanish tool](https://in2test.lsi.uniovi.es/sqlfpc/SQLFpcWeb.aspx)
+[Spreadsheet with example queries and corresponding results](https://docs.google.com/spreadsheets/d/1MvCkE1jT9OSuqwx1zA13ZczDIyj6YJizuWKqK0SITdY/edit#gid=0)  
+
