@@ -1,0 +1,3 @@
+SELECT * FROM TableA
+
+SELECT * FROM TableB WHERE TableB.Var = 1

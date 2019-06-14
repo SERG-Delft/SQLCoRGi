@@ -1,0 +1,9 @@
+<schema dbms="MySQL">
+    <table name="TableA">
+        <column name="id" type="INT" key="true" notnull="true"/>
+    </table>
+	<table name="TableB">
+        <column name="id" type="CHAR" size="36" key="true" notnull="true"/>
+        <column name="var" type="INT" default="NULL"/>
+    </table>
+</schema>
