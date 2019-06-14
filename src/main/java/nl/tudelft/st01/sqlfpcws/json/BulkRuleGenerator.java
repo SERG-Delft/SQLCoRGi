@@ -2,18 +2,20 @@ package nl.tudelft.st01.sqlfpcws.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.util.TablesNamesFinder;
+
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
 import nl.tudelft.st01.util.exceptions.CannotParseInputSQLFileException;
 import nl.tudelft.st01.util.exceptions.CannotWriteJSONOutputException;
 import nl.tudelft.st01.util.exceptions.InvalidSchemaException;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
@@ -25,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -123,7 +124,7 @@ public class BulkRuleGenerator {
             try {
                 CCJSqlParserUtil.parse(query);
             } catch (JSQLParserException e) {
-                throw new CannotBeParsedException("Input query could not be parsed: " + query);
+                throw new CannotBeParsedException("Input query is not valid: " + query);
             }
         }
     }

@@ -261,6 +261,8 @@ public class SQLFpcWSTest {
 
     /**
      * Assert that the correct exception is thrown when SQLFpc returns an error about the syntax of the SQL query.
+     *
+     * @throws Exception because of the use of {@link PowerMockito}.
      */
     @org.junit.jupiter.api.Test
     @Disabled("Couldn't implement as SQLFpc is down...")

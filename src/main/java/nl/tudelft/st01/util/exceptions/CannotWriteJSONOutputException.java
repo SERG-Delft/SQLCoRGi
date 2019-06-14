@@ -1,5 +1,8 @@
 package nl.tudelft.st01.util.exceptions;
 
+/**
+ *  Exception that can be used to alert users that the output JSON file could not be saved succesfully.
+ */
 public class CannotWriteJSONOutputException extends SQLFpcException {
 
     /**

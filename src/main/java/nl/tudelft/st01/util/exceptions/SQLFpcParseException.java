@@ -1,5 +1,8 @@
 package nl.tudelft.st01.util.exceptions;
 
+/**
+ *  Exception that can be used to alert users that SQLFpc could not parse their query.
+ */
 public class SQLFpcParseException extends SQLFpcException {
 
     /**

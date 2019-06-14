@@ -1,5 +1,8 @@
 package nl.tudelft.st01.util.exceptions;
 
+/**
+ *  Exception that can be used to alert users that an input SQL file cannot be parsed.
+ */
 public class CannotParseInputSQLFileException extends SQLFpcException {
     /**
      * Parameterless Constructor for the CannotParseInputSQLFileException class..

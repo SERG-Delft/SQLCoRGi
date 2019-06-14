@@ -1,5 +1,8 @@
 package nl.tudelft.st01.util.exceptions;
 
+/**
+ *  Exception that can be used to alert users that the provided schema is not syntactically valid.
+ */
 public class InvalidSchemaException extends SQLFpcException {
 
     /**
