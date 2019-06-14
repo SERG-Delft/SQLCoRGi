@@ -1,5 +1,6 @@
 package nl.tudelft.st01.functional;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -94,6 +95,7 @@ class JoinTest {
      * This case, the left one.
      */
     @Test
+    @Disabled("THIS TEST IS FOR CASES WITH A NULL EXPRESSION IN THE ON CONDITION. This would lead to contradictions")
     void testJoinOnConditionFromSingleTableLeftNullable() {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL",
 
@@ -231,7 +233,7 @@ class JoinTest {
      * A test for evaluating whether a redundant IS NOT NULL expression is included even though its table's id is not.
      */
     @Test
-    void testJoinWithWhereContainsIsNullOfNonExcludedColumn() {
+    void testJoinWithWhereContainsIsNotNullOfNonExcludedColumn() {
         containsAtLeast(
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.length IS NOT NULL)",
 
@@ -242,6 +244,40 @@ class JoinTest {
                     + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
                 "SELECT * FROM a RIGHT JOIN b ON b.id = a.id WHERE (a.id IS NULL) AND (b.id IS NULL)"
+        );
+    }
+
+    /**
+     * A test for evaluating whether the IS NULL expression is included even though its table's id is too.
+     */
+    @Test
+    void testJoinWithWhereContainsIsNullOfNonExcludedColumn() {
+        containsAtLeast(
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE a.length IS NULL",
+
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE (a.id IS NULL) AND (b.id IS NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id "
+                        + "WHERE ((b.id IS NULL) AND (a.id IS NULL)) AND (a.length IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id "
+                        + "WHERE ((b.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length IS NULL)",
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length IS NULL)"
+        );
+    }
+
+    /**
+     * A test for evaluating whether the IS NULL expression is excluded even of a column that should be excluded.
+     */
+    @Test
+    void testJoinWithWhereNotContainsIsNullOfExcludedColumn() {
+        containsAtLeast(
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE a.id IS NULL",
+
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE (a.id IS NULL) AND (b.id IS NULL)",
+                "SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE (a.id IS NULL) AND (b.id IS NOT NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id WHERE (b.id IS NULL) AND (a.id IS NULL)",
+                "SELECT * FROM a LEFT JOIN b ON a.id = b.id WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
+                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id IS NULL)"
         );
     }
 
@@ -302,7 +338,7 @@ class JoinTest {
      * A test for verifying that no targets are generated for queries with a simple join.
      */
     @Test
-    public void testJoinNoOnConditionSimpleJoin() {
+    void testJoinNoOnConditionSimpleJoin() {
         verify("SELECT * FROM a, b");
     }
 
@@ -311,7 +347,7 @@ class JoinTest {
      * with an additional where and having clause.
      */
     @Test
-    public void testJoinNoOnConditionSimpleJoinWithWhereClause() {
+    void testJoinNoOnConditionSimpleJoinWithWhereClause() {
         verify("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50",
 
                 "SELECT * FROM a, b WHERE a.id = b.id HAVING a.length = 50",
