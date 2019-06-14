@@ -2,6 +2,8 @@ package nl.tudelft.st01.sqlfpcws;
 
 import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
 
+import nl.tudelft.st01.util.exceptions.SQLFpcException;
+import nl.tudelft.st01.util.exceptions.SQLFpcParseException;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
@@ -48,8 +50,7 @@ public final class SQLFpcWS {
         try {
             xmlResponseString = proxy.getRules(sqlQuery, schema, options);
         } catch (RemoteException e) {
-            System.err.println("Server error: " + e.getMessage());
-            return new ArrayList<>();
+            throw new SQLFpcException("Cannot reach SQLFpc: " + e.getMessage());
         }
 
         result = extractSQLTargetsFromXMLResponse(xmlResponseString);
@@ -72,14 +73,12 @@ public final class SQLFpcWS {
         try {
             xmlResponse = reader.read(new StringReader(xmlResponseString));
         } catch (DocumentException e) {
-            System.err.println("Server response was invalid");
-            return result;
+            throw new SQLFpcException("XML Response could not be parsed: " + e.getMessage());
         }
 
         Node error = xmlResponse.selectSingleNode(ERROR_XPATH);
         if (error != null) {
-            System.err.println("SQL Query could not be parsed: " + error.getText());
-            return result;
+            throw new SQLFpcParseException(error.getText());
         }
 
         List<Node> sqlRules = (List<Node>) xmlResponse.selectNodes(SQL_TARGET_XPATH);
