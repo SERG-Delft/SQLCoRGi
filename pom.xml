@@ -284,6 +284,12 @@
                 <groupId>org.openclover</groupId>
                 <artifactId>clover-maven-plugin</artifactId>
                 <version>${clover.version}</version>
+                <configuration>
+                    <methodContexts>
+                        <main>(.* )?public static void main\(String\[\] [a-z][a-zA-Z0-9]*\).*</main>
+                    </methodContexts>
+                    <contextFilters>main</contextFilters>
+                </configuration>
                 <executions>
                     <execution>
                         <id>execution-pre-site</id>
