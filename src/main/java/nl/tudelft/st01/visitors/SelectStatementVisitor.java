@@ -4,10 +4,10 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.*;
 import nl.tudelft.st01.AggregateFunctionsGenerator;
 import nl.tudelft.st01.GroupByGenerator;
-import nl.tudelft.st01.JoinWhereExpressionGenerator;
 import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 import nl.tudelft.st01.visitors.select.NullAttributeFinder;
 import nl.tudelft.st01.visitors.select.NullReducer;
+import nl.tudelft.st01.JoinRulesGenerator;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 
 import java.util.ArrayList;
@@ -209,8 +209,8 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
      */
     private void handleJoins(PlainSelect plainSelect) {
-        JoinWhereExpressionGenerator joinWhereExpressionGenerator = new JoinWhereExpressionGenerator();
-        Set<String> out = joinWhereExpressionGenerator.generateJoinWhereExpressions((PlainSelect) copy(plainSelect));
+        JoinRulesGenerator joinRulesGenerator = new JoinRulesGenerator();
+        Set<String> out = joinRulesGenerator.generate((PlainSelect) copy(plainSelect));
 
         output.addAll(out);
     }
