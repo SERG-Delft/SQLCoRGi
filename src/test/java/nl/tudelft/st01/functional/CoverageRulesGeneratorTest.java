@@ -27,17 +27,13 @@ public class CoverageRulesGeneratorTest {
                 "SELECT COUNT(*) FROM Movies WHERE length_minutes < 100"
         );
 
-        List<String> expected = Arrays.asList(
-            "SELECT COUNT(*) FROM Movies WHERE length_minutes = 101",
-            "SELECT COUNT(*) FROM Movies WHERE length_minutes = 100",
-            "SELECT COUNT(*) FROM Movies WHERE length_minutes = 99",
-            "SELECT COUNT(*) FROM Movies WHERE length_minutes IS NULL"
+        assertThat(result).containsExactlyInAnyOrder(
+                "SELECT COUNT(*) FROM Movies WHERE length_minutes = 101",
+                "SELECT COUNT(*) FROM Movies WHERE length_minutes = 100",
+                "SELECT COUNT(*) FROM Movies WHERE length_minutes = 99",
+                "SELECT COUNT(*) FROM Movies WHERE length_minutes IS NULL"
         );
 
-        Collections.sort(result);
-        Collections.sort(expected);
-
-        assertThat(result).isEqualTo(expected);
     }
 
     /**
