@@ -60,8 +60,6 @@ public final class AssertUtils {
             throw new IllegalArgumentException("Lists have to have the same size");
         }
 
-        Collections.sort(inputList, Comparator.comparingInt(Object::hashCode));
-
         for (int i = 0; i < inputList.size(); i++) {
             assertThat(inputList.get(i)).isEqualToComparingFieldByFieldRecursively(expectedList.get(i));
         }

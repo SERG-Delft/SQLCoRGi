@@ -2,8 +2,8 @@ package nl.tudelft.st01.functional;
 
 import org.junit.jupiter.api.Test;
 
-import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
-import static nl.tudelft.st01.functional.AssertUtils.verify;
+import static nl.tudelft.st01.AssertUtils.containsAtLeast;
+import static nl.tudelft.st01.AssertUtils.verify;
 
 /*
     This warning has been suppressed. Even though the tests may generate the same partial results, they should

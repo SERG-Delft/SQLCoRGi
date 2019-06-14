@@ -120,13 +120,13 @@ public class SelectExpressionVisitorTest {
         selectExpressionVisitor.visit(between);
 
         compareFieldByField(output,
-                between,
-                equalsToEnd,
-                isNullExpression,
                 equalsToStart,
-                notBetween,
+                equalsToEnd,
+                startMinusOne,
                 endPlusOne,
-                startMinusOne
+                between,
+                notBetween,
+                isNullExpression
         );
     }
 
@@ -172,13 +172,13 @@ public class SelectExpressionVisitorTest {
         selectExpressionVisitor.visit(between);
 
         compareFieldByField(output,
-                isNullExpression,
-                endPlusOne,
                 equalsToStart,
                 equalsToEnd,
+                startMinusOne,
+                endPlusOne,
                 between,
                 notBetween,
-                startMinusOne
+                isNullExpression
         );
     }
 
@@ -216,11 +216,11 @@ public class SelectExpressionVisitorTest {
         selectExpressionVisitor.visit(between);
 
         compareFieldByField(output,
-                notBetween,
-                between,
-                isNullExpression,
                 equalsToStart,
-                equalsToEnd
+                equalsToEnd,
+                between,
+                notBetween,
+                isNullExpression
         );
     }
 
@@ -250,7 +250,7 @@ public class SelectExpressionVisitorTest {
 
         selectExpressionVisitor.visit(inExpression);
 
-        compareFieldByField(output, notInExpression, isNullExpression, inExpression);
+        compareFieldByField(output, inExpression, notInExpression, isNullExpression);
     }
 
     /**
@@ -274,6 +274,6 @@ public class SelectExpressionVisitorTest {
 
         selectExpressionVisitor.visit(likeExpression);
 
-        compareFieldByField(output, isNullExpression, likeExpression, notLikeExpression);
+        compareFieldByField(output, likeExpression, notLikeExpression, isNullExpression);
     }
 }
