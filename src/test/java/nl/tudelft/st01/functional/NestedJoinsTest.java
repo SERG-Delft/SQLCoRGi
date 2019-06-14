@@ -13,7 +13,7 @@ import static nl.tudelft.st01.functional.AssertUtils.verify;
  * This test class is related to {@link JoinTest}.
  * The functionality of nested joins is tested and evaluated.
  */
-@SuppressWarnings({"checkstyle:multiplestringliterals", "PMD.JUnitTestsShouldIncludeAssert"})
+@SuppressWarnings({"checkstyle:multiplestringliterals"})
 public class NestedJoinsTest {
 
     /**

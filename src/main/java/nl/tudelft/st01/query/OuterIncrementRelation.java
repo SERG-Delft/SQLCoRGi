@@ -16,7 +16,7 @@ public class OuterIncrementRelation {
 
     /**
      * Constructor. Generates the object.
-     * 
+     *
      * @param leftOuterIncrementRelation The left outer increment relations (loirels).
      * @param rightOuterIncrementRelation The right outer increment relations (roirels).
      * @param loiRelColumns The columns corresponding to the loirels.
