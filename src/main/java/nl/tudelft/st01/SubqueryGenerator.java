@@ -76,38 +76,53 @@ public final class SubqueryGenerator {
             subCopy.getSelectBody().accept(selectVisitor);
 
             for (String mutation : mutations) {
-
-                ExistsExpression existsExpression = new ExistsExpression();
-                SubSelect existsSub = new SubSelect();
-                existsExpression.setRightExpression(existsSub);
-                try {
-                    existsSub.setSelectBody(((Select) CCJSqlParserUtil.parse(mutation)).getSelectBody());
-                } catch (JSQLParserException e) {
-                    throw new CannotBeParsedException();
-                }
-
-                if (isWhereSub) {
-                    Expression where = selectCopy.getWhere();
-                    if (where == null) {
-                        selectCopy.setWhere(existsExpression);
-                    } else {
-                        selectCopy.setWhere(new AndExpression(existsExpression, where));
-                    }
-                    rules.add(selectCopy.toString());
-                    selectCopy.setWhere(where);
-                }
-
-                if (isHavingSub) {
-                    Expression having = selectCopy.getHaving();
-                    if (having == null) {
-                        selectCopy.setHaving(existsExpression);
-                    } else {
-                        selectCopy.setHaving(new AndExpression(existsExpression, having));
-                    }
-                    rules.add(selectCopy.toString());
-                    selectCopy.setHaving(having);
-                }
+                createSelectExprRules(mutation, selectCopy, isWhereSub, isHavingSub, rules);
             }
+        }
+    }
+
+    /**
+     * Creates one or two coverage rules for the WHERE and/or HAVING expressions of {@code query} using the given
+     * {@code mutation}, depending on the values of {@code forWhere} and {@code forHaving}. The rules are added to the
+     * specified {@code rules} set.
+     *
+     * @param mutation is the mutation of a subquery that should be used in the coverage rules.
+     * @param query the query for which the coverage targets must be generated.
+     * @param forWhere states whether a rule should be generated for the WHERE expression.
+     * @param forHaving states whether a rule should be generated for the HAVING expression.
+     * @param rules the set to which the coverage rules need to be added.
+     */
+    private static void createSelectExprRules(String mutation, PlainSelect query, boolean forWhere, boolean forHaving,
+                                              Set<String> rules) {
+        ExistsExpression existsExpression = new ExistsExpression();
+        SubSelect existsSub = new SubSelect();
+        existsExpression.setRightExpression(existsSub);
+        try {
+            existsSub.setSelectBody(((Select) CCJSqlParserUtil.parse(mutation)).getSelectBody());
+        } catch (JSQLParserException e) {
+            throw new CannotBeParsedException();
+        }
+
+        if (forWhere) {
+            Expression where = query.getWhere();
+            if (where == null) {
+                query.setWhere(existsExpression);
+            } else {
+                query.setWhere(new AndExpression(existsExpression, where));
+            }
+            rules.add(query.toString());
+            query.setWhere(where);
+        }
+
+        if (forHaving) {
+            Expression having = query.getHaving();
+            if (having == null) {
+                query.setHaving(existsExpression);
+            } else {
+                query.setHaving(new AndExpression(existsExpression, having));
+            }
+            rules.add(query.toString());
+            query.setHaving(having);
         }
     }
 
