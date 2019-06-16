@@ -35,21 +35,9 @@ public final class SubqueryGenerator {
      */
     public static Set<String> coverSubqueries(PlainSelect plainSelect) {
 
-        List<SubSelect> fromSubSelects = new LinkedList<>(extractSubqueriesFromFromItem(plainSelect.getFromItem()));
-
-        List<Join> joins = plainSelect.getJoins();
-        if (joins != null) {
-            fromSubSelects.addAll(extractSubqueriesFromJoins(joins));
-        }
-
         Set<String> rules = new HashSet<>();
 
-        for (SubSelect subSelect : fromSubSelects) {
-            Set<String> subRules = new HashSet<>();
-            SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(subRules);
-            subSelect.getSelectBody().accept(selectStatementVisitor);
-            rules.addAll(subRules);
-        }
+        coverFromSubqueries(plainSelect, rules);
 
         Map<String, SubSelect> whereSubs = obtainSubqueries(plainSelect.getWhere());
         Map<String, SubSelect> havingSubs = obtainSubqueries(plainSelect.getHaving());
@@ -129,6 +117,31 @@ public final class SubqueryGenerator {
         }
 
         return rules;
+    }
+
+    /**
+     * Generates coverage targets for subqueries found in the FROM clause of a query. Rules that are generated will
+     * be added to the provided set.
+     *
+     * @param plainSelect the SELECT to cover.
+     * @param rules a set in which all generated rules should be stored.
+     */
+    private static void coverFromSubqueries(PlainSelect plainSelect, Set<String> rules) {
+
+        List<SubSelect> fromSubSelects = new LinkedList<>(extractSubqueriesFromFromItem(plainSelect.getFromItem()));
+
+        List<Join> joins = plainSelect.getJoins();
+        if (joins != null) {
+            fromSubSelects.addAll(extractSubqueriesFromJoins(joins));
+        }
+
+
+        for (SubSelect subSelect : fromSubSelects) {
+            Set<String> subRules = new HashSet<>();
+            SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(subRules);
+            subSelect.getSelectBody().accept(selectStatementVisitor);
+            rules.addAll(subRules);
+        }
     }
 
     /**
