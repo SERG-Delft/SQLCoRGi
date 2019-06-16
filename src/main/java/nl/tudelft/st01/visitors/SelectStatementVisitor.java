@@ -58,8 +58,13 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             applyNullReduction(select);
             this.output.add(select.toString());
         }
+    }
 
-        this.output = null;
+    @Override
+    public void visit(SetOperationList setOperationList) {
+        for (SelectBody select : setOperationList.getSelects()) {
+            select.accept(this);
+        }
     }
 
     /**
