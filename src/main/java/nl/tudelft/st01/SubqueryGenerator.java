@@ -1,8 +1,12 @@
 package nl.tudelft.st01;
 
+import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.ExistsExpression;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.select.*;
+import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 import nl.tudelft.st01.visitors.subqueries.SubqueryFinder;
 import nl.tudelft.st01.visitors.subqueries.SubqueryRemover;
@@ -78,24 +82,51 @@ public final class SubqueryGenerator {
             }
 
 
+            HashSet<String> mutations = new HashSet<>();
+            SelectStatementVisitor selectVisitor = new SelectStatementVisitor(mutations);
+            subCopy.getSelectBody().accept(selectVisitor);
 
-            ExistsExpression existsExpression = new ExistsExpression();
-            existsExpression.setRightExpression();
+            for (String mutation : mutations) {
+
+                ExistsExpression existsExpression = new ExistsExpression();
+                SubSelect existsSub = new SubSelect();
+                existsExpression.setRightExpression(existsSub);
+                try {
+                    existsSub.setSelectBody(((Select) CCJSqlParserUtil.parse(mutation)).getSelectBody());
+                } catch (JSQLParserException e) {
+                    throw new CannotBeParsedException();
+                }
+
+                if (whereSubs.containsKey(subquery)) {
+                    Expression where = selectCopy.getWhere();
+                    if (where == null) {
+                        selectCopy.setWhere(existsExpression);
+                        rules.add(selectCopy.toString());
+                        selectCopy.setWhere(null);
+                    } else {
+                        AndExpression andExpression = new AndExpression(existsExpression, where);
+                        selectCopy.setWhere(andExpression);
+                        rules.add(selectCopy.toString());
+                        selectCopy.setWhere(where);
+                    }
+                }
+
+                if (havingSubs.containsKey(subquery)) {
+                    Expression having = selectCopy.getHaving();
+                    if (having == null) {
+                        selectCopy.setHaving(existsExpression);
+                        rules.add(selectCopy.toString());
+                        selectCopy.setHaving(null);
+                    } else {
+                        AndExpression andExpression = new AndExpression(existsExpression, having);
+                        selectCopy.setHaving(andExpression);
+                        rules.add(selectCopy.toString());
+                        selectCopy.setHaving(having);
+                    }
+                }
+            }
+
         }
-
-        //
-        // for each subquery:
-        //   remove all occurrences of subquery from main query
-        //   generate set of coverage targets for subquery
-        //   replace where expression with: EXISTS (mutation of subquery) AND original where
-        // do same for having if subquery in having
-        //
-        //
-        // if we have sth like: WHERE subquery HAVING subquery
-        // then we generate:
-        //   1. WHERE EXISTS(sub mutations)
-        //   2. HAVING EXISTS(sub mutations)
-        //
 
         return rules;
     }
