@@ -28,15 +28,6 @@ public class SubqueryRemover extends ExpressionVisitorAdapter {
         this.updateChild = false;
     }
 
-    @Override
-    public void visit(SubSelect subSelect) {
-
-        if (subSelect.toString().equals(subquery)) {
-            this.child = null;
-            this.updateChild = true;
-        }
-    }
-
     /**
      * Removes or repairs AND and OR operators.
      *
@@ -69,6 +60,15 @@ public class SubqueryRemover extends ExpressionVisitorAdapter {
                 binaryExpression.setRightExpression(this.child);
                 this.updateChild = false;
             }
+        }
+    }
+
+    @Override
+    public void visit(SubSelect subSelect) {
+
+        if (subSelect.toString().equals(subquery)) {
+            this.child = null;
+            this.updateChild = true;
         }
     }
 

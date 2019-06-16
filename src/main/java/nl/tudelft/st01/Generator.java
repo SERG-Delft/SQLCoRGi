@@ -68,7 +68,8 @@ public final class Generator {
      */
     public static void main(String[] args) {
 
-        String query = "SELECT * FROM t WHERE a IN (SELECT * FROM t2 WHERE a2 > 1) HAVING a IN (SELECT * FROM t2 WHERE a2 > 1)";
+        String query = "SELECT * FROM t WHERE a IN (SELECT * FROM t2 WHERE a2 > 1)"
+                + " HAVING a IN (SELECT * FROM t2 WHERE a2 > 1)";
 
         Set<String> result = generateRules(query);
 

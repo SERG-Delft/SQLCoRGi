@@ -136,7 +136,7 @@ public final class SubqueryGenerator {
      *
      * @param expression the {@code Expression} from which subqueries should be obtained.
      * @return a map containing string representations of all subqueries found in the expression and a reference to
-     * the respective subqueries.
+     *         the respective subqueries.
      */
     private static Map<String, SubSelect> obtainSubqueries(Expression expression) {
 

@@ -39,7 +39,7 @@ public class SQLFpcWSTest {
     private SQLFpcWSSoapProxy mockWebService;
 
     public static final String NO_OPTIONAL_ARGS = "";
-    
+
     private static final String DATABASE_SCHEMA =
             " <schema dbms=\"MySQL\">\n"
                     + "     <table name=\"TableB\">\n"
