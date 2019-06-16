@@ -90,28 +90,22 @@ public final class SubqueryGenerator {
                     Expression where = selectCopy.getWhere();
                     if (where == null) {
                         selectCopy.setWhere(existsExpression);
-                        rules.add(selectCopy.toString());
-                        selectCopy.setWhere(null);
                     } else {
-                        AndExpression andExpression = new AndExpression(existsExpression, where);
-                        selectCopy.setWhere(andExpression);
-                        rules.add(selectCopy.toString());
-                        selectCopy.setWhere(where);
+                        selectCopy.setWhere(new AndExpression(existsExpression, where));
                     }
+                    rules.add(selectCopy.toString());
+                    selectCopy.setWhere(where);
                 }
 
                 if (isHavingSub) {
                     Expression having = selectCopy.getHaving();
                     if (having == null) {
                         selectCopy.setHaving(existsExpression);
-                        rules.add(selectCopy.toString());
-                        selectCopy.setHaving(null);
                     } else {
-                        AndExpression andExpression = new AndExpression(existsExpression, having);
-                        selectCopy.setHaving(andExpression);
-                        rules.add(selectCopy.toString());
-                        selectCopy.setHaving(having);
+                        selectCopy.setHaving(new AndExpression(existsExpression, having));
                     }
+                    rules.add(selectCopy.toString());
+                    selectCopy.setHaving(having);
                 }
             }
         }
