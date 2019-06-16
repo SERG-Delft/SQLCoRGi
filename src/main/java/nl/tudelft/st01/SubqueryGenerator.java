@@ -1,14 +1,15 @@
 package nl.tudelft.st01;
 
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.operators.relational.ExistsExpression;
 import net.sf.jsqlparser.statement.select.*;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 import nl.tudelft.st01.visitors.subqueries.SubqueryFinder;
+import nl.tudelft.st01.visitors.subqueries.SubqueryRemover;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
 
 /**
  * This class contains functionality needed to generate coverage rules for subqueries.
@@ -46,26 +47,76 @@ public final class SubqueryGenerator {
             rules.addAll(subRules);
         }
 
-        // TODO: find subselects in where and have
+        Map<String, SubSelect> whereSubs = obtainSubqueries(plainSelect.getWhere());
+        Map<String, SubSelect> havingSubs = obtainSubqueries(plainSelect.getHaving());
 
-        SubqueryFinder subqueryFinder = new SubqueryFinder();
+        Map<String, SubSelect> combinedSubs = new HashMap<>(whereSubs.size() + havingSubs.size());
+        combinedSubs.putAll(whereSubs);
+        combinedSubs.putAll(havingSubs);
 
-        Expression where = plainSelect.getWhere();
-        if (where != null) {
-            where.accept(subqueryFinder);
-            Set<String> whereSubs = subqueryFinder.getSubqueries();
+        for (Map.Entry<String, SubSelect> entry : combinedSubs.entrySet()) {
+
+            String subquery = entry.getKey();
+            SubSelect subCopy = (SubSelect) copy(entry.getValue());
+
+            PlainSelect selectCopy = (PlainSelect) copy(plainSelect);
+
+            if (whereSubs.containsKey(subquery)) {
+                SubqueryRemover subqueryRemover = new SubqueryRemover(subquery);
+                selectCopy.getWhere().accept(subqueryRemover);
+                if (subqueryRemover.isUpdateChild()) {
+                    selectCopy.setWhere(subqueryRemover.getChild());
+                }
+            }
+
+            if (havingSubs.containsKey(subquery)) {
+                SubqueryRemover subqueryRemover = new SubqueryRemover(subquery);
+                selectCopy.getHaving().accept(subqueryRemover);
+                if (subqueryRemover.isUpdateChild()) {
+                    selectCopy.setHaving(subqueryRemover.getChild());
+                }
+            }
+
+
+
+            ExistsExpression existsExpression = new ExistsExpression();
+            existsExpression.setRightExpression();
         }
 
-        Expression having = plainSelect.getHaving();
-        if (having != null) {
-            having.accept(subqueryFinder);
-            Set<String> havingSubs = subqueryFinder.getSubqueries();
-        }
-
-        // TODO: Remove subqueries, check left and right of AND/ORs and propagate removal if needed
-
+        //
+        // for each subquery:
+        //   remove all occurrences of subquery from main query
+        //   generate set of coverage targets for subquery
+        //   replace where expression with: EXISTS (mutation of subquery) AND original where
+        // do same for having if subquery in having
+        //
+        //
+        // if we have sth like: WHERE subquery HAVING subquery
+        // then we generate:
+        //   1. WHERE EXISTS(sub mutations)
+        //   2. HAVING EXISTS(sub mutations)
+        //
 
         return rules;
+    }
+
+    /**
+     * Obtains a collection of subqueries from a given {@link Expression}.
+     *
+     * @param expression the {@code Expression} from which subqueries should be obtained.
+     * @return a map containing string representations of all subqueries found in the expression and a reference to
+     * the respective subqueries.
+     */
+    private static Map<String, SubSelect> obtainSubqueries(Expression expression) {
+
+        if (expression == null) {
+            return new HashMap<>(0);
+        }
+
+        SubqueryFinder subqueryFinder = new SubqueryFinder();
+        expression.accept(subqueryFinder);
+
+        return subqueryFinder.getSubqueries();
     }
 
     /**

@@ -4,25 +4,23 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Finds all subqueries in an {@link Expression} and collects their string representations in a set.
+ * Finds all subqueries in an {@link Expression} and collects their string representations and references.
  */
 public class SubqueryFinder extends ExpressionVisitorAdapter {
 
-    private Set<String> subqueries = new HashSet<>();
+    private Map<String, SubSelect> subqueries = new HashMap<>();
 
     @Override
     public void visit(SubSelect subSelect) {
-        subqueries.add(subSelect.toString());
+        subqueries.put(subSelect.toString(), subSelect);
     }
 
-    public Set<String> getSubqueries() {
-        Set<String> temp = this.subqueries;
-        this.subqueries = new HashSet<>();
-        return temp;
+    public Map<String, SubSelect> getSubqueries() {
+        return this.subqueries;
     }
 
 }
