@@ -38,6 +38,19 @@ public final class SubqueryGenerator {
         Set<String> rules = new HashSet<>();
 
         coverFromSubqueries(plainSelect, rules);
+        coverSelectOperatorSubqueries(plainSelect, rules);
+
+        return rules;
+    }
+
+    /**
+     * Generates coverage targets for subqueries found in the WHERE and HAVING clauses of a query. Rules that are
+     * generated will be added to the provided set.
+     *
+     * @param plainSelect the query to cover.
+     * @param rules a set in which all generated rules should be stored.
+     */
+    private static void coverSelectOperatorSubqueries(PlainSelect plainSelect, Set<String> rules) {
 
         Map<String, SubSelect> whereSubs = obtainSubqueries(plainSelect.getWhere());
         Map<String, SubSelect> havingSubs = obtainSubqueries(plainSelect.getHaving());
@@ -53,22 +66,10 @@ public final class SubqueryGenerator {
 
             PlainSelect selectCopy = (PlainSelect) copy(plainSelect);
 
-            if (whereSubs.containsKey(subquery)) {
-                SubqueryRemover subqueryRemover = new SubqueryRemover(subquery);
-                selectCopy.getWhere().accept(subqueryRemover);
-                if (subqueryRemover.isUpdateChild()) {
-                    selectCopy.setWhere(subqueryRemover.getChild());
-                }
-            }
+            boolean isWhereSub = whereSubs.containsKey(subquery);
+            boolean isHavingSub = havingSubs.containsKey(subquery);
 
-            if (havingSubs.containsKey(subquery)) {
-                SubqueryRemover subqueryRemover = new SubqueryRemover(subquery);
-                selectCopy.getHaving().accept(subqueryRemover);
-                if (subqueryRemover.isUpdateChild()) {
-                    selectCopy.setHaving(subqueryRemover.getChild());
-                }
-            }
-
+            removeSubquery(subquery, selectCopy, isWhereSub, isHavingSub);
 
             HashSet<String> mutations = new HashSet<>();
             SelectStatementVisitor selectVisitor = new SelectStatementVisitor(mutations);
@@ -85,7 +86,7 @@ public final class SubqueryGenerator {
                     throw new CannotBeParsedException();
                 }
 
-                if (whereSubs.containsKey(subquery)) {
+                if (isWhereSub) {
                     Expression where = selectCopy.getWhere();
                     if (where == null) {
                         selectCopy.setWhere(existsExpression);
@@ -99,7 +100,7 @@ public final class SubqueryGenerator {
                     }
                 }
 
-                if (havingSubs.containsKey(subquery)) {
+                if (isHavingSub) {
                     Expression having = selectCopy.getHaving();
                     if (having == null) {
                         selectCopy.setHaving(existsExpression);
@@ -113,10 +114,35 @@ public final class SubqueryGenerator {
                     }
                 }
             }
+        }
+    }
 
+    /**
+     * Removes {@code subquery} from {@code query}'s WHERE and/or HAVING expressions, depending on whether {@code
+     * fromWhere} and {@code fromHaving} are set.
+     *
+     * @param subquery the subquery to remove from {@code query}.
+     * @param query the query from which the given {@code subquery} needs to be removed.
+     * @param fromWhere whether the {@code subquery} needs to be removed from {@code query}'s WHERE expression.
+     * @param fromHaving whether the {@code subquery} needs to be removed from {@code query}'s HAVING expression.
+     */
+    private static void removeSubquery(String subquery, PlainSelect query, boolean fromWhere, boolean fromHaving) {
+
+        if (fromWhere) {
+            SubqueryRemover subqueryRemover = new SubqueryRemover(subquery);
+            query.getWhere().accept(subqueryRemover);
+            if (subqueryRemover.isUpdateChild()) {
+                query.setWhere(subqueryRemover.getChild());
+            }
         }
 
-        return rules;
+        if (fromHaving) {
+            SubqueryRemover subqueryRemover = new SubqueryRemover(subquery);
+            query.getHaving().accept(subqueryRemover);
+            if (subqueryRemover.isUpdateChild()) {
+                query.setHaving(subqueryRemover.getChild());
+            }
+        }
     }
 
     /**
@@ -134,7 +160,6 @@ public final class SubqueryGenerator {
         if (joins != null) {
             fromSubSelects.addAll(extractSubqueriesFromJoins(joins));
         }
-
 
         for (SubSelect subSelect : fromSubSelects) {
             Set<String> subRules = new HashSet<>();
