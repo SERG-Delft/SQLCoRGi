@@ -3,6 +3,7 @@ package nl.tudelft.st01.unit;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
 import nl.tudelft.st01.SubqueryGenerator;
+import nl.tudelft.st01.visitors.SelectStatementVisitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +15,7 @@ import java.util.Set;
 import static nl.tudelft.st01.SubqueryGenerator.coverSubqueries;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -92,6 +93,6 @@ class SubqueryGeneratorTest {
         select.setJoins(joinList);
 
         coverSubqueries(select);
-        verify(selectBody).accept(any());
+        verify(selectBody).accept(isA(SelectStatementVisitor.class));
     }
 }
