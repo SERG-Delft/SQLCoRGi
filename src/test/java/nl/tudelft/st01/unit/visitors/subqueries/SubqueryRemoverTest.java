@@ -99,4 +99,63 @@ class SubqueryRemoverTest {
         assertThat(subqueryRemover.getChild()).isSameAs(left);
         assertThat(subqueryRemover.isUpdateChild()).isTrue();
     }
+
+    /**
+     * Verifies that {@code SubqueryRemover#visitLogicalOperator(BinaryExpression)} correctly updates the
+     * {@link SubqueryRemover} if both subexpressions of the logical operator that is being visited must be removed.
+     */
+    @Test
+    void testVisitLogicalRemoveBoth() {
+
+        SubSelect subSelect = new SubSelect();
+        String subqueryStr = subSelect.toString();
+
+        OrExpression orExpression = new OrExpression(subSelect, subSelect);
+
+        SubqueryRemover subqueryRemover = new SubqueryRemover(subqueryStr);
+        orExpression.accept(subqueryRemover);
+
+        assertThat(subqueryRemover.getChild()).isNull();
+        assertThat(subqueryRemover.isUpdateChild()).isTrue();
+    }
+
+    /**
+     * Verifies that {@code SubqueryRemover#visitLogicalOperator(BinaryExpression)} correctly updates the
+     * {@link SubqueryRemover} if the left subexpression of the logical operator that is being visited must be updated.
+     */
+    @Test
+    void testVisitLogicalUpdateLeft() {
+
+        SubSelect subSelect = new SubSelect();
+        String subqueryStr = subSelect.toString();
+
+        OrExpression orExpression = new OrExpression(subSelect, new NullValue());
+
+        AndExpression andExpression = new AndExpression(orExpression, new NullValue());
+
+        SubqueryRemover subqueryRemover = new SubqueryRemover(subqueryStr);
+        andExpression.accept(subqueryRemover);
+
+        assertThat(subqueryRemover.isUpdateChild()).isFalse();
+    }
+
+    /**
+     * Verifies that {@code SubqueryRemover#visitLogicalOperator(BinaryExpression)} correctly updates the
+     * {@link SubqueryRemover} if the right subexpression of the logical operator that is being visited must be updated.
+     */
+    @Test
+    void testVisitLogicalUpdateRight() {
+
+        SubSelect subSelect = new SubSelect();
+        String subqueryStr = subSelect.toString();
+
+        AndExpression andExpression = new AndExpression(subSelect, new NullValue());
+
+        OrExpression orExpression = new OrExpression(new NullValue(), andExpression);
+
+        SubqueryRemover subqueryRemover = new SubqueryRemover(subqueryStr);
+        orExpression.accept(subqueryRemover);
+
+        assertThat(subqueryRemover.isUpdateChild()).isFalse();
+    }
 }
