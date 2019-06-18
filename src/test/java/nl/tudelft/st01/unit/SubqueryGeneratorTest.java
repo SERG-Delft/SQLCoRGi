@@ -1,7 +1,10 @@
 package nl.tudelft.st01.unit;
 
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -109,28 +112,60 @@ class SubqueryGeneratorTest {
 
     /**
      * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect)} generates coverage targets if the
+     * WHERE clause of the provided query contains a subquery.
+     */
+    @Test
+    void testCoverQueryWhereContainsSubquery() {
+
+        SubSelect subquery = createSimpleSubquery();
+
+        AndExpression andExpression = new AndExpression(subquery, new NullValue());
+        OrExpression orExpression = new OrExpression(new NullValue(), andExpression);
+
+        select.setWhere(orExpression);
+        Set<String> result = coverSubqueries(select);
+
+        Set<String> expected = new HashSet<>(Arrays.asList(
+                "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE a = 'b') AND NULL OR NULL",
+                "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE a <> 'b') AND NULL OR NULL",
+                "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE a IS NULL) AND NULL OR NULL"
+        ));
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    /**
+     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect)} generates coverage targets if the
+     * HAVING clause of the provided query contains a subquery.
+     */
+    @Test
+    void testCoverQueryHavingContainsSubquery() {
+
+        SubSelect subquery = createSimpleSubquery();
+
+        OrExpression orExpression = new OrExpression(new NullValue(), subquery);
+        AndExpression andExpression = new AndExpression(orExpression, new NullValue());
+
+        select.setHaving(andExpression);
+        Set<String> result = coverSubqueries(select);
+
+        Set<String> expected = new HashSet<>(Arrays.asList(
+                "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE a = 'b') AND NULL AND NULL",
+                "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE a <> 'b') AND NULL AND NULL",
+                "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE a IS NULL) AND NULL AND NULL"
+        ));
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    /**
+     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect)} generates coverage targets if the
      * WHERE clause of the provided query consists only of the subquery.
      */
     @Test
     void testCoverQueryWhereOnlySubquery() {
 
-        EqualsTo equalsTo = new EqualsTo();
-        equalsTo.setLeftExpression(new Column(COLUMN_A));
-        equalsTo.setRightExpression(new StringValue(STRING_B));
-
-        PlainSelect plainSelect = new PlainSelect();
-        plainSelect.setWhere(equalsTo);
-
-        ArrayList<SelectItem> selectItems = new ArrayList<>();
-        selectItems.add(new AllColumns());
-        plainSelect.setSelectItems(selectItems);
-
-        plainSelect.setFromItem(new Table(TABLE_T));
-
-        SubSelect subSelect = new SubSelect();
-        subSelect.setSelectBody(plainSelect);
-        select.setWhere(subSelect);
-
+        select.setWhere(createSimpleSubquery());
         Set<String> result = coverSubqueries(select);
 
         Set<String> expected = new HashSet<>(Arrays.asList(
@@ -149,23 +184,7 @@ class SubqueryGeneratorTest {
     @Test
     void testCoverQueryHavingOnlySubquery() {
 
-        EqualsTo equalsTo = new EqualsTo();
-        equalsTo.setLeftExpression(new Column(COLUMN_A));
-        equalsTo.setRightExpression(new StringValue(STRING_B));
-
-        PlainSelect plainSelect = new PlainSelect();
-        plainSelect.setWhere(equalsTo);
-
-        ArrayList<SelectItem> selectItems = new ArrayList<>();
-        selectItems.add(new AllColumns());
-        plainSelect.setSelectItems(selectItems);
-
-        plainSelect.setFromItem(new Table(TABLE_T));
-
-        SubSelect subSelect = new SubSelect();
-        subSelect.setSelectBody(plainSelect);
-        select.setHaving(subSelect);
-
+        select.setHaving(createSimpleSubquery());
         Set<String> result = coverSubqueries(select);
 
         Set<String> expected = new HashSet<>(Arrays.asList(
@@ -200,5 +219,31 @@ class SubqueryGeneratorTest {
         select.setWhere(subSelect);
 
         assertThatThrownBy(() -> coverSubqueries(select)).isInstanceOf(CannotBeParsedException.class);
+    }
+
+    /**
+     * Creates a simple subquery object: {@code (SELECT * FROM t WHERE a = 'b')}.
+     *
+     * @return a subquery object.
+     */
+    private static SubSelect createSimpleSubquery() {
+
+        EqualsTo equalsTo = new EqualsTo();
+        equalsTo.setLeftExpression(new Column(COLUMN_A));
+        equalsTo.setRightExpression(new StringValue(STRING_B));
+
+        PlainSelect plainSelect = new PlainSelect();
+        plainSelect.setWhere(equalsTo);
+
+        ArrayList<SelectItem> selectItems = new ArrayList<>();
+        selectItems.add(new AllColumns());
+        plainSelect.setSelectItems(selectItems);
+
+        plainSelect.setFromItem(new Table(TABLE_T));
+
+        SubSelect subSelect = new SubSelect();
+        subSelect.setSelectBody(plainSelect);
+
+        return subSelect;
     }
 }
