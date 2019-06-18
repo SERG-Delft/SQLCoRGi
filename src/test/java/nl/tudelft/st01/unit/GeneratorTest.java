@@ -19,11 +19,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class GeneratorTest {
 
     /**
-     * Trying to invoke the {@link Generator} constructor should throw an {@link UnsupportedOperationException}.
+     * Trying to invoke the {@link Generator} constructor should throw an {@code UnsupportedOperationException}.
      *
-     * Java Reflection is used because the {@link Generator} constructor is private.
+     * Java Reflection is used because the {@code Generator} constructor is private.
      *
-     * @throws NoSuchMethodException if the {@link Generator} constructor is not found - this cannot happen.
+     * @throws NoSuchMethodException if the {@code Generator} constructor is not found - this cannot happen.
      */
     @Test
     void testConstructorThrowsException() throws NoSuchMethodException {
@@ -35,7 +35,7 @@ class GeneratorTest {
     }
 
     /**
-     * Assert that the right exception is thrown when {@code GenerateRules} is called with a null-query.
+     * Assert that the right exception is thrown when {@link Generator#generateRules} is called with a null-query.
      */
     @Test
     void testGenerateRulesNullShouldPrintErrorMessage() {
@@ -45,7 +45,7 @@ class GeneratorTest {
     }
 
     /**
-     * Assert that the right exception is thrown when {@code GenerateRules} is called with a query that is not
+     * Assert that the right exception is thrown when {link Generator#generateRules} is called with a query that is not
      * valid SQL..
      */
     @Test
@@ -57,7 +57,8 @@ class GeneratorTest {
     }
 
     /**
-     * Assert that the right exception is thrown when {@code GenerateRules} is called with a non-select statement.
+     * Assert that the right exception is thrown when {link Generator#generateRules} is called with a non-select
+     * statement.
      */
     @Test
     void testGenerateRulesWithNonSelectQueryShouldPrintErrorMessage() {
