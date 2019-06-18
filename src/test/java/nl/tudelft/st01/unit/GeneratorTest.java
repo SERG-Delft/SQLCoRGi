@@ -1,10 +1,8 @@
 package nl.tudelft.st01.unit;
 
 import nl.tudelft.st01.Generator;
-
 import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
-import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
 import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +29,7 @@ class GeneratorTest {
         generatorConstructor.setAccessible(true);
 
         assertThatThrownBy(generatorConstructor::newInstance)
-                .hasRootCauseInstanceOf(ShouldNotBeInstantiatedException.class);
+                .hasRootCauseInstanceOf(UnsupportedOperationException.class);
     }
 
     /**
