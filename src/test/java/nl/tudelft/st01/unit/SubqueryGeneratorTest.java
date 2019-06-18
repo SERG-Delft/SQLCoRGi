@@ -10,7 +10,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
 import nl.tudelft.st01.SubqueryGenerator;
-import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
+import nl.tudelft.st01.exceptions.CannotBeParsedException;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

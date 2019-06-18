@@ -5,9 +5,9 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
-import nl.tudelft.st01.util.exceptions.CannotBeNullException;
-import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
-import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
+import nl.tudelft.st01.exceptions.CannotBeNullException;
+import nl.tudelft.st01.exceptions.CannotBeParsedException;
+import nl.tudelft.st01.exceptions.UnsupportedInputException;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 
 import java.util.HashSet;

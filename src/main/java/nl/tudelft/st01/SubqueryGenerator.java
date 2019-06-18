@@ -6,7 +6,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.ExistsExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.select.*;
-import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
+import nl.tudelft.st01.exceptions.CannotBeParsedException;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 import nl.tudelft.st01.visitors.subqueries.SubqueryFinder;
 import nl.tudelft.st01.visitors.subqueries.SubqueryRemover;

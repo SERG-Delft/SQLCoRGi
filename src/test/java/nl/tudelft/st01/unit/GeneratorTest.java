@@ -1,9 +1,9 @@
 package nl.tudelft.st01.unit;
 
 import nl.tudelft.st01.Generator;
-import nl.tudelft.st01.util.exceptions.CannotBeNullException;
-import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
-import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
+import nl.tudelft.st01.exceptions.CannotBeNullException;
+import nl.tudelft.st01.exceptions.CannotBeParsedException;
+import nl.tudelft.st01.exceptions.UnsupportedInputException;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;

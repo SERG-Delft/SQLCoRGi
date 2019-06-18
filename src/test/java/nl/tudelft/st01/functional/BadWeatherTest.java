@@ -1,8 +1,8 @@
 package nl.tudelft.st01.functional;
 
 import nl.tudelft.st01.Generator;
-import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
-import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
+import nl.tudelft.st01.exceptions.CannotBeParsedException;
+import nl.tudelft.st01.exceptions.UnsupportedInputException;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;

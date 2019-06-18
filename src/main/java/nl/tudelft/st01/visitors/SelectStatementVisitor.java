@@ -4,7 +4,7 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.*;
 import nl.tudelft.st01.AggregateFunctionsGenerator;
 import nl.tudelft.st01.GroupByGenerator;
-import nl.tudelft.st01.util.exceptions.CannotBeNullException;
+import nl.tudelft.st01.exceptions.CannotBeNullException;
 import nl.tudelft.st01.visitors.select.NullAttributeFinder;
 import nl.tudelft.st01.visitors.select.NullReducer;
 import nl.tudelft.st01.JoinRulesGenerator;
