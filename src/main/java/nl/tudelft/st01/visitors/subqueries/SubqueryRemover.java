@@ -38,6 +38,7 @@ public class SubqueryRemover extends ExpressionVisitorAdapter {
         Expression right = binaryExpression.getRightExpression();
         binaryExpression.getLeftExpression().accept(this);
         if (this.updateChild) {
+            this.updateChild = false;
             if (this.child != null) {
                 binaryExpression.setLeftExpression(this.child);
             } else {
@@ -49,7 +50,6 @@ public class SubqueryRemover extends ExpressionVisitorAdapter {
                 }
                 return;
             }
-            this.updateChild = false;
         }
 
         right.accept(this);
