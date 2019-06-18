@@ -49,7 +49,7 @@ class SubqueryGeneratorTest {
     }
 
     /**
-     * Tests whether {@link SubqueryGenerator}s cannot be instantiated.
+     * Tests whether {@link SubqueryGenerator} cannot be instantiated.
      *
      * @throws NoSuchMethodException if the {@code SubqueryGenerator} constructor cannot be found.
      */
