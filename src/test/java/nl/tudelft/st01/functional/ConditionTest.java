@@ -158,6 +158,22 @@ class ConditionTest {
     }
 
     /**
+     * A test case with two parenthesized conditions, combined with OR.
+     */
+    @Test
+    public void testTwoParenthesisedConditionsWithOR() {
+        verify("SELECT * FROM Movies WHERE (year = 1996) OR (year = 2019)",
+
+                "SELECT * FROM Movies WHERE (year = 1995) AND NOT (year = 2019)",
+                "SELECT * FROM Movies WHERE (year = 1996) AND NOT (year = 2019)",
+                "SELECT * FROM Movies WHERE (year = 1997) AND NOT (year = 2019)",
+                "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2018)",
+                "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2019)",
+                "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2020)",
+                "SELECT * FROM Movies WHERE (year IS NULL)");
+    }
+
+    /**
      * A test case with three conditions, combined with AND and OR.
      */
     @Test
