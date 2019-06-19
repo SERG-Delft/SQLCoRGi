@@ -1,8 +1,6 @@
 package nl.tudelft.st01.unit.visitors.select;
 
-import net.sf.jsqlparser.expression.DoubleValue;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.query.NumericDoubleValue;
@@ -20,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
 import static nl.tudelft.st01.AssertUtils.compareFieldByField;
 
 /**
- * Unit tests for the {@code SelectExpressionVisitorTest}.
+ * Unit tests for the {@code SelectExpressionVisitor}.
  */
 class SelectExpressionVisitorTest {
     private static final String EXCEPTION_MESSAGE = "A SelectExpressionVisitor requires an empty,"
@@ -63,7 +61,7 @@ class SelectExpressionVisitorTest {
     }
 
     /**
-     * Assert that the {@code visit} method for an {@code EqualsTo} generates the correct outpur.
+     * Assert that the {@code visit} method for an {@code EqualsTo} generates the correct output.
      */
     @Test
     void visitEqualsToTest() {
