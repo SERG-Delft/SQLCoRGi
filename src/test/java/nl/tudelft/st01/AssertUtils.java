@@ -1,8 +1,6 @@
 package nl.tudelft.st01;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -51,12 +49,13 @@ public final class AssertUtils {
      * Asserts that every object in the inputList is equal to an object in the expected list when comparing
      * field-by-field, recursively.
      *
+     * @param <T> The type used by the lists.
      * @param inputList The list of arguments that should be compared
      * @param expected The expected outputs that the inputList should be compared with
      */
-    public static <T> void compareFieldByField(List<T> inputList, T... expected) {
+    public static<T> void compareFieldByField(List<T> inputList, T... expected) {
         List<T> expectedList = Arrays.asList(expected);
-        if(expectedList.size() != inputList.size()) {
+        if (expectedList.size() != inputList.size()) {
             throw new IllegalArgumentException("Lists have to have the same size");
         }
 
