@@ -254,7 +254,7 @@ class SelectExpressionVisitorTest {
     }
 
     /**
-     * Assert that the {@code visit} method for an {@code LikeExpression} generates the correct output.
+     * Assert that the {@code visit} method for a case-insensitive {@code LikeExpression} generates the correct output.
      */
     @Test
     void visitLikeExpressionTest() {
@@ -268,6 +268,32 @@ class SelectExpressionVisitorTest {
         notLikeExpression.setNot();
         notLikeExpression.setLeftExpression(leftValue);
         notLikeExpression.setRightExpression(rightValue);
+
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(leftValue);
+
+        selectExpressionVisitor.visit(likeExpression);
+
+        compareFieldByField(output, likeExpression, notLikeExpression, isNullExpression);
+    }
+
+    /**
+     * Assert that the {@code visit} method for an {@code LikeExpression} generates the correct output.
+     */
+    @Test
+    void visitILikeExpressionTest() {
+        LikeExpression likeExpression = new LikeExpression();
+        StringValue leftValue = new StringValue("y");
+        StringValue rightValue = new StringValue("coverage");
+        likeExpression.setLeftExpression(leftValue);
+        likeExpression.setRightExpression(rightValue);
+        likeExpression.setCaseInsensitive(true);
+
+        LikeExpression notLikeExpression = new LikeExpression();
+        notLikeExpression.setNot();
+        notLikeExpression.setLeftExpression(leftValue);
+        notLikeExpression.setRightExpression(rightValue);
+        notLikeExpression.setCaseInsensitive(true);
 
         IsNullExpression isNullExpression = new IsNullExpression();
         isNullExpression.setLeftExpression(leftValue);
