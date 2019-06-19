@@ -4,6 +4,7 @@ import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.*;
+import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.query.NumericDoubleValue;
 import nl.tudelft.st01.query.NumericLongValue;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
@@ -58,6 +59,32 @@ class SelectExpressionVisitorTest {
         assertThatThrownBy(() -> {
             new SelectExpressionVisitor(output);
         }).isInstanceOf(CannotBeNullException.class).hasMessageContaining(EXCEPTION_MESSAGE);
+    }
+
+    /**
+     * Assert that the {@code visit} method for an {@code EqualsTo} generates the correct outpur.
+     */
+    @Test
+    void visitEqualsToTest() {
+        EqualsTo equalsTo = new EqualsTo();
+        Column leftValue = new Column("something");
+        equalsTo.setLeftExpression(leftValue);
+        equalsTo.setRightExpression(new NumericDoubleValue("42.0"));
+
+        EqualsTo minusOne = new EqualsTo();
+        minusOne.setLeftExpression(leftValue);
+        minusOne.setRightExpression(new NumericDoubleValue("41.0"));
+
+        EqualsTo plusOne = new EqualsTo();
+        plusOne.setLeftExpression(leftValue);
+        plusOne.setRightExpression(new NumericDoubleValue("43.0"));
+
+        IsNullExpression isNullExpression = new IsNullExpression();
+        isNullExpression.setLeftExpression(leftValue);
+
+        selectExpressionVisitor.visit(equalsTo);
+
+        compareFieldByField(output, minusOne, equalsTo, plusOne, isNullExpression);
     }
 
     /**
