@@ -20,7 +20,7 @@ import static nl.tudelft.st01.AssertUtils.compareFieldByField;
 /**
  * Unit tests for the {@code SelectExpressionVisitorTest}.
  */
-public class SelectExpressionVisitorTest {
+class SelectExpressionVisitorTest {
     private static final String EXCEPTION_MESSAGE = "A SelectExpressionVisitor requires an empty,"
             + " non-null set to which it can write generated expressions.";
 
@@ -31,7 +31,7 @@ public class SelectExpressionVisitorTest {
      * Set-up a {@code SelectExpressionVisitor} with an empty {@code ArrayList}.
      */
     @BeforeEach
-    public void setUpSelectExpressionVisitor() {
+    void setUpSelectExpressionVisitor() {
         output = new ArrayList<>();
         selectExpressionVisitor = new SelectExpressionVisitor(output);
     }
@@ -40,7 +40,7 @@ public class SelectExpressionVisitorTest {
      * Test whether initializing a {@code SelectExpressionVisitor} with {@code null} throws the correct exception.
      */
     @Test
-    public void constructorNullOutputTest() {
+    void constructorNullOutputTest() {
         assertThatThrownBy(() -> {
             new SelectExpressionVisitor(null);
         }).isInstanceOf(CannotBeNullException.class).hasMessageContaining(EXCEPTION_MESSAGE);
@@ -51,7 +51,7 @@ public class SelectExpressionVisitorTest {
      * with a non-empty {@code output} throws the correct exception.
      */
     @Test
-    public void constructorNonEmptyOutputTest() {
+    void constructorNonEmptyOutputTest() {
         List<Expression> output = new ArrayList<>();
         output.add(new GreaterThan());
 
@@ -64,7 +64,7 @@ public class SelectExpressionVisitorTest {
      * Assert that the {@code visit} method for an {@code IsNullExpression} generates the correct output.
      */
     @Test
-    public void visitNullExpressionTest() {
+    void visitNullExpressionTest() {
         IsNullExpression isNullExpression = new IsNullExpression();
         StringValue stringValue = new StringValue("context");
         isNullExpression.setLeftExpression(stringValue);
@@ -83,11 +83,11 @@ public class SelectExpressionVisitorTest {
      * {@code BetweenExpression} with Double values generates the correct output.
      */
     @Test
-    public void visitBetweenWithDoubleValueTest() {
+    void visitBetweenWithDoubleValueTest() {
         Between between = new Between();
-        StringValue left = new StringValue("y");
-        NumericDoubleValue start = new NumericDoubleValue("1");
-        NumericDoubleValue end = new NumericDoubleValue("12");
+        StringValue left = new StringValue("double");
+        NumericDoubleValue start = new NumericDoubleValue("2");
+        NumericDoubleValue end = new NumericDoubleValue("24");
         between.setLeftExpression(left);
         between.setBetweenExpressionStart(start);
         between.setBetweenExpressionEnd(end);
@@ -135,9 +135,9 @@ public class SelectExpressionVisitorTest {
      * {@code BetweenExpression} with Long values generates the correct output.
      */
     @Test
-    public void visitBetweenWithLongValueTest() {
+    void visitBetweenWithLongValueTest() {
         Between between = new Between();
-        StringValue left = new StringValue("y");
+        StringValue left = new StringValue("long");
         NumericLongValue start = new NumericLongValue("1");
         NumericLongValue end = new NumericLongValue("12");
         between.setLeftExpression(left);
@@ -187,9 +187,9 @@ public class SelectExpressionVisitorTest {
      * {@code BetweenExpression} with String values generates the correct output.
      */
     @Test
-    public void visitBetweenWithStringValueTest() {
+    void visitBetweenWithStringValueTest() {
         Between between = new Between();
-        StringValue left = new StringValue("z");
+        StringValue left = new StringValue("string");
         StringValue start = new StringValue("aaa");
         StringValue end = new StringValue("azz");
         between.setLeftExpression(left);
@@ -228,9 +228,9 @@ public class SelectExpressionVisitorTest {
      * Assert that the {@code visit} method for an {@code InExpression} generates the correct output.
      */
     @Test
-    public void visitInExpressionTest() {
+    void visitInExpressionTest() {
         InExpression inExpression = new InExpression();
-        StringValue left = new StringValue("x");
+        StringValue left = new StringValue("number");
         ExpressionList right = new ExpressionList();
         List<Expression> itemList = new ArrayList<>();
         DoubleValue item = new DoubleValue("28");
@@ -257,7 +257,7 @@ public class SelectExpressionVisitorTest {
      * Assert that the {@code visit} method for an {@code LikeExpression} generates the correct output.
      */
     @Test
-    public void visitLikeExpressionTest() {
+    void visitLikeExpressionTest() {
         LikeExpression likeExpression = new LikeExpression();
         StringValue leftValue = new StringValue("x");
         StringValue rightValue = new StringValue("project");
