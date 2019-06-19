@@ -7,6 +7,7 @@ import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.query.NumericDoubleValue;
 import nl.tudelft.st01.query.NumericLongValue;
+import nl.tudelft.st01.query.NumericValue;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
 import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 import org.junit.jupiter.api.BeforeEach;
@@ -111,50 +112,11 @@ class SelectExpressionVisitorTest {
      */
     @Test
     void visitBetweenWithDoubleValueTest() {
-        Between between = new Between();
         StringValue left = new StringValue("double");
         NumericDoubleValue start = new NumericDoubleValue("2");
         NumericDoubleValue end = new NumericDoubleValue("24");
-        between.setLeftExpression(left);
-        between.setBetweenExpressionStart(start);
-        between.setBetweenExpressionEnd(end);
 
-        Between notBetween = new Between();
-        notBetween.setNot(true);
-        notBetween.setLeftExpression(left);
-        notBetween.setBetweenExpressionStart(start);
-        notBetween.setBetweenExpressionEnd(end);
-
-        IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(left);
-
-        EqualsTo equalsToStart = new EqualsTo();
-        equalsToStart.setLeftExpression(left);
-        equalsToStart.setRightExpression(start);
-
-        EqualsTo equalsToEnd = new EqualsTo();
-        equalsToEnd.setLeftExpression(left);
-        equalsToEnd.setRightExpression(end);
-
-        EqualsTo startMinusOne = new EqualsTo();
-        startMinusOne.setLeftExpression(left);
-        startMinusOne.setRightExpression(start.add(-1));
-
-        EqualsTo endPlusOne = new EqualsTo();
-        endPlusOne.setLeftExpression(left);
-        endPlusOne.setRightExpression(end.add(1));
-
-        selectExpressionVisitor.visit(between);
-
-        compareFieldByField(output,
-                equalsToStart,
-                equalsToEnd,
-                startMinusOne,
-                endPlusOne,
-                between,
-                notBetween,
-                isNullExpression
-        );
+        betweenAssert(left, start, end, true);
     }
 
     /**
@@ -163,50 +125,11 @@ class SelectExpressionVisitorTest {
      */
     @Test
     void visitBetweenWithLongValueTest() {
-        Between between = new Between();
         StringValue left = new StringValue("long");
         NumericLongValue start = new NumericLongValue("1");
         NumericLongValue end = new NumericLongValue("12");
-        between.setLeftExpression(left);
-        between.setBetweenExpressionStart(start);
-        between.setBetweenExpressionEnd(end);
 
-        Between notBetween = new Between();
-        notBetween.setNot(true);
-        notBetween.setLeftExpression(left);
-        notBetween.setBetweenExpressionStart(start);
-        notBetween.setBetweenExpressionEnd(end);
-
-        IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(left);
-
-        EqualsTo equalsToStart = new EqualsTo();
-        equalsToStart.setLeftExpression(left);
-        equalsToStart.setRightExpression(start);
-
-        EqualsTo equalsToEnd = new EqualsTo();
-        equalsToEnd.setLeftExpression(left);
-        equalsToEnd.setRightExpression(end);
-
-        EqualsTo startMinusOne = new EqualsTo();
-        startMinusOne.setLeftExpression(left);
-        startMinusOne.setRightExpression(start.add(-1));
-
-        EqualsTo endPlusOne = new EqualsTo();
-        endPlusOne.setLeftExpression(left);
-        endPlusOne.setRightExpression(end.add(1));
-
-        selectExpressionVisitor.visit(between);
-
-        compareFieldByField(output,
-                equalsToStart,
-                equalsToEnd,
-                startMinusOne,
-                endPlusOne,
-                between,
-                notBetween,
-                isNullExpression
-        );
+        betweenAssert(left, start, end, true);
     }
 
     /**
@@ -215,10 +138,22 @@ class SelectExpressionVisitorTest {
      */
     @Test
     void visitBetweenWithStringValueTest() {
-        Between between = new Between();
         StringValue left = new StringValue("string");
         StringValue start = new StringValue("aaa");
         StringValue end = new StringValue("azz");
+
+        betweenAssert(left, start, end, false);
+    }
+
+    /**
+     * Asserts the different tests or BETWEEN expressions.
+     * @param left The expression left of the BETWEEN operator
+     * @param start The start of the BETWEEN expression
+     * @param end The end of the BETWEEN expression
+     * @param isNumeric Flag to check whether the BETWEEN expression is numeric
+     */
+    private void betweenAssert(Expression left, Expression start, Expression end, boolean isNumeric) {
+        Between between = new Between();
         between.setLeftExpression(left);
         between.setBetweenExpressionStart(start);
         between.setBetweenExpressionEnd(end);
@@ -240,15 +175,37 @@ class SelectExpressionVisitorTest {
         equalsToEnd.setLeftExpression(left);
         equalsToEnd.setRightExpression(end);
 
-        selectExpressionVisitor.visit(between);
+        if (isNumeric) {
+            EqualsTo startMinusOne = new EqualsTo();
+            startMinusOne.setLeftExpression(left);
+            startMinusOne.setRightExpression(((NumericValue) start).add(-1));
 
-        compareFieldByField(output,
-                equalsToStart,
-                equalsToEnd,
-                between,
-                notBetween,
-                isNullExpression
-        );
+            EqualsTo endPlusOne = new EqualsTo();
+            endPlusOne.setLeftExpression(left);
+            endPlusOne.setRightExpression(((NumericValue) end).add(1));
+
+            selectExpressionVisitor.visit(between);
+
+            compareFieldByField(output,
+                    equalsToStart,
+                    equalsToEnd,
+                    startMinusOne,
+                    endPlusOne,
+                    between,
+                    notBetween,
+                    isNullExpression
+            );
+        } else {
+            selectExpressionVisitor.visit(between);
+
+            compareFieldByField(output,
+                    equalsToStart,
+                    equalsToEnd,
+                    between,
+                    notBetween,
+                    isNullExpression
+            );
+        }
     }
 
     /**
