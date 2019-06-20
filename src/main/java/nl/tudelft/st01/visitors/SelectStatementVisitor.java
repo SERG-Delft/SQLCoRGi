@@ -4,7 +4,7 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.*;
 import nl.tudelft.st01.AggregateFunctionsGenerator;
 import nl.tudelft.st01.GroupByGenerator;
-import nl.tudelft.st01.util.exceptions.CannotBeNullException;
+import nl.tudelft.st01.exceptions.CannotBeNullException;
 import nl.tudelft.st01.visitors.select.NullAttributeFinder;
 import nl.tudelft.st01.visitors.select.NullReducer;
 import nl.tudelft.st01.JoinRulesGenerator;
@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static nl.tudelft.st01.SubqueryGenerator.coverSubqueries;
 import static nl.tudelft.st01.util.Expressions.setJoinToInner;
 import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
 
@@ -51,13 +52,28 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
         handleGroupBy(plainSelect);
         handleHaving(plainSelect);
         handleJoins(plainSelect);
+        handleSubqueries(plainSelect);
 
         for (PlainSelect select : this.statements) {
             applyNullReduction(select);
             this.output.add(select.toString());
         }
+    }
 
-        this.output = null;
+    @Override
+    public void visit(SetOperationList setOperationList) {
+        for (SelectBody select : setOperationList.getSelects()) {
+            select.accept(this);
+        }
+    }
+
+    /**
+     * Generates coverage rules for the subqueries found in the given {@link PlainSelect}.
+     *
+     * @param plainSelect the plainSelect that needs to be covered.
+     */
+    private void handleSubqueries(PlainSelect plainSelect) {
+        this.output.addAll(coverSubqueries((PlainSelect) copy(plainSelect)));
     }
 
     /**

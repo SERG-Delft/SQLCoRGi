@@ -8,7 +8,7 @@ import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.query.NumericDoubleValue;
 import nl.tudelft.st01.query.NumericLongValue;
 import nl.tudelft.st01.query.NumericValue;
-import nl.tudelft.st01.util.exceptions.CannotBeNullException;
+import nl.tudelft.st01.exceptions.CannotBeNullException;
 
 import java.util.List;
 

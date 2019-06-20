@@ -1,4 +1,4 @@
-package nl.tudelft.st01.util.exceptions;
+package nl.tudelft.st01.exceptions;
 
 /**
  *  Exception that can be used to alert users that there is something wrong with the number of arguments.

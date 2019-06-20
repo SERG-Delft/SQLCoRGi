@@ -5,10 +5,9 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
-import nl.tudelft.st01.util.exceptions.CannotBeNullException;
-import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
-import nl.tudelft.st01.util.exceptions.ShouldNotBeInstantiatedException;
-import nl.tudelft.st01.util.exceptions.UnsupportedInputException;
+import nl.tudelft.st01.exceptions.CannotBeNullException;
+import nl.tudelft.st01.exceptions.CannotBeParsedException;
+import nl.tudelft.st01.exceptions.UnsupportedInputException;
 import nl.tudelft.st01.visitors.SelectStatementVisitor;
 
 import java.util.HashSet;
@@ -23,7 +22,7 @@ public final class Generator {
      * No instance of this class should be created.
      */
     private Generator() {
-        throw new ShouldNotBeInstantiatedException();
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -67,7 +66,8 @@ public final class Generator {
      * @param args unused.
      */
     public static void main(String[] args) {
-        String query = "SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 inner join d on d.id > 0";
+
+        String query = "SELECT * FROM t WHERE a = 0 UNION SELECT * FROM t2 WHERE b > 888";
 
         Set<String> result = generateRules(query);
 

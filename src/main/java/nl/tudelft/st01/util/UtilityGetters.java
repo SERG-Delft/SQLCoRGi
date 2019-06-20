@@ -49,10 +49,10 @@ public final class UtilityGetters {
     }
 
     /**
-     * Generates a `__ > 1` expression.
+     * Generates a `__ GREATER THAN 1` expression.
      *
-     * @param expr - expression to fill in the __
-     * @return `expr > 1` object
+     * @param expr expression to fill in the __
+     * @return `expr GREATER THAN 1` object
      */
     public static GreaterThan createGreaterThanOne(Expression expr) {
         GreaterThan greaterThan = new GreaterThan();

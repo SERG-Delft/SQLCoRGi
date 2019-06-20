@@ -444,6 +444,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
         }
 
         this.copy = copy;
+        this.itemsList = copy;
     }
 
     @Override
