@@ -4,8 +4,8 @@ import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
 
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 
-import nl.tudelft.st01.util.exceptions.SQLFpcException;
-import nl.tudelft.st01.util.exceptions.SQLFpcParseException;
+import nl.tudelft.st01.exceptions.SQLFpcException;
+import nl.tudelft.st01.exceptions.SQLFpcParseException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class SQLFpcWSTest {
     private SQLFpcWSSoapProxy mockWebService;
 
     public static final String NO_OPTIONAL_ARGS = "";
-    
+
     private static final String DATABASE_SCHEMA =
             " <schema dbms=\"MySQL\">\n"
                     + "     <table name=\"TableB\">\n"

@@ -8,7 +8,6 @@ import net.sf.jsqlparser.schema.Column;
 import nl.tudelft.st01.query.NumericDoubleValue;
 import nl.tudelft.st01.query.NumericLongValue;
 import nl.tudelft.st01.query.NumericValue;
-import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class SelectValueVisitor extends ExpressionVisitorAdapter {
      */
     public SelectValueVisitor(Column column, List<Expression> output) {
         if (output == null || !output.isEmpty()) {
-            throw new CannotBeNullException(
+            throw new IllegalArgumentException(
                     "A SelectValueVisitor requires an empty, non-null set to which it can write generated mutations."
             );
         }

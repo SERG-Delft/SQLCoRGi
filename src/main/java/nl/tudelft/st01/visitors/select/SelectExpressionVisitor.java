@@ -5,9 +5,9 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.SubSelect;
 import nl.tudelft.st01.query.NumericDoubleValue;
 import nl.tudelft.st01.query.NumericLongValue;
-import nl.tudelft.st01.util.exceptions.CannotBeNullException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      */
     public SelectExpressionVisitor(List<Expression> output) {
         if (output == null || !output.isEmpty()) {
-            throw new CannotBeNullException(
+            throw new IllegalArgumentException(
                 "A SelectExpressionVisitor requires an empty, non-null set to which it can write generated expressions."
             );
         }
@@ -232,6 +232,11 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         IsNullExpression isNullExpressionOut = new IsNullExpression();
         isNullExpressionOut.setLeftExpression(copy(likeExpression.getLeftExpression()));
         output.add(isNullExpressionOut);
+    }
+
+    @Override
+    public void visit(SubSelect subSelect) {
+        // Don't do anything here.
     }
 
 }
