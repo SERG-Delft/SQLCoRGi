@@ -3,7 +3,7 @@ package nl.tudelft.st01.unit.visitors.select;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.schema.Column;
-import nl.tudelft.st01.util.exceptions.CannotBeNullException;
+import nl.tudelft.st01.exceptions.CannotBeNullException;
 import nl.tudelft.st01.visitors.select.SelectValueVisitor;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +13,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
- * Unit tests for the {@code SelectValueVisitor}.
+ * Unit tests for the {@link SelectValueVisitor}.
  */
 class SelectValueVisitorTest {
     private static final String EXCEPTION_MESSAGE = "A SelectValueVisitor requires an empty,"

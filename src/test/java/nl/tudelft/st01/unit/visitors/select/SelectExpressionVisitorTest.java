@@ -7,7 +7,7 @@ import nl.tudelft.st01.query.NumericDoubleValue;
 import nl.tudelft.st01.query.NumericLongValue;
 import nl.tudelft.st01.query.NumericValue;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
-import nl.tudelft.st01.util.exceptions.CannotBeNullException;
+import nl.tudelft.st01.exceptions.CannotBeNullException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
 import static nl.tudelft.st01.AssertUtils.compareFieldByField;
 
 /**
- * Unit tests for the {@code SelectExpressionVisitor}.
+ * Unit tests for the {@link SelectExpressionVisitor}.
  */
 class SelectExpressionVisitorTest {
     private static final String EXCEPTION_MESSAGE = "A SelectExpressionVisitor requires an empty,"
@@ -28,7 +28,7 @@ class SelectExpressionVisitorTest {
     private SelectExpressionVisitor selectExpressionVisitor;
 
     /**
-     * Set-up a {@code SelectExpressionVisitor} with an empty {@code ArrayList}.
+     * Set-up a {@link SelectExpressionVisitor} with an empty {@link ArrayList}.
      */
     @BeforeEach
     void setUpSelectExpressionVisitor() {
@@ -37,7 +37,7 @@ class SelectExpressionVisitorTest {
     }
 
     /**
-     * Test whether initializing a {@code SelectExpressionVisitor} with {@code null} throws the correct exception.
+     * Test whether initializing a {@link SelectExpressionVisitor} with {@code null} throws the correct exception.
      */
     @Test
     void constructorNullOutputTest() {
@@ -47,7 +47,7 @@ class SelectExpressionVisitorTest {
     }
 
     /**
-     * Test whether initializing a {@code SelectExpressionVisitor}
+     * Test whether initializing a {@link SelectExpressionVisitor}
      * with a non-empty {@code output} throws the correct exception.
      */
     @Test
@@ -61,7 +61,7 @@ class SelectExpressionVisitorTest {
     }
 
     /**
-     * Assert that the {@code visit} method for an {@code EqualsTo} generates the correct output.
+     * Assert that the {@code visit} method for an {@link EqualsTo} generates the correct output.
      */
     @Test
     void visitEqualsToTest() {
@@ -87,7 +87,7 @@ class SelectExpressionVisitorTest {
     }
 
     /**
-     * Assert that the {@code visit} method for an {@code IsNullExpression} generates the correct output.
+     * Assert that the {@code visit} method for an {@link IsNullExpression} generates the correct output.
      */
     @Test
     void visitNullExpressionTest() {
@@ -106,7 +106,7 @@ class SelectExpressionVisitorTest {
 
     /**
      * Assert that the {@code visit} method for an
-     * {@code BetweenExpression} with Double values generates the correct output.
+     * {@link Between} with Double values generates the correct output.
      */
     @Test
     void visitBetweenWithDoubleValueTest() {
@@ -119,7 +119,7 @@ class SelectExpressionVisitorTest {
 
     /**
      * Assert that the {@code visit} method for an
-     * {@code BetweenExpression} with Long values generates the correct output.
+     * {@link Between} with Long values generates the correct output.
      */
     @Test
     void visitBetweenWithLongValueTest() {
@@ -132,7 +132,7 @@ class SelectExpressionVisitorTest {
 
     /**
      * Assert that the {@code visit} method for an
-     * {@code BetweenExpression} with String values generates the correct output.
+     * {@link Between} with String values generates the correct output.
      */
     @Test
     void visitBetweenWithStringValueTest() {
@@ -207,7 +207,7 @@ class SelectExpressionVisitorTest {
     }
 
     /**
-     * Assert that the {@code visit} method for an {@code InExpression} generates the correct output.
+     * Assert that the {@code visit} method for an {@link InExpression} generates the correct output.
      */
     @Test
     void visitInExpressionTest() {
@@ -236,7 +236,7 @@ class SelectExpressionVisitorTest {
     }
 
     /**
-     * Assert that the {@code visit} method for a case-insensitive {@code LikeExpression} generates the correct output.
+     * Assert that the {@code visit} method for a case-insensitive {@link LikeExpression} generates the correct output.
      */
     @Test
     void visitLikeExpressionTest() {
@@ -260,7 +260,7 @@ class SelectExpressionVisitorTest {
     }
 
     /**
-     * Assert that the {@code visit} method for an {@code LikeExpression} generates the correct output.
+     * Assert that the {@code visit} method for an {@link LikeExpression} generates the correct output.
      */
     @Test
     void visitILikeExpressionTest() {
