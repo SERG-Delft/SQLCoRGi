@@ -2,7 +2,7 @@ package nl.tudelft.st01.functional;
 
 import org.junit.jupiter.api.Test;
 
-import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
+import static nl.tudelft.st01.AssertUtils.containsAtLeast;
 
 /**
  * This class contains tests that check whether the correct coverage rules are generated for queries that contain
