@@ -7,7 +7,6 @@ import nl.tudelft.st01.query.NumericDoubleValue;
 import nl.tudelft.st01.query.NumericLongValue;
 import nl.tudelft.st01.query.NumericValue;
 import nl.tudelft.st01.visitors.select.SelectExpressionVisitor;
-import nl.tudelft.st01.exceptions.CannotBeNullException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +42,7 @@ class SelectExpressionVisitorTest {
     void constructorNullOutputTest() {
         assertThatThrownBy(() -> {
             new SelectExpressionVisitor(null);
-        }).isInstanceOf(CannotBeNullException.class).hasMessageContaining(EXCEPTION_MESSAGE);
+        }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining(EXCEPTION_MESSAGE);
     }
 
     /**
@@ -57,7 +56,7 @@ class SelectExpressionVisitorTest {
 
         assertThatThrownBy(() -> {
             new SelectExpressionVisitor(output);
-        }).isInstanceOf(CannotBeNullException.class).hasMessageContaining(EXCEPTION_MESSAGE);
+        }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining(EXCEPTION_MESSAGE);
     }
 
     /**

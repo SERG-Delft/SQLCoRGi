@@ -35,7 +35,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      */
     public SelectStatementVisitor(Set<String> output) {
         if (output == null || !output.isEmpty()) {
-            throw new CannotBeNullException(
+            throw new IllegalArgumentException(
                 "A SelectStatementVisitor requires an empty, non-null set to which it can output generated rules."
             );
         }
