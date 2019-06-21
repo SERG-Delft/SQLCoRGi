@@ -86,6 +86,7 @@
             <property name="reliefPattern" value="\bfallthr(?>u|ough)\b"/>
         </module>
         <module name="FinalClass"/>
+        <module name="GenericWhitespace"/>
         <module name="HideUtilityClassConstructor"/>
         <module name="IllegalCatch"/>
         <module name="IllegalImport"/>

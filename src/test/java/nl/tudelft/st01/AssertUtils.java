@@ -53,7 +53,8 @@ public final class AssertUtils {
      * @param inputList The list of arguments that should be compared
      * @param expected The expected outputs that the inputList should be compared with
      */
-    public static<T> void compareFieldByField(List<T> inputList, T... expected) {
+    @SuppressWarnings("checkstyle:NoWhiteSpaceBefore")
+    public static <T> void compareFieldByField(List<T> inputList, T... expected) {
         List<T> expectedList = Arrays.asList(expected);
         if (expectedList.size() != inputList.size()) {
             throw new IllegalArgumentException("Lists have to have the same size");
