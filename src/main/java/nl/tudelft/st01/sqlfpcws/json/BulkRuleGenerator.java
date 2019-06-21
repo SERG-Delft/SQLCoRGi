@@ -9,10 +9,10 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.util.TablesNamesFinder;
 
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
-import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
-import nl.tudelft.st01.util.exceptions.CannotParseInputSQLFileException;
-import nl.tudelft.st01.util.exceptions.CannotWriteJSONOutputException;
-import nl.tudelft.st01.util.exceptions.InvalidSchemaException;
+import nl.tudelft.st01.exceptions.CannotBeParsedException;
+import nl.tudelft.st01.exceptions.CannotParseInputSQLFileException;
+import nl.tudelft.st01.exceptions.CannotWriteJSONOutputException;
+import nl.tudelft.st01.exceptions.InvalidSchemaException;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;

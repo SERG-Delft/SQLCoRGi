@@ -1,7 +1,7 @@
 package nl.tudelft.st01.functional;
 
 import nl.tudelft.st01.CoverageRuleGenerator;
-import nl.tudelft.st01.util.exceptions.CannotBeParsedException;
+import nl.tudelft.st01.exceptions.CannotBeParsedException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

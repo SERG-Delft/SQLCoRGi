@@ -17,7 +17,7 @@ class ConditionTest {
      * A test case for a simple query containing only one condition with = as operator.
      */
     @Test
-    public void testEqualsInteger() {
+    void testEqualsInteger() {
         verify("SELECT * FROM Movies WHERE year = 2003",
 
                 "SELECT * FROM Movies WHERE year = 2004",
@@ -107,7 +107,7 @@ class ConditionTest {
      * A test case for a simple query with IS NULL.
      */
     @Test
-    public void testIsNull() {
+    void testIsNull() {
         verify("SELECT * FROM table WHERE a IS NULL",
 
                 "SELECT * FROM table WHERE a IS NOT NULL",
@@ -118,7 +118,7 @@ class ConditionTest {
      * A test case for a simple query with IS NOT NULL.
      */
     @Test
-    public void testIsNotNull() {
+    void testIsNotNull() {
         verify("SELECT * FROM table WHERE a IS NOT NULL",
 
                 "SELECT * FROM table WHERE a IS NULL",
@@ -129,7 +129,7 @@ class ConditionTest {
      * A test case with two conditions, combined with AND.
      */
     @Test
-    public void testTwoConditionsWithAND() {
+    void testTwoConditionsWithAND() {
         verify("SELECT * FROM Movies WHERE year > 1950 AND year < 2000",
 
                 "SELECT * FROM Movies WHERE (year = 1949) AND (year < 2000)",
@@ -145,7 +145,7 @@ class ConditionTest {
      * A test case with two conditions, combined with OR.
      */
     @Test
-    public void testTwoConditionsWithOR() {
+    void testTwoConditionsWithOR() {
         verify("SELECT * FROM Movies WHERE year < 2004 OR year > 2010",
 
                 "SELECT * FROM Movies WHERE (year = 2003) AND NOT (year > 2010)",
@@ -197,7 +197,7 @@ class ConditionTest {
      * A test case with three conditions, combined with AND and OR. Version 2.
      */
     @Test
-    public void testThreeConditionsAndOr2() {
+    void testThreeConditionsAndOr2() {
         verify("SELECT * FROM Movies WHERE year < 2004 AND length_minutes > 100 OR year > 2005",
 
                 "SELECT * FROM Movies WHERE ((year < 2004) AND (length_minutes = 99)) AND NOT (year > 2005)",
@@ -218,7 +218,7 @@ class ConditionTest {
      * A test case with an alias, due to the AS condition.
      */
     @Test
-    public void testAliasing() {
+    void testAliasing() {
         verify("SELECT * FROM Movies AS M WHERE M.id = 8",
 
                 "SELECT * FROM Movies AS M WHERE M.id = 9",

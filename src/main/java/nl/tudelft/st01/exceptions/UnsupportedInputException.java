@@ -1,4 +1,4 @@
-package nl.tudelft.st01.util.exceptions;
+package nl.tudelft.st01.exceptions;
 
 /**
  *  Exception that can be used to alert programmers that a certain input is not supported.
