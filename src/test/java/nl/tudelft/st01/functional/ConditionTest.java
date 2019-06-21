@@ -2,8 +2,8 @@ package nl.tudelft.st01.functional;
 
 import org.junit.jupiter.api.Test;
 
-import static nl.tudelft.st01.functional.AssertUtils.containsAtLeast;
-import static nl.tudelft.st01.functional.AssertUtils.verify;
+import static nl.tudelft.st01.AssertUtils.containsAtLeast;
+import static nl.tudelft.st01.AssertUtils.verify;
 
 /**
  * This class tests if the coverage targets for queries with WHERE clauses are generated correctly.
@@ -154,6 +154,22 @@ class ConditionTest {
                 "SELECT * FROM Movies WHERE NOT (year < 2004) AND (year = 2009)",
                 "SELECT * FROM Movies WHERE NOT (year < 2004) AND (year = 2010)",
                 "SELECT * FROM Movies WHERE NOT (year < 2004) AND (year = 2011)",
+                "SELECT * FROM Movies WHERE (year IS NULL)");
+    }
+
+    /**
+     * A test case with two parenthesized conditions, combined with OR.
+     */
+    @Test
+    public void testTwoParenthesisedConditionsWithOR() {
+        verify("SELECT * FROM Movies WHERE (year = 1996) OR (year = 2019)",
+
+                "SELECT * FROM Movies WHERE (year = 1995) AND NOT (year = 2019)",
+                "SELECT * FROM Movies WHERE (year = 1996) AND NOT (year = 2019)",
+                "SELECT * FROM Movies WHERE (year = 1997) AND NOT (year = 2019)",
+                "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2018)",
+                "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2019)",
+                "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2020)",
                 "SELECT * FROM Movies WHERE (year IS NULL)");
     }
 

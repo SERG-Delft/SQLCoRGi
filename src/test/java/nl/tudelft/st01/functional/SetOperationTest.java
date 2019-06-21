@@ -2,7 +2,7 @@ package nl.tudelft.st01.functional;
 
 import org.junit.jupiter.api.Test;
 
-import static nl.tudelft.st01.functional.AssertUtils.verify;
+import static nl.tudelft.st01.AssertUtils.verify;
 
 /**
  * This class contains tests that check whether the correct coverage rules are generated for queries containing set

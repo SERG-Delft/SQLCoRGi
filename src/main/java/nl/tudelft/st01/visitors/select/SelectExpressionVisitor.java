@@ -8,7 +8,6 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import nl.tudelft.st01.query.NumericDoubleValue;
 import nl.tudelft.st01.query.NumericLongValue;
-import nl.tudelft.st01.exceptions.CannotBeNullException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +30,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      */
     public SelectExpressionVisitor(List<Expression> output) {
         if (output == null || !output.isEmpty()) {
-            throw new CannotBeNullException(
+            throw new IllegalArgumentException(
                 "A SelectExpressionVisitor requires an empty, non-null set to which it can write generated expressions."
             );
         }
