@@ -3,65 +3,69 @@ package nl.tudelft.st01;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
+import nl.tudelft.st01.exceptions.CannotBeNullException;
+import nl.tudelft.st01.exceptions.CannotBeParsedException;
+import nl.tudelft.st01.exceptions.UnsupportedInputException;
+import nl.tudelft.st01.visitors.SelectStatementVisitor;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
 /**
- * Utility class for coverage target generation.
+ * The entry point of the coverage rule generator.
  */
+@SuppressWarnings("checkstyle")
 public final class Generator {
 
     /**
-     * Nope.
+     * No instance of this class should be created.
      */
     private Generator() {
         throw new UnsupportedOperationException();
     }
 
     /**
-     * Generates coverage targets for a given query.
-     * @param query the query that needs to be covered.
-     * @return the generated queries.
+     * Generates coverage targets for the given query.
+     *
+     * @param query the query for which coverage rules should be generated.
+     * @return the rules that are generated for the input query.
      */
+    // It's neater to throw a CannotBeParsedException instead of printing something. PMD doesn't like it, so
+    // we have to suppress the warning that we should not throw a new exception in a catch block.
+    @SuppressWarnings({"PMD.PreserveStackTrace"})
     public static Set<String> generateRules(String query) {
-
         Set<String> result = new HashSet<>();
 
-        Statement statement = null;
+        if (query == null) {
+            throw new CannotBeNullException("Input cannot be null.");
+        }
+
+        Statement statement;
         try {
             statement = CCJSqlParserUtil.parse(query);
         } catch (JSQLParserException e) {
-            System.err.println("Input query could not be parsed.");
-            return result;
+            throw new CannotBeParsedException("Input query could not be parsed.");
         }
 
         if (!(statement instanceof Select)) {
-            System.err.println("Only SELECT statements are accepted.");
-            return result;
+            throw new UnsupportedInputException("Only SELECT statements are supported.");
         }
 
         SelectBody selectBody = ((Select) statement).getSelectBody();
-        RuleGeneratorSelectVisitor ruleGeneratorSelectVisitor = new RuleGeneratorSelectVisitor();
-        ArrayList<PlainSelect> plainSelects = new ArrayList<>();
-        ruleGeneratorSelectVisitor.setOutput(plainSelects);
-        selectBody.accept(ruleGeneratorSelectVisitor);
 
-        for (PlainSelect plainSelect : plainSelects) {
-            result.add(plainSelect.toString());
-        }
+        SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(result);
+        selectBody.accept(selectStatementVisitor);
 
         return result;
     }
 
     /**
-     * Example query to try out the generator.
+     * Main method for manual testing.
+     *
      * @param args unused.
      */
     @SuppressWarnings("checkstyle:innerAssignment")
@@ -83,8 +87,9 @@ public final class Generator {
                 "SELECT * FROM Movies WHERE year BETWEEN 1980 AND 1987",
                 "SELECT * FROM Movies WHERE year IS NULL",
                 "SELECT MAX(duration) FROM Movies GROUP BY year",
-                "UPDATE Account SET balance = 999999999 WHERE id = 123",
-                "CAN'T PARSE THIS",
+                "select parent, options from tabDocField where fieldtype='Table' and options in (select name from tabDocType where istable='1'and name in ('Portal Settings', 'Workflow Transition', 'Page Role', 'Stock Settings', 'Event Role', 'Authorization Rule', 'Email Alert Recipient', 'DocPerm', 'Portal Menu Item', 'Accounts Settings', 'Custom DocPerm', 'ToDo', 'Workflow Document State', 'UserRole'))",
+                "SELECT sum(debit) from \"tabGL Entry\" gle WHERE posting_date <= '2013-02-14' and posting_date >= '2013-01-01' and voucher_type != 'Period Closing Voucher' and exists ( select name from \"tabaccount\" ac where ac.name = gle.account and ac.lft >='377'and ac.rgt <='386')",
+                "SELECT t.* FROM (SELECT * FROM table WHERE a = 0) t",
             };
 
             for (String query : queries) {
@@ -92,7 +97,11 @@ public final class Generator {
                 System.out.println("Current query: " + query);
                 scanner.nextLine();
 
-                printResults(generateRules(query));
+                try {
+                    printResults(generateRules(query));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 scanner.nextLine();
             }
 
@@ -103,7 +112,11 @@ public final class Generator {
                 + "Enter \"quit\" instead to leave.");
 
             while (!(choice = scanner.nextLine()).equals("quit")) {
-                printResults(Generator.generateRules(choice));
+                try {
+                    printResults(Generator.generateRules(choice));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             System.out.println("You make me sad.");
