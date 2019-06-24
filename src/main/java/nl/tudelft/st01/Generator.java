@@ -87,6 +87,8 @@ public final class Generator {
                 "SELECT * FROM Movies WHERE year BETWEEN 1980 AND 1987",
                 "SELECT * FROM Movies WHERE year IS NULL",
                 "SELECT MAX(duration) FROM Movies GROUP BY year",
+                "SELECT cases.*,cases_cstm.* FROM cases  LEFT JOIN cases_cstm ON cases.id = cases_cstm.id_c",
+                "SELECT * FROM t1 INNER JOIN t3 ON t1.b = t3.b INNER JOIN t2 ON t3.a = t2.a",
                 "select parent, options from tabDocField where fieldtype='Table' and options in (select name from tabDocType where istable='1'and name in ('Portal Settings', 'Workflow Transition', 'Page Role', 'Stock Settings', 'Event Role', 'Authorization Rule', 'Email Alert Recipient', 'DocPerm', 'Portal Menu Item', 'Accounts Settings', 'Custom DocPerm', 'ToDo', 'Workflow Document State', 'UserRole'))",
                 "SELECT sum(debit) from \"tabGL Entry\" gle WHERE posting_date <= '2013-02-14' and posting_date >= '2013-01-01' and voucher_type != 'Period Closing Voucher' and exists ( select name from \"tabaccount\" ac where ac.name = gle.account and ac.lft >='377'and ac.rgt <='386')",
                 "SELECT t.* FROM (SELECT * FROM table WHERE a = 0) t",
