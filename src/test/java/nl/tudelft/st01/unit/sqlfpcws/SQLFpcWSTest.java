@@ -1,15 +1,10 @@
 package nl.tudelft.st01.unit.sqlfpcws;
 
 import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
-
-import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
-
 import nl.tudelft.st01.exceptions.SQLFpcException;
-import nl.tudelft.st01.exceptions.SQLFpcParseException;
-
+import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -19,10 +14,7 @@ import java.lang.reflect.Constructor;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
+
 /**
  * Class that generates rules for the aggregate functions such as MAX, AVG etc.
  */
@@ -23,7 +25,7 @@ public class AggregateFunctionsGenerator {
 
 
     /**
-     * Main, public method that generates the rules for the aggregate functions.
+     * Main method that generates the rules for the aggregate functions.
      *
      * @param plainSelect - query object to generate rules for
      * @return list of query objects which represent the rules for the aggregator function
@@ -80,56 +82,48 @@ public class AggregateFunctionsGenerator {
 
     /**
      * Creates the aggregator statement that checks for at least one entry
-     *  having a certain column. Example result:
+     * having a certain column. Example result:<p>
      *
-     *  `SELECT COUNT(*) FROM Movies HAVING count(distinct Director) > 1`
+     * {@code SELECT COUNT(*) FROM Movies HAVING count(distinct Director) > 1}
      *
      * @param plainSelect - select to add the part to
      * @return - select item in the above specified form
      */
     private PlainSelect firstRule(PlainSelect plainSelect) {
 
-        // Get a deep copy of the plainSelect
-        PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, false);
+        PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
+        plainSelectOut.setGroupByElement(null);
 
-        // Create COUNT(*) object
         Function count = UtilityGetters.createCountAllColumns();
 
-        // Create selectItem object with the count in it
-        SelectItem si = UtilityGetters.createSelectItemWithObject(count);
+        SelectExpressionItem selectExpressionItem = new SelectExpressionItem(count);
 
         List<SelectItem> selectItemList = new ArrayList<>();
-        selectItemList.add(si);
+        selectItemList.add(selectExpressionItem);
 
-        // Set selectItemList of plainSelectOut to be only the count object, overwriting the others
         plainSelectOut.setSelectItems(selectItemList);
 
-        // Get selectItem inside the Group By clause
         Expression groupBy = plainSelect.getGroupBy().getGroupByExpressions().get(0);
 
-        // Create COUNT(distinct groupByColumn) object
         Function countColumn = UtilityGetters.createCountColumn(groupBy, true);
 
-        // Create count > 1
         GreaterThan greaterThan = UtilityGetters.createGreaterThanOne(countColumn);
 
-        // Add to plainselect
         plainSelectOut.setHaving(greaterThan);
 
-        // You may guess what this line does by yourself
         return plainSelectOut;
     }
 
     /**
      * Adds "HAVING count(*)>1" to a plainSelect item.
-     *  This is needed for handling aggregate operators.
+     * This is needed for handling aggregate operators.
      *
      * @param plainSelect - select to add the part to
      * @return - select item with the having part added
      */
     private PlainSelect secondRule(PlainSelect plainSelect) {
 
-        PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
+        PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
         // Create COUNT(*) object
         Function count = UtilityGetters.createCountAllColumns();
@@ -152,7 +146,7 @@ public class AggregateFunctionsGenerator {
      */
     private PlainSelect thirdRule(PlainSelect plainSelect, Function function) {
 
-        PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
+        PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
         // Create COUNT(*) object
         Function count = UtilityGetters.createCountAllColumns();
@@ -187,22 +181,19 @@ public class AggregateFunctionsGenerator {
      */
     private PlainSelect fourthRule(PlainSelect plainSelect, Function function) {
 
-        PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
+        PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
         // Retrieve column in function
         Expression expr = function.getParameters().getExpressions().get(0);
 
-        // Create left condition
         GreaterThan leftGreaterThan = new GreaterThan();
         leftGreaterThan.setLeftExpression(UtilityGetters.createCountColumn(expr, false));
         leftGreaterThan.setRightExpression(UtilityGetters.createCountColumn(expr, true));
 
-        // Create right condition
         GreaterThan rightGreaterThan = UtilityGetters.createGreaterThanOne(
             UtilityGetters.createCountColumn(expr, true)
         );
 
-        // Create AND
         BinaryExpression binaryExpression = new AndExpression(leftGreaterThan, rightGreaterThan);
 
         plainSelectOut.setHaving(binaryExpression);
