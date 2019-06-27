@@ -6,9 +6,9 @@ import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 import nl.tudelft.st01.sqlfpcws.json.BulkRuleGenerator;
 
 
-import nl.tudelft.st01.exceptions.CannotParseInputSQLFileException;
-import nl.tudelft.st01.exceptions.CannotWriteJSONOutputException;
-import nl.tudelft.st01.exceptions.InvalidSchemaException;
+import nl.tudelft.st01.sqlfpcws.CannotParseInputSQLFileException;
+import nl.tudelft.st01.sqlfpcws.CannotWriteJSONOutputException;
+import nl.tudelft.st01.sqlfpcws.InvalidSchemaException;
 
 import org.junit.After;
 import org.junit.jupiter.api.Test;

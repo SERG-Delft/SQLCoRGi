@@ -478,8 +478,7 @@ public class JoinRulesGenerator {
     // Neither with nor without a white space is accepted between <T> and static.
     @SuppressWarnings("checkstyle:nowhitespacebefore")
     private static <T> Set<T> intersection(Set<T> set1, Set<T> set2) {
-        Set set = new HashSet();
-        set.addAll(set1);
+        Set<T> set = new HashSet<>(set1);
         set.retainAll(set2);
 
         return set;
@@ -545,7 +544,7 @@ public class JoinRulesGenerator {
      * @param join The join that should be copied.
      * @return A generic shallow copy of join.
      */
-    public static Join genericCopyOfJoin(Join join) {
+    private static Join genericCopyOfJoin(Join join) {
         Join outJoin = new Join();
         outJoin.setRightItem(join.getRightItem());
         outJoin.setOnExpression(join.getOnExpression());

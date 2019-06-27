@@ -10,9 +10,9 @@ import net.sf.jsqlparser.util.TablesNamesFinder;
 
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 import nl.tudelft.st01.exceptions.CannotBeParsedException;
-import nl.tudelft.st01.exceptions.CannotParseInputSQLFileException;
-import nl.tudelft.st01.exceptions.CannotWriteJSONOutputException;
-import nl.tudelft.st01.exceptions.InvalidSchemaException;
+import nl.tudelft.st01.sqlfpcws.CannotParseInputSQLFileException;
+import nl.tudelft.st01.sqlfpcws.CannotWriteJSONOutputException;
+import nl.tudelft.st01.sqlfpcws.InvalidSchemaException;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

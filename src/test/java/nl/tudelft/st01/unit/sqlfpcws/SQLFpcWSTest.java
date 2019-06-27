@@ -1,7 +1,7 @@
 package nl.tudelft.st01.unit.sqlfpcws;
 
 import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
-import nl.tudelft.st01.exceptions.SQLFpcException;
+import nl.tudelft.st01.sqlfpcws.SQLFpcException;
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
 import org.junit.Before;
 import org.junit.Test;
