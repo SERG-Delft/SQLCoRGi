@@ -7,7 +7,7 @@ import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
-import nl.tudelft.st01.util.UtilityGetters;
+import nl.tudelft.st01.util.AggregateComponentFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,9 +44,9 @@ public class GroupByGenerator {
     private PlainSelect firstRule(PlainSelect plainSelect) {
         PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
-        Function count = UtilityGetters.createCountAllColumns();
+        Function count = AggregateComponentFactory.createCountAllColumns();
 
-        GreaterThan greaterThan1 = UtilityGetters.createGreaterThanOne(count);
+        GreaterThan greaterThan1 = AggregateComponentFactory.createGreaterThanOne(count);
 
         Expression having = plainSelect.getHaving();
         if (having != null) {
@@ -72,7 +72,7 @@ public class GroupByGenerator {
         PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
         plainSelectOut.setGroupByElement(null);
 
-        Function count = UtilityGetters.createCountAllColumns();
+        Function count = AggregateComponentFactory.createCountAllColumns();
 
         List<SelectItem> selectItemList = new ArrayList<>();
 
@@ -84,9 +84,9 @@ public class GroupByGenerator {
 
         Expression groupBy = plainSelect.getGroupBy().getGroupByExpressions().get(0);
 
-        Function countColumn = UtilityGetters.createCountColumn(groupBy, true);
+        Function countColumn = AggregateComponentFactory.createCountColumn(groupBy, true);
 
-        GreaterThan greaterThan1 = UtilityGetters.createGreaterThanOne(countColumn);
+        GreaterThan greaterThan1 = AggregateComponentFactory.createGreaterThanOne(countColumn);
 
         Expression having = plainSelect.getHaving();
         if (having != null) {

@@ -9,14 +9,14 @@ import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 /**
  * Utility class that can be used to quickly create statements with COUNT(*), COUNT(DISTINCT __).
  */
-public final class UtilityGetters {
+public final class AggregateComponentFactory {
 
-    private static final String COUNT_STRING = "COUNT";
+    public static final String COUNT_STRING = "COUNT";
 
     /**
      * No instance of this class should be created.
      */
-    private UtilityGetters() {
+    private AggregateComponentFactory() {
         throw new UnsupportedOperationException();
     }
 

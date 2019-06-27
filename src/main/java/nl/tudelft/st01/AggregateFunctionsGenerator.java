@@ -8,21 +8,20 @@ import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
-import nl.tudelft.st01.util.UtilityGetters;
+import nl.tudelft.st01.util.AggregateComponentFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static nl.tudelft.st01.util.AggregateComponentFactory.COUNT_STRING;
 import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
 
 /**
  * Class that generates rules for the aggregate functions such as MAX, AVG etc.
  */
 public class AggregateFunctionsGenerator {
-    private static final String COUNT_STRING = "COUNT";
-
 
     /**
      * Main method that generates the rules for the aggregate functions.
@@ -38,22 +37,18 @@ public class AggregateFunctionsGenerator {
             if (selectItem instanceof SelectExpressionItem) {
                 SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
                 if (selectExpressionItem.getExpression() instanceof Function) {
-                    // Here we know the selectItem is a function (AVG, SUM, MAX etc.)
-                    // so we can start adding the rules for it.
+
                     Function func = (Function) selectExpressionItem.getExpression();
 
-                    // Check for COUNT(*)
                     if (func.isAllColumns()) {
                         if (plainSelect.getGroupBy() != null) {
                             outputAfterAggregator.add(firstRule(plainSelect).toString());
                             outputAfterAggregator.add(secondRule(plainSelect).toString());
                         }
 
-                        // Skip the rest of this iteration.
                         continue;
                     }
 
-                    // Check for a query without Group By
                     if (plainSelect.getGroupBy() != null) {
                         outputAfterAggregator.add(firstRule(plainSelect).toString());
                         outputAfterAggregator.add(secondRule(plainSelect).toString());
@@ -63,15 +58,13 @@ public class AggregateFunctionsGenerator {
                         continue;
                     }
 
-                    // Check for an aggregator that is NOT Count
-                    if (!func.getName().equals(COUNT_STRING)) {
+                    if (!COUNT_STRING.equals(func.getName().toUpperCase())) {
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
                         outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
 
                         continue;
                     }
 
-                    // Handle COUNT operator
                     outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
                 }
             }
@@ -94,7 +87,9 @@ public class AggregateFunctionsGenerator {
         PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
         plainSelectOut.setGroupByElement(null);
 
-        SelectExpressionItem selectExpressionItem = new SelectExpressionItem(UtilityGetters.createCountAllColumns());
+        SelectExpressionItem selectExpressionItem = new SelectExpressionItem(
+            AggregateComponentFactory.createCountAllColumns()
+        );
 
         List<SelectItem> selectItemList = new ArrayList<>();
         selectItemList.add(selectExpressionItem);
@@ -102,9 +97,9 @@ public class AggregateFunctionsGenerator {
         plainSelectOut.setSelectItems(selectItemList);
 
         Expression groupBy = plainSelect.getGroupBy().getGroupByExpressions().get(0);
-        Function countColumn = UtilityGetters.createCountColumn(groupBy, true);
+        Function countColumn = AggregateComponentFactory.createCountColumn(groupBy, true);
 
-        GreaterThan greaterThan = UtilityGetters.createGreaterThanOne(countColumn);
+        GreaterThan greaterThan = AggregateComponentFactory.createGreaterThanOne(countColumn);
         plainSelectOut.setHaving(greaterThan);
 
         return plainSelectOut;
@@ -121,8 +116,8 @@ public class AggregateFunctionsGenerator {
 
         PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
-        Function count = UtilityGetters.createCountAllColumns();
-        GreaterThan greaterThan = UtilityGetters.createGreaterThanOne(count);
+        Function count = AggregateComponentFactory.createCountAllColumns();
+        GreaterThan greaterThan = AggregateComponentFactory.createGreaterThanOne(count);
         plainSelectOut.setHaving(greaterThan);
 
         return plainSelectOut;
@@ -139,15 +134,15 @@ public class AggregateFunctionsGenerator {
 
         PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
-        Function count = UtilityGetters.createCountAllColumns();
+        Function count = AggregateComponentFactory.createCountAllColumns();
         Expression expr = function.getParameters().getExpressions().get(0);
 
         GreaterThan leftGreaterThan = new GreaterThan();
         leftGreaterThan.setLeftExpression(count);
-        leftGreaterThan.setRightExpression(UtilityGetters.createCountColumn(expr, false));
+        leftGreaterThan.setRightExpression(AggregateComponentFactory.createCountColumn(expr, false));
 
-        GreaterThan rightGreaterThan = UtilityGetters.createGreaterThanOne(
-                UtilityGetters.createCountColumn(expr, true)
+        GreaterThan rightGreaterThan = AggregateComponentFactory.createGreaterThanOne(
+                AggregateComponentFactory.createCountColumn(expr, true)
         );
 
         BinaryExpression binaryExpression = new AndExpression(leftGreaterThan, rightGreaterThan);
@@ -170,11 +165,11 @@ public class AggregateFunctionsGenerator {
         Expression expr = function.getParameters().getExpressions().get(0);
 
         GreaterThan leftGreaterThan = new GreaterThan();
-        leftGreaterThan.setLeftExpression(UtilityGetters.createCountColumn(expr, false));
-        leftGreaterThan.setRightExpression(UtilityGetters.createCountColumn(expr, true));
+        leftGreaterThan.setLeftExpression(AggregateComponentFactory.createCountColumn(expr, false));
+        leftGreaterThan.setRightExpression(AggregateComponentFactory.createCountColumn(expr, true));
 
-        GreaterThan rightGreaterThan = UtilityGetters.createGreaterThanOne(
-            UtilityGetters.createCountColumn(expr, true)
+        GreaterThan rightGreaterThan = AggregateComponentFactory.createGreaterThanOne(
+            AggregateComponentFactory.createCountColumn(expr, true)
         );
 
         BinaryExpression binaryExpression = new AndExpression(leftGreaterThan, rightGreaterThan);
