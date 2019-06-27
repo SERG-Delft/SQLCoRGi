@@ -47,7 +47,7 @@ class OrderByCloner {
      * @param orderByElement the {@code ORDER BY} to copy.
      * @return a copy of the {@code ORDER BY}.
      */
-    OrderByElement copy(OrderByElement orderByElement) {
+    private OrderByElement copy(OrderByElement orderByElement) {
 
         OrderByElement copy = new OrderByElement();
 

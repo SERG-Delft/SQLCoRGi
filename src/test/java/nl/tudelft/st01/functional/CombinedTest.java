@@ -11,13 +11,13 @@ import static nl.tudelft.st01.AssertUtils.verify;
  * Suppresses the checkstyle multipleStringLiterals violation, because some output sets have queries in common.
  */
 @SuppressWarnings("checkstyle:multipleStringLiterals")
-public class CombinedTest {
+class CombinedTest {
 
     /**
      * A test case with WHERE, JOIN and AGGREGATE parts.
      */
     @Test
-    public void testIntegratedWhereJoinAggregate() {
+    void testIntegratedWhereJoinAggregate() {
         verify("SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id < 10 GROUP BY b.id",
 
                 // WHERE RESULTS
@@ -55,7 +55,7 @@ public class CombinedTest {
      * are still present in the where expression.
      */
     @Test
-    public void testJoinWithWhereNonIdsIncludedInWhereExpression() {
+    void testJoinWithWhereNonIdsIncludedInWhereExpression() {
         verify("SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE a.length < 50 OR b.length > 70",
 
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 69)",
@@ -86,7 +86,7 @@ public class CombinedTest {
      * are still present in the where expression.
      */
     @Test
-    public void testJoinWithWhereIdsExcludedInWhereExpressionWhenIsNull() {
+    void testJoinWithWhereIdsExcludedInWhereExpressionWhenIsNull() {
         verify("SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE a.id <= 50 AND b.id >= 70",
 
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id = 49) AND (b.id >= 70)",
@@ -116,7 +116,7 @@ public class CombinedTest {
      * Note that there are no queries in the 'expected' area, which indicates no queries should be generated.
      */
     @Test
-    public void testQueryOnlySelectAndFrom() {
+    void testQueryOnlySelectAndFrom() {
         verify("SELECT * FROM TableA");
     }
 }

@@ -5,13 +5,16 @@ import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
-import nl.tudelft.st01.util.UtilityGetters;
+import nl.tudelft.st01.util.AggregateComponentFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
+
+import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
 
 /**
  * Class that generates rules based on the GROUP BY clause.
@@ -19,13 +22,13 @@ import java.util.TreeSet;
 public class GroupByGenerator {
 
     /**
-     * Main, public method that generates the rules for the GROUP BY clause.
+     * Main method that generates the rules for the GROUP BY clause.
      *
      * @param plainSelect - query object to generate rules for
      * @return list of query objects which represent the rules for the GROUP BY clause
      */
     public Set<String> generate(PlainSelect plainSelect) {
-        Set<String> outputWithGroupBy = new TreeSet<>();
+        Set<String> outputWithGroupBy = new HashSet<>(2);
         outputWithGroupBy.add(firstRule(plainSelect).toString());
         outputWithGroupBy.add(secondRule(plainSelect).toString());
 
@@ -33,25 +36,22 @@ public class GroupByGenerator {
     }
 
     /**
-     * Adds "HAVING count(*)>1" to a plainSelect item.
+     * Adds {@code HAVING count(*) > 1} to a plainSelect item.
      *
      * @param plainSelect - select to add the part to
      * @return - select item with the having part added
      */
     private PlainSelect firstRule(PlainSelect plainSelect) {
-        PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
+        PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
-        // Create COUNT(*) object
-        Function count = UtilityGetters.createCountAllColumns();
+        Function count = AggregateComponentFactory.createCountAllColumns();
 
-        // Create COUNT(*) > 1
-        GreaterThan greaterThan1 = UtilityGetters.createGreaterThanOne(count);
+        GreaterThan greaterThan1 = AggregateComponentFactory.createGreaterThanOne(count);
 
         Expression having = plainSelect.getHaving();
         if (having != null) {
             plainSelectOut.setHaving(new AndExpression(greaterThan1, having));
         } else {
-            // Add to plainselect
             plainSelectOut.setHaving(greaterThan1);
         }
 
@@ -60,43 +60,38 @@ public class GroupByGenerator {
 
     /**
      * Creates the aggregator statement that checks for at least one entry
-     *  having a certain column. Example result:
+     * having a certain column. Example result:
      *
-     *  `SELECT COUNT(*) FROM Movies HAVING count(distinct Director) > 1`
+     * `SELECT COUNT(*) FROM Movies HAVING count(distinct Director) > 1`
      *
      * @param plainSelect - select to add the part to
      * @return - select item in the above specified form
      */
     private PlainSelect secondRule(PlainSelect plainSelect) {
-        // Get a deep copy of the plainSelect
-        PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, false);
 
-        // Create COUNT(*) object
-        Function count = UtilityGetters.createCountAllColumns();
+        PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
+        plainSelectOut.setGroupByElement(null);
 
-        // Create selectItem object with the count in it
-        SelectItem si = UtilityGetters.createSelectItemWithObject(count);
+        Function count = AggregateComponentFactory.createCountAllColumns();
 
         List<SelectItem> selectItemList = new ArrayList<>();
-        selectItemList.add(si);
 
-        // Set selectItemList of plainSelectOut to be only the count object, overwriting the others
+        SelectExpressionItem selectExpressionItem = new SelectExpressionItem(count);
+
+        selectItemList.add(selectExpressionItem);
+
         plainSelectOut.setSelectItems(selectItemList);
 
-        // Get selectItem inside the Group By clause
         Expression groupBy = plainSelect.getGroupBy().getGroupByExpressions().get(0);
 
-        // Create COUNT(distinct groupByColumn) object
-        Function countColumn = UtilityGetters.createCountColumn(groupBy, true);
+        Function countColumn = AggregateComponentFactory.createCountColumn(groupBy, true);
 
-        // Create count > 1
-        GreaterThan greaterThan1 = UtilityGetters.createGreaterThanOne(countColumn);
+        GreaterThan greaterThan1 = AggregateComponentFactory.createGreaterThanOne(countColumn);
 
         Expression having = plainSelect.getHaving();
         if (having != null) {
             plainSelectOut.setHaving(new AndExpression(greaterThan1, having));
         } else {
-            // Add to plainselect
             plainSelectOut.setHaving(greaterThan1);
         }
 

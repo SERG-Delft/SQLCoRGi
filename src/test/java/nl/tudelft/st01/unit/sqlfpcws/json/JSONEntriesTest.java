@@ -13,19 +13,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Class that tests {@link JSONEntries}.
  */
-public class JSONEntriesTest {
+class JSONEntriesTest {
 
     private JSONEntries jsonEntries;
 
-    public static final int QUERYNO_ONE = 1;
-    public static final int QUERYNO_TWO = 2;
-    public static final int QUERYNO_THREE = 3;
+    private static final int QUERYNO_ONE = 1;
+    private static final int QUERYNO_TWO = 2;
+    private static final int QUERYNO_THREE = 3;
 
     /**
      * Sets up a {@link JSONEntries} object.
      */
     @BeforeEach
-    public void setUpJSONEntries() {
+    void setUpJSONEntries() {
         jsonEntries = new JSONEntries();
     }
 
@@ -34,7 +34,7 @@ public class JSONEntriesTest {
      * when the {@code getEntries} method is called.
      */
     @Test
-    public void testGetEntriesNewlyInstantiatedJSONEntriesObject() {
+    void testGetEntriesNewlyInstantiatedJSONEntriesObject() {
         assertThat(jsonEntries.getEntries())
                 .hasOnlyElementsOfType(SQLRules.class)
                 .isEmpty();
@@ -45,7 +45,7 @@ public class JSONEntriesTest {
      * method.
      */
     @Test
-    public void testGetEntriesAfterAddingOneEntry() {
+    void testGetEntriesAfterAddingOneEntry() {
         SQLRules rules = new SQLRules(QUERYNO_ONE, new ArrayList<>());
 
         jsonEntries.addEntry(rules);
@@ -58,7 +58,7 @@ public class JSONEntriesTest {
      * {@code addEntry} method.
      */
     @Test
-    public void testGetEntriesAfterAddingMultipleEntries() {
+    void testGetEntriesAfterAddingMultipleEntries() {
         SQLRules rules1 = new SQLRules(QUERYNO_ONE, new ArrayList<>());
         SQLRules rules2 = new SQLRules(QUERYNO_TWO, new ArrayList<>());
         SQLRules rules3 = new SQLRules(QUERYNO_THREE, new ArrayList<>());

@@ -1,6 +1,5 @@
 package nl.tudelft.st01.functional;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -47,7 +46,7 @@ class JoinTest {
      */
     @ParameterizedTest(name = "[{index}] Join type: {0}, Condition type: {1}")
     @CsvSource({"INNER, AND", "INNER, OR", "RIGHT, AND", "RIGHT, OR", "LEFT, AND", "LEFT, OR", "FULL, AND", "FULL, OR"})
-    public void testJoinsOnTwoDisjointConditionsWithNullableColumns(String joinType, String conditionType) {
+    void testJoinsOnTwoDisjointConditionsWithNullableColumns(String joinType, String conditionType) {
         verify("SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
                     + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2",
 
@@ -88,20 +87,6 @@ class JoinTest {
                     + " WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NOT NULL)",
                 "SELECT * FROM TableA RIGHT JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull"
                     + " WHERE (TableA.CanBeNull IS NULL) AND (TableB.CanBeNull IS NULL)");
-    }
-
-    /**
-     * A test for testing joins with on conditions with columns from only one table with an IS NULL expression.
-     * This case, the left one.
-     */
-    @Test
-    @Disabled("THIS TEST IS FOR CASES WITH A NULL EXPRESSION IN THE ON CONDITION. This would lead to contradictions")
-    void testJoinOnConditionFromSingleTableLeftNullable() {
-        verify("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL",
-
-                "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL",
-                "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL WHERE"
-                    + " (NOT (TableA.CanBeNull IS NULL)) AND (TableA.CanBeNull IS NOT NULL)");
     }
 
     /**

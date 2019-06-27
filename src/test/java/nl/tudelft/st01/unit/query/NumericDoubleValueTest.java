@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * This class tests the {@link NumericDoubleValue} class.
  */
-public class NumericDoubleValueTest {
+class NumericDoubleValueTest {
 
     private static final String TEST_NUMBER_STR = "2.0";
     private static final double TEST_NUMBER = 2.0;
@@ -20,7 +20,7 @@ public class NumericDoubleValueTest {
      * Test the constructor {@link NumericDoubleValue#NumericDoubleValue(String)} of NumericDoubleValue.
      */
     @Test
-    public void testConstructor() {
+    void testConstructor() {
         NumericDoubleValue n = new NumericDoubleValue(TEST_NUMBER_STR);
 
         assertThat(n).isNotNull().isInstanceOf(DoubleValue.class);
@@ -34,7 +34,7 @@ public class NumericDoubleValueTest {
      */
     @ParameterizedTest(name = "[{index}] number to add: {0}")
     @CsvSource({"1", "-1", "0", "10"})
-    public void testAdd(int input) {
+    void testAdd(int input) {
         NumericDoubleValue oldValue = new NumericDoubleValue(TEST_NUMBER_STR);
         NumericDoubleValue newValue = (NumericDoubleValue) oldValue.add(input);
 

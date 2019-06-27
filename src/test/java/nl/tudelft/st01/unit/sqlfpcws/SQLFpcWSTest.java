@@ -1,15 +1,10 @@
 package nl.tudelft.st01.unit.sqlfpcws;
 
 import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
-
+import nl.tudelft.st01.sqlfpcws.SQLFpcException;
 import nl.tudelft.st01.sqlfpcws.SQLFpcWS;
-
-import nl.tudelft.st01.exceptions.SQLFpcException;
-import nl.tudelft.st01.exceptions.SQLFpcParseException;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -19,10 +14,7 @@ import java.lang.reflect.Constructor;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -38,7 +30,7 @@ public class SQLFpcWSTest {
 
     private SQLFpcWSSoapProxy mockWebService;
 
-    public static final String NO_OPTIONAL_ARGS = "";
+    private static final String NO_OPTIONAL_ARGS = "";
 
     private static final String DATABASE_SCHEMA =
             " <schema dbms=\"MySQL\">\n"
@@ -149,9 +141,8 @@ public class SQLFpcWSTest {
         Constructor<SQLFpcWS> sqlFpcWSConstructorConstructor = SQLFpcWS.class.getDeclaredConstructor();
         sqlFpcWSConstructorConstructor.setAccessible(true);
 
-        assertThatThrownBy(
-            () -> sqlFpcWSConstructorConstructor.newInstance()
-        ).hasRootCauseInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(sqlFpcWSConstructorConstructor::newInstance)
+            .hasRootCauseInstanceOf(UnsupportedOperationException.class);
     }
 
     /**
@@ -255,34 +246,6 @@ public class SQLFpcWSTest {
         PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
 
         assertThatExceptionOfType(SQLFpcException.class).isThrownBy(
-            () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
-        );
-    }
-
-    /**
-     * Assert that the correct exception is thrown when SQLFpc returns an error about the syntax of the SQL query.
-     *
-     * The XML response from the SQLFpc web service is mocked in order for the test to work independently of a working
-     * internet connection.
-     *
-     * @throws Exception because of the use of {@link PowerMockito}.
-     */
-    @org.junit.jupiter.api.Test
-    @Disabled("Couldn't implement as SQLFpc is down...")
-    public void testCorrectExceptionIsThrownWhenSQLQueryIsNotValidForSQLFpc() throws Exception {
-        String sqlQuery = "SELECT * FROM tableA LIMIT 0, 1";
-
-        String invalidXMLServerReply =
-                          "<sqlfpc>\n"
-                        + "   <version>1.3.180.91</version>\n"
-                        + "   <sql>SELECT * FROM tableB</sql>\n"
-                        + "   <fpcrules>\n"
-                        + "</sqlfpc>";
-
-        when(mockWebService.getRules(any(), any(), any())).thenReturn(invalidXMLServerReply);
-        PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
-
-        assertThatExceptionOfType(SQLFpcParseException.class).isThrownBy(
             () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
         );
     }

@@ -31,9 +31,6 @@ public final class Generator {
      * @param query the query for which coverage rules should be generated.
      * @return the rules that are generated for the input query.
      */
-    // It's neater to throw a CannotBeParsedException instead of printing something. PMD doesn't like it, so
-    // we have to suppress the warning that we should not throw a new exception in a catch block.
-    @SuppressWarnings({"PMD.PreserveStackTrace"})
     public static Set<String> generateRules(String query) {
         Set<String> result = new HashSet<>();
 
