@@ -1,18 +1,13 @@
 package nl.tudelft.st01.sqlfpcws;
 
 import es.uniovi.lsi.in2test.sqlfpcws.SQLFpcWSSoapProxy;
-
-import nl.tudelft.st01.exceptions.SQLFpcException;
-import nl.tudelft.st01.exceptions.SQLFpcParseException;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
 import java.io.StringReader;
-
 import java.rmi.RemoteException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +18,7 @@ import java.util.List;
  */
 public final class SQLFpcWS {
 
-    public static final String ERROR_XPATH = "/sqlfpc/error";
+    private static final String ERROR_XPATH = "/sqlfpc/error";
     private static final String SQL_TARGET_XPATH = "/sqlfpc/fpcrules/fpcrule/sql";
 
     /**
@@ -64,7 +59,6 @@ public final class SQLFpcWS {
      * @param xmlResponseString the XML-formatted response from SQLFpc.
      * @return A list of the coverage targets.
      */
-    @SuppressWarnings("unchecked")
     private static List<String> extractSQLTargetsFromXMLResponse(String xmlResponseString) {
         ArrayList<String> result = new ArrayList<>();
         SAXReader reader = new SAXReader();
@@ -81,7 +75,7 @@ public final class SQLFpcWS {
             throw new SQLFpcParseException(error.getText());
         }
 
-        List<Node> sqlRules = (List<Node>) xmlResponse.selectNodes(SQL_TARGET_XPATH);
+        List<Node> sqlRules = xmlResponse.selectNodes(SQL_TARGET_XPATH);
         for (Node sqlRule : sqlRules) {
             result.add(sqlRule.getText());
         }

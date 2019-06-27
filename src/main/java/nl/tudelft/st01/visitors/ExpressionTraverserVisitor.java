@@ -266,7 +266,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
      *
      * @param inExpression The expression to evaluate.
      */
-    public void handleExpressionIn(InExpression inExpression) {
+    private void handleExpressionIn(InExpression inExpression) {
         inExpression.getLeftExpression().accept(this);
         if (expression != null) {
             expression = inExpression;
@@ -279,7 +279,7 @@ public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
      * @param between The between to evaluate.
      * @param seed The seed corresponding to the given expression.
      */
-    public void handleExpressionBetween(Between between, Between seed) {
+    private void handleExpressionBetween(Between between, Between seed) {
         between.getLeftExpression().accept(this);
 
         if (expression != null) {

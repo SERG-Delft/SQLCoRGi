@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * This class tests the functions of the {@link JoinWhereItemTest} class.
  */
-public class JoinWhereItemTest {
+class JoinWhereItemTest {
 
     private static final Join JOIN = new Join();
     private static final GreaterThan WHERE = new GreaterThan();
@@ -20,7 +20,7 @@ public class JoinWhereItemTest {
      * Tests whether {@link JoinWhereItem#JoinWhereItem(Join, Expression)} does not return {@code null}.
      */
     @Test
-    public void testConstructorNotNull() {
+    void testConstructorNotNull() {
         JoinWhereItem joinWhereItem = new JoinWhereItem(JOIN, WHERE);
 
         assertThat(joinWhereItem).isNotNull();
@@ -30,7 +30,7 @@ public class JoinWhereItemTest {
      * Tests whether the constructor correctly sets the join, and returns it with {@link JoinWhereItem#getJoin()}.
      */
     @Test
-    public void testGetJoin() {
+    void testGetJoin() {
         JoinWhereItem joinWhereItem = new JoinWhereItem(JOIN, WHERE);
 
         assertThat(joinWhereItem.getJoin()).isSameAs(JOIN);
@@ -40,7 +40,7 @@ public class JoinWhereItemTest {
      * Tests whether the constructor correctly sets the join, and returns it with {@link JoinWhereItem#getJoinWhere()}.
      */
     @Test
-    public void testGetJoinWhere() {
+    void testGetJoinWhere() {
         JoinWhereItem joinWhereItem = new JoinWhereItem(JOIN, WHERE);
 
         assertThat(joinWhereItem.getJoinWhere()).isSameAs(WHERE);

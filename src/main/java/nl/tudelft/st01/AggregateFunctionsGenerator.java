@@ -8,69 +8,51 @@ import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
-import nl.tudelft.st01.util.UtilityGetters;
+import nl.tudelft.st01.util.AggregateComponentFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+
+import static nl.tudelft.st01.util.AggregateComponentFactory.COUNT_STRING;
+import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
 
 /**
  * Class that generates rules for the aggregate functions such as MAX, AVG etc.
  */
 public class AggregateFunctionsGenerator {
-    private static final String COUNT_STRING = "COUNT";
-
 
     /**
-     * Main, public method that generates the rules for the aggregate functions.
+     * Main method that generates the rules for the aggregate functions.
      *
-     * @param plainSelect - query object to generate rules for
-     * @return list of query objects which represent the rules for the aggregator function
+     * @param plainSelect the query to generate rules for.
+     * @return list rules generated for the aggregator functions.
      */
     public Set<String> generate(PlainSelect plainSelect) {
-        // Check if there is a Function in one of the columns. If so, generate rules for it.
-        Set<String> outputAfterAggregator = new TreeSet<>();
+
+        Set<String> outputAfterAggregator = new HashSet<>();
 
         for (SelectItem selectItem : plainSelect.getSelectItems()) {
             if (selectItem instanceof SelectExpressionItem) {
                 SelectExpressionItem selectExpressionItem = (SelectExpressionItem) selectItem;
                 if (selectExpressionItem.getExpression() instanceof Function) {
-                    // Here we know the selectItem is a function (AVG, SUM, MAX etc.)
-                    // so we can start adding the rules for it.
+
                     Function func = (Function) selectExpressionItem.getExpression();
 
-                    // Check for COUNT(*)
                     if (func.isAllColumns()) {
                         if (plainSelect.getGroupBy() != null) {
                             outputAfterAggregator.add(firstRule(plainSelect).toString());
                             outputAfterAggregator.add(secondRule(plainSelect).toString());
                         }
-
-                        // Skip the rest of this iteration.
-                        continue;
-                    }
-
-                    // Check for a query without Group By
-                    if (plainSelect.getGroupBy() != null) {
+                    } else if (plainSelect.getGroupBy() != null) {
                         outputAfterAggregator.add(firstRule(plainSelect).toString());
                         outputAfterAggregator.add(secondRule(plainSelect).toString());
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
                         outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
-
-                        continue;
-                    }
-
-                    // Check for an aggregator that is NOT Count
-                    if (!func.getName().equals(COUNT_STRING)) {
-                        outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
+                    } else {
+                        if (!COUNT_STRING.equals(func.getName().toUpperCase())) {
+                            outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
+                        }
                         outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
-
-                        continue;
                     }
-
-                    // Handle COUNT operator
-                    outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
                 }
             }
         }
@@ -80,64 +62,49 @@ public class AggregateFunctionsGenerator {
 
     /**
      * Creates the aggregator statement that checks for at least one entry
-     *  having a certain column. Example result:
+     * having a certain column. Example result:<p>
      *
-     *  `SELECT COUNT(*) FROM Movies HAVING count(distinct Director) > 1`
+     * {@code SELECT COUNT(*) FROM Movies HAVING count(distinct Director) > 1}
      *
      * @param plainSelect - select to add the part to
      * @return - select item in the above specified form
      */
     private PlainSelect firstRule(PlainSelect plainSelect) {
 
-        // Get a deep copy of the plainSelect
-        PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, false);
+        PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
+        plainSelectOut.setGroupByElement(null);
 
-        // Create COUNT(*) object
-        Function count = UtilityGetters.createCountAllColumns();
-
-        // Create selectItem object with the count in it
-        SelectItem si = UtilityGetters.createSelectItemWithObject(count);
+        SelectExpressionItem selectExpressionItem = new SelectExpressionItem(
+            AggregateComponentFactory.createCountAllColumns()
+        );
 
         List<SelectItem> selectItemList = new ArrayList<>();
-        selectItemList.add(si);
+        selectItemList.add(selectExpressionItem);
 
-        // Set selectItemList of plainSelectOut to be only the count object, overwriting the others
         plainSelectOut.setSelectItems(selectItemList);
 
-        // Get selectItem inside the Group By clause
         Expression groupBy = plainSelect.getGroupBy().getGroupByExpressions().get(0);
+        Function countColumn = AggregateComponentFactory.createCountColumn(groupBy, true);
 
-        // Create COUNT(distinct groupByColumn) object
-        Function countColumn = UtilityGetters.createCountColumn(groupBy, true);
-
-        // Create count > 1
-        GreaterThan greaterThan = UtilityGetters.createGreaterThanOne(countColumn);
-
-        // Add to plainselect
+        GreaterThan greaterThan = AggregateComponentFactory.createGreaterThanOne(countColumn);
         plainSelectOut.setHaving(greaterThan);
 
-        // You may guess what this line does by yourself
         return plainSelectOut;
     }
 
     /**
      * Adds "HAVING count(*)>1" to a plainSelect item.
-     *  This is needed for handling aggregate operators.
+     * This is needed for handling aggregate operators.
      *
      * @param plainSelect - select to add the part to
      * @return - select item with the having part added
      */
     private PlainSelect secondRule(PlainSelect plainSelect) {
 
-        PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
+        PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
-        // Create COUNT(*) object
-        Function count = UtilityGetters.createCountAllColumns();
-
-        // Create COUNT(*) > 1
-        GreaterThan greaterThan = UtilityGetters.createGreaterThanOne(count);
-
-        // Add to plainselect
+        Function count = AggregateComponentFactory.createCountAllColumns();
+        GreaterThan greaterThan = AggregateComponentFactory.createGreaterThanOne(count);
         plainSelectOut.setHaving(greaterThan);
 
         return plainSelectOut;
@@ -152,27 +119,20 @@ public class AggregateFunctionsGenerator {
      */
     private PlainSelect thirdRule(PlainSelect plainSelect, Function function) {
 
-        PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
+        PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
-        // Create COUNT(*) object
-        Function count = UtilityGetters.createCountAllColumns();
-
-        // Retrieve column in function
+        Function count = AggregateComponentFactory.createCountAllColumns();
         Expression expr = function.getParameters().getExpressions().get(0);
 
-        // Create count(*) > column in function
         GreaterThan leftGreaterThan = new GreaterThan();
         leftGreaterThan.setLeftExpression(count);
-        leftGreaterThan.setRightExpression(UtilityGetters.createCountColumn(expr, false));
+        leftGreaterThan.setRightExpression(AggregateComponentFactory.createCountColumn(expr, false));
 
-        // Create count(distinct FunctionColumn) > 1
-        GreaterThan rightGreaterThan = UtilityGetters.createGreaterThanOne(
-            UtilityGetters.createCountColumn(expr, true)
+        GreaterThan rightGreaterThan = AggregateComponentFactory.createGreaterThanOne(
+                AggregateComponentFactory.createCountColumn(expr, true)
         );
 
-        // Create AND
         BinaryExpression binaryExpression = new AndExpression(leftGreaterThan, rightGreaterThan);
-
         plainSelectOut.setHaving(binaryExpression);
 
         return plainSelectOut;
@@ -187,22 +147,18 @@ public class AggregateFunctionsGenerator {
      */
     private PlainSelect fourthRule(PlainSelect plainSelect, Function function) {
 
-        PlainSelect plainSelectOut = UtilityGetters.deepCopy(plainSelect, true);
+        PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
-        // Retrieve column in function
         Expression expr = function.getParameters().getExpressions().get(0);
 
-        // Create left condition
         GreaterThan leftGreaterThan = new GreaterThan();
-        leftGreaterThan.setLeftExpression(UtilityGetters.createCountColumn(expr, false));
-        leftGreaterThan.setRightExpression(UtilityGetters.createCountColumn(expr, true));
+        leftGreaterThan.setLeftExpression(AggregateComponentFactory.createCountColumn(expr, false));
+        leftGreaterThan.setRightExpression(AggregateComponentFactory.createCountColumn(expr, true));
 
-        // Create right condition
-        GreaterThan rightGreaterThan = UtilityGetters.createGreaterThanOne(
-            UtilityGetters.createCountColumn(expr, true)
+        GreaterThan rightGreaterThan = AggregateComponentFactory.createGreaterThanOne(
+            AggregateComponentFactory.createCountColumn(expr, true)
         );
 
-        // Create AND
         BinaryExpression binaryExpression = new AndExpression(leftGreaterThan, rightGreaterThan);
 
         plainSelectOut.setHaving(binaryExpression);

@@ -13,14 +13,14 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  *  This test class tests a good flow and a bad flow for the entry point to this tool,
  *  the {@link CoverageRuleGenerator} class.
  */
-public class CoverageRuleGeneratorTest {
+class CoverageRuleGeneratorTest {
 
     /**
      * A test case for the happy flow of the class. This shows what happens when
      * the {@code generateRules()} method is given a good input.
      */
     @Test
-    public void goodFlowTest() {
+    void goodFlowTest() {
         List<String> result = CoverageRuleGenerator.generateRules(
                 "SELECT COUNT(*) FROM Movies WHERE length_minutes < 100"
         );
@@ -39,7 +39,7 @@ public class CoverageRuleGeneratorTest {
      * when the {@code generateRules()} method is given a bad input.
      */
     @Test
-    public void badFlowTest() {
+    void badFlowTest() {
         assertThatExceptionOfType(CannotBeParsedException.class).isThrownBy(
             () -> CoverageRuleGenerator.generateRules("SELEC * FRO invalid WERE statement = 5")
         );
