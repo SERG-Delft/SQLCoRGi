@@ -48,11 +48,11 @@ public class BulkRuleGeneratorTest {
     private static final String XML_SCHEMA_PATH = RESOURCE_PATH + "schema.xml";
     private static final String JSON_OUTPUT_PATH = RESOURCE_PATH + "output.json";
 
-    public static final int NUMBER_OF_QUERIES = 2;
-    public static final int NUMBER_OF_TABLES = 2;
-    public static final int NUMBER_OF_COLUMNS = 3;
+    private static final int NUMBER_OF_QUERIES = 2;
+    private static final int NUMBER_OF_TABLES = 2;
+    private static final int NUMBER_OF_COLUMNS = 3;
 
-    public static final int TIME_REQUIRED_MS = 2000;
+    private static final int TIME_REQUIRED_MS = 2000;
 
     /**
      * Asserts that the empty line in the input file is ignored and so exactly 2 queries are read in.

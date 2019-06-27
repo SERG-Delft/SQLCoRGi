@@ -12,14 +12,14 @@ import static nl.tudelft.st01.AssertUtils.verify;
  * Suppresses the checkstyle multipleStringLiterals violation, because some output sets have queries in common.
  */
 @SuppressWarnings("checkstyle:multipleStringLiterals")
-public class AggregatorTest {
+class AggregatorTest {
 
     /**
      * A test case with the COUNT clause, to ensure the single rule that is required for the
      * count clause is generated (and no more).
      */
     @Test
-    public void testCountNoGroupBy() {
+    void testCountNoGroupBy() {
         verify("SELECT COUNT(id) FROM role",
 
                 "SELECT COUNT(id) FROM role HAVING COUNT(id) > COUNT(DISTINCT id) AND COUNT(DISTINCT id) > 1");
@@ -30,7 +30,7 @@ public class AggregatorTest {
      * but specifically on the WHERE clause.
      */
     @Test
-    public void testCountOnColumnWithWhere() {
+    void testCountOnColumnWithWhere() {
         verify("SELECT COUNT(id) FROM Movies WHERE length_minutes < 100",
 
             "SELECT COUNT(id) FROM Movies WHERE length_minutes = 101",
@@ -46,7 +46,7 @@ public class AggregatorTest {
      * but specifically on the WHERE clause.
      */
     @Test
-    public void testCountAllWithWhere() {
+    void testCountAllWithWhere() {
         verify("SELECT COUNT(*) FROM Movies WHERE length_minutes < 100",
 
             "SELECT COUNT(*) FROM Movies WHERE length_minutes = 101",
@@ -63,7 +63,7 @@ public class AggregatorTest {
      * It also focuses on the GROUP BY clause, as this is often paired with Aggregate functions.
      */
     @Test
-    public void testCountAllWithGroupBy() {
+    void testCountAllWithGroupBy() {
         verify("SELECT director, COUNT(*) FROM Movies GROUP BY director",
 
             "SELECT director, COUNT(*) FROM Movies GROUP BY director HAVING COUNT(*) > 1",
@@ -78,7 +78,7 @@ public class AggregatorTest {
      */
     @ParameterizedTest(name = "[{index}] Aggregate function: {0}")
     @CsvSource({"AVG", "SUM", "MIN", "MAX"})
-    public void testOtherAggregateFunctionsNoGroupBy(String func) {
+    void testOtherAggregateFunctionsNoGroupBy(String func) {
         verify("SELECT " + func + "(Points) FROM Customers",
 
                 "SELECT " + func + "(Points) FROM Customers "
@@ -92,7 +92,7 @@ public class AggregatorTest {
      * In this test all of the 4 rules from the aggregator class are generated.
      */
     @Test
-    public void testAVGAggregator1column1Aggr() {
+    void testAVGAggregator1column1Aggr() {
         verify("SELECT Director, AVG(Length) FROM Movies GROUP BY Director",
 
                 "SELECT COUNT(*) FROM Movies HAVING COUNT(DISTINCT Director) > 1",
@@ -109,7 +109,7 @@ public class AggregatorTest {
      * (2 of them for the GROUP BY, and 2 per Aggregator)
      */
     @Test
-    public void testSUMAVGAggregator1column2Aggr() {
+    void testSUMAVGAggregator1column2Aggr() {
         verify("SELECT Director, AVG(Score), SUM(Length) FROM Movies GROUP BY Director",
 
                 // generated for GROUP BY
@@ -133,7 +133,7 @@ public class AggregatorTest {
      * In this case you can clearly see the 2 rules for GROUP BY and the 2 rules for the aggregators.
      */
     @Test
-    public void testMAXAggregator2columns1Aggr() {
+    void testMAXAggregator2columns1Aggr() {
         verify("SELECT Director, Name, MAX(Length) FROM Movies GROUP BY Name",
 
                 // Group By
@@ -153,7 +153,7 @@ public class AggregatorTest {
      *
      */
     @Test
-    public void testDuplicateColumsDistinctOperators() {
+    void testDuplicateColumsDistinctOperators() {
         verify("SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers",
 
                 "SELECT COUNT(Points), AVG(Score), SUM(Score) FROM Customers "
@@ -169,7 +169,7 @@ public class AggregatorTest {
      * This shows the two rules that are generated for the GROUP BY statement
      */
     @Test
-    public void testBasicGroupBy() {
+    void testBasicGroupBy() {
         verify("SELECT Director, Name FROM Movies GROUP BY Name",
 
                 "SELECT Director, Name FROM Movies GROUP BY Name HAVING COUNT(*) > 1",
@@ -181,7 +181,7 @@ public class AggregatorTest {
      * Here you see the combination of handling the where clause and the group by in seperate rules.
      */
     @Test
-    public void testGroupByWithWhere() {
+    void testGroupByWithWhere() {
         verify("SELECT Director FROM Movies WHERE title = 'Finding Nemo' GROUP BY Director",
 
                 // Where clause
@@ -198,7 +198,7 @@ public class AggregatorTest {
      * are suspiciously similar to the rules generated for the where clause.
      */
     @Test
-    public void testHaving() {
+    void testHaving() {
         verify("SELECT Director FROM Movies GROUP BY Director HAVING Director LIKE 'B%'",
 
                 // HAVING clause
@@ -216,7 +216,7 @@ public class AggregatorTest {
      * original rule, and then 2 rules specifically per clause. See the comments in the code.
      */
     @Test
-    public void testHavingWithWhere() {
+    void testHavingWithWhere() {
         verify("SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                 + "GROUP BY Director HAVING Director LIKE 'A%'",
 

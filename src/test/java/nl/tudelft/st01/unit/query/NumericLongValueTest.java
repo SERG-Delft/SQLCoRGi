@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * This class tests the {@link NumericLongValue} class.
  */
-public class NumericLongValueTest {
+class NumericLongValueTest {
 
     private static final String TEST_NUMBER_STR = "1";
     private static final int TEST_NUMBER = 1;
@@ -20,7 +20,7 @@ public class NumericLongValueTest {
      * Test the constructor {@link NumericLongValue#NumericLongValue(String)} of NumericLongValue.
      */
     @Test
-    public void testConstructor() {
+    void testConstructor() {
         NumericLongValue n = new NumericLongValue(TEST_NUMBER_STR);
 
         assertThat(n).isNotNull().isInstanceOf(LongValue.class);
@@ -34,7 +34,7 @@ public class NumericLongValueTest {
      */
     @ParameterizedTest(name = "[{index}] number to add: {0}")
     @CsvSource({"1", "-1", "0", "10"})
-    public void testAdd(int input) {
+    void testAdd(int input) {
         NumericLongValue oldValue = new NumericLongValue(TEST_NUMBER_STR);
         NumericLongValue newValue = (NumericLongValue) oldValue.add(input);
 

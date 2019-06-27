@@ -161,7 +161,7 @@ class ConditionTest {
      * A test case with two parenthesized conditions, combined with OR.
      */
     @Test
-    public void testTwoParenthesisedConditionsWithOR() {
+    void testTwoParenthesisedConditionsWithOR() {
         verify("SELECT * FROM Movies WHERE (year = 1996) OR (year = 2019)",
 
                 "SELECT * FROM Movies WHERE (year = 1995) AND NOT (year = 2019)",

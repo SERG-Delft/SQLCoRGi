@@ -14,13 +14,13 @@ import static nl.tudelft.st01.AssertUtils.verify;
  * The functionality of nested joins is tested and evaluated.
  */
 @SuppressWarnings({"checkstyle:multiplestringliterals"})
-public class NestedJoinsTest {
+class NestedJoinsTest {
 
     /**
      * This test evaluates whether the nested joins are transformed to the correct join type.
      */
     @Test
-    public void testNestedJoinCorrectJoinConfigurationTwoJoins() {
+    void testNestedJoinCorrectJoinConfigurationTwoJoins() {
         verify("SELECT * FROM a RIGHT JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id",
 
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id",
@@ -47,7 +47,7 @@ public class NestedJoinsTest {
      * This test evaluates whether the nested joins are transformed to the correct join type.
      */
     @Test
-    public void testNestedJoinCorrectJoinConfigurationThreeJoins() {
+    void testNestedJoinCorrectJoinConfigurationThreeJoins() {
         verify("SELECT * FROM a INNER JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id",
 
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id",
@@ -87,7 +87,7 @@ public class NestedJoinsTest {
      * In this case, the outer increment relations only contain a single table.
      */
     @Test
-    public void testNestedJoinNullReductionSingleTableOINonOIRColumnIncluded() {
+    void testNestedJoinNullReductionSingleTableOINonOIRColumnIncluded() {
         containsAtLeast("SELECT * FROM a LEFT JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id "
                         + "INNER JOIN d on d.id = a.id WHERE c.length > 1 OR b.length > 1 OR a.length > 1 "
                         + "OR d.length > 1",
@@ -132,7 +132,7 @@ public class NestedJoinsTest {
      * In this case, the outer increment relations contain multiple tables.
      */
     @Test
-    public void testNestedJoinNullReductionMultiTableOINonOIRColumnIncluded() {
+    void testNestedJoinNullReductionMultiTableOINonOIRColumnIncluded() {
         containsAtLeast("SELECT * FROM a LEFT JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id AND c.id = a.id "
                         + "WHERE c.length > 1 OR b.length > 1 OR a.length > 1",
 
@@ -165,7 +165,7 @@ public class NestedJoinsTest {
      * from the where expression.
      */
     @Test
-    public void testNestedJoinNullReductionSingleTableOIExcludeOIRColumns() {
+    void testNestedJoinNullReductionSingleTableOIExcludeOIRColumns() {
         containsAtLeast("SELECT * FROM a INNER JOIN b ON b.id = a.id RIGHT JOIN c ON c.id = b.id "
                         + "WHERE c.id > 1 OR b.id > 1 OR a.id > 1",
 
@@ -193,7 +193,7 @@ public class NestedJoinsTest {
      * contains columns from one table. Case: only the from item is used in the first on condition.
      */
     @Test
-    public void testNestedJoinOnConditionColumnsFromOneTable1() {
+    void testNestedJoinOnConditionColumnsFromOneTable1() {
         verify("SELECT * FROM a RIGHT JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id",
 
                 "SELECT * FROM a INNER JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id",
@@ -215,7 +215,7 @@ public class NestedJoinsTest {
      * contains columns from one table. Case: only the right item is used in the first on condition.
      */
     @Test
-    public void testNestedJoinOnConditionColumnsFromOneTable2() {
+    void testNestedJoinOnConditionColumnsFromOneTable2() {
         verify("SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id",
 
                 "SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
@@ -237,7 +237,7 @@ public class NestedJoinsTest {
      * contains columns from one table. Case: only the right item is used in the second on condition.
      */
     @Test
-    public void testNestedJoinOnConditionColumnsFromOneTable3() {
+    void testNestedJoinOnConditionColumnsFromOneTable3() {
         verify("SELECT * FROM a LEFT JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
 
                 "SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
@@ -259,7 +259,7 @@ public class NestedJoinsTest {
      * contains columns from one table. Case: only the right item is used in the third on condition.
      */
     @Test
-    public void testNestedJoinOnConditionColumnsFromOneTable4() {
+    void testNestedJoinOnConditionColumnsFromOneTable4() {
         verify("SELECT * FROM a INNER JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id",
 
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id",
@@ -289,7 +289,7 @@ public class NestedJoinsTest {
      * contains columns from one table. Case: multiple on condition with columns from only one table.
      */
     @Test
-    public void testNestedJoinOnConditionColumnsFromOneTableMultipleCases() {
+    void testNestedJoinOnConditionColumnsFromOneTableMultipleCases() {
         verify("SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 RIGHT JOIN d on d.id > 0",
 
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id > 0",

@@ -46,7 +46,7 @@ class JoinTest {
      */
     @ParameterizedTest(name = "[{index}] Join type: {0}, Condition type: {1}")
     @CsvSource({"INNER, AND", "INNER, OR", "RIGHT, AND", "RIGHT, OR", "LEFT, AND", "LEFT, OR", "FULL, AND", "FULL, OR"})
-    public void testJoinsOnTwoDisjointConditionsWithNullableColumns(String joinType, String conditionType) {
+    void testJoinsOnTwoDisjointConditionsWithNullableColumns(String joinType, String conditionType) {
         verify("SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
                     + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2",
 

@@ -13,16 +13,16 @@ import java.util.List;
 /**
  * Class that tests {@link SQLRules}.
  */
-public class SQLRulesTest {
+class SQLRulesTest {
 
-    public static final int QUERY_NO = 1;
-    public static final String QUERY = "SELECT * FROM Universe WHERE Universe.Truth = 42";
+    private static final int QUERY_NO = 1;
+    private static final String QUERY = "SELECT * FROM Universe WHERE Universe.Truth = 42";
 
     /**
      * Tests that the getter for the {@code QueryNo} correctly returns the query number.
      */
     @Test
-    public void testGetQueryNo() {
+    void testGetQueryNo() {
         SQLRules rules = new SQLRules(QUERY_NO, new ArrayList<>());
 
         assertThat(rules.getQueryNo()).isEqualTo(1);
@@ -32,7 +32,7 @@ public class SQLRulesTest {
      * Tests that the getter for the {@code pathList} correctly returns the list.
      */
     @Test
-    public void testGetPathList() {
+    void testGetPathList() {
         List<String> pathList = new ArrayList<>();
         pathList.add(QUERY);
 

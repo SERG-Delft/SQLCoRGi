@@ -190,16 +190,13 @@ public class BulkRuleGenerator {
      * @param query The query for which the schema should be filtered.
      * @return A filtered {@link Document}.
      */
-    // Suppresses 'Unchecked Cast', because Java cannot infer the type of the selectNodes method, but it must be a List
-    // Nodes, as can be found in its documentation.
-    @SuppressWarnings("unchecked")
     private Document filterSchema(String query) {
         List<String> tableNames = getInvolvedTableFromQuery(query);
         Document filteredSchema = (Document) schema.clone();
 
         tableNames.replaceAll(String::toLowerCase);
 
-        List<Node> tables = (List<Node>) filteredSchema.selectNodes(SCHEMA_TABLE_XPATH);
+        List<Node> tables = filteredSchema.selectNodes(SCHEMA_TABLE_XPATH);
         for (Node table : tables) {
             String tableNameXML = ((Element) table).attribute(TABLE_ATTRIBUTE_NAME).getValue().toLowerCase();
 
@@ -218,7 +215,6 @@ public class BulkRuleGenerator {
      * @return A list of table names.
      */
     private List<String> getInvolvedTableFromQuery(String query) {
-        List<String> tableNames = Collections.emptyList();
 
         Statement statement;
         try {
@@ -227,7 +223,7 @@ public class BulkRuleGenerator {
             throw new CannotBeParsedException("Input query could not be parsed: " + query);
         }
 
-        tableNames = new TablesNamesFinder().getTableList(statement);
+        List<String> tableNames = new TablesNamesFinder().getTableList(statement);
         tableNames.replaceAll(e -> e.replace("\"", ""));
 
         return tableNames;
