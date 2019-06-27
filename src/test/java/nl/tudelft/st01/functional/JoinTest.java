@@ -91,20 +91,6 @@ class JoinTest {
     }
 
     /**
-     * A test for testing joins with on conditions with columns from only one table with an IS NULL expression.
-     * This case, the left one.
-     */
-    @Test
-    @Disabled("THIS TEST IS FOR CASES WITH A NULL EXPRESSION IN THE ON CONDITION. This would lead to contradictions")
-    void testJoinOnConditionFromSingleTableLeftNullable() {
-        verify("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL",
-
-                "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL",
-                "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull IS NULL WHERE"
-                    + " (NOT (TableA.CanBeNull IS NULL)) AND (TableA.CanBeNull IS NOT NULL)");
-    }
-
-    /**
      * A test for testing joins with on conditions with columns from only one table with a comparison.
      * This case, the left one.
      */
