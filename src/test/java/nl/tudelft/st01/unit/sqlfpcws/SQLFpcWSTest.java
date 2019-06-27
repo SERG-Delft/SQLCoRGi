@@ -258,32 +258,4 @@ public class SQLFpcWSTest {
             () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
         );
     }
-
-    /**
-     * Assert that the correct exception is thrown when SQLFpc returns an error about the syntax of the SQL query.
-     *
-     * The XML response from the SQLFpc web service is mocked in order for the test to work independently of a working
-     * internet connection.
-     *
-     * @throws Exception because of the use of {@link PowerMockito}.
-     */
-    @org.junit.jupiter.api.Test
-    @Disabled("Couldn't implement as SQLFpc is down...")
-    public void testCorrectExceptionIsThrownWhenSQLQueryIsNotValidForSQLFpc() throws Exception {
-        String sqlQuery = "SELECT * FROM tableA LIMIT 0, 1";
-
-        String invalidXMLServerReply =
-                          "<sqlfpc>\n"
-                        + "   <version>1.3.180.91</version>\n"
-                        + "   <sql>SELECT * FROM tableB</sql>\n"
-                        + "   <fpcrules>\n"
-                        + "</sqlfpc>";
-
-        when(mockWebService.getRules(any(), any(), any())).thenReturn(invalidXMLServerReply);
-        PowerMockito.whenNew(SQLFpcWSSoapProxy.class).withAnyArguments().thenReturn(mockWebService);
-
-        assertThatExceptionOfType(SQLFpcParseException.class).isThrownBy(
-            () -> SQLFpcWS.getCoverageTargets(sqlQuery, DATABASE_SCHEMA, NO_OPTIONAL_ARGS)
-        );
-    }
 }
