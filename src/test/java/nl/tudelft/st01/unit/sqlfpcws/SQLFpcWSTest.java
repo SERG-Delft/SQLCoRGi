@@ -30,7 +30,7 @@ public class SQLFpcWSTest {
 
     private SQLFpcWSSoapProxy mockWebService;
 
-    public static final String NO_OPTIONAL_ARGS = "";
+    private static final String NO_OPTIONAL_ARGS = "";
 
     private static final String DATABASE_SCHEMA =
             " <schema dbms=\"MySQL\">\n"
@@ -141,9 +141,8 @@ public class SQLFpcWSTest {
         Constructor<SQLFpcWS> sqlFpcWSConstructorConstructor = SQLFpcWS.class.getDeclaredConstructor();
         sqlFpcWSConstructorConstructor.setAccessible(true);
 
-        assertThatThrownBy(
-            () -> sqlFpcWSConstructorConstructor.newInstance()
-        ).hasRootCauseInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(sqlFpcWSConstructorConstructor::newInstance)
+            .hasRootCauseInstanceOf(UnsupportedOperationException.class);
     }
 
     /**
