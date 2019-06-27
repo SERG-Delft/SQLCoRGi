@@ -94,9 +94,7 @@ public class AggregateFunctionsGenerator {
         PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
         plainSelectOut.setGroupByElement(null);
 
-        Function count = UtilityGetters.createCountAllColumns();
-
-        SelectExpressionItem selectExpressionItem = new SelectExpressionItem(count);
+        SelectExpressionItem selectExpressionItem = new SelectExpressionItem(UtilityGetters.createCountAllColumns());
 
         List<SelectItem> selectItemList = new ArrayList<>();
         selectItemList.add(selectExpressionItem);
@@ -104,11 +102,9 @@ public class AggregateFunctionsGenerator {
         plainSelectOut.setSelectItems(selectItemList);
 
         Expression groupBy = plainSelect.getGroupBy().getGroupByExpressions().get(0);
-
         Function countColumn = UtilityGetters.createCountColumn(groupBy, true);
 
         GreaterThan greaterThan = UtilityGetters.createGreaterThanOne(countColumn);
-
         plainSelectOut.setHaving(greaterThan);
 
         return plainSelectOut;
@@ -125,13 +121,8 @@ public class AggregateFunctionsGenerator {
 
         PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
-        // Create COUNT(*) object
         Function count = UtilityGetters.createCountAllColumns();
-
-        // Create COUNT(*) > 1
         GreaterThan greaterThan = UtilityGetters.createGreaterThanOne(count);
-
-        // Add to plainselect
         plainSelectOut.setHaving(greaterThan);
 
         return plainSelectOut;
@@ -148,25 +139,18 @@ public class AggregateFunctionsGenerator {
 
         PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
-        // Create COUNT(*) object
         Function count = UtilityGetters.createCountAllColumns();
-
-        // Retrieve column in function
         Expression expr = function.getParameters().getExpressions().get(0);
 
-        // Create count(*) > column in function
         GreaterThan leftGreaterThan = new GreaterThan();
         leftGreaterThan.setLeftExpression(count);
         leftGreaterThan.setRightExpression(UtilityGetters.createCountColumn(expr, false));
 
-        // Create count(distinct FunctionColumn) > 1
         GreaterThan rightGreaterThan = UtilityGetters.createGreaterThanOne(
-            UtilityGetters.createCountColumn(expr, true)
+                UtilityGetters.createCountColumn(expr, true)
         );
 
-        // Create AND
         BinaryExpression binaryExpression = new AndExpression(leftGreaterThan, rightGreaterThan);
-
         plainSelectOut.setHaving(binaryExpression);
 
         return plainSelectOut;
@@ -183,7 +167,6 @@ public class AggregateFunctionsGenerator {
 
         PlainSelect plainSelectOut = (PlainSelect) copy(plainSelect);
 
-        // Retrieve column in function
         Expression expr = function.getParameters().getExpressions().get(0);
 
         GreaterThan leftGreaterThan = new GreaterThan();

@@ -22,7 +22,7 @@ import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
 public class GroupByGenerator {
 
     /**
-     * Main, public method that generates the rules for the GROUP BY clause.
+     * Main method that generates the rules for the GROUP BY clause.
      *
      * @param plainSelect - query object to generate rules for
      * @return list of query objects which represent the rules for the GROUP BY clause
