@@ -10,10 +10,7 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import nl.tudelft.st01.util.AggregateComponentFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static nl.tudelft.st01.util.AggregateComponentFactory.COUNT_STRING;
 import static nl.tudelft.st01.util.cloner.SelectCloner.copy;
@@ -26,12 +23,12 @@ public class AggregateFunctionsGenerator {
     /**
      * Main method that generates the rules for the aggregate functions.
      *
-     * @param plainSelect - query object to generate rules for
-     * @return list of query objects which represent the rules for the aggregator function
+     * @param plainSelect the query to generate rules for.
+     * @return list rules generated for the aggregator functions.
      */
     public Set<String> generate(PlainSelect plainSelect) {
-        // Check if there is a Function in one of the columns. If so, generate rules for it.
-        Set<String> outputAfterAggregator = new TreeSet<>();
+
+        Set<String> outputAfterAggregator = new HashSet<>();
 
         for (SelectItem selectItem : plainSelect.getSelectItems()) {
             if (selectItem instanceof SelectExpressionItem) {
@@ -45,27 +42,17 @@ public class AggregateFunctionsGenerator {
                             outputAfterAggregator.add(firstRule(plainSelect).toString());
                             outputAfterAggregator.add(secondRule(plainSelect).toString());
                         }
-
-                        continue;
-                    }
-
-                    if (plainSelect.getGroupBy() != null) {
+                    } else if (plainSelect.getGroupBy() != null) {
                         outputAfterAggregator.add(firstRule(plainSelect).toString());
                         outputAfterAggregator.add(secondRule(plainSelect).toString());
                         outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
                         outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
-
-                        continue;
-                    }
-
-                    if (!COUNT_STRING.equals(func.getName().toUpperCase())) {
-                        outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
+                    } else {
+                        if (!COUNT_STRING.equals(func.getName().toUpperCase())) {
+                            outputAfterAggregator.add(thirdRule(plainSelect, func).toString());
+                        }
                         outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
-
-                        continue;
                     }
-
-                    outputAfterAggregator.add(fourthRule(plainSelect, func).toString());
                 }
             }
         }
