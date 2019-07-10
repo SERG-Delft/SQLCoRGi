@@ -28,20 +28,23 @@
         <site.plugin.version>3.7.1</site.plugin.version>
         <surefire.plugin.version>3.0.0-M3</surefire.plugin.version>
 
-        <checkstyle.version>8.20</checkstyle.version>
+        <checkstyle.version>8.22</checkstyle.version>
         <checkstyle.plugin.version>3.0.0</checkstyle.plugin.version>
 
         <clover.version>4.3.1</clover.version>
 
         <jsqlparser.version>2.0</jsqlparser.version>
 
+        <junit.jupiter.api.version>5.5.0</junit.jupiter.api.version>
+        <junit.jupiter.engine.version>5.5.0</junit.jupiter.engine.version>
+        <junit.jupiter.params.version>5.5.0</junit.jupiter.params.version>
+        <junit.vintage.engine.version>5.5.0</junit.vintage.engine.version>
         <junit.version>4.12</junit.version>
-        <junit.jupiter.version>5.4.2</junit.jupiter.version>
 
-        <assertj.core.version>3.11.1</assertj.core.version>
+        <assertj.core.version>3.12.2</assertj.core.version>
 
-        <mockito.version>2.28.2</mockito.version>
-        <mockito.junit.jupiter.version>2.28.2</mockito.junit.jupiter.version>
+        <mockito.version>3.0.0</mockito.version>
+        <mockito.junit.jupiter.version>3.0.1</mockito.junit.jupiter.version>
 
         <powermock.version>2.0.2</powermock.version>
 
@@ -51,8 +54,8 @@
         <spotbugs.annotations.version>3.1.12</spotbugs.annotations.version>
         <spotbugs.plugin.version>3.1.11</spotbugs.plugin.version>
 
-        <systems.manifold.version>2019.1.0-ea</systems.manifold.version>
-        <systems.manifold.ext.version>2019.1.0-ea</systems.manifold.ext.version>
+        <systems.manifold.version>2019.1.7</systems.manifold.version>
+        <systems.manifold.ext.version>2019.1.7</systems.manifold.ext.version>
 
         <sqlrules.version>2.0.141.204</sqlrules.version>
         <sqlrules.path>${project.basedir}/src/main/resources/lib/sqlrules.jar</sqlrules.path>
@@ -97,20 +100,20 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <version>${junit.jupiter.api.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <version>${junit.vintage.engine.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <version>${junit.jupiter.engine.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -145,7 +148,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <version>${junit.jupiter.params.version}</version>
             <scope>test</scope>
         </dependency>
 
