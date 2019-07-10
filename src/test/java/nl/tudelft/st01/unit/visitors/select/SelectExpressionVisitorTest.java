@@ -246,7 +246,7 @@ class SelectExpressionVisitorTest {
         likeExpression.setRightExpression(rightValue);
 
         LikeExpression notLikeExpression = new LikeExpression();
-        notLikeExpression.setNot();
+        notLikeExpression.setNot(true);
         notLikeExpression.setLeftExpression(leftValue);
         notLikeExpression.setRightExpression(rightValue);
 
@@ -271,7 +271,7 @@ class SelectExpressionVisitorTest {
         likeExpression.setCaseInsensitive(true);
 
         LikeExpression notLikeExpression = new LikeExpression();
-        notLikeExpression.setNot();
+        notLikeExpression.setNot(true);
         notLikeExpression.setLeftExpression(leftValue);
         notLikeExpression.setRightExpression(rightValue);
         notLikeExpression.setCaseInsensitive(true);

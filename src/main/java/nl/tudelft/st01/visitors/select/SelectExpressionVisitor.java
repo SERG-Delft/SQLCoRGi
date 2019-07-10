@@ -219,15 +219,13 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(LikeExpression likeExpression) {
 
-        output.add(copy(likeExpression));
+        LikeExpression likeExpressionCopy = (LikeExpression) copy(likeExpression);
+        likeExpressionCopy.setNot(false);
+        output.add(likeExpressionCopy);
 
-        LikeExpression likeExpressionFlipped = (LikeExpression) copy(likeExpression);
-        if (likeExpression.isNot()) {
-            likeExpressionFlipped.removeNot();
-        } else {
-            likeExpressionFlipped.setNot();
-        }
-        output.add(likeExpressionFlipped);
+        LikeExpression notLikeExpression = (LikeExpression) copy(likeExpression);
+        notLikeExpression.setNot(true);
+        output.add(notLikeExpression);
 
         IsNullExpression isNullExpressionOut = new IsNullExpression();
         isNullExpressionOut.setLeftExpression(copy(likeExpression.getLeftExpression()));

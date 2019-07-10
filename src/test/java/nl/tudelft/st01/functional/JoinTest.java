@@ -159,7 +159,7 @@ class JoinTest {
      */
     @ParameterizedTest
     @CsvSource({"a.id < b.id", "a.id <> b.id", "b.length = a.length",
-            "a.id IS NULL", "b.length IS NULL", "a.size BETWEEN 50.0 AND b.length"})
+            "a.id IS NULL", "b.length IS NULL", "a.magic BETWEEN 50.0 AND b.length"})
     void testJoinWithWhereColumnsExcludedIfSideIsNull(String where) {
         containsAtLeast("SELECT * FROM a INNER JOIN b ON a.id = b.id OR a.length < b.length WHERE " + where,
 

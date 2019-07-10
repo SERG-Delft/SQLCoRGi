@@ -66,7 +66,7 @@ class SubqueryTest {
                 "SELECT * FROM t WHERE a NOT IN (SELECT * FROM t2 WHERE b2 LIKE 'xyz')",
                 "SELECT * FROM t WHERE a IS NULL",
                 "SELECT * FROM t WHERE EXISTS (SELECT * FROM t2 WHERE b2 LIKE 'xyz')",
-                "SELECT * FROM t WHERE EXISTS (SELECT * FROM t2 WHERE NOT b2 LIKE 'xyz')",
+                "SELECT * FROM t WHERE EXISTS (SELECT * FROM t2 WHERE b2 NOT LIKE 'xyz')",
                 "SELECT * FROM t WHERE EXISTS (SELECT * FROM t2 WHERE b2 IS NULL)"
         );
     }

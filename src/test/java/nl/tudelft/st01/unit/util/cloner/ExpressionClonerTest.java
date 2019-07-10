@@ -716,7 +716,7 @@ class ExpressionClonerTest {
     private static Stream<Arguments> provideBinaryExpressions() {
 
         LikeExpression notLike = new LikeExpression();
-        notLike.setNot();
+        notLike.setNot(true);
 
         RegExpMySQLOperator regExpMySQLOperator = new RegExpMySQLOperator(RegExpMatchOperatorType.MATCH_CASESENSITIVE);
         regExpMySQLOperator.useRLike();

@@ -92,11 +92,6 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
         toBeCopied.getRightExpression().accept(this);
         Expression rightCopy = this.copy;
 
-        if (toBeCopied.isNot()) {
-            temp.setNot();
-        } else {
-            temp.removeNot();
-        }
         temp.setLeftExpression(leftCopy);
         temp.setRightExpression(rightCopy);
         this.copy = temp;
@@ -372,6 +367,7 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
     public void visit(LikeExpression likeExpression) {
 
         LikeExpression copy = new LikeExpression();
+        copy.setNot(likeExpression.isNot());
         copy.setEscape(likeExpression.getEscape());
         copy.setCaseInsensitive(likeExpression.isCaseInsensitive());
 
@@ -797,6 +793,17 @@ public class ExpressionCloner implements ExpressionVisitor, ItemsListVisitor {
     public void visit(CollateExpression collateExpression) {
         collateExpression.getLeftExpression().accept(this);
         this.copy = new CollateExpression(this.copy, collateExpression.getCollate());
+    }
+
+    @Override
+    public void visit(SimilarToExpression similarToExpression) {
+
+        SimilarToExpression copy = new SimilarToExpression();
+        copy.setNot(similarToExpression.isNot());
+        copy.setEscape(similarToExpression.getEscape());
+
+        this.copy = copy;
+        copyBinaryExpression(similarToExpression);
     }
 
     public Expression getCopy() {
