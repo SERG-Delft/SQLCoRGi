@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>nl.tudelft.st01</groupId>
-    <artifactId>sql-coverage-target-generator</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>sql-coverage-rule-generator</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
 
@@ -506,8 +506,8 @@
     </reporting>
 
 
-    <name>SQL Coverage Target Generator</name>
-    <description>A SQL coverage target generator for EvoSQL by Daan den Ouden, Dylan Franken, Mark Bekooy, Matthijs Halvemaan, Rolf Piepenbrink and Timon Bestebreur.</description>
+    <name>SQL Coverage Rule Generator</name>
+    <description>A SQL coverage rule generator for EvoSQL by Daan den Ouden, Dylan Franken, Mark Bekooy, Matthijs Halvemaan, Rolf Piepenbrink and Timon Bestebreur.</description>
     <url>https://gitlab.ewi.tudelft.nl/TI2806/2018-2019/ST/cp19-st-01/st-01</url>
     <inceptionYear>2019</inceptionYear>
     <developers>
@@ -523,7 +523,7 @@
         <developer>
             <id>dtfranken</id>
             <name>Dylan Franken</name>
-            <email>d.t.franken@student.tudelft.nl</email>
+            <email>dtfranken@gmail.com</email>
             <roles>
                 <role>developer</role>
             </roles>
