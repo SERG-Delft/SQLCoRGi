@@ -1,7 +1,6 @@
 package com.github.sergdelft.sqlcorgi.unit;
 
 import com.github.sergdelft.sqlcorgi.AggregateFunctionsGenerator;
-import com.github.sergdelft.sqlcorgi.Generator;
 import manifold.ext.api.Jailbreak;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
@@ -22,7 +21,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for the {@link Generator}.
+ * Unit tests for the {@link AggregateFunctionsGenerator}.
  */
 class AggregateFunctionsGeneratorTest {
 
