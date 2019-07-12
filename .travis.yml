@@ -2,12 +2,18 @@ language: java
 jdk:
   - oraclejdk8
 
+cache:
+  directories:
+  - $HOME/.m2
+
 install: true
 
 jobs:
   include:
   - stage: test
     script: mvn -B test
+    name: "JUnit"
+
   - stage: static-analysis
     script: mvn -B checkstyle:check
     name: "Checkstyle"
@@ -18,10 +24,11 @@ jobs:
   - script: mvn -B spotbugs:check
     name: "SpotBugs"
 
+  - stage: coverage
+    script: mvn -B clover:instrument clover:clover && bash <(curl -s https://codecov.io/bash)
+    name: "Clover"
+
 stages:
   - test
   - static-analysis
-
-cache:
-  directories:
-  - $HOME/.m2
+  - coverage
