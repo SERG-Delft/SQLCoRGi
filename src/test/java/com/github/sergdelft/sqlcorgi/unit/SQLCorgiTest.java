@@ -25,10 +25,10 @@ class SQLCorgiTest {
      */
     @Test
     void testConstructorThrowsException() throws NoSuchMethodException {
-        Constructor<SQLCorgi> SQLCorgiConstructor = SQLCorgi.class.getDeclaredConstructor();
-        SQLCorgiConstructor.setAccessible(true);
+        Constructor<SQLCorgi> sqlCorgiConstructor = SQLCorgi.class.getDeclaredConstructor();
+        sqlCorgiConstructor.setAccessible(true);
 
-        assertThatThrownBy(SQLCorgiConstructor::newInstance)
+        assertThatThrownBy(sqlCorgiConstructor::newInstance)
                 .hasRootCauseInstanceOf(UnsupportedOperationException.class);
     }
 
