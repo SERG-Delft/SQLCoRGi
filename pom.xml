@@ -44,8 +44,6 @@
         <mockito.version>3.0.0</mockito.version>
         <mockito.junit.jupiter.version>3.0.1</mockito.junit.jupiter.version>
 
-        <powermock.version>2.0.2</powermock.version>
-
         <pmd.plugin.version>3.12.0</pmd.plugin.version>
 
         <spotbugs.version>3.1.12</spotbugs.version>
@@ -54,7 +52,6 @@
 
         <systems.manifold.version>2019.1.7</systems.manifold.version>
         <systems.manifold.ext.version>2019.1.7</systems.manifold.ext.version>
-
     </properties>
 
 
