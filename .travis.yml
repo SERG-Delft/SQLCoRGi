@@ -26,7 +26,7 @@ jobs:
 
   - stage: coverage
     script: mvn -B clover:instrument clover:log && bash <(curl -s https://codecov.io/bash)
-    name "Clover"
+    name: "Clover"
 
 stages:
   - test
