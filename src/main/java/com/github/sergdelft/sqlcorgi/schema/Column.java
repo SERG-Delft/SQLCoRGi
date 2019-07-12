@@ -1,5 +1,8 @@
 package com.github.sergdelft.sqlcorgi.schema;
 
+/**
+ * Column contains all relevant database column data.
+ */
 public class Column {
     private String name;
     private boolean isNullable;
