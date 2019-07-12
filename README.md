@@ -1,4 +1,5 @@
 # Coverage Rule Generator
+![Travis CI build status](https://travis-ci.com/SERG-Delft/SQLCoRGi.svg?branch=master)
 
 ## Features
 
