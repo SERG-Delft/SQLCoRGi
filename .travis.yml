@@ -25,7 +25,7 @@ jobs:
     name: "SpotBugs"
 
   - stage: coverage
-    script: mvn -B clover:instrument clover:log && bash <(curl -s https://codecov.io/bash)
+    script: mvn -B clover:instrument clover:clover && bash <(curl -s https://codecov.io/bash)
     name: "Clover"
 
 stages:
