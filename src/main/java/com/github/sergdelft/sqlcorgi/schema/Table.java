@@ -1,20 +1,20 @@
 package com.github.sergdelft.sqlcorgi.schema;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * The table data structure allows for storing a database table in a systematic manner.
  */
 public class Table {
     private String name;
-    private Set<Column> columns;
+    private List<Column> columns;
 
     /**
      * Constructor to instantiate a table.
      * @param name The table name.
      * @param columns The columns contained in the table.
      */
-    public Table(String name, Set<Column> columns) {
+    public Table(String name, List<Column> columns) {
         this.name = name;
         this.columns = columns;
     }
@@ -23,7 +23,7 @@ public class Table {
         return name;
     }
 
-    public Set<Column> getColumns() {
+    public List<Column> getColumns() {
         return columns;
     }
 }

@@ -13,7 +13,7 @@ public class Column {
      * Data type enum.
      * Contains all supported data types.
      */
-    enum DataType {
+    public enum DataType {
         INTEGER, STRING
     }
 
