@@ -8,6 +8,7 @@ jobs:
   include:
   - stage: test
     script: mvn -B test
+
   - stage: static-analysis
     script: mvn -B checkstyle:check
     name: "Checkstyle"
@@ -17,11 +18,11 @@ jobs:
     name: "CPD"
   - script: mvn -B spotbugs:check
     name: "SpotBugs"
+
   - stage: coverage
     script: mvn -B clover:instrument clover:log
-
-after-success:
-- bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+    after-success:
+    - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
 
 stages:
   - test
