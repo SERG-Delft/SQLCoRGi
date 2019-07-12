@@ -23,8 +23,9 @@ jobs:
   - stage: coverage
     script: mvn -B clover:instrument clover:log
     name "Clover"
-    after_success:
-    - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
 
 stages:
   - test
