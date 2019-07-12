@@ -1,6 +1,6 @@
 package com.github.sergdelft.sqlcorgi.unit;
 
-import com.github.sergdelft.sqlcorgi.Generator;
+import com.github.sergdelft.sqlcorgi.SQLCorgi;
 import com.github.sergdelft.sqlcorgi.exceptions.CannotBeNullException;
 import com.github.sergdelft.sqlcorgi.exceptions.CannotBeParsedException;
 import com.github.sergdelft.sqlcorgi.exceptions.UnsupportedInputException;
@@ -12,57 +12,57 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Unit tests for the {@link Generator}.
+ * Unit tests for the {@link SQLCorgi}.
  */
-class GeneratorTest {
+class SQLCorgiTest {
 
     /**
-     * Trying to invoke the {@link Generator} constructor should throw an {@code UnsupportedOperationException}.
+     * Trying to invoke the {@link SQLCorgi} constructor should throw an {@code UnsupportedOperationException}.
      *
-     * Java Reflection is used because the {@code Generator} constructor is private.
+     * Java Reflection is used because the {@code SQLCorgi} constructor is private.
      *
-     * @throws NoSuchMethodException if the {@code Generator} constructor is not found - this cannot happen.
+     * @throws NoSuchMethodException if the {@code SQLCorgi} constructor is not found - this cannot happen.
      */
     @Test
     void testConstructorThrowsException() throws NoSuchMethodException {
-        Constructor<Generator> generatorConstructor = Generator.class.getDeclaredConstructor();
-        generatorConstructor.setAccessible(true);
+        Constructor<SQLCorgi> sqlCorgiConstructor = SQLCorgi.class.getDeclaredConstructor();
+        sqlCorgiConstructor.setAccessible(true);
 
-        assertThatThrownBy(generatorConstructor::newInstance)
+        assertThatThrownBy(sqlCorgiConstructor::newInstance)
                 .hasRootCauseInstanceOf(UnsupportedOperationException.class);
     }
 
     /**
-     * Assert that the right exception is thrown when {@link Generator#generateRules} is called with a null-query.
+     * Assert that the right exception is thrown when {@link SQLCorgi#generateRules} is called with a null-query.
      */
     @Test
     void testGenerateRulesNullShouldPrintErrorMessage() {
         assertThatExceptionOfType(CannotBeNullException.class).isThrownBy(
-            () -> Generator.generateRules(null)
+            () -> SQLCorgi.generateRules(null, null)
         );
     }
 
     /**
-     * Assert that the right exception is thrown when {link Generator#generateRules} is called with a query that is not
+     * Assert that the right exception is thrown when {link SQLCorgi#generateRules} is called with a query that is not
      * valid SQL..
      */
     @Test
     void testGenerateRulesWithInvalidQueryShouldPrintErrorMessage() {
 
         assertThatExceptionOfType(CannotBeParsedException.class).isThrownBy(
-            () -> Generator.generateRules("This is not a SQL Query")
+            () -> SQLCorgi.generateRules("This is not a SQL Query", null)
         );
     }
 
     /**
-     * Assert that the right exception is thrown when {link Generator#generateRules} is called with a non-select
+     * Assert that the right exception is thrown when {link SQLCorgi#generateRules} is called with a non-select
      * statement.
      */
     @Test
     void testGenerateRulesWithNonSelectQueryShouldPrintErrorMessage() {
 
         assertThatExceptionOfType(UnsupportedInputException.class).isThrownBy(
-            () -> Generator.generateRules("UPDATE Table1 SET column = value WHERE condition IS NOT NULL;")
+            () -> SQLCorgi.generateRules("UPDATE Table1 SET column = value WHERE condition IS NOT NULL;", null)
         );
     }
 }

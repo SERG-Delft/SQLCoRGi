@@ -1,5 +1,6 @@
 # Coverage Rule Generator
 ![Travis CI build status](https://travis-ci.com/SERG-Delft/SQLCoRGi.svg?branch=master)
+[![codecov](https://codecov.io/gh/SERG-Delft/SQLCoRGi/branch/master/graph/badge.svg)](https://codecov.io/gh/SERG-Delft/SQLCoRGi)
 
 ## Features
 
