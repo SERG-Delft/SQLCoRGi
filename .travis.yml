@@ -2,6 +2,10 @@ language: java
 jdk:
   - oraclejdk8
 
+cache:
+  directories:
+  - $HOME/.m2
+
 install: true
 
 jobs:
@@ -24,14 +28,10 @@ jobs:
     script: mvn -B clover:instrument clover:log
     name "Clover"
 
-after_success:
-- bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
-
 stages:
   - test
   - static-analysis
   - coverage
 
-cache:
-  directories:
-  - $HOME/.m2
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
