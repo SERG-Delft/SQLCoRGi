@@ -1,3 +1,25 @@
 language: java
 jdk:
   - oraclejdk8
+
+jobs:
+  include:
+  - stage: test
+    script: mvn -B test
+  - stage: static-analysis
+    script: mvn -B checkstyle:check
+    name: "Checkstyle"
+  - script: mvn -B pmd:check
+    name: "PMD"
+  - script: mvn -B pmd:cpd-check
+    name: "CPD"
+  - script: mvn -B spotbugs:check
+    name: "SpotBugs"
+
+stages:
+  - test
+  - static-analysis
+
+cache:
+  directories:
+  - $HOME/.m2
