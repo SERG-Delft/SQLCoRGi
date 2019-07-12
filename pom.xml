@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.sergdelft</groupId>
-    <artifactId>sqlcrg</artifactId>
+    <artifactId>sqlcorgi</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
@@ -509,8 +509,8 @@
     </reporting>
 
 
-    <name>SQL Coverage Rule Generator</name>
-    <description>A SQL coverage rule generator for EvoSQL by Daan den Ouden, Dylan Franken, Mark Bekooy, Matthijs Halvemaan, Rolf Piepenbrink and Timon Bestebreur.</description>
+    <name>SQLCoRGi</name>
+    <description>SQLCoRGi is a SQL coverage rule generator for EvoSQL by Daan den Ouden, Dylan Franken, Mark Bekooy, Matthijs Halvemaan, Rolf Piepenbrink and Timon Bestebreur.</description>
     <inceptionYear>2019</inceptionYear>
     <developers>
         <developer>
