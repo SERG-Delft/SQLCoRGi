@@ -1,5 +1,7 @@
 package com.github.sergdelft.sqlcorgi;
 
+import com.github.sergdelft.sqlcorgi.schema.Schema;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,9 +22,10 @@ public final class CoverageRuleGenerator {
     *  Generates coverage targets based on an input SQL query.
     *
     * @param query SQL query to generate coverage rules for.
+    * @param schema The database schema.
     * @return List of MC/DC coverage rules as strings.
     */
-    public static List<String> generateRules(String query) {
+    public static List<String> generateRules(String query, Schema schema) {
         return new ArrayList<>(Generator.generateRules(query));
     }
 
