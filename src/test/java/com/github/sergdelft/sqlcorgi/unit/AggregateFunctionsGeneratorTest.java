@@ -22,7 +22,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for the {@link Generator}.
+ * Unit tests for the {@link AggregateFunctionsGenerator}.
  */
 class AggregateFunctionsGeneratorTest {
 
