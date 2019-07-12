@@ -27,4 +27,20 @@ public class Column {
         this.isKey = isKey;
         this.dataType = dataType;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isNullable() {
+        return isNullable;
+    }
+
+    public boolean isKey() {
+        return isKey;
+    }
+
+    public DataType getDataType() {
+        return dataType;
+    }
 }
