@@ -1,7 +1,6 @@
 package com.github.sergdelft.sqlcorgi.unit;
 
 import com.github.sergdelft.sqlcorgi.AggregateFunctionsGenerator;
-import com.github.sergdelft.sqlcorgi.Generator;
 import manifold.ext.api.Jailbreak;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;

@@ -1,6 +1,6 @@
 package com.github.sergdelft.sqlcorgi.functional;
 
-import com.github.sergdelft.sqlcorgi.Generator;
+import com.github.sergdelft.sqlcorgi.SQLCorgi;
 import com.github.sergdelft.sqlcorgi.exceptions.CannotBeParsedException;
 import com.github.sergdelft.sqlcorgi.exceptions.UnsupportedInputException;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ class BadWeatherTest {
     @Test
     void testInvalidQuery() {
         assertThatExceptionOfType(CannotBeParsedException.class).isThrownBy(
-            () -> Generator.generateRules("ELECT * ROM invalid WERE statement = 5"));
+            () -> SQLCorgi.generateRules("ELECT * ROM invalid WERE statement = 5", null));
     }
 
     /**
@@ -28,7 +28,7 @@ class BadWeatherTest {
     @Test
     void testNonSelectQuery() {
         assertThatExceptionOfType(UnsupportedInputException.class).isThrownBy(
-            () -> Generator.generateRules("ALTER TABLE Customers ADD Email varchar(255)"));
+            () -> SQLCorgi.generateRules("ALTER TABLE Customers ADD Email varchar(255)", null));
 
     }
 }

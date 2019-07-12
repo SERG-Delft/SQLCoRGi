@@ -25,10 +25,10 @@ public final class AssertUtils {
      * Asserts that the right set of coverage targets are generated for a given input query.
      *
      * @param query The input query that needs to be covered
-     * @param expected The expected output of the {@link Generator}
+     * @param expected The expected output of the {@link SQLCorgi}
      */
     public static void verify(String query, String... expected) {
-        Set<String> resultSet = Generator.generateRules(query);
+        Set<String> resultSet = SQLCorgi.generateRules(query, null);
         Set<String> expectedSet = new TreeSet<>(Arrays.asList(expected));
 
         assertThat(resultSet).isEqualTo(expectedSet);
@@ -37,10 +37,10 @@ public final class AssertUtils {
     /**
      * Asserts that the expected targets are contained in the results list.
      * @param query The input query that needs to be covered.
-     * @param atLeast The expected output of the {@link Generator}
+     * @param atLeast The expected output of the {@link SQLCorgi}
      */
     public static void containsAtLeast(String query, String... atLeast) {
-        Set<String> resultSet = Generator.generateRules(query);
+        Set<String> resultSet = SQLCorgi.generateRules(query, null);
 
         assertThat(resultSet).contains(atLeast);
     }
