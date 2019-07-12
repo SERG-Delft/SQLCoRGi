@@ -8,7 +8,7 @@ jobs:
   include:
   - stage: test
     script: mvn -B test
-    name: JUnit
+    name: "JUnit"
 
   - stage: static-analysis
     script: mvn -B checkstyle:check
