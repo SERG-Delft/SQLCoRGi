@@ -3,6 +3,7 @@ package com.github.sergdelft.sqlcorgi;
 import com.github.sergdelft.sqlcorgi.exceptions.CannotBeNullException;
 import com.github.sergdelft.sqlcorgi.exceptions.CannotBeParsedException;
 import com.github.sergdelft.sqlcorgi.exceptions.UnsupportedInputException;
+import com.github.sergdelft.sqlcorgi.schema.Schema;
 import com.github.sergdelft.sqlcorgi.visitors.SelectStatementVisitor;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -16,12 +17,12 @@ import java.util.Set;
 /**
  * The entry point of the coverage rule generator.
  */
-public final class Generator {
+public final class SQLCorgi {
 
     /**
      * No instance of this class should be created.
      */
-    private Generator() {
+    private SQLCorgi() {
         throw new UnsupportedOperationException();
     }
 
@@ -29,9 +30,10 @@ public final class Generator {
      * Generates coverage targets for the given query.
      *
      * @param query the query for which coverage rules should be generated.
+     * @param schema The database schema.
      * @return the rules that are generated for the input query.
      */
-    public static Set<String> generateRules(String query) {
+    public static Set<String> generateRules(String query, Schema schema) {
         Set<String> result = new HashSet<>();
 
         if (query == null) {
@@ -56,22 +58,4 @@ public final class Generator {
 
         return result;
     }
-
-    /**
-     * Main method for manual testing.
-     *
-     * @param args unused.
-     */
-    public static void main(String[] args) {
-
-        String query = "SELECT * FROM t WHERE a = 0 UNION SELECT * FROM t2 WHERE b > 888";
-
-        Set<String> result = generateRules(query);
-
-        System.out.println("Result:");
-        for (String s : result) {
-            System.out.println(s);
-        }
-    }
-
 }
