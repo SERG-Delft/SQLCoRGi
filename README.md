@@ -16,7 +16,7 @@ Please do the following to use our tool:
 Here is an example of how you would use this:
 
 ```java
-import nl.tudelft.st01.CoverageRuleGenerator;
+import CoverageRuleGenerator;
 
 // ...
 
