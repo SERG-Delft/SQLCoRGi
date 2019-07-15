@@ -2,7 +2,9 @@ package com.github.sergdelft.sqlcorgi;
 
 import com.github.sergdelft.sqlcorgi.query.JoinWhereItem;
 import com.github.sergdelft.sqlcorgi.query.OuterIncrementRelation;
+import com.github.sergdelft.sqlcorgi.schema.Schema;
 import com.github.sergdelft.sqlcorgi.visitors.ExpressionTraverserVisitor;
+import com.github.sergdelft.sqlcorgi.visitors.join.ImplicitInnerJoinDeducer;
 import com.github.sergdelft.sqlcorgi.visitors.join.OnExpressionVisitor;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
@@ -26,6 +28,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
+import static com.github.sergdelft.sqlcorgi.util.cloner.ExpressionCloner.copy;
+
 /**
  * This class allows for mutating a given query such that a set of mutated queries is returned.
  */
@@ -41,6 +45,7 @@ public class JoinRulesGenerator {
     private List<OuterIncrementRelation> outerIncrementRelations;
     private List<OIREmpty> tablesInOnExpression = new ArrayList<>();
     private FromItem fromItem;
+    private Schema schema;
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
@@ -48,7 +53,8 @@ public class JoinRulesGenerator {
      * @param plainSelect The statement for which the joins have to be mutated.
      * @return A set of mutated queries in string format.
      */
-    public Set<String> generate(PlainSelect plainSelect) {
+    public Set<String> generate(PlainSelect plainSelect, Schema schema) {
+        this.schema = schema;
         List<Join> joins = plainSelect.getJoins();
         Expression where = plainSelect.getWhere();
         Set<String> result = new TreeSet<>();
@@ -57,7 +63,12 @@ public class JoinRulesGenerator {
         }
 
         fromItem = plainSelect.getFromItem();
+
+        implicitInnerJoinDeduction(joins, plainSelect.getWhere());
+
+
         outerIncrementRelations = generateOIRsForEachJoin(plainSelect.getJoins());
+
 
         if (!outerIncrementRelations.isEmpty()) {
             Set<JoinWhereItem> items = handleJoins(plainSelect);
@@ -71,6 +82,34 @@ public class JoinRulesGenerator {
         plainSelect.setJoins(joins);
         plainSelect.setWhere(where);
         return result;
+    }
+
+    private JoinWhereItem implicitInnerJoinDeduction(List<Join> joins, Expression where) {
+        if (where != null) {
+            List<Join> outJoins = new ArrayList<>();
+            for (Join j : joins) {
+                if (j.isSimple()) {
+
+                    deduce(j, fromItem, where, joins);
+                }
+            }
+
+            return new JoinWhereItem(joins, where);
+
+
+        } else {
+            return new JoinWhereItem(joins, null);
+        }
+    }
+
+    private void deduce(Join join, FromItem fromItem, Expression where, List<Join> joins) {
+        Expression whereCopy = copy(where);
+        List<Join> temp = new ArrayList<>(joins);
+        JoinWhereItem jwi = new JoinWhereItem(new ArrayList<>(), null);
+        ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(join, fromItem, jwi);
+        whereCopy.accept(deducer);
+
+
     }
 
     /**

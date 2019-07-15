@@ -58,4 +58,9 @@ public final class SQLCorgi {
 
         return result;
     }
+
+    public static void main(String[] args) {
+        Set<String> set = generateRules("SELECT * FROM a, b", null);
+        System.out.println(set.toString());
+    }
 }
