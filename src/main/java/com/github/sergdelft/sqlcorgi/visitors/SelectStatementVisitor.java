@@ -5,7 +5,7 @@ import com.github.sergdelft.sqlcorgi.GroupByGenerator;
 import com.github.sergdelft.sqlcorgi.JoinRulesGenerator;
 import com.github.sergdelft.sqlcorgi.schema.Schema;
 import com.github.sergdelft.sqlcorgi.schema.Table;
-import com.github.sergdelft.sqlcorgi.schema.TableSetBuilder;
+import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.visitors.select.NullAttributeFinder;
 import com.github.sergdelft.sqlcorgi.visitors.select.NullReducer;
 import com.github.sergdelft.sqlcorgi.visitors.select.SelectExpressionVisitor;
@@ -24,7 +24,7 @@ import static com.github.sergdelft.sqlcorgi.util.cloner.SelectCloner.copy;
 public class SelectStatementVisitor extends SelectVisitorAdapter {
 
     private Schema schema;
-    private Deque<Map<String, Table>> tables; // TODO: Encapsulate
+    private TableStructure tableStructure;
 
     private Set<String> output;
     private List<PlainSelect> statements;
@@ -54,10 +54,9 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     public void visit(PlainSelect plainSelect) {
 
         if (schema != null) {
-            tables = new LinkedList<>();
-            TableSetBuilder tableSetBuilder = new TableSetBuilder();
-            tableSetBuilder.setSchema(schema); // TODO: Extract to method
-            plainSelect.getFromItem().accept(tableSetBuilder);
+            tableStructure = new TableStructure();
+            tableStructure.setSchema(schema);
+            tableStructure.addLayer(plainSelect.getFromItem(), plainSelect.getJoins());
         }
 
         handleWhere(plainSelect);

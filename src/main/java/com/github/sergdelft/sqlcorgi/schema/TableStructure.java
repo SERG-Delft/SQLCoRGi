@@ -1,56 +1,22 @@
 package com.github.sergdelft.sqlcorgi.schema;
 
-import net.sf.jsqlparser.statement.select.*;
+import net.sf.jsqlparser.statement.select.FromItem;
+import net.sf.jsqlparser.statement.select.Join;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 // TODO
-public class TableSetBuilder implements FromItemVisitor {
+public class TableStructure {
 
     private Schema schema;
-    private Map<String, Table> tables = new HashMap<>();
+    private Deque<Map<String, Table>> tableStack = new LinkedList<>();
 
-    @Override
-    public void visit(net.sf.jsqlparser.schema.Table tableName) {
-        List<Table> tables = schema.getTables();
-        for (Table table : tables) {
-            if (table.getName().equals(tableName.getName())) {
-                this.tables.put(table.getName(), table);
-                break;
-            }
+    public void addLayer(FromItem fromItem, List<Join> joins) {
+        Map<String, Table> tables = new HashMap<>();
+
+        if (fromItem instanceof net.sf.jsqlparser.schema.Table) {
+            net.sf.jsqlparser.schema.Table fromItem1 = (net.sf.jsqlparser.schema.Table) fromItem;
         }
-    }
-
-    @Override
-    public void visit(SubSelect subSelect) {
-
-    }
-
-    @Override
-    public void visit(SubJoin subjoin) {
-
-    }
-
-    @Override
-    public void visit(LateralSubSelect lateralSubSelect) {
-
-    }
-
-    @Override
-    public void visit(ValuesList valuesList) {
-
-    }
-
-    @Override
-    public void visit(TableFunction tableFunction) {
-
-    }
-
-    @Override
-    public void visit(ParenthesisFromItem aThis) {
-
     }
 
     public void setSchema(Schema schema) {
