@@ -1,6 +1,5 @@
 package com.github.sergdelft.sqlcorgi.visitors.join;
 
-import com.github.sergdelft.sqlcorgi.JoinRulesGenerator;
 import com.github.sergdelft.sqlcorgi.query.JoinWhereItem;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
@@ -15,10 +14,14 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 
 import java.util.List;
 
+
+/**
+ * This class is used to deduce whether the input query contains an implicit inner join. If so, it is converted to
+ * an inner join. The joins list and the where expression are updated accordingly.
+ */
 public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
     private String rightTable;
-    //private String leftTable;
-    private JoinWhereItem output;
+    //private JoinWhereItem output;
     private boolean update;
     private FromItem fromItem;
     private Join join;
@@ -28,7 +31,7 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
         this.rightTable = join.getRightItem().toString().toLowerCase();
         this.fromItem = fromItem;
         this.join = join;
-        this.output = output;
+        output.getJoin();
         this.joins = joins;
         update = false;
     }
@@ -36,9 +39,6 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
     @Override
     public void visit(AndExpression andExpression) {
         handleExpressionLogical(andExpression);
-        if (update) {
-
-        }
     }
 
     @Override
@@ -53,31 +53,26 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        EqualsTo eq = new EqualsTo();
         if (equalsTo.getLeftExpression() instanceof Column && equalsTo.getRightExpression() instanceof Column) {
             Column left = (Column) equalsTo.getLeftExpression();
             Column right = (Column) equalsTo.getRightExpression();
 
             checkImplicitJoin(left, right);
-            System.out.println(joins);
         }
     }
 
+    /**
+     * Checks whether the given two columns are related to the implicit inner join.
+     * @param left The right column of the expression.
+     * @param right The left column in the expression.
+     */
     private void checkImplicitJoin(Column left, Column right) {
         Table t1;
         Table t2;
+        // TODO: Alias stuff
+        t1 = left.getTable();
+        t2 = right.getTable();
 
-//        if (left.getTable() == null) {
-//            t1 = lookupTableByColumn(left);
-//        } else {
-            t1 = left.getTable();
-       // }
-
-//        if (right.getTable() == null) {
-//            t2 = lookupTableByColumn(right);
-//        } else {
-            t2 = right.getTable();
-      //  }
         String t1String = t1.toString().toLowerCase();
         String t2String = t2.toString().toLowerCase();
         String leftString = null;
@@ -92,7 +87,7 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
             String jString;
             for (Join j : joins) {
                 jString = j.getRightItem().toString().toLowerCase();
-                if ((leftString.equals(jString) && !rightTable.equals(jString))) {
+                if (leftString.equals(jString) && !rightTable.equals(jString)) {
                     j.setSimple(false);
                     j.setInner(true);
 
@@ -122,14 +117,16 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
             }
         }
 
-
-
         if (update) {
-
+            update = true;
         }
     }
 
 
+    /**
+     * Updates the where expression if needed when checking for an implicit inner join.
+     * @param expression The expression to be handled.
+     */
     private void handleExpressionLogical(BinaryExpression expression) {
         expression.getRightExpression().accept(this);
         if (update) {

@@ -42,19 +42,19 @@ public class JoinRulesGenerator {
         LEFT, RIGHT, NONE
     }
 
-    private HashMap<Integer, OuterIncrementRelation> outerIncrementRelations;
+    private Map<Integer, OuterIncrementRelation> outerIncrementRelations;
     private List<OIREmpty> tablesInOnExpression = new ArrayList<>();
     private FromItem fromItem;
-    private Schema schema;
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
      *
      * @param plainSelect The statement for which the joins have to be mutated.
+     * @param schema The schema related to the input query.
      * @return A set of mutated queries in string format.
      */
     public Set<String> generate(PlainSelect plainSelect, Schema schema) {
-        this.schema = schema;
+        schema.getTables();
         List<Join> joins = plainSelect.getJoins();
         Expression where = plainSelect.getWhere();
         Set<String> result = new TreeSet<>();
@@ -66,9 +66,7 @@ public class JoinRulesGenerator {
 
         implicitInnerJoinDeduction(joins, plainSelect.getWhere());
 
-
         outerIncrementRelations = generateOIRsForEachJoin(plainSelect.getJoins());
-
 
         if (!outerIncrementRelations.isEmpty()) {
             Set<JoinWhereItem> items = handleJoins(plainSelect);
@@ -84,9 +82,16 @@ public class JoinRulesGenerator {
         return result;
     }
 
+    // TODO: remove this later. Might be redundant.
+    /**
+     * Deduces whether an implicit inner join is present in the input. The where and joins list are
+     * updated accordingly.
+     * @param joins The list of joins in the from clause.
+     * @param where The expression in the where clause.
+     * @return Returns a JoinwWhereItem.
+     */
     private JoinWhereItem implicitInnerJoinDeduction(List<Join> joins, Expression where) {
         if (where != null) {
-            List<Join> outJoins = new ArrayList<>();
             for (Join j : joins) {
                 if (j.isSimple()) {
 
@@ -102,9 +107,15 @@ public class JoinRulesGenerator {
         }
     }
 
+    /**
+     * Performs the deduction of implicit inner joins for a specific join.
+     * @param join The join to be checked.
+     * @param fromItem The from item.
+     * @param where The expression in the where clause.
+     * @param joins The list of all joins in the from clause.
+     */
     private void deduce(Join join, FromItem fromItem, Expression where, List<Join> joins) {
         Expression whereCopy = copy(where);
-        List<Join> temp = new ArrayList<>(joins);
         JoinWhereItem jwi = new JoinWhereItem(new ArrayList<>(), null);
         ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(join, fromItem, joins, jwi);
         whereCopy.accept(deducer);
@@ -117,7 +128,7 @@ public class JoinRulesGenerator {
      * @param joins The joins for which the OIRs have to be determined.
      * @return A list of OIRs. The order of the input joins is the same as the order of the list of OIRs.
      */
-    private HashMap<Integer, OuterIncrementRelation> generateOIRsForEachJoin(List<Join> joins) {
+    private Map<Integer, OuterIncrementRelation> generateOIRsForEachJoin(List<Join> joins) {
         Map<String, List<Column>> map = new HashMap<>();
 
         if (outerIncrementRelations == null) {
@@ -271,7 +282,7 @@ public class JoinRulesGenerator {
      * @param oirs The list of {@link OuterIncrementRelation}s corresponding to the joins.
      * @return A list of OIRs that must be included.
      */
-    private List<OuterIncrementRelation> getAllIncludesInner(List<JoinType> labels, HashMap<Integer,
+    private List<OuterIncrementRelation> getAllIncludesInner(List<JoinType> labels, Map<Integer,
             OuterIncrementRelation> oirs) {
         List<OuterIncrementRelation> includes = new ArrayList<>();
         for (int i = 0; i < labels.size(); i++) {
@@ -455,7 +466,7 @@ public class JoinRulesGenerator {
      * @param oirs The list of {@link OuterIncrementRelation}s used to label the joins.
      * @return A list of join types, which are used to make sure that all joins are configured correctly.
      */
-    private List<JoinType> label(JoinType joinType, List<Join> joins, int index, HashMap<Integer,
+    private List<JoinType> label(JoinType joinType, List<Join> joins, int index, Map<Integer,
             OuterIncrementRelation> oirs) {
         if (index >= joins.size()) {
             throw new IllegalArgumentException("The index cannot be larger than the size of the given list of joins.");
@@ -505,7 +516,7 @@ public class JoinRulesGenerator {
                     return JoinType.RIGHT;
                 }
             } else if (joinType == JoinType.LEFT) {
-                if (!intersection(mvoi, oiRel.getLoiRelations()).isEmpty()){
+                if (!intersection(mvoi, oiRel.getLoiRelations()).isEmpty()) {
                     mvoi.addAll(oiRel.getRoiRelations());
                     return JoinType.RIGHT;
                 } else if (!intersection(mvoi, oiRel.getRoiRelations()).isEmpty()) {
