@@ -1,120 +1,147 @@
 package com.github.sergdelft.sqlcorgi.visitors.join;
 
+import com.github.sergdelft.sqlcorgi.JoinRulesGenerator;
 import com.github.sergdelft.sqlcorgi.query.JoinWhereItem;
-import net.sf.jsqlparser.expression.DoubleValue;
+import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.Parenthesis;
-import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-import net.sf.jsqlparser.expression.operators.relational.Between;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
-import net.sf.jsqlparser.expression.operators.relational.InExpression;
-import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
-import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
-import net.sf.jsqlparser.expression.operators.relational.MinorThan;
-import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
-import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
+import net.sf.jsqlparser.statement.select.SubSelect;
+
+import java.util.List;
 
 public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
-    private String right;
-    private String left;
+    private String rightTable;
+    //private String leftTable;
     private JoinWhereItem output;
+    private boolean update;
+    private FromItem fromItem;
+    private Join join;
+    private List<Join> joins;
 
-    public ImplicitInnerJoinDeducer(Join join, FromItem fromItem, JoinWhereItem output) {
-        this.right = join.getRightItem().toString().toLowerCase();
-        this.left = fromItem.toString();
+    public ImplicitInnerJoinDeducer(Join join, FromItem fromItem, List<Join> joins, JoinWhereItem output) {
+        this.rightTable = join.getRightItem().toString().toLowerCase();
+        this.fromItem = fromItem;
+        this.join = join;
         this.output = output;
+        this.joins = joins;
+        update = false;
     }
 
     @Override
     public void visit(AndExpression andExpression) {
-        AndExpression and = new AndExpression(null, null);
-        andExpression.getLeftExpression().accept(this);
+        handleExpressionLogical(andExpression);
+        if (update) {
+
+        }
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        OrExpression or = new OrExpression(null, null);
+        handleExpressionLogical(orExpression);
+    }
+
+    @Override
+    public void visit(SubSelect subSelect) {
+
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
         EqualsTo eq = new EqualsTo();
+        if (equalsTo.getLeftExpression() instanceof Column && equalsTo.getRightExpression() instanceof Column) {
+            Column left = (Column) equalsTo.getLeftExpression();
+            Column right = (Column) equalsTo.getRightExpression();
+
+            checkImplicitJoin(left, right);
+            System.out.println(joins);
+        }
     }
 
-    @Override
-    public void visit(GreaterThan greaterThan) {
+    private void checkImplicitJoin(Column left, Column right) {
+        Table t1;
+        Table t2;
 
+//        if (left.getTable() == null) {
+//            t1 = lookupTableByColumn(left);
+//        } else {
+            t1 = left.getTable();
+       // }
+
+//        if (right.getTable() == null) {
+//            t2 = lookupTableByColumn(right);
+//        } else {
+            t2 = right.getTable();
+      //  }
+        String t1String = t1.toString().toLowerCase();
+        String t2String = t2.toString().toLowerCase();
+        String leftString = null;
+
+        if (t1String.equals(rightTable)) {
+            leftString = t2.toString().toLowerCase();
+        } else if (t2String.toLowerCase().equals(rightTable)) {
+            leftString = t1.toString().toLowerCase();
+        }
+
+        if (leftString != null) {
+            String jString;
+            for (Join j : joins) {
+                jString = j.getRightItem().toString().toLowerCase();
+                if ((leftString.equals(jString) && !rightTable.equals(jString))) {
+                    j.setSimple(false);
+                    j.setInner(true);
+
+                    EqualsTo expression = new EqualsTo();
+                    expression.setRightExpression(right);
+                    expression.setLeftExpression(left);
+
+                    j.setOnExpression(expression);
+                    update = true;
+                    break;
+                }
+            }
+
+            if (!update) {
+                String fromString = fromItem.toString().toLowerCase();
+                if (leftString.equals(fromString) && !rightTable.equals(fromString)) {
+                    join.setInner(true);
+                    join.setSimple(false);
+
+                    EqualsTo expression = new EqualsTo();
+                    expression.setRightExpression(right);
+                    expression.setLeftExpression(left);
+
+                    join.setOnExpression(expression);
+                    update = true;
+                }
+            }
+        }
+
+
+
+        if (update) {
+
+        }
     }
 
-    @Override
-    public void visit(GreaterThanEquals greaterThanEquals) {
+
+    private void handleExpressionLogical(BinaryExpression expression) {
+        expression.getRightExpression().accept(this);
+        if (update) {
+            update = false;
+            expression.setRightExpression(null);
+        } else {
+            expression.getLeftExpression().accept(this);
+            if (update) {
+                update = false;
+                expression.setLeftExpression(null);
+            }
+        }
     }
-
-    @Override
-    public void visit(IsNullExpression isNullExpression) {
-
-    }
-
-    @Override
-    public void visit(MinorThan minorThan) {
-
-    }
-
-    @Override
-    public void visit(MinorThanEquals minorThanEquals) {
-    }
-
-    @Override
-    public void visit(NotEqualsTo notEqualsTo) {
-
-    }
-
-    @Override
-    public void visit(DoubleValue doubleValue) {
-
-    }
-
-    @Override
-    public void visit(LongValue longValue) {
-
-    }
-
-    @Override
-    public void visit(Column column) {
-
-    }
-
-    @Override
-    public void visit(Between between) {
-
-    }
-
-    @Override
-    public void visit(LikeExpression likeExpression) {
-
-    }
-
-    @Override
-    public void visit(InExpression inExpression) {
-
-    }
-
-    @Override
-    public void visit(StringValue value) {
-    }
-
-    @Override
-    public void visit(Parenthesis parenthesis) {
-        parenthesis.getExpression().accept(this);
-    }
-
 
 }
