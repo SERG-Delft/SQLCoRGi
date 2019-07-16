@@ -1,18 +1,18 @@
 package com.github.sergdelft.sqlcorgi.visitors;
 
+import com.github.sergdelft.sqlcorgi.AggregateFunctionsGenerator;
+import com.github.sergdelft.sqlcorgi.GroupByGenerator;
+import com.github.sergdelft.sqlcorgi.JoinRulesGenerator;
+import com.github.sergdelft.sqlcorgi.schema.Schema;
+import com.github.sergdelft.sqlcorgi.schema.Table;
+import com.github.sergdelft.sqlcorgi.schema.TableSetBuilder;
 import com.github.sergdelft.sqlcorgi.visitors.select.NullAttributeFinder;
 import com.github.sergdelft.sqlcorgi.visitors.select.NullReducer;
 import com.github.sergdelft.sqlcorgi.visitors.select.SelectExpressionVisitor;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.*;
-import com.github.sergdelft.sqlcorgi.AggregateFunctionsGenerator;
-import com.github.sergdelft.sqlcorgi.GroupByGenerator;
-import com.github.sergdelft.sqlcorgi.JoinRulesGenerator;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.github.sergdelft.sqlcorgi.SubqueryGenerator.coverSubqueries;
 import static com.github.sergdelft.sqlcorgi.util.Expressions.setJoinToInner;
@@ -23,6 +23,9 @@ import static com.github.sergdelft.sqlcorgi.util.cloner.SelectCloner.copy;
  */
 public class SelectStatementVisitor extends SelectVisitorAdapter {
 
+    private Schema schema;
+    private Deque<Map<String, Table>> tables; // TODO: Encapsulate
+
     private Set<String> output;
     private List<PlainSelect> statements;
 
@@ -32,12 +35,14 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      *
      * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
      */
-    public SelectStatementVisitor(Set<String> output) {
+    public SelectStatementVisitor(Schema schema, Set<String> output) {
         if (output == null || !output.isEmpty()) {
             throw new IllegalArgumentException(
                 "A SelectStatementVisitor requires an empty, non-null set to which it can output generated rules."
             );
         }
+
+        this.schema = schema;
 
         this.output = output;
         this.statements = new ArrayList<>();
@@ -45,6 +50,13 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
 
     @Override
     public void visit(PlainSelect plainSelect) {
+
+        if (schema != null) {
+            tables = new LinkedList<>();
+            TableSetBuilder tableSetBuilder = new TableSetBuilder();
+            tableSetBuilder.setSchema(schema); // TODO: Extract to method
+            plainSelect.getFromItem().accept(tableSetBuilder);
+        }
 
         handleWhere(plainSelect);
         handleAggregators(plainSelect);

@@ -1,5 +1,7 @@
 package com.github.sergdelft.sqlcorgi;
 
+import com.github.sergdelft.sqlcorgi.schema.Schema;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -23,11 +25,11 @@ public final class AssertUtils {
 
     /**
      * Asserts that the right set of coverage targets are generated for a given input query.
-     *
-     * @param query The input query that needs to be covered
-     * @param expected The expected output of the {@link SQLCorgi}
+     * @param query the input query that needs to be covered.
+     * @param schema the schema to use with the query.
+     * @param expected the expected output of the generator.
      */
-    public static void verify(String query, String... expected) {
+    public static void verify(String query, Schema schema, String... expected) {
         Set<String> resultSet = SQLCorgi.generateRules(query, null);
         Set<String> expectedSet = new TreeSet<>(Arrays.asList(expected));
 
