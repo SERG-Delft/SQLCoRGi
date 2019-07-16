@@ -60,7 +60,7 @@ public final class SQLCorgi {
     }
 
     public static void main(String[] args) {
-        Set<String> set = generateRules("SELECT * FROM a, b", null);
+        Set<String> set = generateRules("SELECT * FROM a, b, c, d WHERE d.id = b.id", null);
         System.out.println(set.toString());
     }
 }
