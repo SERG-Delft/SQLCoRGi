@@ -33,6 +33,8 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * Creates a new visitor which can be used to generate coverage rules for queries.
      * Any rules that are generated will be written to {@code output}.
      *
+     * @param schema the schema to be used when generating rules. If null is provided, all attributes are assumed to
+     *               be nullable.
      * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
      */
     public SelectStatementVisitor(Schema schema, Set<String> output) {
