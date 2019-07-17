@@ -38,7 +38,7 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
      * @param fromItem The from item of the from clause.
      * @param joins The list of joins in the from clause.
      */
-    public ImplicitInnerJoinDeducer(Join join, FromItem fromItem, List<Join> joins) {
+    public ImplicitInnerJoinDeducer(Join join, FromItem fromItem, List<Join> joins, LinkedList<String> linked) {
         this.rightTable = join.getRightItem().toString().toLowerCase();
         this.fromItem = fromItem;
         this.join = join;
@@ -46,12 +46,7 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
         update = false;
         foundImplicit = false;
 
-        linked = new LinkedList<>();
-
-        linked.add(fromItem.toString().toLowerCase());
-        for (Join j : joins) {
-            linked.add(j.getRightItem().toString().toLowerCase());
-        }
+        this.linked = linked;
     }
 
     @Override
@@ -112,9 +107,6 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
         String t1String = t1.toString().toLowerCase();
         String t2String = t2.toString().toLowerCase();
         String leftString = null;
-
-
-
 
         if (t1String.equals(rightTable)) {
             leftString = t2.toString().toLowerCase();

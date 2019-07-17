@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -92,16 +93,34 @@ public class JoinRulesGenerator {
      */
     private JoinWhereItem implicitInnerJoinDeduction(List<Join> joins, Expression where) {
         Expression expression = where;
+
+        LinkedList<String> order = new LinkedList<>();
+        order.add(fromItem.toString().toLowerCase());
+        for (Join j : joins) {
+            order.add(j.getRightItem().toString().toLowerCase());
+        }
+
         if (where != null) {
             for (Join j : joins) {
                 if (j.isSimple()) {
-                    ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(j, fromItem, joins);
+                    ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(j, fromItem, joins, order);
                     expression.accept(deducer);
                     expression = deducer.getExpression();
                 }
             }
 
-            plainSelect.setWhere(copy(expression));
+            List<Join> orderedJoins = new LinkedList<>();
+            for (String s : order) {
+                for (Join j : joins) {
+                    if (s.equals(j.getRightItem().toString().toLowerCase())) {
+                        orderedJoins.add(j);
+                    }
+                }
+
+            }
+
+            plainSelect.setWhere(expression);
+            plainSelect.setJoins(orderedJoins);
             return new JoinWhereItem(joins, where);
         } else {
             return new JoinWhereItem(joins, null);
@@ -110,21 +129,21 @@ public class JoinRulesGenerator {
 
     }
 
-    /**
-     * Performs the deduction of implicit inner joins for a specific join.
-     * @param join The join to be checked.
-     * @param fromItem The from item.
-     * @param where The expression in the where clause.
-     * @param joins The list of all joins in the from clause.
-     */
-    private void deduce(Join join, FromItem fromItem, Expression where, List<Join> joins) {
-        Expression whereCopy = copy(where);
-        ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(join, fromItem, joins);
-        whereCopy.accept(deducer);
-        //plainSelect.setWhere(copy(deducer.getExpression()));
-        plainSelect.setJoins(deducer.getJoins());
-
-    }
+//    /**
+//     * Performs the deduction of implicit inner joins for a specific join.
+//     * @param join The join to be checked.
+//     * @param fromItem The from item.
+//     * @param where The expression in the where clause.
+//     * @param joins The list of all joins in the from clause.
+//     */
+//    private void deduce(Join join, FromItem fromItem, Expression where, List<Join> joins) {
+//        Expression whereCopy = copy(where);
+//        ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(join, fromItem, joins);
+//        whereCopy.accept(deducer);
+//        //plainSelect.setWhere(copy(deducer.getExpression()));
+//        plainSelect.setJoins(deducer.getJoins());
+//
+//    }
 
     /**
      * Takes in the list of joins and determines the outer increment relations (OIR) for each of them,

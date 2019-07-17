@@ -63,7 +63,7 @@ public final class SQLCorgi {
     }
 
     public static void main(String[] args) {
-        List<String> set = new ArrayList<>(generateRules("SELECT * FROM a, b, c, d WHERE a.l = 6 AND d.id = a.id AND a.id = c.id", null));
+        List<String> set = new ArrayList<>(generateRules("SELECT * FROM a, b, c, d WHERE a.l = 6 AND d.id = b.id AND b.id = c.id", null));
         Collections.sort(set);
         for (String s : set) {
             System.out.println(s);
