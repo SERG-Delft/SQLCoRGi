@@ -6,11 +6,26 @@ import net.sf.jsqlparser.statement.select.*;
 import java.util.*;
 
 // TODO: Finish this class and write documentation
+
+/**
+ * This class represents the collection of tables that can be referenced from within a query. In order to use it,
+ * create an instance, provide it with a schema, and add a new layer. Each layer represents the collection of tables
+ * that can be referenced in the local FROM clause of a query. Consider a subquery: it can reference tables from its
+ * own FROM clause, but also from the FROM clause of the query that contains it. When finished with a query, make sure
+ * to remove its layer.
+ */
 public class TableStructure {
 
     private Schema schema;
     private Deque<Map<String, Table>> tableStack = new LinkedList<>();
 
+    /**
+     * Adds a new layer of tables to the structure, which is derived from the given {@link FromItem} and list of
+     * {@link Join}s.
+     *
+     * @param fromItem the {@code FromItem} of a query.
+     * @param joins the accompanying list of {@code Join}s of the query.
+     */
     public void addLayer(FromItem fromItem, List<Join> joins) {
 
         HashMap<String, Table> tables = new HashMap<>();
@@ -144,6 +159,9 @@ public class TableStructure {
         throw new UnsupportedOperationException("To be implemented");
     }
 
+    /**
+     * Removes the most recently added layer of tables from the structure.
+     */
     public void removeLayer() {
         tableStack.pop();
     }
