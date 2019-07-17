@@ -101,10 +101,13 @@ public class JoinRulesGenerator {
                 }
             }
 
+            plainSelect.setWhere(copy(expression));
             return new JoinWhereItem(joins, where);
         } else {
             return new JoinWhereItem(joins, null);
         }
+
+
     }
 
     /**

@@ -11,6 +11,7 @@ import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -19,7 +20,7 @@ import java.util.List;
  * an inner join. The joins list and the where expression are updated accordingly.
  */
 public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
-    private final String rightTable;
+    private String rightTable;
     private boolean update;
     private final FromItem fromItem;
 
@@ -28,6 +29,8 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
     private Join join;
     private List<Join> joins;
     private Expression expression;
+    private List<String> linked;
+
 
     /**
      * Constructor.
@@ -42,6 +45,13 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
         this.joins = joins;
         update = false;
         foundImplicit = false;
+
+        linked = new LinkedList<>();
+
+        linked.add(fromItem.toString().toLowerCase());
+        for (Join j : joins) {
+            linked.add(j.getRightItem().toString().toLowerCase());
+        }
     }
 
     @Override
@@ -83,7 +93,7 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
             Column right = (Column) equalsTo.getRightExpression();
 
             checkImplicitJoin(left, right);
-            foundImplicit = true;
+
         }
     }
 
@@ -91,9 +101,8 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
      * Checks whether the given two columns are related to the implicit inner join.
      * @param left The right column of the expression.
      * @param right The left column in the expression.
-     * @return True if there is an implicit inner join, false otherwise.
      */
-    private boolean checkImplicitJoin(Column left, Column right) {
+    private void checkImplicitJoin(Column left, Column right) {
         Table t1;
         Table t2;
         // TODO: Alias stuff
@@ -103,6 +112,9 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
         String t1String = t1.toString().toLowerCase();
         String t2String = t2.toString().toLowerCase();
         String leftString = null;
+
+
+
 
         if (t1String.equals(rightTable)) {
             leftString = t2.toString().toLowerCase();
@@ -121,8 +133,14 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
                 expression.setRightExpression(right);
                 expression.setLeftExpression(left);
 
+                linked.remove(rightTable);
+                linked.add(1, rightTable);
+
+
                 join.setOnExpression(expression);
                 update = true;
+
+                foundImplicit = true;
             }
 
             if (!update) {
@@ -137,14 +155,24 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
                         expression.setLeftExpression(left);
 
                         j.setOnExpression(expression);
+
+                        if (jString.equals(leftString)) {
+                            linked.remove(rightTable);
+                            linked.add(linked.indexOf(leftString), rightTable);
+                        } else {
+                            linked.remove(leftString);
+                            linked.add(linked.indexOf(rightTable), leftString);
+                        }
+
                         update = true;
+                        foundImplicit = true;
                         break;
                     }
                 }
             }
         }
 
-        return update;
+
     }
 
     public Expression getExpression() {
