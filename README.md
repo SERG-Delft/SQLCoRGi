@@ -28,3 +28,7 @@ Set<String> coverageRules = CoverageRuleGenerator.generateRules(query);
 // Use the generated coverage rules
 ```
 6. Enjoy the coverage rules generated for the provided query.
+
+## License
+
+This project is licensed under Apache License 2.0.
