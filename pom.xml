@@ -3,7 +3,7 @@
 
     <groupId>com.github.serg-delft</groupId>
     <artifactId>sqlcorgi</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -460,7 +460,7 @@
         <url>https://github.com/SERG-Delft/SQLCoRGi</url>
         <connection>scm:git:git://github.com/SERG-Delft/SQLCoRGi</connection>
         <developerConnection>scm:git:git@github.com:SERG-Delft/SQLCoRGi.git</developerConnection>
-        <tag>sqlcorgi-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <profiles>
