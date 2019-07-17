@@ -19,30 +19,56 @@ import java.util.List;
  * an inner join. The joins list and the where expression are updated accordingly.
  */
 public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
-    private String rightTable;
-    //private JoinWhereItem output;
+    private final String rightTable;
     private boolean update;
-    private FromItem fromItem;
+    private final FromItem fromItem;
+
+    private boolean foundImplicit;
+
     private Join join;
     private List<Join> joins;
+    private Expression expression;
 
-    public ImplicitInnerJoinDeducer(Join join, FromItem fromItem, List<Join> joins, JoinWhereItem output) {
+    /**
+     * Constructor.
+     * @param join The join that is evaluated.
+     * @param fromItem The from item of the from clause.
+     * @param joins The list of joins in the from clause.
+     */
+    public ImplicitInnerJoinDeducer(Join join, FromItem fromItem, List<Join> joins) {
         this.rightTable = join.getRightItem().toString().toLowerCase();
         this.fromItem = fromItem;
         this.join = join;
-        output.getJoin();
         this.joins = joins;
         update = false;
+        foundImplicit = false;
     }
 
     @Override
     public void visit(AndExpression andExpression) {
-        handleExpressionLogical(andExpression);
+        andExpression.getLeftExpression().accept(this);
+
+        if (expression != null) {
+            andExpression.setLeftExpression(expression);
+        }
+
+        if (!update) {
+            andExpression.getRightExpression().accept(this);
+            if (update) {
+                expression = andExpression.getLeftExpression();
+                update = false;
+            } else {
+                expression = andExpression;
+            }
+        } else {
+            update = false;
+            expression = andExpression.getRightExpression();
+        }
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        handleExpressionLogical(orExpression);
+       // This method must be empty!
     }
 
     @Override
