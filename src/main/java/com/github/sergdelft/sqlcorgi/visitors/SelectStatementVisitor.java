@@ -4,7 +4,6 @@ import com.github.sergdelft.sqlcorgi.AggregateFunctionsGenerator;
 import com.github.sergdelft.sqlcorgi.GroupByGenerator;
 import com.github.sergdelft.sqlcorgi.JoinRulesGenerator;
 import com.github.sergdelft.sqlcorgi.schema.Schema;
-import com.github.sergdelft.sqlcorgi.schema.Table;
 import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.visitors.select.NullAttributeFinder;
 import com.github.sergdelft.sqlcorgi.visitors.select.NullReducer;
@@ -12,7 +11,10 @@ import com.github.sergdelft.sqlcorgi.visitors.select.SelectExpressionVisitor;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.github.sergdelft.sqlcorgi.SubqueryGenerator.coverSubqueries;
 import static com.github.sergdelft.sqlcorgi.util.Expressions.setJoinToInner;

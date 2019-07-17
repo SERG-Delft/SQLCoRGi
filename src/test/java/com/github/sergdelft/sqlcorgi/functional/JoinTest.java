@@ -121,7 +121,7 @@ class JoinTest {
     @Test
     void testJoinOnConditionFromSingleTableRightComparison() {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableB.CanBeNull > 5",
-                null, "SELECT * FROM TableA RIGHT JOIN TableB ON TableB.CanBeNull > 5 WHERE (NOT (TableB.CanBeNull > 5))"
+            null, "SELECT * FROM TableA RIGHT JOIN TableB ON TableB.CanBeNull > 5 WHERE (NOT (TableB.CanBeNull > 5))"
             + " AND (TableB.CanBeNull IS NOT NULL)");
     }
 

@@ -137,9 +137,9 @@ public class TableStructure {
         // TODO: Derive table
 
         Alias alias = subSelect.getAlias();
-        if (alias != null) {
-            // TODO: Add table
-        }
+        //if (alias != null) {
+        //    // TODO: Add table
+        //}
 
         throw new UnsupportedOperationException("To be implemented");
     }
