@@ -1,7 +1,6 @@
 package com.github.sergdelft.sqlcorgi.visitors.join;
 
-import com.github.sergdelft.sqlcorgi.query.JoinWhereItem;
-import net.sf.jsqlparser.expression.BinaryExpression;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -53,11 +52,12 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        if (equalsTo.getLeftExpression() instanceof Column && equalsTo.getRightExpression() instanceof Column) {
+        if (!foundImplicit && equalsTo.getLeftExpression() instanceof Column && equalsTo.getRightExpression() instanceof Column) {
             Column left = (Column) equalsTo.getLeftExpression();
             Column right = (Column) equalsTo.getRightExpression();
 
             checkImplicitJoin(left, right);
+            foundImplicit = true;
         }
     }
 
@@ -65,8 +65,9 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
      * Checks whether the given two columns are related to the implicit inner join.
      * @param left The right column of the expression.
      * @param right The left column in the expression.
+     * @return True if there is an implicit inner join, false otherwise.
      */
-    private void checkImplicitJoin(Column left, Column right) {
+    private boolean checkImplicitJoin(Column left, Column right) {
         Table t1;
         Table t2;
         // TODO: Alias stuff
@@ -85,60 +86,46 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
 
         if (leftString != null) {
             String jString;
-            for (Join j : joins) {
-                jString = j.getRightItem().toString().toLowerCase();
-                if (leftString.equals(jString) && !rightTable.equals(jString)) {
-                    j.setSimple(false);
-                    j.setInner(true);
+            String fromString = fromItem.toString().toLowerCase();
+            if (leftString.equals(fromString) && !rightTable.equals(fromString)) {
+                join.setInner(true);
+                join.setSimple(false);
 
-                    EqualsTo expression = new EqualsTo();
-                    expression.setRightExpression(right);
-                    expression.setLeftExpression(left);
+                EqualsTo expression = new EqualsTo();
+                expression.setRightExpression(right);
+                expression.setLeftExpression(left);
 
-                    j.setOnExpression(expression);
-                    update = true;
-                    break;
-                }
+                join.setOnExpression(expression);
+                update = true;
             }
 
             if (!update) {
-                String fromString = fromItem.toString().toLowerCase();
-                if (leftString.equals(fromString) && !rightTable.equals(fromString)) {
-                    join.setInner(true);
-                    join.setSimple(false);
+                for (Join j : joins) {
+                    jString = j.getRightItem().toString().toLowerCase();
+                    if (j.isSimple() && (leftString.equals(jString) || rightTable.equals(jString))) {
+                        j.setSimple(false);
+                        j.setInner(true);
 
-                    EqualsTo expression = new EqualsTo();
-                    expression.setRightExpression(right);
-                    expression.setLeftExpression(left);
+                        EqualsTo expression = new EqualsTo();
+                        expression.setRightExpression(right);
+                        expression.setLeftExpression(left);
 
-                    join.setOnExpression(expression);
-                    update = true;
+                        j.setOnExpression(expression);
+                        update = true;
+                        break;
+                    }
                 }
             }
         }
 
-        if (update) {
-            update = true;
-        }
+        return update;
     }
 
-
-    /**
-     * Updates the where expression if needed when checking for an implicit inner join.
-     * @param expression The expression to be handled.
-     */
-    private void handleExpressionLogical(BinaryExpression expression) {
-        expression.getRightExpression().accept(this);
-        if (update) {
-            update = false;
-            expression.setRightExpression(null);
-        } else {
-            expression.getLeftExpression().accept(this);
-            if (update) {
-                update = false;
-                expression.setLeftExpression(null);
-            }
-        }
+    public Expression getExpression() {
+        return expression;
     }
 
+    public List<Join> getJoins() {
+        return joins;
+    }
 }

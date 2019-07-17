@@ -45,6 +45,7 @@ public class JoinRulesGenerator {
     private Map<Integer, OuterIncrementRelation> outerIncrementRelations;
     private List<OIREmpty> tablesInOnExpression = new ArrayList<>();
     private FromItem fromItem;
+    private PlainSelect plainSelect;
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
@@ -54,7 +55,6 @@ public class JoinRulesGenerator {
      * @return A set of mutated queries in string format.
      */
     public Set<String> generate(PlainSelect plainSelect, Schema schema) {
-        schema.getTables();
         List<Join> joins = plainSelect.getJoins();
         Expression where = plainSelect.getWhere();
         Set<String> result = new TreeSet<>();
@@ -63,7 +63,7 @@ public class JoinRulesGenerator {
         }
 
         fromItem = plainSelect.getFromItem();
-
+        this.plainSelect = plainSelect;
         implicitInnerJoinDeduction(joins, plainSelect.getWhere());
 
         outerIncrementRelations = generateOIRsForEachJoin(plainSelect.getJoins());
@@ -91,17 +91,17 @@ public class JoinRulesGenerator {
      * @return Returns a JoinwWhereItem.
      */
     private JoinWhereItem implicitInnerJoinDeduction(List<Join> joins, Expression where) {
+        Expression expression = where;
         if (where != null) {
             for (Join j : joins) {
                 if (j.isSimple()) {
-
-                    deduce(j, fromItem, where, joins);
+                    ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(j, fromItem, joins);
+                    expression.accept(deducer);
+                    expression = deducer.getExpression();
                 }
             }
 
             return new JoinWhereItem(joins, where);
-
-
         } else {
             return new JoinWhereItem(joins, null);
         }
@@ -116,9 +116,11 @@ public class JoinRulesGenerator {
      */
     private void deduce(Join join, FromItem fromItem, Expression where, List<Join> joins) {
         Expression whereCopy = copy(where);
-        JoinWhereItem jwi = new JoinWhereItem(new ArrayList<>(), null);
-        ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(join, fromItem, joins, jwi);
+        ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(join, fromItem, joins);
         whereCopy.accept(deducer);
+        //plainSelect.setWhere(copy(deducer.getExpression()));
+        plainSelect.setJoins(deducer.getJoins());
+
     }
 
     /**

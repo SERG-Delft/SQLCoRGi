@@ -11,7 +11,10 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -60,7 +63,11 @@ public final class SQLCorgi {
     }
 
     public static void main(String[] args) {
-        Set<String> set = generateRules("SELECT * FROM a, b, c, d WHERE d.id = b.id", null);
-        System.out.println(set.toString());
+        List<String> set = new ArrayList<>(generateRules("SELECT * FROM a, b, c, d WHERE a.l = 6 AND d.id = b.id AND b.id = c.id", null));
+        Collections.sort(set);
+        for (String s : set) {
+            System.out.println(s);
+        }
+
     }
 }
