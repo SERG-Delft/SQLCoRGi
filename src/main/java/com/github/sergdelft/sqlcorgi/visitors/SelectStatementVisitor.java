@@ -70,6 +70,10 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             applyNullReduction(select);
             this.output.add(select.toString());
         }
+
+        if (schema != null) {
+            tableStructure.removeLayer();
+        }
     }
 
     @Override
