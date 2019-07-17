@@ -4,12 +4,12 @@
 
     <groupId>com.github.sergdelft</groupId>
     <artifactId>sqlcorgi</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.10</maven.compiler.source>
+        <maven.compiler.target>1.10</maven.compiler.target>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -458,7 +458,7 @@
     </developers>
 
     <scm>
-        <url>https://github.com/serg-delft/sqlcorgi</url>
+        <url>https://github.com/SERG-Delft/SQLCoRGi</url>
         <connection>scm:git:git://github.com/SERG-Delft/SQLCoRGi</connection>
         <developerConnection>scm:git:git@github.com:SERG-Delft/SQLCoRGi.git</developerConnection>
         <tag>HEAD</tag>
@@ -492,4 +492,15 @@
             </build>
         </profile>
     </profiles>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 </project>
