@@ -27,6 +27,15 @@ public class TableStructure {
         tables.put("", left);
     }
 
+    /**
+     * Returns the {@link Table} derived from the given {@link FromItem}. If the {@code FromItem} has an
+     * {@link Alias} and {@code storeTable} is {@code true}, it will be added to the collection of {@code Table}s.
+     *
+     * @param fromItem the {@code FromItem} to derive the {@code Table} from.
+     * @param storeTable determines whether the {@code FromItem} is added to the collection of {@code Table}s, if the
+     * {@code FromItem} has an {@code Alias} or is a {@code Table} itself.
+     * @return the {@code Table} derived from the given {@code FromItem}.
+     */
     private Table deriveFromItem(FromItem fromItem, boolean storeTable) {
 
         Map<String, Table> tables = tableStack.peek();
@@ -48,14 +57,6 @@ public class TableStructure {
             return table;
         }
 
-        if (fromItem instanceof SubSelect) {
-            return deriveSubTable((SubSelect) fromItem, storeTable);
-        }
-
-        if (fromItem instanceof SubJoin) {
-            return deriveSubJoinTable((SubJoin) fromItem, storeTable);
-        }
-
         if (fromItem instanceof ParenthesisFromItem) {
             Alias alias = fromItem.getAlias();
             Table table = deriveFromItem(((ParenthesisFromItem) fromItem).getFromItem(), storeTable && alias == null);
@@ -66,6 +67,14 @@ public class TableStructure {
             return table;
         }
 
+        if (fromItem instanceof SubJoin) {
+            return deriveSubJoinTable((SubJoin) fromItem, storeTable);
+        }
+
+        if (fromItem instanceof SubSelect) {
+            return deriveSubTable((SubSelect) fromItem, storeTable);
+        }
+
         // TODO: Lateral subselect, values list, table function
 
         throw new UnsupportedOperationException("Encountered the following item in the FROM clause: " + fromItem);
@@ -74,7 +83,6 @@ public class TableStructure {
     private Table deriveSubJoinTable(SubJoin subJoin, boolean storeTable) {
 
         Alias alias = subJoin.getAlias();
-
         Table joinTable = deriveFromItem(subJoin.getLeft(), storeTable && alias == null);
 
         List<Join> joins = subJoin.getJoinList();
@@ -99,23 +107,27 @@ public class TableStructure {
         List<Column> leftColumns = left.getColumns();
         List<Column> rightColumns = right.getColumns();
 
-        ArrayList<Column> joinColumns = new ArrayList<>(leftColumns.size() + rightColumns.size());
+        List<Column> joinColumns = new ArrayList<>(leftColumns.size() + rightColumns.size());
         Table joinTable = new Table(null, joinColumns);
 
-        if (join.isRight()) {
-            List<Column> temp = leftColumns;
-            leftColumns = rightColumns;
-            rightColumns = temp;
+        boolean updateLeft = join.isRight() || join.isFull();
+        boolean updateRight = join.isLeft() || join.isFull();
+
+        if (updateLeft) {
+            for (Column column : leftColumns) {
+                joinColumns.add(new Column(column.getName(), true, false, column.getDataType()));
+            }
+        } else {
+            joinColumns.addAll(leftColumns);
         }
 
-        if (join.isLeft() || join.isRight()) {
+        if (updateRight) {
             for (Column column : rightColumns) {
-                joinColumns.add(new Column(column.getName(), true, column.isKey(), column.getDataType()));
+                joinColumns.add(new Column(column.getName(), true, false, column.getDataType()));
             }
         } else {
             joinColumns.addAll(rightColumns);
         }
-        joinColumns.addAll(leftColumns);
 
         return joinTable;
     }
