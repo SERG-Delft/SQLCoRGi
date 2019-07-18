@@ -29,8 +29,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import static com.github.sergdelft.sqlcorgi.util.cloner.ExpressionCloner.copy;
-
 /**
  * This class allows for mutating a given query such that a set of mutated queries is returned.
  */
@@ -47,6 +45,7 @@ public class JoinRulesGenerator {
     private List<OIREmpty> tablesInOnExpression = new ArrayList<>();
     private FromItem fromItem;
     private PlainSelect plainSelect;
+    private Set<String> simple;
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
@@ -59,18 +58,24 @@ public class JoinRulesGenerator {
         List<Join> joins = plainSelect.getJoins();
         Expression where = plainSelect.getWhere();
         Set<String> result = new TreeSet<>();
+        simple = new HashSet<>();
         if (joins == null || joins.isEmpty()) {
             return new HashSet<>();
+        }
+
+        for (Join j : joins) {
+            if (j.isSimple()) {
+                simple.add(j.getRightItem().toString().toLowerCase());
+            }
         }
 
         fromItem = plainSelect.getFromItem();
         this.plainSelect = plainSelect;
         implicitInnerJoinDeduction(joins, plainSelect.getWhere());
-
         outerIncrementRelations = generateOIRsForEachJoin(plainSelect.getJoins());
 
         if (!outerIncrementRelations.isEmpty()) {
-            Set<JoinWhereItem> items = handleJoins(plainSelect);
+            Set<JoinWhereItem> items = handleJoins(this.plainSelect);
             for (JoinWhereItem j : items) {
                 plainSelect.setJoins(j.getJoins());
                 plainSelect.setWhere(j.getJoinWhere());
@@ -103,7 +108,7 @@ public class JoinRulesGenerator {
         if (where != null) {
             for (Join j : joins) {
                 if (j.isSimple()) {
-                    ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(j, fromItem, joins, order);
+                    ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(j, fromItem, joins, order, simple);
                     expression.accept(deducer);
                     expression = deducer.getExpression();
                 }
@@ -125,25 +130,8 @@ public class JoinRulesGenerator {
         } else {
             return new JoinWhereItem(joins, null);
         }
-
-
     }
 
-//    /**
-//     * Performs the deduction of implicit inner joins for a specific join.
-//     * @param join The join to be checked.
-//     * @param fromItem The from item.
-//     * @param where The expression in the where clause.
-//     * @param joins The list of all joins in the from clause.
-//     */
-//    private void deduce(Join join, FromItem fromItem, Expression where, List<Join> joins) {
-//        Expression whereCopy = copy(where);
-//        ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(join, fromItem, joins);
-//        whereCopy.accept(deducer);
-//        //plainSelect.setWhere(copy(deducer.getExpression()));
-//        plainSelect.setJoins(deducer.getJoins());
-//
-//    }
 
     /**
      * Takes in the list of joins and determines the outer increment relations (OIR) for each of them,
@@ -348,12 +336,13 @@ public class JoinRulesGenerator {
      * @param nullable True if the outer increment relations are nullable, false otherwise.
      * @return The reduced expression.
      */
-    private static Expression nullReduction(Expression expression, JoinType joinType, OuterIncrementRelation oir,
+    private Expression nullReduction(Expression expression, JoinType joinType, OuterIncrementRelation oir,
                                             List<OuterIncrementRelation> oirs, boolean nullable) {
         if (expression != null) {
             Set<String> includeTables = new HashSet<>();
             List<Column> columns = new ArrayList<>();
 
+            includeTables.addAll(simple);
             for (OuterIncrementRelation o : oirs) {
                 includeTables.addAll(o.getLoiRelations());
                 includeTables.addAll(o.getRoiRelations());

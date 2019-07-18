@@ -13,6 +13,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -30,6 +31,7 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
     private List<Join> joins;
     private Expression expression;
     private List<String> linked;
+    private Set<String> simple;
 
 
     /**
@@ -38,11 +40,12 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
      * @param fromItem The from item of the from clause.
      * @param joins The list of joins in the from clause.
      */
-    public ImplicitInnerJoinDeducer(Join join, FromItem fromItem, List<Join> joins, LinkedList<String> linked) {
+    public ImplicitInnerJoinDeducer(Join join, FromItem fromItem, List<Join> joins, LinkedList<String> linked, Set<String> simple) {
         this.rightTable = join.getRightItem().toString().toLowerCase();
         this.fromItem = fromItem;
         this.join = join;
         this.joins = joins;
+        this.simple = simple;
         update = false;
         foundImplicit = false;
 
@@ -132,6 +135,9 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
                 join.setOnExpression(expression);
                 update = true;
 
+                simple.remove(rightTable);
+                simple.remove(fromString);
+
                 foundImplicit = true;
             }
 
@@ -157,6 +163,10 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
                         }
 
                         update = true;
+
+                        simple.remove(rightTable);
+                        simple.remove(leftString);
+
                         foundImplicit = true;
                         break;
                     }
