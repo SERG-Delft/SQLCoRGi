@@ -378,7 +378,7 @@ class NestedJoinsTest {
     }
 
     /**
-     *
+     * This test verifies whether the where expression is reduced correctly.
      */
     @Test
     void testNestedJoinWithImplicitInnerJoinReduceWhereCorrectly() {
