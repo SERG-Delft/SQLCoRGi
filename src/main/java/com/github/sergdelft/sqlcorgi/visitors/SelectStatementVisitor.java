@@ -45,12 +45,13 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
 
     @Override
     public void visit(PlainSelect plainSelect) {
+        plainSelect = handleJoins(plainSelect);
 
         handleWhere(plainSelect);
         handleAggregators(plainSelect);
         handleGroupBy(plainSelect);
         handleHaving(plainSelect);
-        handleJoins(plainSelect);
+
         handleSubqueries(plainSelect);
 
         for (PlainSelect select : this.statements) {
@@ -222,12 +223,18 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * The generated rules are stored in the {@code output} set.
      *
      * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
+     * @return The sanitized plainselect.
      */
-    private void handleJoins(PlainSelect plainSelect) {
+    private PlainSelect handleJoins(PlainSelect plainSelect) {
         JoinRulesGenerator joinRulesGenerator = new JoinRulesGenerator();
-        Set<String> out = joinRulesGenerator.generate((PlainSelect) copy(plainSelect));
-
+        Set<String> out = joinRulesGenerator.generate((PlainSelect) copy(plainSelect), null);
         output.addAll(out);
+
+        if (joinRulesGenerator.getSanitized() != null) {
+            return (PlainSelect) copy(joinRulesGenerator.getSanitized());
+        } else {
+            return plainSelect;
+        }
     }
 
 }
