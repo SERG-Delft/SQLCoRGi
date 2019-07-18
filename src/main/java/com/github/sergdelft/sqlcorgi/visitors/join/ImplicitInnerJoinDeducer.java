@@ -11,7 +11,6 @@ import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -36,12 +35,15 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
 
     /**
      * Constructor.
+     *
      * @param join The join that is evaluated.
      * @param fromItem The from item of the from clause.
      * @param joins The list of joins in the from clause.
+     * @param linked The list of the current order of joins.
+     * @param simple The set of table names of simple joins.
      */
     public ImplicitInnerJoinDeducer(Join join, FromItem fromItem, List<Join> joins,
-                                    LinkedList<String> linked, Set<String> simple) {
+                                    List<String> linked, Set<String> simple) {
         this.rightTable = join.getRightItem().toString().toLowerCase();
         this.fromItem = fromItem;
         this.join = join;
@@ -83,6 +85,7 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
 
     /**
      * Checks whether the given two columns are related to the implicit inner join.
+     *
      * @param left The right column of the expression.
      * @param right The left column in the expression.
      */
@@ -139,6 +142,7 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
 
     /**
      * Updates the and expression if an implicit inner join is present in the expression in the where clause.
+     *
      * @param andExpression The and expression to be updated.
      */
     private void updateAndExpression(AndExpression andExpression) {
@@ -163,6 +167,7 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
     /**
      * When an simple join is to be converted to an inner join, the join is updated and removed from the list
      * of simple joins.
+     *
      * @param join The join to be updated.
      * @param left The left column for the on expression.
      * @param right The right column for the on expression.
@@ -182,6 +187,7 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
 
     /**
      * Update the linked list when the order of joins should be changed.
+     *
      * @param table The table for which the join should be moved.
      * @param index The index of the new position.
      */

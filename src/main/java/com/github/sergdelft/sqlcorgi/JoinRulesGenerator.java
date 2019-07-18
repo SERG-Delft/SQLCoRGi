@@ -90,6 +90,7 @@ public class JoinRulesGenerator {
         plainSelect.setWhere(where);
         return result;
     }
+
     /**
      * Deduces whether an implicit inner join is present in the input. The where and joins list are
      * updated accordingly.
