@@ -223,6 +223,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * The generated rules are stored in the {@code output} set.
      *
      * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
+     * @return The sanitized plainselect.
      */
     private PlainSelect handleJoins(PlainSelect plainSelect) {
         JoinRulesGenerator joinRulesGenerator = new JoinRulesGenerator();
