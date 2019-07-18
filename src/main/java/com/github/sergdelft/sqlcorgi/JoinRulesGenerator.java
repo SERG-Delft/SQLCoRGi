@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
+import static com.github.sergdelft.sqlcorgi.util.cloner.SelectCloner.copy;
+
 /**
  * This class allows for mutating a given query such that a set of mutated queries is returned.
  */
@@ -46,6 +48,7 @@ public class JoinRulesGenerator {
     private FromItem fromItem;
     private PlainSelect plainSelect;
     private Set<String> simple;
+    private PlainSelect sanitized;
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
@@ -56,7 +59,7 @@ public class JoinRulesGenerator {
      */
     public Set<String> generate(PlainSelect plainSelect, Schema schema) {
         List<Join> joins = plainSelect.getJoins();
-        Expression where = plainSelect.getWhere();
+
         Set<String> result = new TreeSet<>();
         simple = new HashSet<>();
         fromItem = plainSelect.getFromItem();
@@ -74,8 +77,10 @@ public class JoinRulesGenerator {
             }
         }
 
+        Expression where = plainSelect.getWhere();
 
-        implicitInnerJoinDeduction(joins, plainSelect.getWhere());
+        implicitInnerJoinDeduction(joins, where);
+        sanitized = (PlainSelect) copy(plainSelect);
 
         outerIncrementRelations = generateOIRsForEachJoin(plainSelect.getJoins());
 
@@ -88,8 +93,6 @@ public class JoinRulesGenerator {
             }
         }
 
-        plainSelect.setJoins(joins);
-        plainSelect.setWhere(where);
         return result;
     }
 
@@ -131,6 +134,7 @@ public class JoinRulesGenerator {
 
             plainSelect.setWhere(expression);
             plainSelect.setJoins(orderedJoins);
+
         }
     }
 
@@ -710,5 +714,9 @@ public class JoinRulesGenerator {
         Stack<Column> stack = new Stack<>();
         stack.addAll(columns);
         return createIsNullExpressions(stack, isNull);
+    }
+
+    public PlainSelect getSanitized() {
+        return sanitized;
     }
 }

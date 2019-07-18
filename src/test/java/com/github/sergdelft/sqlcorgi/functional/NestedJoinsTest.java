@@ -385,16 +385,16 @@ class NestedJoinsTest {
         verify("SELECT * FROM a, b, c, d WHERE a.length > 50 AND d.id = a.id",
 
                 "SELECT * FROM a INNER JOIN d ON d.id = a.id, b, c WHERE (a.length > 50)",
+                "SELECT * FROM a INNER JOIN d ON d.id = a.id, b, c WHERE a.length = 49",
+                "SELECT * FROM a INNER JOIN d ON d.id = a.id, b, c WHERE a.length = 50",
+                "SELECT * FROM a INNER JOIN d ON d.id = a.id, b, c WHERE a.length = 51",
+                "SELECT * FROM a INNER JOIN d ON d.id = a.id, b, c WHERE a.length IS NULL",
                 "SELECT * FROM a LEFT JOIN d ON d.id = a.id, b, c "
                         + "WHERE ((d.id IS NULL) AND (a.id IS NOT NULL)) AND (a.length > 50)",
                 "SELECT * FROM a LEFT JOIN d ON d.id = a.id, b, c "
                         + "WHERE ((d.id IS NULL) AND (a.id IS NULL)) AND (a.length > 50)",
                 "SELECT * FROM a RIGHT JOIN d ON d.id = a.id, b, c WHERE (a.id IS NULL) AND (d.id IS NOT NULL)",
-                "SELECT * FROM a RIGHT JOIN d ON d.id = a.id, b, c WHERE (a.id IS NULL) AND (d.id IS NULL)",
-                "SELECT * FROM a, b, c, d WHERE (a.length = 49) AND (d.id = a.id)",
-                "SELECT * FROM a, b, c, d WHERE (a.length = 50) AND (d.id = a.id)",
-                "SELECT * FROM a, b, c, d WHERE (a.length = 51) AND (d.id = a.id)",
-                "SELECT * FROM a, b, c, d WHERE (a.length IS NULL) AND (d.id = a.id)"
+                "SELECT * FROM a RIGHT JOIN d ON d.id = a.id, b, c WHERE (a.id IS NULL) AND (d.id IS NULL)"
         );
     }
 
