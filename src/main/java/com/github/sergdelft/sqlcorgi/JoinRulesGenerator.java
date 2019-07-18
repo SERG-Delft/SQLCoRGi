@@ -59,19 +59,21 @@ public class JoinRulesGenerator {
         Expression where = plainSelect.getWhere();
         Set<String> result = new TreeSet<>();
         simple = new HashSet<>();
+        fromItem = plainSelect.getFromItem();
+        this.plainSelect = plainSelect;
 
         if (joins == null || joins.isEmpty()) {
             return new HashSet<>();
         }
 
+
         for (Join j : joins) {
             if (j.isSimple()) {
                 simple.add(j.getRightItem().toString().toLowerCase());
+                simple.add(fromItem.toString().toLowerCase());
             }
         }
 
-        fromItem = plainSelect.getFromItem();
-        this.plainSelect = plainSelect;
 
         implicitInnerJoinDeduction(joins, plainSelect.getWhere());
 
@@ -110,8 +112,10 @@ public class JoinRulesGenerator {
             for (Join j : joins) {
                 if (j.isSimple()) {
                     ImplicitInnerJoinDeducer deducer = new ImplicitInnerJoinDeducer(j, fromItem, joins, order, simple);
-                    expression.accept(deducer);
-                    expression = deducer.getExpression();
+                    if (expression != null) {
+                        expression.accept(deducer);
+                        expression = deducer.getExpression();
+                    }
                 }
             }
 

@@ -1,15 +1,28 @@
 package com.github.sergdelft.sqlcorgi.visitors.join;
 
+import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
+import net.sf.jsqlparser.expression.operators.relational.Between;
+import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.InExpression;
+import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
+import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
+import net.sf.jsqlparser.expression.operators.relational.MinorThan;
+import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
-import net.sf.jsqlparser.statement.select.SubSelect;
 
 import java.util.List;
 import java.util.Set;
@@ -55,36 +68,8 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
         this.linked = linked;
     }
 
-    @Override
-    public void visit(AndExpression andExpression) {
-        andExpression.getLeftExpression().accept(this);
-        updateAndExpression(andExpression);
-
-    }
-
-    @Override
-    public void visit(OrExpression orExpression) {
-       // This method must be empty!
-    }
-
-    @Override
-    public void visit(SubSelect subSelect) {
-
-    }
-
-    @Override
-    public void visit(EqualsTo equalsTo) {
-        if (!foundImplicit && equalsTo.getLeftExpression() instanceof Column
-                && equalsTo.getRightExpression() instanceof Column) {
-            Column left = (Column) equalsTo.getLeftExpression();
-            Column right = (Column) equalsTo.getRightExpression();
-
-            checkImplicitJoin(left, right);
-        }
-    }
-
     /**
-     * Checks whether the given two columns are related to the implicit inner join.
+     * Checks whether the given two columns are related to an implicit inner join.
      *
      * @param left The right column of the expression.
      * @param right The left column in the expression.
@@ -92,7 +77,7 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
     private void checkImplicitJoin(Column left, Column right) {
         Table t1;
         Table t2;
-        // TODO: Alias stuff
+
         t1 = left.getTable();
         t2 = right.getTable();
 
@@ -136,8 +121,6 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
                 }
             }
         }
-
-
     }
 
     /**
@@ -146,21 +129,21 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
      * @param andExpression The and expression to be updated.
      */
     private void updateAndExpression(AndExpression andExpression) {
-        if (expression != null) {
-            andExpression.setLeftExpression(expression);
-        }
+        andExpression.getLeftExpression().accept(this);
 
-        if (!update) {
-            andExpression.getRightExpression().accept(this);
-            if (update) {
-                expression = andExpression.getLeftExpression();
-                update = false;
+        if (andExpression.getRightExpression() != null) {
+            if (!update) {
+                andExpression.getRightExpression().accept(this);
+                if (update) {
+                    expression = andExpression.getLeftExpression();
+                    update = false;
+                } else {
+                    expression = andExpression;
+                }
             } else {
-                expression = andExpression;
+                update = false;
+                expression = andExpression.getRightExpression();
             }
-        } else {
-            update = false;
-            expression = andExpression.getRightExpression();
         }
     }
 
@@ -200,7 +183,93 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
         return expression;
     }
 
-    public List<Join> getJoins() {
-        return joins;
+    @Override
+    public void visit(AndExpression andExpression) {
+        updateAndExpression(andExpression);
+    }
+
+    @Override
+    public void visit(EqualsTo equalsTo) {
+        if (!foundImplicit && equalsTo.getLeftExpression() instanceof Column
+                && equalsTo.getRightExpression() instanceof Column) {
+            Column left = (Column) equalsTo.getLeftExpression();
+            Column right = (Column) equalsTo.getRightExpression();
+
+            checkImplicitJoin(left, right);
+        }
+    }
+
+    @Override
+    public void visit(GreaterThan gt) {
+        expression = gt;
+    }
+    @Override
+    public void visit(OrExpression orExpression) {
+        expression = orExpression;
+    }
+
+    @Override
+    public void visit(GreaterThanEquals greaterThanEquals) {
+        expression = greaterThanEquals;
+    }
+
+    @Override
+    public void visit(IsNullExpression isNullExpression) {
+        expression = isNullExpression;
+    }
+
+    @Override
+    public void visit(MinorThan minorThan) {
+        expression = minorThan;
+    }
+
+    @Override
+    public void visit(MinorThanEquals minorThanEquals) {
+        expression = minorThanEquals;
+    }
+
+    @Override
+    public void visit(NotEqualsTo notEqualsTo) {
+        expression = notEqualsTo;
+    }
+
+    @Override
+    public void visit(DoubleValue doubleValue) {
+        expression = doubleValue;
+    }
+
+    @Override
+    public void visit(LongValue longValue) {
+        expression = longValue;
+    }
+
+    @Override
+    public void visit(Column column) {
+        expression = column;
+    }
+
+    @Override
+    public void visit(Between between) {
+        expression = between;
+    }
+
+    @Override
+    public void visit(LikeExpression likeExpression) {
+        expression = likeExpression;
+    }
+
+    @Override
+    public void visit(InExpression inExpression) {
+        expression = inExpression;
+    }
+
+    @Override
+    public void visit(StringValue value) {
+        expression = value;
+    }
+
+    @Override
+    public void visit(Parenthesis parenthesis) {
+        expression = parenthesis;
     }
 }

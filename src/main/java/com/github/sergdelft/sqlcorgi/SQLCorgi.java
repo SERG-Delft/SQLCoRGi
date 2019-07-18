@@ -64,11 +64,10 @@ public final class SQLCorgi {
 
     public static void main(String[] args) {
         List<String> set = new ArrayList<>(generateRules(
-                "SELECT * FROM a, d, b, c WHERE d.id = a.id AND c.id = a.id "
-                        + "AND (a.l = 6 AND a.l > 50 OR b.l = 7)", null));
+                "SELECT * FROM a, b, c, d WHERE a.length > 50 AND d.id = a.id", null));
         Collections.sort(set);
         for (String s : set) {
-            System.out.println(s);
+            System.out.println("\"" + s + "\", ");
         }
 
     }
