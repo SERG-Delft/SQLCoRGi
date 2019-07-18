@@ -40,7 +40,8 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
      * @param fromItem The from item of the from clause.
      * @param joins The list of joins in the from clause.
      */
-    public ImplicitInnerJoinDeducer(Join join, FromItem fromItem, List<Join> joins, LinkedList<String> linked, Set<String> simple) {
+    public ImplicitInnerJoinDeducer(Join join, FromItem fromItem, List<Join> joins,
+                                    LinkedList<String> linked, Set<String> simple) {
         this.rightTable = join.getRightItem().toString().toLowerCase();
         this.fromItem = fromItem;
         this.join = join;
@@ -55,23 +56,8 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
     @Override
     public void visit(AndExpression andExpression) {
         andExpression.getLeftExpression().accept(this);
+        updateAndExpression(andExpression);
 
-        if (expression != null) {
-            andExpression.setLeftExpression(expression);
-        }
-
-        if (!update) {
-            andExpression.getRightExpression().accept(this);
-            if (update) {
-                expression = andExpression.getLeftExpression();
-                update = false;
-            } else {
-                expression = andExpression;
-            }
-        } else {
-            update = false;
-            expression = andExpression.getRightExpression();
-        }
     }
 
     @Override
@@ -86,12 +72,12 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        if (!foundImplicit && equalsTo.getLeftExpression() instanceof Column && equalsTo.getRightExpression() instanceof Column) {
+        if (!foundImplicit && equalsTo.getLeftExpression() instanceof Column
+                && equalsTo.getRightExpression() instanceof Column) {
             Column left = (Column) equalsTo.getLeftExpression();
             Column right = (Column) equalsTo.getRightExpression();
 
             checkImplicitJoin(left, right);
-
         }
     }
 
@@ -121,23 +107,10 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
             String jString;
             String fromString = fromItem.toString().toLowerCase();
             if (leftString.equals(fromString) && !rightTable.equals(fromString)) {
-                join.setInner(true);
-                join.setSimple(false);
+                updateSimpleJoin(join, left, right);
+                updateLinked(rightTable, 1);
 
-                EqualsTo expression = new EqualsTo();
-                expression.setRightExpression(right);
-                expression.setLeftExpression(left);
-
-                linked.remove(rightTable);
-                linked.add(1, rightTable);
-
-
-                join.setOnExpression(expression);
                 update = true;
-
-                simple.remove(rightTable);
-                simple.remove(fromString);
-
                 foundImplicit = true;
             }
 
@@ -145,28 +118,15 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
                 for (Join j : joins) {
                     jString = j.getRightItem().toString().toLowerCase();
                     if (j.isSimple() && (leftString.equals(jString) || rightTable.equals(jString))) {
-                        j.setSimple(false);
-                        j.setInner(true);
-
-                        EqualsTo expression = new EqualsTo();
-                        expression.setRightExpression(right);
-                        expression.setLeftExpression(left);
-
-                        j.setOnExpression(expression);
+                        updateSimpleJoin(j, left, right);
 
                         if (jString.equals(leftString)) {
-                            linked.remove(rightTable);
-                            linked.add(linked.indexOf(leftString), rightTable);
+                            updateLinked(rightTable, linked.indexOf(leftString));
                         } else {
-                            linked.remove(leftString);
-                            linked.add(linked.indexOf(rightTable), leftString);
+                            updateLinked(leftString, linked.indexOf(rightTable));
                         }
 
                         update = true;
-
-                        simple.remove(rightTable);
-                        simple.remove(leftString);
-
                         foundImplicit = true;
                         break;
                     }
@@ -175,6 +135,59 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
         }
 
 
+    }
+
+    /**
+     * Updates the and expression if an implicit inner join is present in the expression in the where clause.
+     * @param andExpression The and expression to be updated.
+     */
+    private void updateAndExpression(AndExpression andExpression) {
+        if (expression != null) {
+            andExpression.setLeftExpression(expression);
+        }
+
+        if (!update) {
+            andExpression.getRightExpression().accept(this);
+            if (update) {
+                expression = andExpression.getLeftExpression();
+                update = false;
+            } else {
+                expression = andExpression;
+            }
+        } else {
+            update = false;
+            expression = andExpression.getRightExpression();
+        }
+    }
+
+    /**
+     * When an simple join is to be converted to an inner join, the join is updated and removed from the list
+     * of simple joins.
+     * @param join The join to be updated.
+     * @param left The left column for the on expression.
+     * @param right The right column for the on expression.
+     */
+    private void updateSimpleJoin(Join join, Column left, Column right) {
+        join.setInner(true);
+        join.setSimple(false);
+
+        EqualsTo expression = new EqualsTo();
+        expression.setRightExpression(right);
+        expression.setLeftExpression(left);
+        join.setOnExpression(expression);
+
+        simple.remove(left.getTable().toString().toLowerCase());
+        simple.remove(right.getTable().toString().toLowerCase());
+    }
+
+    /**
+     * Update the linked list when the order of joins should be changed.
+     * @param table The table for which the join should be moved.
+     * @param index The index of the new position.
+     */
+    private void updateLinked(String table, int index) {
+        linked.remove(table);
+        linked.add(index, table);
     }
 
     public Expression getExpression() {

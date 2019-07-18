@@ -59,6 +59,7 @@ public class JoinRulesGenerator {
         Expression where = plainSelect.getWhere();
         Set<String> result = new TreeSet<>();
         simple = new HashSet<>();
+
         if (joins == null || joins.isEmpty()) {
             return new HashSet<>();
         }
@@ -71,7 +72,9 @@ public class JoinRulesGenerator {
 
         fromItem = plainSelect.getFromItem();
         this.plainSelect = plainSelect;
+
         implicitInnerJoinDeduction(joins, plainSelect.getWhere());
+
         outerIncrementRelations = generateOIRsForEachJoin(plainSelect.getJoins());
 
         if (!outerIncrementRelations.isEmpty()) {
@@ -87,16 +90,13 @@ public class JoinRulesGenerator {
         plainSelect.setWhere(where);
         return result;
     }
-
-    // TODO: remove this later. Might be redundant.
     /**
      * Deduces whether an implicit inner join is present in the input. The where and joins list are
      * updated accordingly.
      * @param joins The list of joins in the from clause.
      * @param where The expression in the where clause.
-     * @return Returns a JoinwWhereItem.
      */
-    private JoinWhereItem implicitInnerJoinDeduction(List<Join> joins, Expression where) {
+    private void implicitInnerJoinDeduction(List<Join> joins, Expression where) {
         Expression expression = where;
 
         LinkedList<String> order = new LinkedList<>();
@@ -126,9 +126,6 @@ public class JoinRulesGenerator {
 
             plainSelect.setWhere(expression);
             plainSelect.setJoins(orderedJoins);
-            return new JoinWhereItem(joins, where);
-        } else {
-            return new JoinWhereItem(joins, null);
         }
     }
 
