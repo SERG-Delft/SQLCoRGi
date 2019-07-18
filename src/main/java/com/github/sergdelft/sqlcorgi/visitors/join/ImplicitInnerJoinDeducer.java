@@ -9,7 +9,6 @@ import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.Between;
-import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
@@ -130,20 +129,17 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
      */
     private void updateAndExpression(AndExpression andExpression) {
         andExpression.getLeftExpression().accept(this);
-
-        if (andExpression.getRightExpression() != null) {
-            if (!update) {
-                andExpression.getRightExpression().accept(this);
-                if (update) {
-                    expression = andExpression.getLeftExpression();
-                    update = false;
-                } else {
-                    expression = andExpression;
-                }
-            } else {
+        if (!update) {
+            andExpression.getRightExpression().accept(this);
+            if (update) {
+                expression = andExpression.getLeftExpression();
                 update = false;
-                expression = andExpression.getRightExpression();
+            } else {
+                expression = andExpression;
             }
+        } else {
+            update = false;
+            expression = andExpression.getRightExpression();
         }
     }
 
@@ -203,6 +199,7 @@ public class ImplicitInnerJoinDeducer extends ExpressionVisitorAdapter {
     public void visit(GreaterThan gt) {
         expression = gt;
     }
+
     @Override
     public void visit(OrExpression orExpression) {
         expression = orExpression;
