@@ -61,14 +61,4 @@ public final class SQLCorgi {
 
         return result;
     }
-
-    public static void main(String[] args) {
-        List<String> set = new ArrayList<>(generateRules(
-                "SELECT * FROM a, b, c, d WHERE a.length > 50 AND d.id = a.id", null));
-        Collections.sort(set);
-        for (String s : set) {
-            System.out.println("\"" + s + "\", ");
-        }
-
-    }
 }
