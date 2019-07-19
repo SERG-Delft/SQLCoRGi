@@ -1,10 +1,9 @@
 package com.github.sergdelft.sqlcorgi.visitors.select;
 
+import com.github.sergdelft.sqlcorgi.query.NumericValue;
 import com.github.sergdelft.sqlcorgi.schema.TypeChecker;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
-import net.sf.jsqlparser.expression.operators.arithmetic.Division;
-import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
 import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -16,7 +15,6 @@ import com.github.sergdelft.sqlcorgi.query.NumericLongValue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -67,26 +65,85 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      * @param comparisonOperator the relational operator to be mutated.
      */
     private void generateRelationalMutations(ComparisonOperator comparisonOperator) {
-        ColumnExtractor columnExtractor = new ColumnExtractor();
+        List<Expression> output = new ArrayList<>();
 
+        ColumnExtractor columnExtractor = new ColumnExtractor();
         comparisonOperator.getLeftExpression().accept(columnExtractor);
         Set<Column> columns = new HashSet<>(columnExtractor.getColumns());
-        columnExtractor.reset();
-        for (Column c : columns) {
 
+        // TODO: check schema for nullable
+        for (Column c : columns) {
+            IsNullExpression isNullExpression = new IsNullExpression();
+            isNullExpression.setLeftExpression(copy(c));
         }
 
         com.github.sergdelft.sqlcorgi.schema.Column.DataType type = checkTypes(comparisonOperator);
 
         switch (type) {
-            case NUM: generateNumericCases(comparisonOperator);
+            case NUM: output.addAll(generateNumericCases(comparisonOperator));
                 break;
-            case STRING: generateStringCases(comparisonOperator);
+            case STRING: output.addAll(generateStringCases(comparisonOperator));
                 break;
-
             default: break;
         }
 
+        this.output.addAll(output);
+
+    }
+
+    private List<Expression> generateNumericCases(BinaryExpression expression) {
+        Expression right = expression.getRightExpression();
+        Expression left = expression.getLeftExpression();
+
+        List<Expression> rightExpressions = new ArrayList<>();
+        List<Expression> output = new ArrayList<>();
+
+        if (right instanceof NumericValue) {
+            for (int i = -1; i <= 1; i++) {
+                NumericValue e = (NumericValue) copy(right);
+                e.add(i);
+                rightExpressions.add(e);
+            }
+        } else {
+            rightExpressions.add(copy(expression));
+            rightExpressions.add(generateAddOffByOne(right));
+            rightExpressions.add(generateSubOffByOne(right));
+        }
+
+        for (Expression e : rightExpressions) {
+            EqualsTo eq = new EqualsTo();
+            eq.setLeftExpression(left);
+            eq.setRightExpression(e);
+            output.add(eq);
+        }
+
+        return output;
+    }
+
+    private Expression generateAddOffByOne(Expression expression) {
+        Addition addition = new Addition();
+        addition.setLeftExpression(copy(expression));
+        addition.setRightExpression(new NumericDoubleValue("1"));
+
+        return addition;
+    }
+
+    private Expression generateSubOffByOne(Expression expression) {
+        Subtraction subtraction = new Subtraction();
+        subtraction.setLeftExpression(copy(expression));
+        subtraction.setRightExpression(new NumericDoubleValue("1"));
+
+        return subtraction;
+    }
+
+
+    // TODO: Check if not expression works well.
+    private List<Expression> generateStringCases(BinaryExpression expression) {
+        List<Expression> output = new ArrayList<>();
+        output.add(new NotExpression(copy(expression)));
+        output.add(copy(expression));
+
+        return output;
     }
 
 
