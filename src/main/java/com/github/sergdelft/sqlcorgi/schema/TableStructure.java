@@ -3,6 +3,7 @@ package com.github.sergdelft.sqlcorgi.schema;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.statement.select.*;
 
+import javax.xml.crypto.Data;
 import java.util.*;
 
 // TODO: Finish this class and write documentation
@@ -168,5 +169,16 @@ public class TableStructure {
 
     public void setSchema(Schema schema) {
         this.schema = schema;
+    }
+
+
+    /*
+
+
+    TODO: Update this dummy method.
+
+     */
+    public Column.DataType getDataType(net.sf.jsqlparser.schema.Column column) {
+        return Column.DataType.NUM;
     }
 }

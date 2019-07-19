@@ -1,5 +1,6 @@
 package com.github.sergdelft.sqlcorgi.schema;
 
+import com.github.sergdelft.sqlcorgi.exceptions.TypeCheckerException;
 import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.LongValue;
