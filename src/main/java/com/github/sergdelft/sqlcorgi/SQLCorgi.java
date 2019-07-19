@@ -59,4 +59,9 @@ public final class SQLCorgi {
 
         return result;
     }
+
+    public static void main(String[] args) {
+
+        System.out.println(generateRules("SELECT * FROM a WHERE a.length = 5 + a.b", null));
+    }
 }

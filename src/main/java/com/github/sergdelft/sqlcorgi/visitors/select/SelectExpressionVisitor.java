@@ -1,6 +1,11 @@
 package com.github.sergdelft.sqlcorgi.visitors.select;
 
+import com.github.sergdelft.sqlcorgi.schema.TypeChecker;
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
+import net.sf.jsqlparser.expression.operators.arithmetic.Division;
+import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
+import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
@@ -10,7 +15,10 @@ import com.github.sergdelft.sqlcorgi.query.NumericDoubleValue;
 import com.github.sergdelft.sqlcorgi.query.NumericLongValue;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static com.github.sergdelft.sqlcorgi.util.Expressions.createEqualsTo;
 import static com.github.sergdelft.sqlcorgi.util.cloner.ExpressionCloner.copy;
@@ -19,7 +27,6 @@ import static com.github.sergdelft.sqlcorgi.util.cloner.ExpressionCloner.copy;
  * A visitor for select expressions, i.e. {@code WHERE} and {@code HAVING} clauses in {@code SELECT} statements.
  */
 public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
-
     private List<Expression> output;
 
     /**
@@ -38,20 +45,56 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         this.output = output;
     }
 
+//    /**
+//     * Generates mutations for relational operators.
+//     *
+//     * @param comparisonOperator the relational operator to be mutated.
+//     */
+//    private void generateRelationalMutations(ComparisonOperator comparisonOperator) {
+//
+//        ArrayList<Expression> cases = new ArrayList<>();
+//        Column column = (Column) comparisonOperator.getLeftExpression();
+//        SelectValueVisitor valueVisitor = new SelectValueVisitor(column, cases);
+//
+//        comparisonOperator.getRightExpression().accept(valueVisitor);
+//
+//        output.addAll(cases);
+//    }
+
     /**
      * Generates mutations for relational operators.
      *
      * @param comparisonOperator the relational operator to be mutated.
      */
     private void generateRelationalMutations(ComparisonOperator comparisonOperator) {
+        ColumnExtractor columnExtractor = new ColumnExtractor();
 
-        ArrayList<Expression> cases = new ArrayList<>();
-        Column column = (Column) comparisonOperator.getLeftExpression();
-        SelectValueVisitor valueVisitor = new SelectValueVisitor(column, cases);
+        comparisonOperator.getLeftExpression().accept(columnExtractor);
+        Set<Column> columns = new HashSet<>(columnExtractor.getColumns());
+        columnExtractor.reset();
+        for (Column c : columns) {
 
-        comparisonOperator.getRightExpression().accept(valueVisitor);
+        }
 
-        output.addAll(cases);
+        com.github.sergdelft.sqlcorgi.schema.Column.DataType type = checkTypes(comparisonOperator);
+
+        switch (type) {
+            case NUM: generateNumericCases(comparisonOperator);
+                break;
+            case STRING: generateStringCases(comparisonOperator);
+                break;
+
+            default: break;
+        }
+
+    }
+
+
+    private com.github.sergdelft.sqlcorgi.schema.Column.DataType checkTypes(Expression expression) {
+        TypeChecker typeChecker = new TypeChecker(null);
+        expression.accept(typeChecker);
+
+        return typeChecker.getType();
     }
 
     /**
@@ -120,7 +163,6 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
-
         output.add(copy(isNullExpression));
 
         IsNullExpression isNullExpressionToggled = (IsNullExpression) copy(isNullExpression);
