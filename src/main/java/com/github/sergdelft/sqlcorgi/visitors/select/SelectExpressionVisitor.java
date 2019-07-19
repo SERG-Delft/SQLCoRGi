@@ -1,6 +1,7 @@
 package com.github.sergdelft.sqlcorgi.visitors.select;
 
 import com.github.sergdelft.sqlcorgi.query.NumericValue;
+import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.schema.TypeChecker;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
@@ -148,7 +149,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
 
     private com.github.sergdelft.sqlcorgi.schema.Column.DataType checkTypes(Expression expression) {
-        TypeChecker typeChecker = new TypeChecker(null);
+        TypeChecker typeChecker = new TypeChecker(new TableStructure());
         expression.accept(typeChecker);
 
         return typeChecker.getType();
