@@ -385,9 +385,9 @@ class ConditionTest {
                 "SELECT * FROM t WHERE ((a > 3) AND (a = 19)) AND NOT (a = -10)",
                 "SELECT * FROM t WHERE ((a > 3) AND (a = 20)) AND NOT (a = -10)",
                 "SELECT * FROM t WHERE ((a > 3) AND (a = 21)) AND NOT (a = -10)",
-                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = 9)",
-                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = 10)",
-                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = 11)");
+                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = -9)",
+                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = -10)",
+                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = -11)");
     }
 
     /**
