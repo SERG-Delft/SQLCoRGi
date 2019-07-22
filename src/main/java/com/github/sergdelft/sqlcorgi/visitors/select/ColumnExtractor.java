@@ -8,7 +8,9 @@ import java.util.Set;
 
 import static com.github.sergdelft.sqlcorgi.util.cloner.ExpressionCloner.copy;
 
-
+/**
+ * This class is used to extract all columns used in a given expression.
+ */
 public class ColumnExtractor extends ExpressionVisitorAdapter {
     private Set<Column> columns;
 

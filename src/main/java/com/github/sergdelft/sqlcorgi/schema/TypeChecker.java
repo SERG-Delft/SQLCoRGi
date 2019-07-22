@@ -6,6 +6,9 @@ import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;
 
+/**
+ * This class is used to determine whether the types of the attributes and elements of an expression are consistent.
+ */
 public class TypeChecker extends ExpressionVisitorAdapter {
 
     private Column.DataType type;
@@ -47,24 +50,4 @@ public class TypeChecker extends ExpressionVisitorAdapter {
     public void visit(StringValue stringValue) {
         setType(Column.DataType.STRING);
     }
-
-//    @Override
-//    public void visit(Addition expr) {
-//        type = Column.DataType.NUM;
-//    }
-//
-//    @Override
-//    public void visit(Division expr) {
-//        this.visitBinaryExpression(expr);
-//    }
-//
-//    @Override
-//    public void visit(Multiplication expr) {
-//        this.visitBinaryExpression(expr);
-//    }
-//
-//    @Override
-//    public void visit(Subtraction expr) {
-//        this.visitBinaryExpression(expr);
-//    }
 }

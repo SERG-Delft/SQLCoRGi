@@ -44,22 +44,6 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         this.output = output;
     }
 
-//    /**
-//     * Generates mutations for relational operators.
-//     *
-//     * @param comparisonOperator the relational operator to be mutated.
-//     */
-//    private void generateRelationalMutations(ComparisonOperator comparisonOperator) {
-//
-//        ArrayList<Expression> cases = new ArrayList<>();
-//        Column column = (Column) comparisonOperator.getLeftExpression();
-//        SelectValueVisitor valueVisitor = new SelectValueVisitor(column, cases);
-//
-//        comparisonOperator.getRightExpression().accept(valueVisitor);
-//
-//        output.addAll(cases);
-//    }
-
     /**
      * Generates mutations for relational operators.
      *
@@ -68,17 +52,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
     private void generateRelationalMutations(ComparisonOperator comparisonOperator) {
         Set<Expression> output = new HashSet<>();
 
-        ColumnExtractor columnExtractor = new ColumnExtractor();
-        comparisonOperator.accept(columnExtractor);
-
-        Set<Column> columns = new HashSet<>(columnExtractor.getColumns());
-
-        // TODO: check schema for nullable
-        for (Column c : columns) {
-            IsNullExpression isNullExpression = new IsNullExpression();
-            isNullExpression.setLeftExpression(copy(c));
-            output.add(isNullExpression);
-        }
+        output.addAll(generateIsNullCases(comparisonOperator));
 
         com.github.sergdelft.sqlcorgi.schema.Column.DataType type = checkTypes(comparisonOperator);
 
@@ -93,6 +67,12 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         this.output.addAll(output);
     }
 
+    /**
+     * Generates the numeric cases for the given expression. The off by one rules and the input rule are added to the
+     * output as well as a null case, if applicable.
+     * @param binaryExpression The expression for which the cases have to be generated.
+     * @return The list of rules for the given expression.
+     */
     private List<Expression> generateNumericCases(BinaryExpression binaryExpression) {
         Expression right = binaryExpression.getRightExpression();
         Expression left = binaryExpression.getLeftExpression();
@@ -133,6 +113,11 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
     }
 
 
+    /**
+     * Converts the given expression to a numeric value if possible.
+     * @param expression The expression to be converted.
+     * @return The numeric value if the conversion could be done, null otherwise.
+     */
     private NumericValue convertToNumericValue(Expression expression) {
         if (expression instanceof LongValue) {
             return new NumericLongValue(Long.toString(((LongValue) expression).getValue()));
@@ -141,9 +126,16 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         }
 
         return null;
-
     }
 
+    /**
+     * Generates the off by one case for the given expression, where one is added.
+     *
+     * @param expression The expression from which one is to be added.
+     * @return The addition expression.
+     */
+    // This warning is suppressed, as "1" should indeed occur multiple times in the class.
+    @SuppressWarnings("MultipleStringLiterals")
     private Expression generateAddOffByOne(Expression expression) {
         Addition addition = new Addition();
         addition.setLeftExpression(copy(expression));
@@ -152,6 +144,12 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         return addition;
     }
 
+    /**
+     * Generates the off by one case for the given expression, where one is subtracted.
+     *
+     * @param expression The expression from which one is to be subtracted.
+     * @return The subtraction expression.
+     */
     private Expression generateSubOffByOne(Expression expression) {
         Subtraction subtraction = new Subtraction();
         subtraction.setLeftExpression(copy(expression));
@@ -160,8 +158,12 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         return subtraction;
     }
 
-
-    // TODO: Check if not expression works well.
+    /**
+     * Generates the rules in case strings are used.
+     *
+     * @param expression The expression for which the string cases have to be generated.
+     * @return A list of rules for the expression.
+     */
     private List<Expression> generateStringCases(BinaryExpression expression) {
         List<Expression> output = new ArrayList<>();
         output.add(new NotExpression(copy(expression)));
@@ -170,7 +172,36 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         return output;
     }
 
+    /**
+     * Generates the is null cases for all columns used in the expression.
+     *
+     * @param expression The expression for which the rules have to be generated.
+     * @return A list of rules with is null cases for the columns.
+     */
+    private List<Expression> generateIsNullCases(Expression expression) {
+        List<Expression> output = new ArrayList<>();
+        ColumnExtractor columnExtractor = new ColumnExtractor();
+        expression.accept(columnExtractor);
 
+        Set<Column> columns = new HashSet<>(columnExtractor.getColumns());
+
+        // TODO: check schema for nullable
+        for (Column c : columns) {
+            IsNullExpression isNullExpression = new IsNullExpression();
+            isNullExpression.setLeftExpression(copy(c));
+            output.add(isNullExpression);
+        }
+
+        return output;
+    }
+
+    /**
+     * Returns the data type of the expression, if all the attributes' types are the same.
+     * The checker throws an exception otherwise.
+     *
+     * @param expression The expression to check.
+     * @return The type of the expression.
+     */
     private com.github.sergdelft.sqlcorgi.schema.Column.DataType checkTypes(Expression expression) {
         TypeChecker typeChecker = new TypeChecker(new TableStructure());
         expression.accept(typeChecker);
