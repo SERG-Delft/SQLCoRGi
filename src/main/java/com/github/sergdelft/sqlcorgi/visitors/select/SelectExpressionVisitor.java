@@ -66,10 +66,11 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      * @param comparisonOperator the relational operator to be mutated.
      */
     private void generateRelationalMutations(ComparisonOperator comparisonOperator) {
-        List<Expression> output = new ArrayList<>();
+        Set<Expression> output = new HashSet<>();
 
         ColumnExtractor columnExtractor = new ColumnExtractor();
-        comparisonOperator.getLeftExpression().accept(columnExtractor);
+        comparisonOperator.accept(columnExtractor);
+
         Set<Column> columns = new HashSet<>(columnExtractor.getColumns());
 
         // TODO: check schema for nullable
@@ -90,46 +91,63 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         }
 
         this.output.addAll(output);
-
     }
 
-    private List<Expression> generateNumericCases(BinaryExpression expression) {
-        Expression right = expression.getRightExpression();
-        Expression left = expression.getLeftExpression();
+    private List<Expression> generateNumericCases(BinaryExpression binaryExpression) {
+        Expression right = binaryExpression.getRightExpression();
+        Expression left = binaryExpression.getLeftExpression();
 
         List<Expression> rightExpressions = new ArrayList<>();
         List<Expression> output = new ArrayList<>();
 
-        if (right instanceof DoubleValue || right instanceof LongValue) {
-            NumericValue numValue;
-            if (right instanceof DoubleValue) {
-                numValue = new NumericDoubleValue(Double.toString(((DoubleValue) right).getValue()));
-            } else {
-                numValue = new NumericLongValue(Long.toString(((LongValue) right).getValue()));
-            }
+        Expression e = right;
+        boolean signed = false;
+        if (right instanceof SignedExpression) {
+            signed = true;
+            e = ((SignedExpression) right).getExpression();
+        }
+
+        NumericValue numValue = convertToNumericValue(e);
+        if (numValue != null) {
             for (int i = -1; i <= 1; i++) {
-                rightExpressions.add(numValue.add(i));
+                if (!signed) {
+                    rightExpressions.add(numValue.add(i));
+                } else {
+                    rightExpressions.add(new SignedExpression('-', numValue.add(i)));
+                }
             }
         } else {
-            rightExpressions.add(copy(expression));
+            rightExpressions.add(copy(right));
             rightExpressions.add(generateAddOffByOne(right));
             rightExpressions.add(generateSubOffByOne(right));
         }
 
-        for (Expression e : rightExpressions) {
+        for (Expression expression : rightExpressions) {
             EqualsTo eq = new EqualsTo();
             eq.setLeftExpression(left);
-            eq.setRightExpression(e);
+            eq.setRightExpression(expression);
             output.add(eq);
         }
 
         return output;
     }
 
+
+    private NumericValue convertToNumericValue(Expression expression) {
+        if (expression instanceof LongValue) {
+            return new NumericLongValue(Long.toString(((LongValue) expression).getValue()));
+        } else if (expression instanceof DoubleValue) {
+            return new NumericDoubleValue(Double.toString(((DoubleValue) expression).getValue()));
+        }
+
+        return null;
+
+    }
+
     private Expression generateAddOffByOne(Expression expression) {
         Addition addition = new Addition();
         addition.setLeftExpression(copy(expression));
-        addition.setRightExpression(new NumericDoubleValue("1"));
+        addition.setRightExpression(new NumericLongValue("1"));
 
         return addition;
     }
@@ -137,7 +155,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
     private Expression generateSubOffByOne(Expression expression) {
         Subtraction subtraction = new Subtraction();
         subtraction.setLeftExpression(copy(expression));
-        subtraction.setRightExpression(new NumericDoubleValue("1"));
+        subtraction.setRightExpression(new NumericLongValue("1"));
 
         return subtraction;
     }

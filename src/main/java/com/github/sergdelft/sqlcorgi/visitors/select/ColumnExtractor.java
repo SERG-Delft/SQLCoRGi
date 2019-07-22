@@ -20,10 +20,6 @@ public class ColumnExtractor extends ExpressionVisitorAdapter {
         return columns;
     }
 
-    public void reset() {
-        columns.clear();
-    }
-
     @Override
     public void visit(Column column) {
         columns.add((Column) copy(column));
