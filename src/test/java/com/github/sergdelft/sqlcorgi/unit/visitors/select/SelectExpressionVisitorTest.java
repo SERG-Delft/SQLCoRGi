@@ -82,7 +82,7 @@ class SelectExpressionVisitorTest {
 
         selectExpressionVisitor.visit(equalsTo);
 
-        AssertUtils.compareFieldByField(output, minusOne, equalsTo, plusOne, isNullExpression);
+        AssertUtils.compareFieldByField(output, isNullExpression, minusOne, equalsTo, plusOne);
     }
 
     /**

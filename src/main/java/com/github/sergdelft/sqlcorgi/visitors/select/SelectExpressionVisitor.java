@@ -76,6 +76,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         for (Column c : columns) {
             IsNullExpression isNullExpression = new IsNullExpression();
             isNullExpression.setLeftExpression(copy(c));
+            output.add(isNullExpression);
         }
 
         com.github.sergdelft.sqlcorgi.schema.Column.DataType type = checkTypes(comparisonOperator);
@@ -99,11 +100,15 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         List<Expression> rightExpressions = new ArrayList<>();
         List<Expression> output = new ArrayList<>();
 
-        if (right instanceof NumericValue) {
+        if (right instanceof DoubleValue || right instanceof LongValue) {
+            NumericValue numValue;
+            if (right instanceof DoubleValue) {
+                numValue = new NumericDoubleValue(Double.toString(((DoubleValue) right).getValue()));
+            } else {
+                numValue = new NumericLongValue(Long.toString(((LongValue) right).getValue()));
+            }
             for (int i = -1; i <= 1; i++) {
-                NumericValue e = (NumericValue) copy(right);
-                e.add(i);
-                rightExpressions.add(e);
+                rightExpressions.add(numValue.add(i));
             }
         } else {
             rightExpressions.add(copy(expression));
