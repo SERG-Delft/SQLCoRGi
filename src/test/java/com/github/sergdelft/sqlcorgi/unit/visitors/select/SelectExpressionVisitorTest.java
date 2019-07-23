@@ -7,7 +7,6 @@ import com.github.sergdelft.sqlcorgi.query.NumericValue;
 import com.github.sergdelft.sqlcorgi.visitors.select.SelectExpressionVisitor;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.relational.*;
-import net.sf.jsqlparser.schema.Column;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

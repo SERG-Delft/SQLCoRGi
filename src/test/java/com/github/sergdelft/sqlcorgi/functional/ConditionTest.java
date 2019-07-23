@@ -23,7 +23,8 @@ class ConditionTest {
                 "SELECT * FROM Movies WHERE year = 2004",
                 "SELECT * FROM Movies WHERE year = 2003",
                 "SELECT * FROM Movies WHERE year = 2002",
-                "SELECT * FROM Movies WHERE year IS NULL");
+                "SELECT * FROM Movies WHERE year IS NULL"
+        );
     }
 
     /**
@@ -36,7 +37,8 @@ class ConditionTest {
                 "SELECT * FROM table WHERE a = 99",
                 "SELECT * FROM table WHERE a = 100",
                 "SELECT * FROM table WHERE a = 101",
-                "SELECT * FROM table WHERE a IS NULL");
+                "SELECT * FROM table WHERE a IS NULL"
+        );
     }
 
     /**
@@ -49,7 +51,8 @@ class ConditionTest {
                 "SELECT * FROM table WHERE a = 99",
                 "SELECT * FROM table WHERE a = 100",
                 "SELECT * FROM table WHERE a = 101",
-                "SELECT * FROM table WHERE a IS NULL");
+                "SELECT * FROM table WHERE a IS NULL"
+        );
     }
 
     /**
@@ -62,7 +65,8 @@ class ConditionTest {
                 "SELECT * FROM Table WHERE x = 27",
                 "SELECT * FROM Table WHERE x = 28",
                 "SELECT * FROM Table WHERE x = 29",
-                "SELECT * FROM Table WHERE x IS NULL");
+                "SELECT * FROM Table WHERE x IS NULL"
+        );
     }
 
     /**
@@ -75,7 +79,8 @@ class ConditionTest {
                 "SELECT * FROM Table WHERE x = 36",
                 "SELECT * FROM Table WHERE x = 37",
                 "SELECT * FROM Table WHERE x = 38",
-                "SELECT * FROM Table WHERE x IS NULL");
+                "SELECT * FROM Table WHERE x IS NULL"
+        );
     }
 
     /**
@@ -88,7 +93,8 @@ class ConditionTest {
                 "SELECT * FROM table WHERE a = -1.0",
                 "SELECT * FROM table WHERE a = 0.0",
                 "SELECT * FROM table WHERE a = 1.0",
-                "SELECT * FROM table WHERE a IS NULL");
+                "SELECT * FROM table WHERE a IS NULL"
+        );
     }
 
     /**
@@ -100,7 +106,8 @@ class ConditionTest {
 
                 "SELECT * FROM table WHERE a = 'qwerty'",
                 "SELECT * FROM table WHERE a <> 'qwerty'",
-                "SELECT * FROM table WHERE a IS NULL");
+                "SELECT * FROM table WHERE a IS NULL"
+        );
     }
 
     /**
@@ -111,7 +118,8 @@ class ConditionTest {
         verify("SELECT * FROM table WHERE a IS NULL",
 
                 "SELECT * FROM table WHERE a IS NOT NULL",
-                "SELECT * FROM table WHERE a IS NULL");
+                "SELECT * FROM table WHERE a IS NULL"
+        );
     }
 
     /**
@@ -122,7 +130,8 @@ class ConditionTest {
         verify("SELECT * FROM table WHERE a IS NOT NULL",
 
                 "SELECT * FROM table WHERE a IS NULL",
-                "SELECT * FROM table WHERE a IS NOT NULL");
+                "SELECT * FROM table WHERE a IS NOT NULL"
+        );
     }
 
     /**
@@ -138,7 +147,8 @@ class ConditionTest {
                 "SELECT * FROM Movies WHERE (year > 1950) AND (year = 1999)",
                 "SELECT * FROM Movies WHERE (year > 1950) AND (year = 2000)",
                 "SELECT * FROM Movies WHERE (year > 1950) AND (year = 2001)",
-                "SELECT * FROM Movies WHERE (year IS NULL)");
+                "SELECT * FROM Movies WHERE (year IS NULL)"
+        );
     }
 
     /**
@@ -154,7 +164,8 @@ class ConditionTest {
                 "SELECT * FROM Movies WHERE NOT (year < 2004) AND (year = 2009)",
                 "SELECT * FROM Movies WHERE NOT (year < 2004) AND (year = 2010)",
                 "SELECT * FROM Movies WHERE NOT (year < 2004) AND (year = 2011)",
-                "SELECT * FROM Movies WHERE (year IS NULL)");
+                "SELECT * FROM Movies WHERE (year IS NULL)"
+        );
     }
 
     /**
@@ -170,7 +181,8 @@ class ConditionTest {
                 "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2018)",
                 "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2019)",
                 "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2020)",
-                "SELECT * FROM Movies WHERE (year IS NULL)");
+                "SELECT * FROM Movies WHERE (year IS NULL)"
+        );
     }
 
     /**
@@ -190,7 +202,8 @@ class ConditionTest {
                 "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 IS NULL) AND (a3 = 33))",
                 "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 22) AND (a3 = 32))",
                 "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 22) AND (a3 = 34))",
-                "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 22) AND (a3 IS NULL))");
+                "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 22) AND (a3 IS NULL))"
+        );
     }
 
     /**
@@ -211,7 +224,8 @@ class ConditionTest {
                 "SELECT * FROM Movies WHERE ((year = 2003) AND (length_minutes > 100)) AND NOT (year > 2005)",
                 "SELECT * FROM Movies WHERE ((year = 2004) AND (length_minutes > 100)) AND NOT (year > 2005)",
                 "SELECT * FROM Movies WHERE ((year = 2005) AND (length_minutes > 100)) AND NOT (year > 2005)",
-                "SELECT * FROM Movies WHERE ((year IS NULL) AND (length_minutes > 100))");
+                "SELECT * FROM Movies WHERE ((year IS NULL) AND (length_minutes > 100))"
+        );
     }
 
     /**
@@ -224,7 +238,8 @@ class ConditionTest {
                 "SELECT * FROM Movies AS M WHERE M.id = 9",
                 "SELECT * FROM Movies AS M WHERE M.id = 8",
                 "SELECT * FROM Movies AS M WHERE M.id = 7",
-                "SELECT * FROM Movies AS M WHERE M.id IS NULL");
+                "SELECT * FROM Movies AS M WHERE M.id IS NULL"
+        );
     }
 
     /**
@@ -236,7 +251,8 @@ class ConditionTest {
 
                 "SELECT * FROM Table1 WHERE x IN (30, 38)",
                 "SELECT * FROM Table1 WHERE x NOT IN (30, 38)",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                "SELECT * FROM Table1 WHERE x IS NULL"
+        );
     }
 
     /**
@@ -248,7 +264,8 @@ class ConditionTest {
 
                 "SELECT * FROM Table1 WHERE x IN (30, 38)",
                 "SELECT * FROM Table1 WHERE x NOT IN (30, 38)",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                "SELECT * FROM Table1 WHERE x IS NULL"
+        );
     }
 
     /**
@@ -262,7 +279,8 @@ class ConditionTest {
                 // JSQLParser generates "NOT name LIKE" instead of "name NOT LIKE", they are however identical in
                 // behavior, therefore we stick with the behavior used in JSQLParser
                 "SELECT * FROM Table1 WHERE name NOT LIKE 'John%'",
-                "SELECT * FROM Table1 WHERE name IS NULL");
+                "SELECT * FROM Table1 WHERE name IS NULL"
+        );
     }
 
     /**
@@ -276,7 +294,8 @@ class ConditionTest {
                 // JSQLParser generates "NOT name LIKE" instead of "name NOT LIKE", they are however identical in
                 // behavior, therefore we stick with the behavior used in JSQLParser
                 "SELECT * FROM Table1 WHERE name NOT ILIKE 'john%'",
-                "SELECT * FROM Table1 WHERE name IS NULL");
+                "SELECT * FROM Table1 WHERE name IS NULL"
+        );
     }
 
     /**
@@ -290,7 +309,8 @@ class ConditionTest {
                 // JSQLParser generates "NOT name LIKE" instead of "name NOT LIKE", they are however identical in
                 // behavior, therefore we stick with the behavior used in JSQLParser
                 "SELECT * FROM Table1 WHERE name NOT LIKE 'John%'",
-                "SELECT * FROM Table1 WHERE name IS NULL");
+                "SELECT * FROM Table1 WHERE name IS NULL"
+        );
     }
 
     /**
@@ -306,7 +326,8 @@ class ConditionTest {
                 "SELECT * FROM Table1 WHERE x = 38",
                 "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
                 "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                "SELECT * FROM Table1 WHERE x IS NULL"
+        );
     }
 
     /**
@@ -322,7 +343,8 @@ class ConditionTest {
                 "SELECT * FROM Table1 WHERE x = 38",
                 "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
                 "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                "SELECT * FROM Table1 WHERE x IS NULL"
+        );
     }
 
     /**
@@ -338,7 +360,8 @@ class ConditionTest {
                 "SELECT * FROM Table1 WHERE x = 14.3",
                 "SELECT * FROM Table1 WHERE x = 32.2",
                 "SELECT * FROM Table1 WHERE x = 33.2",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                "SELECT * FROM Table1 WHERE x IS NULL"
+        );
     }
 
     /**
@@ -354,7 +377,8 @@ class ConditionTest {
                 "SELECT * FROM Table1 WHERE x = 33.2",
                 "SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
                 "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                "SELECT * FROM Table1 WHERE x IS NULL"
+        );
     }
 
     /**
@@ -368,7 +392,8 @@ class ConditionTest {
                 "SELECT * FROM Table1 WHERE x BETWEEN 'hello' AND 'world'",
                 "SELECT * FROM Table1 WHERE x = 'hello'",
                 "SELECT * FROM Table1 WHERE x = 'world'",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                "SELECT * FROM Table1 WHERE x IS NULL"
+        );
     }
 
     /**
@@ -387,7 +412,8 @@ class ConditionTest {
                 "SELECT * FROM t WHERE ((a > 3) AND (a = 21)) AND NOT (a = -10)",
                 "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = -9)",
                 "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = -10)",
-                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = -11)");
+                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = -11)"
+        );
     }
 
     /**
@@ -407,6 +433,54 @@ class ConditionTest {
                 "SELECT * FROM t WHERE ((a > 3) AND (b = 19)) AND (a <> 15)",
                 "SELECT * FROM t WHERE ((a > 3) AND (b = 20)) AND (a <> 15)",
                 "SELECT * FROM t WHERE ((a > 3) AND (b = 21)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a > 3) AND (b IS NULL)) AND (a <> 15)");
+                "SELECT * FROM t WHERE ((a > 3) AND (b IS NULL)) AND (a <> 15)"
+        );
+    }
+
+    /**
+     * This test verifies whether the binary expression is converted to an off by one addition and subtraction.
+     */
+    @Test
+    void testNumericBinaryExpressionToAdditionAndSubtraction() {
+        verify("SELECT * FROM t1 WHERE t1.c1 = t1.c2 - 10",
+
+                "SELECT * FROM t1 WHERE t1.c1 = t1.c2 - 10",
+                "SELECT * FROM t1 WHERE t1.c1 = t1.c2 - 10 + 1",
+                "SELECT * FROM t1 WHERE t1.c1 = t1.c2 - 10 - 1",
+                "SELECT * FROM t1 WHERE t1.c2 IS NULL",
+                "SELECT * FROM t1 WHERE t1.c1 IS NULL"
+        );
+    }
+
+    /**
+     * This test verifies whether the binary expression is converted to an off by addition and subtraction on the
+     * right side only.
+     */
+    @Test
+    void testNumericBinaryExpressionRightSideConvertedOnly() {
+        verify("SELECT * FROM t1 WHERE t1.c1 + 7 > t1.c2 - 8",
+
+                "SELECT * FROM t1 WHERE t1.c1 + 7 = t1.c2 - 8",
+                "SELECT * FROM t1 WHERE t1.c1 + 7 = t1.c2 - 8 + 1",
+                "SELECT * FROM t1 WHERE t1.c1 + 7 = t1.c2 - 8 - 1",
+                "SELECT * FROM t1 WHERE t1.c2 IS NULL",
+                "SELECT * FROM t1 WHERE t1.c1 IS NULL"
+        );
+    }
+
+    /**
+     * This test verifies whether the signed expression is converted correctly such that one is added and subtracted
+     * in the generated rules. The columns in the signed expression must also be checked for null.
+     */
+    @Test
+    void testSignedBinaryExpressionToAdditionAndSubtraction() {
+        verify("SELECT * FROM t1 WHERE t1.c1 = -(5 + t1.c2)",
+
+                "SELECT * FROM t1 WHERE t1.c1 = -(5 + t1.c2) + 1",
+                "SELECT * FROM t1 WHERE t1.c1 = -(5 + t1.c2) - 1",
+                "SELECT * FROM t1 WHERE t1.c1 = -(5 + t1.c2)",
+                "SELECT * FROM t1 WHERE t1.c2 IS NULL",
+                "SELECT * FROM t1 WHERE t1.c1 IS NULL"
+        );
     }
 }
