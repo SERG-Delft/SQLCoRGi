@@ -29,7 +29,6 @@ import java.util.TreeSet;
  * This class allows traversing and modifying an expression such that none of the provided columns,
  * or columns related to the provided tables, are in the expression anymore. The expression remains valid.
  */
-// TODO: Pass schema. Use to check if
 public class ExpressionTraverserVisitor extends ExpressionVisitorAdapter {
     private List<Column> nullColumns;
     private List<Column> onColumns;

@@ -27,6 +27,7 @@ import static com.github.sergdelft.sqlcorgi.util.cloner.ExpressionCloner.copy;
  */
 public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
     private List<Expression> output;
+    private TableStructure tableStructure;
 
     /**
      * Creates a new visitor which can be used to generate mutations of select operators. Any rules that are
@@ -35,6 +36,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
      */
     public SelectExpressionVisitor(List<Expression> output) {
+        tableStructure = new TableStructure();
         if (output == null || !output.isEmpty()) {
             throw new IllegalArgumentException(
                 "A SelectExpressionVisitor requires an empty, non-null set to which it can write generated expressions."
@@ -187,9 +189,11 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
         // TODO: check schema for nullable
         for (Column c : columns) {
-            IsNullExpression isNullExpression = new IsNullExpression();
-            isNullExpression.setLeftExpression(copy(c));
-            output.add(isNullExpression);
+            if (tableStructure.getColumn(c).isNullable()) {
+                IsNullExpression isNullExpression = new IsNullExpression();
+                isNullExpression.setLeftExpression(copy(c));
+                output.add(isNullExpression);
+            }
         }
 
         return output;
