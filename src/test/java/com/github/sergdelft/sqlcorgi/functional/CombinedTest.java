@@ -25,16 +25,16 @@ class CombinedTest {
     @BeforeAll
     static void makeSchema() {
 
+        schema = new Schema();
+
         Table tableA = new Table("a");
         tableA.addColumn(new Column("id", true, true, Column.DataType.NUM));
         tableA.addColumn(new Column("length", false, false, Column.DataType.NUM));
+        schema.addTable(tableA);
 
         Table tableB = new Table("b");
         tableB.addColumn(new Column("id", true, true, Column.DataType.NUM));
         tableB.addColumn(new Column("length", false, false, Column.DataType.NUM));
-
-        schema = new Schema();
-        schema.addTable(tableA);
         schema.addTable(tableB);
     }
 
