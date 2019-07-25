@@ -347,6 +347,16 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         generateIsNullCases(between);
     }
 
+    @Override
+    public void visit(ExistsExpression existsExpression) {
+
+        output.add(copy(existsExpression));
+
+        ExistsExpression flippedExists = (ExistsExpression) copy(existsExpression);
+        flippedExists.setNot(!flippedExists.isNot());
+        output.add(flippedExists);
+    }
+
     /**
      * Generates test queries for 'IN' expressions.
      *
