@@ -23,7 +23,7 @@ class NestedJoinsTest {
     void testNestedJoinCorrectJoinConfigurationTwoJoins() {
         verify("SELECT * FROM a RIGHT JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id",
 
-                "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id",
+                null, "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id "
                         + "WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
                 "SELECT * FROM a LEFT JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id "
@@ -50,6 +50,7 @@ class NestedJoinsTest {
     void testNestedJoinCorrectJoinConfigurationThreeJoins() {
         verify("SELECT * FROM a INNER JOIN b ON b.id = a.id LEFT JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id",
 
+                null,
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id INNER JOIN d ON d.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id = b.id LEFT JOIN d ON d.id = a.id"
                         + " WHERE (d.id IS NULL) AND (a.id IS NOT NULL)",
@@ -196,7 +197,7 @@ class NestedJoinsTest {
     void testNestedJoinOnConditionColumnsFromOneTable1() {
         verify("SELECT * FROM a RIGHT JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id",
 
-                "SELECT * FROM a INNER JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id",
+                null, "SELECT * FROM a INNER JOIN b ON a.id > 0 INNER JOIN c ON c.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON a.id > 0 LEFT JOIN c ON c.id = a.id "
                         + "WHERE (c.id IS NULL) AND (a.id IS NOT NULL)",
                 "SELECT * FROM a INNER JOIN b ON a.id > 0 LEFT JOIN c ON c.id = a.id "
@@ -218,7 +219,7 @@ class NestedJoinsTest {
     void testNestedJoinOnConditionColumnsFromOneTable2() {
         verify("SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id",
 
-                "SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
+                null, "SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id "
                         + "WHERE (c.id IS NULL) AND (a.id IS NOT NULL)",
                 "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id "
@@ -240,7 +241,7 @@ class NestedJoinsTest {
     void testNestedJoinOnConditionColumnsFromOneTable3() {
         verify("SELECT * FROM a LEFT JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
 
-                "SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
+                null, "SELECT * FROM a INNER JOIN b ON b.id > 0 INNER JOIN c ON c.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id "
                         + "WHERE (c.id IS NULL) AND (a.id IS NOT NULL)",
                 "SELECT * FROM a INNER JOIN b ON b.id > 0 LEFT JOIN c ON c.id = a.id "
@@ -262,6 +263,7 @@ class NestedJoinsTest {
     void testNestedJoinOnConditionColumnsFromOneTable4() {
         verify("SELECT * FROM a INNER JOIN b ON b.id = a.id LEFT JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id",
 
+                null,
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id = a.id",
                 "SELECT * FROM a INNER JOIN b ON b.id = a.id INNER JOIN c ON c.id > 0 LEFT JOIN d ON d.id = a.id "
                         + "WHERE (d.id IS NULL) AND (a.id IS NOT NULL)",
@@ -292,7 +294,7 @@ class NestedJoinsTest {
     void testNestedJoinOnConditionColumnsFromOneTableMultipleCases() {
         verify("SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 RIGHT JOIN d on d.id > 0",
 
-                "SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id > 0",
+                null, "SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id > 0 INNER JOIN d ON d.id > 0",
                 "SELECT * FROM a LEFT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 "
                         + "WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
                 "SELECT * FROM a LEFT JOIN b ON a.id = b.id LEFT JOIN c ON c.id > 0 LEFT JOIN d ON d.id > 0 "
@@ -316,7 +318,7 @@ class NestedJoinsTest {
     void testNestedJoinWithImplicitInnerJoins() {
         verify("SELECT * FROM a, b, c WHERE a.id = b.id AND c.id = a.id",
 
-                "SELECT * FROM a INNER JOIN c ON c.id = a.id INNER JOIN b ON a.id = b.id",
+                null, "SELECT * FROM a INNER JOIN c ON c.id = a.id INNER JOIN b ON a.id = b.id",
                 "SELECT * FROM a INNER JOIN c ON c.id = a.id LEFT JOIN b ON a.id = b.id "
                         + "WHERE (b.id IS NULL) AND (a.id IS NOT NULL)",
                 "SELECT * FROM a INNER JOIN c ON c.id = a.id LEFT JOIN b ON a.id = b.id "
@@ -343,7 +345,7 @@ class NestedJoinsTest {
     void testNestedJoinWithImplicitInnerJoinAndInnerJoin() {
         verify("SELECT * FROM a, b INNER JOIN c ON c.id = b.id WHERE a.id = b.id",
 
-                "SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id = b.id",
+                null, "SELECT * FROM a INNER JOIN b ON a.id = b.id INNER JOIN c ON c.id = b.id",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id LEFT JOIN c ON c.id = b.id "
                         + "WHERE (c.id IS NULL) AND (b.id IS NOT NULL)",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id LEFT JOIN c ON c.id = b.id "
@@ -370,7 +372,7 @@ class NestedJoinsTest {
     void testNestedJoinWithImplicitInnerJoinAndSimpleJoin() {
         verify("SELECT * FROM a, b, c, d WHERE d.id = b.id",
 
-                "SELECT * FROM a, d INNER JOIN b ON d.id = b.id, c",
+                null, "SELECT * FROM a, d INNER JOIN b ON d.id = b.id, c",
                 "SELECT * FROM a, d LEFT JOIN b ON d.id = b.id, c WHERE (b.id IS NULL) AND (d.id IS NOT NULL)",
                 "SELECT * FROM a, d LEFT JOIN b ON d.id = b.id, c WHERE (b.id IS NULL) AND (d.id IS NULL)",
                 "SELECT * FROM a, d RIGHT JOIN b ON d.id = b.id, c WHERE (d.id IS NULL) AND (b.id IS NOT NULL)",
@@ -384,7 +386,7 @@ class NestedJoinsTest {
     void testNestedJoinWithImplicitInnerJoinReduceWhereCorrectly() {
         verify("SELECT * FROM a, b, c, d WHERE a.length > 50 AND d.id = a.id",
 
-                "SELECT * FROM a INNER JOIN d ON d.id = a.id, b, c WHERE (a.length > 50)",
+                null, "SELECT * FROM a INNER JOIN d ON d.id = a.id, b, c WHERE (a.length > 50)",
                 "SELECT * FROM a INNER JOIN d ON d.id = a.id, b, c WHERE a.length = 49",
                 "SELECT * FROM a INNER JOIN d ON d.id = a.id, b, c WHERE a.length = 50",
                 "SELECT * FROM a INNER JOIN d ON d.id = a.id, b, c WHERE a.length = 51",

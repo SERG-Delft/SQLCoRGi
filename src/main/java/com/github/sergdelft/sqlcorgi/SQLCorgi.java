@@ -54,7 +54,7 @@ public final class SQLCorgi {
 
         SelectBody selectBody = ((Select) statement).getSelectBody();
 
-        SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(result);
+        SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(schema, result);
         selectBody.accept(selectStatementVisitor);
 
         return result;

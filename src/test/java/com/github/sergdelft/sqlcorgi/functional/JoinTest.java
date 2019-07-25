@@ -26,7 +26,7 @@ class JoinTest {
     void testJoinsOnOneEqualityConditionWithNullableColumns(String joinType) {
         verify("SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull",
 
-                "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull",
+                null, "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull "
                     + "WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NOT NULL)",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull < TableB.CanBeNull "
@@ -50,7 +50,7 @@ class JoinTest {
         verify("SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
                     + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2",
 
-                "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
+                null, "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
                     + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull = TableB.CanBeNull "
                     + conditionType + " TableA.CanBeNull2 = TableB.CanBeNull2 WHERE (TableB.CanBeNull IS NULL) AND "
@@ -78,7 +78,7 @@ class JoinTest {
     void testOnConditionsInJoins(String on) {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull",
 
-                "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull",
+                null, "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull"
                     + " WHERE (TableB.CanBeNull IS NULL) AND (TableA.CanBeNull IS NOT NULL)",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull " + on + " TableB.CanBeNull"
@@ -97,7 +97,7 @@ class JoinTest {
     void testJoinOnConditionFromSingleTableLeftComparison() {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull > 5",
 
-                "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull > 5",
+                null, "SELECT * FROM TableA INNER JOIN TableB ON TableA.CanBeNull > 5",
                 "SELECT * FROM TableA LEFT JOIN TableB ON TableA.CanBeNull > 5 WHERE (NOT (TableA.CanBeNull > 5))"
                     + " AND (TableA.CanBeNull IS NOT NULL)");
     }
@@ -110,7 +110,7 @@ class JoinTest {
     void testJoinOnConditionFromSingleTableRightNullable() {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableB.CanBeNull IS NULL",
 
-                "SELECT * FROM TableA RIGHT JOIN TableB ON TableB.CanBeNull IS NULL WHERE"
+                null, "SELECT * FROM TableA RIGHT JOIN TableB ON TableB.CanBeNull IS NULL WHERE"
                     + " (NOT (TableB.CanBeNull IS NULL)) AND (TableB.CanBeNull IS NOT NULL)");
     }
 
@@ -121,7 +121,7 @@ class JoinTest {
     @Test
     void testJoinOnConditionFromSingleTableRightComparison() {
         verify("SELECT * FROM TableA INNER JOIN TableB ON TableB.CanBeNull > 5",
-                "SELECT * FROM TableA RIGHT JOIN TableB ON TableB.CanBeNull > 5 WHERE (NOT (TableB.CanBeNull > 5))"
+            null, "SELECT * FROM TableA RIGHT JOIN TableB ON TableB.CanBeNull > 5 WHERE (NOT (TableB.CanBeNull > 5))"
             + " AND (TableB.CanBeNull IS NOT NULL)");
     }
 
@@ -136,7 +136,7 @@ class JoinTest {
         verify("SELECT * FROM TableA " + joinType + " JOIN TableB ON TableA.Var = TableB.Var "
                         + "WHERE TableA.Value > 1",
 
-                "SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE TableA.Value = 2",
+                null, "SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE TableA.Value = 2",
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE TableA.Value = 1",
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE TableA.Value = 0",
                 "SELECT * FROM TableA INNER JOIN TableB ON TableA.Var = TableB.Var WHERE TableA.Value IS NULL",
@@ -323,7 +323,7 @@ class JoinTest {
      */
     @Test
     void testJoinNoOnConditionSimpleJoin() {
-        verify("SELECT * FROM a, b");
+        verify("SELECT * FROM a, b", null);
     }
 
     /**

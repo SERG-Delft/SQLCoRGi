@@ -19,7 +19,7 @@ class SetOperationTest {
     void testUnion() {
         verify("SELECT * FROM t WHERE a = 'left' UNION SELECT * FROM t WHERE a = 'right'",
 
-                "SELECT * FROM t WHERE a = 'left'",
+                null, "SELECT * FROM t WHERE a = 'left'",
                 "SELECT * FROM t WHERE a <> 'left'",
                 "SELECT * FROM t WHERE a = 'right'",
                 "SELECT * FROM t WHERE a <> 'right'",
@@ -34,7 +34,7 @@ class SetOperationTest {
     void testIntersect() {
         verify("SELECT * FROM t WHERE a = 'left' INTERSECT SELECT * FROM t WHERE a = 'right'",
 
-                "SELECT * FROM t WHERE a = 'left'",
+                null, "SELECT * FROM t WHERE a = 'left'",
                 "SELECT * FROM t WHERE a <> 'left'",
                 "SELECT * FROM t WHERE a = 'right'",
                 "SELECT * FROM t WHERE a <> 'right'",
@@ -49,7 +49,7 @@ class SetOperationTest {
     void testMinus() {
         verify("SELECT * FROM t WHERE a = 'left' MINUS SELECT * FROM t WHERE a = 'right'",
 
-                "SELECT * FROM t WHERE a = 'left'",
+                null, "SELECT * FROM t WHERE a = 'left'",
                 "SELECT * FROM t WHERE a <> 'left'",
                 "SELECT * FROM t WHERE a = 'right'",
                 "SELECT * FROM t WHERE a <> 'right'",
@@ -64,7 +64,7 @@ class SetOperationTest {
     void testExcept() {
         verify("SELECT * FROM t WHERE a = 'left' EXCEPT SELECT * FROM t WHERE a = 'right'",
 
-                "SELECT * FROM t WHERE a = 'left'",
+                null, "SELECT * FROM t WHERE a = 'left'",
                 "SELECT * FROM t WHERE a <> 'left'",
                 "SELECT * FROM t WHERE a = 'right'",
                 "SELECT * FROM t WHERE a <> 'right'",

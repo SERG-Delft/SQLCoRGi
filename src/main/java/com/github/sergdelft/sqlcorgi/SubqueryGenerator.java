@@ -71,7 +71,8 @@ public final class SubqueryGenerator {
             removeSubquery(subquery, selectCopy, isWhereSub, isHavingSub);
 
             HashSet<String> mutations = new HashSet<>();
-            SelectStatementVisitor selectVisitor = new SelectStatementVisitor(mutations);
+            // TODO: pass along the schema
+            SelectStatementVisitor selectVisitor = new SelectStatementVisitor(null, mutations);
             subCopy.getSelectBody().accept(selectVisitor);
 
             for (String mutation : mutations) {
@@ -171,7 +172,8 @@ public final class SubqueryGenerator {
 
         for (SubSelect subSelect : fromSubSelects) {
             Set<String> subRules = new HashSet<>();
-            SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(subRules);
+            // TODO: pass along the schema and the intermediate table structure
+            SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(null, subRules);
             subSelect.getSelectBody().accept(selectStatementVisitor);
             rules.addAll(subRules);
         }

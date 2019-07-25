@@ -22,7 +22,7 @@ public class SelectStatementVisitorTest {
     @Test
     public void testConstructorWithNullSetThrowsException() {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-            () -> new SelectStatementVisitor(null)
+            () -> new SelectStatementVisitor(null, null)
         );
     }
 
@@ -35,7 +35,7 @@ public class SelectStatementVisitorTest {
         nonEmptySet.add("");
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-            () -> new SelectStatementVisitor(nonEmptySet)
+            () -> new SelectStatementVisitor(null, nonEmptySet)
         ).withMessage(EXCEPTION_MESSAGE);
     }
 }

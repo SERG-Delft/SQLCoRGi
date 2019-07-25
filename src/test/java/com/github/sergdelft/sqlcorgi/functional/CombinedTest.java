@@ -21,7 +21,7 @@ class CombinedTest {
         verify("SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id < 10 GROUP BY b.id",
 
                 // WHERE RESULTS
-                "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id = 9 GROUP BY b.id",
+                null, "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id = 9 GROUP BY b.id",
                 "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id = 11 GROUP BY b.id",
                 "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id = 10 GROUP BY b.id",
                 "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id IS NULL GROUP BY b.id",
@@ -58,7 +58,7 @@ class CombinedTest {
     void testJoinWithWhereNonIdsIncludedInWhereExpression() {
         verify("SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE a.length < 50 OR b.length > 70",
 
-                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 69)",
+                null, "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 69)",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 71)",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 70)",
 
@@ -89,7 +89,7 @@ class CombinedTest {
     void testJoinWithWhereIdsExcludedInWhereExpressionWhenIsNull() {
         verify("SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE a.id <= 50 AND b.id >= 70",
 
-                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id = 49) AND (b.id >= 70)",
+                null, "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id = 49) AND (b.id >= 70)",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id = 50) AND (b.id >= 70)",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id = 51) AND (b.id >= 70)",
 
@@ -117,6 +117,6 @@ class CombinedTest {
      */
     @Test
     void testQueryOnlySelectAndFrom() {
-        verify("SELECT * FROM TableA");
+        verify("SELECT * FROM TableA", null);
     }
 }
