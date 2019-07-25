@@ -185,7 +185,7 @@ class AggregatorTest {
         verify("SELECT Director FROM Movies WHERE title = 'Finding Nemo' GROUP BY Director",
 
                 // Where clause
-                null, "SELECT Director FROM Movies WHERE title <> 'Finding Nemo' GROUP BY Director",
+                null, "SELECT Director FROM Movies WHERE NOT (title = 'Finding Nemo') GROUP BY Director",
                 "SELECT Director FROM Movies WHERE title = 'Finding Nemo' GROUP BY Director",
                 "SELECT Director FROM Movies WHERE title IS NULL GROUP BY Director",
                 // Group By
@@ -224,7 +224,7 @@ class AggregatorTest {
                 null, "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                     + "GROUP BY Director HAVING Director LIKE 'A%'",
                 //  WHERE
-                "SELECT Director FROM Movies WHERE title <> 'Finding Nemo' "
+                "SELECT Director FROM Movies WHERE NOT (title = 'Finding Nemo') "
                     + "GROUP BY Director HAVING Director LIKE 'A%'",
                 "SELECT Director FROM Movies WHERE title IS NULL "
                     + "GROUP BY Director HAVING Director LIKE 'A%'",

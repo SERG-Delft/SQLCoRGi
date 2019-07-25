@@ -20,9 +20,9 @@ class SetOperationTest {
         verify("SELECT * FROM t WHERE a = 'left' UNION SELECT * FROM t WHERE a = 'right'",
 
                 null, "SELECT * FROM t WHERE a = 'left'",
-                "SELECT * FROM t WHERE a <> 'left'",
+                "SELECT * FROM t WHERE NOT (a = 'left')",
                 "SELECT * FROM t WHERE a = 'right'",
-                "SELECT * FROM t WHERE a <> 'right'",
+                "SELECT * FROM t WHERE NOT (a = 'right')",
                 "SELECT * FROM t WHERE a IS NULL"
         );
     }
@@ -35,9 +35,9 @@ class SetOperationTest {
         verify("SELECT * FROM t WHERE a = 'left' INTERSECT SELECT * FROM t WHERE a = 'right'",
 
                 null, "SELECT * FROM t WHERE a = 'left'",
-                "SELECT * FROM t WHERE a <> 'left'",
+                "SELECT * FROM t WHERE NOT (a = 'left')",
                 "SELECT * FROM t WHERE a = 'right'",
-                "SELECT * FROM t WHERE a <> 'right'",
+                "SELECT * FROM t WHERE NOT (a = 'right')",
                 "SELECT * FROM t WHERE a IS NULL"
         );
     }
@@ -50,9 +50,9 @@ class SetOperationTest {
         verify("SELECT * FROM t WHERE a = 'left' MINUS SELECT * FROM t WHERE a = 'right'",
 
                 null, "SELECT * FROM t WHERE a = 'left'",
-                "SELECT * FROM t WHERE a <> 'left'",
+                "SELECT * FROM t WHERE NOT (a = 'left')",
                 "SELECT * FROM t WHERE a = 'right'",
-                "SELECT * FROM t WHERE a <> 'right'",
+                "SELECT * FROM t WHERE NOT (a = 'right')",
                 "SELECT * FROM t WHERE a IS NULL"
         );
     }
@@ -65,9 +65,9 @@ class SetOperationTest {
         verify("SELECT * FROM t WHERE a = 'left' EXCEPT SELECT * FROM t WHERE a = 'right'",
 
                 null, "SELECT * FROM t WHERE a = 'left'",
-                "SELECT * FROM t WHERE a <> 'left'",
+                "SELECT * FROM t WHERE NOT (a = 'left')",
                 "SELECT * FROM t WHERE a = 'right'",
-                "SELECT * FROM t WHERE a <> 'right'",
+                "SELECT * FROM t WHERE NOT (a = 'right')",
                 "SELECT * FROM t WHERE a IS NULL"
         );
     }

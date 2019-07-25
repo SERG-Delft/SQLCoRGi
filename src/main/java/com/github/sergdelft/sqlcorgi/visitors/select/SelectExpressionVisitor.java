@@ -54,7 +54,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
         output.addAll(generateIsNullCases(comparisonOperator));
 
-        com.github.sergdelft.sqlcorgi.schema.Column.DataType type = checkTypes(comparisonOperator);
+        com.github.sergdelft.sqlcorgi.schema.Column.DataType type = checkTypes(comparisonOperator.getRightExpression());
 
         switch (type) {
             case NUM: output.addAll(generateNumericCases(comparisonOperator));
@@ -166,7 +166,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      */
     private List<Expression> generateStringCases(BinaryExpression expression) {
         List<Expression> output = new ArrayList<>();
-        output.add(new NotExpression(copy(expression)));
+        output.add(new NotExpression(new Parenthesis(copy(expression))));
         output.add(copy(expression));
 
         return output;

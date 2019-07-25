@@ -105,7 +105,7 @@ class ConditionTest {
         verify("SELECT * FROM table WHERE a = 'qwerty'",
 
                 null, "SELECT * FROM table WHERE a = 'qwerty'",
-                "SELECT * FROM table WHERE a <> 'qwerty'",
+                "SELECT * FROM table WHERE NOT (a = 'qwerty')",
                 "SELECT * FROM table WHERE a IS NULL"
         );
     }
