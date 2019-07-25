@@ -126,7 +126,7 @@ class SubqueryGeneratorTest {
 
         Set<String> expected = new HashSet<>(Arrays.asList(
                 "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE a = 'b') AND NULL OR NULL",
-                "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE a <> 'b') AND NULL OR NULL",
+                "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE NOT (a = 'b')) AND NULL OR NULL",
                 "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE a IS NULL) AND NULL OR NULL"
         ));
 
@@ -150,7 +150,7 @@ class SubqueryGeneratorTest {
 
         Set<String> expected = new HashSet<>(Arrays.asList(
                 "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE a = 'b') AND NULL AND NULL",
-                "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE a <> 'b') AND NULL AND NULL",
+                "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE NOT (a = 'b')) AND NULL AND NULL",
                 "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE a IS NULL) AND NULL AND NULL"
         ));
 
@@ -169,7 +169,7 @@ class SubqueryGeneratorTest {
 
         Set<String> expected = new HashSet<>(Arrays.asList(
                 "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE a = 'b')",
-                "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE a <> 'b')",
+                "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE NOT (a = 'b'))",
                 "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE a IS NULL)"
         ));
 
@@ -188,7 +188,7 @@ class SubqueryGeneratorTest {
 
         Set<String> expected = new HashSet<>(Arrays.asList(
                 "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE a = 'b')",
-                "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE a <> 'b')",
+                "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE NOT (a = 'b'))",
                 "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE a IS NULL)"
         ));
 

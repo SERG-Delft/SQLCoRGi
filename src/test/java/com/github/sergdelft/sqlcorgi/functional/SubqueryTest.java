@@ -33,7 +33,7 @@ class SubqueryTest {
         containsAtLeast("SELECT * FROM t JOIN (SELECT a FROM t WHERE a = 'a') AS t2 ON 1 = 1 WHERE t2.a > 2",
 
                 "SELECT a FROM t WHERE a = 'a'",
-                "SELECT a FROM t WHERE a <> 'a'",
+                "SELECT a FROM t WHERE NOT (a = 'a')",
                 "SELECT a FROM t WHERE a IS NULL"
         );
     }
@@ -90,10 +90,10 @@ class SubqueryTest {
                 "SELECT * FROM t WHERE a IN (SELECT * FROM t WHERE b = 'x')"
                         + " HAVING b IS NULL",
                 "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE b = 'x')",
-                "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE b <> 'x')",
+                "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE NOT (b = 'x'))",
                 "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE b IS NULL)",
                 "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE b = 'x')",
-                "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE b <> 'x')",
+                "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE NOT (b = 'x'))",
                 "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE b IS NULL)"
         );
     }
@@ -114,7 +114,7 @@ class SubqueryTest {
                 "SELECT * FROM t WHERE a IS NULL",
                 "SELECT * FROM t WHERE EXISTS (SELECT a FROM t WHERE (b = 'x') AND NOT (b IN"
                         + " (SELECT b FROM t WHERE a = '1')))",
-                "SELECT * FROM t WHERE EXISTS (SELECT a FROM t WHERE (b <> 'x') AND NOT (b IN"
+                "SELECT * FROM t WHERE EXISTS (SELECT a FROM t WHERE (NOT (b = 'x')) AND NOT (b IN"
                         + " (SELECT b FROM t WHERE a = '1')))",
                 "SELECT * FROM t WHERE EXISTS (SELECT a FROM t WHERE (b IS NULL))",
                 "SELECT * FROM t WHERE EXISTS (SELECT a FROM t WHERE NOT (b = 'x') AND (b IN"
@@ -124,7 +124,7 @@ class SubqueryTest {
                 "SELECT * FROM t WHERE EXISTS"
                         + " (SELECT a FROM t WHERE EXISTS (SELECT b FROM t WHERE a = '1') AND b = 'x')",
                 "SELECT * FROM t WHERE EXISTS"
-                        + " (SELECT a FROM t WHERE EXISTS (SELECT b FROM t WHERE a <> '1') AND b = 'x')",
+                        + " (SELECT a FROM t WHERE EXISTS (SELECT b FROM t WHERE NOT (a = '1')) AND b = 'x')",
                 "SELECT * FROM t WHERE EXISTS"
                         + " (SELECT a FROM t WHERE EXISTS (SELECT b FROM t WHERE a IS NULL) AND b = 'x')"
         );
