@@ -2,6 +2,7 @@ package com.github.sergdelft.sqlcorgi.schema;
 
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.statement.select.*;
+import net.sf.jsqlparser.statement.values.ValuesStatement;
 
 import java.util.*;
 
@@ -18,6 +19,15 @@ public class TableStructure {
 
     private Schema schema;
     private Deque<Map<String, Table>> tableStack = new LinkedList<>();
+
+    public Deque<Map<String, Table>> getTableStack() {
+        return tableStack;
+    }
+
+    @Override
+    public String toString() {
+        return tableStack.toString();
+    }
 
     /**
      * Adds a new layer of tables to the structure, which is derived from the given {@link FromItem} and list of
@@ -149,14 +159,69 @@ public class TableStructure {
 
     private Table deriveSubTable(SubSelect subSelect, boolean storeTable) {
 
-        // TODO: Derive table
-
         Alias alias = subSelect.getAlias();
-        //if (alias != null) {
-        //    // TODO: Add table
-        //}
+        if (alias == null) {
+            throw new IllegalArgumentException("The following subquery must have an alias: " + subSelect);
+        }
+
+        // TODO: Derive table
+        Table derivedTable = new Table(null);
+
+        SelectBody selectBody = subSelect.getSelectBody();
+        if (selectBody instanceof PlainSelect) {
+            PlainSelect plainSelect = (PlainSelect) selectBody;
+
+            List<SelectItem> selectItems = plainSelect.getSelectItems();
+            FromItem fromItem = plainSelect.getFromItem();
+            List<Join> joins = plainSelect.getJoins();
+
+            // TODO: Just add layer on top of this table structure? No, because findColumn would incorrectly search
+            //  in wrong layers
+            TableStructure tableStructure = new TableStructure();
+            tableStructure.setSchema(schema);
+            tableStructure.addLayer(fromItem, joins);
+            for (SelectItem selectItem : selectItems) {
+                // TODO: different types of select items + column aliases
+
+                if (selectItem instanceof AllColumns) {
+                    // add each column in resultant table of subquery to new table
+                    for (Column column : tableStructure.getFromTable().getColumns()) {
+                        derivedTable.addColumn(column);
+                    }
+                } else if (selectItem instanceof AllTableColumns) {
+                    // add each column in table to new table
+                    Table table = tableStructure.getTable(((AllTableColumns) selectItem).getTable().getName());
+                    for (Column column : table.getColumns()) {
+                        derivedTable.addColumn(column);
+                    }
+                } else if (selectItem instanceof SelectExpressionItem) {
+                    // add column to new table
+                    // TODO
+                }
+            }
+            tableStructure.removeLayer();
+
+        } else if (selectBody instanceof SetOperationList) {
+            // TODO: Derived table is same as for single query in set op list
+        }
+
+        if (storeTable) {
+            Map<String, Table> tables = tableStack.peek();
+            assert tables != null;
+
+            tables.put(alias.getName(), derivedTable);
+        }
 
         throw new UnsupportedOperationException("To be implemented");
+    }
+
+    public Table getFromTable() {
+
+        if (tableStack.isEmpty()) {
+            return null;
+        }
+
+        return tableStack.peek().get("");
     }
 
     /**
