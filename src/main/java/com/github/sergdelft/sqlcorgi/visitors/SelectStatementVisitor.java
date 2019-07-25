@@ -48,7 +48,6 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
         }
 
         this.schema = schema;
-        this.schema = new Schema()
         this.output = output;
         this.statements = new ArrayList<>();
     }
