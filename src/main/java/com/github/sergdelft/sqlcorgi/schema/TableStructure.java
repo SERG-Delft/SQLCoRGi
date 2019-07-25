@@ -58,17 +58,65 @@ public class TableStructure {
         tableStack.pop();
     }
 
-    public Column getColumn(net.sf.jsqlparser.schema.Column column) {
-        return null; // TODO
+    /**
+     * Returns the {@link Column} associated with the {@code column}.
+     * @param column a {@link net.sf.jsqlparser.schema.Column} referring to a {@code Column}.
+     *
+     * @return a {@code Column} if one is found.
+     * @throws AmbiguousColumnException if {@code column} references multiple {@code Column}s.
+     * @throws UnknownColumnException if no {@code Column} is found.
+     */
+    public Column getColumn(net.sf.jsqlparser.schema.Column column)
+            throws AmbiguousColumnException, UnknownColumnException {
+
+        net.sf.jsqlparser.schema.Table table = column.getTable();
+        String tableName = table == null ? null : table.getName();
+        String colName = column.getColumnName();
+
+        Column result = null;
+        for (Map<String, Table> tableMap : tableStack) {
+
+            if (tableName != null) {
+                for (Column temp : tableMap.get(tableName).getColumns()) {
+                    if (colName.equals(temp.getName())) {
+                        result = temp;
+                        break;
+                    }
+                }
+            } else {
+                for (Map.Entry<String, Table> tables : tableMap.entrySet()) {
+
+                    Column found = null;
+                    for (Column temp : tables.getValue().getColumns()) {
+                        if (colName.equals(temp.getName())) {
+                            found = temp;
+                            break;
+                        }
+                    }
+
+                    if (result != null && found != null) {
+                        throw new AmbiguousColumnException("The following column reference is ambiguous: " + colName);
+                    }
+                    result = found;
+                }
+            }
+
+            if (result != null) {
+                return result;
+            }
+        }
+
+        throw new UnknownColumnException("The following column could not be found: " + column);
     }
 
     /**
      * Returns the {@link Table} associated with the {@code tableName}.
      * @param tableName a string referring to a {@code Table}.
      *
-     * @return a {@code Table} if one is found, throws an {@link UnknownTableException} otherwise.
+     * @return a {@code Table} if one is found.
+     * @throws UnknownTableException if no {@code Table} is found.
      */
-    public Table getTable(String tableName) {
+    public Table getTable(String tableName) throws UnknownTableException {
 
         for (Map<String, Table> tableMap : tableStack) {
             Table table = tableMap.get(tableName);
