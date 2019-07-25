@@ -42,7 +42,17 @@ public final class AssertUtils {
      * @param atLeast The expected output of the {@link SQLCorgi}
      */
     public static void containsAtLeast(String query, String... atLeast) {
-        Set<String> resultSet = SQLCorgi.generateRules(query, null);
+        containsAtLeast(query, null, atLeast);
+    }
+
+    /**
+     * Asserts that the expected targets are contained in the results list.
+     * @param query The input query that needs to be covered.
+     * @param schema the schema to use for the query under test.
+     * @param atLeast The expected output of the {@link SQLCorgi}
+     */
+    public static void containsAtLeast(String query, Schema schema, String... atLeast) {
+        Set<String> resultSet = SQLCorgi.generateRules(query, schema);
 
         assertThat(resultSet).contains(atLeast);
     }

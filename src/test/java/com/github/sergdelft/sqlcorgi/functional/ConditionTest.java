@@ -31,6 +31,7 @@ class ConditionTest {
         ArrayList<Column> tColumns = new ArrayList<>();
         tColumns.add(new Column("a", true, false, Column.DataType.NUM));
         tColumns.add(new Column("b", true, false, Column.DataType.STRING));
+        tColumns.add(new Column("c", true, false, Column.DataType.NUM));
 
         Table tTable = new Table("t", tColumns);
 
@@ -340,15 +341,15 @@ class ConditionTest {
      */
     @Test
     void testLongBetweenConditionNegated() {
-        verify("SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
+        verify("SELECT * FROM t WHERE a NOT BETWEEN 28 AND 37",
 
-                null, "SELECT * FROM Table1 WHERE x = 27",
-                "SELECT * FROM Table1 WHERE x = 28",
-                "SELECT * FROM Table1 WHERE x = 37",
-                "SELECT * FROM Table1 WHERE x = 38",
-                "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x IS NULL"
+                makeSchema(), "SELECT * FROM t WHERE a = 27",
+                "SELECT * FROM t WHERE a = 28",
+                "SELECT * FROM t WHERE a = 37",
+                "SELECT * FROM t WHERE a = 38",
+                "SELECT * FROM t WHERE a BETWEEN 28 AND 37",
+                "SELECT * FROM t WHERE a NOT BETWEEN 28 AND 37",
+                "SELECT * FROM t WHERE a IS NULL"
         );
     }
 
@@ -357,15 +358,15 @@ class ConditionTest {
      */
     @Test
     void testDoubleBetweenCondition() {
-        verify("SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
+        verify("SELECT * FROM t WHERE a BETWEEN 14.3 AND 32.2",
 
-                null, "SELECT * FROM Table1 WHERE x = 13.3",
-                "SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
-                "SELECT * FROM Table1 WHERE x = 14.3",
-                "SELECT * FROM Table1 WHERE x = 32.2",
-                "SELECT * FROM Table1 WHERE x = 33.2",
-                "SELECT * FROM Table1 WHERE x IS NULL"
+                makeSchema(), "SELECT * FROM t WHERE a = 13.3",
+                "SELECT * FROM t WHERE a BETWEEN 14.3 AND 32.2",
+                "SELECT * FROM t WHERE a NOT BETWEEN 14.3 AND 32.2",
+                "SELECT * FROM t WHERE a = 14.3",
+                "SELECT * FROM t WHERE a = 32.2",
+                "SELECT * FROM t WHERE a = 33.2",
+                "SELECT * FROM t WHERE a IS NULL"
         );
     }
 
@@ -381,8 +382,7 @@ class ConditionTest {
                 "SELECT * FROM Table1 WHERE x = 32.2",
                 "SELECT * FROM Table1 WHERE x = 33.2",
                 "SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
-                "SELECT * FROM Table1 WHERE x IS NULL"
+                "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2"
         );
     }
 
@@ -426,19 +426,19 @@ class ConditionTest {
      */
     @Test
     void testMultipleConditionsOnMultipleAttribute() {
-        containsAtLeast("SELECT * FROM t WHERE a > 3 AND b < 20 AND a <> 15",
+        containsAtLeast("SELECT * FROM t WHERE a > 3 AND c < 20 AND a <> 15",
 
-                "SELECT * FROM t WHERE ((a = 2) AND (b < 20)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a = 3) AND (b < 20)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a = 4) AND (b < 20)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a IS NULL) AND (b < 20))",
-                "SELECT * FROM t WHERE (a > 3 AND b < 20) AND (a = 14)",
-                "SELECT * FROM t WHERE (a > 3 AND b < 20) AND (a = 15)",
-                "SELECT * FROM t WHERE (a > 3 AND b < 20) AND (a = 16)",
-                "SELECT * FROM t WHERE ((a > 3) AND (b = 19)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a > 3) AND (b = 20)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a > 3) AND (b = 21)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a > 3) AND (b IS NULL)) AND (a <> 15)"
+                makeSchema(), "SELECT * FROM t WHERE ((a = 2) AND (c < 20)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a = 3) AND (c < 20)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a = 4) AND (c < 20)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a IS NULL) AND (c < 20))",
+                "SELECT * FROM t WHERE (a > 3 AND c < 20) AND (a = 14)",
+                "SELECT * FROM t WHERE (a > 3 AND c < 20) AND (a = 15)",
+                "SELECT * FROM t WHERE (a > 3 AND c < 20) AND (a = 16)",
+                "SELECT * FROM t WHERE ((a > 3) AND (c = 19)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a > 3) AND (c = 20)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a > 3) AND (c = 21)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a > 3) AND (c IS NULL)) AND (a <> 15)"
         );
     }
 
@@ -447,13 +447,13 @@ class ConditionTest {
      */
     @Test
     void testNumericBinaryExpressionToAdditionAndSubtraction() {
-        verify("SELECT * FROM t1 WHERE t1.c1 = t1.c2 - 10",
+        verify("SELECT * FROM t WHERE t.a = t.c - 10",
 
-                null, "SELECT * FROM t1 WHERE t1.c1 = t1.c2 - 10",
-                "SELECT * FROM t1 WHERE t1.c1 = t1.c2 - 10 + 1",
-                "SELECT * FROM t1 WHERE t1.c1 = t1.c2 - 10 - 1",
-                "SELECT * FROM t1 WHERE t1.c2 IS NULL",
-                "SELECT * FROM t1 WHERE t1.c1 IS NULL"
+                makeSchema(), "SELECT * FROM t WHERE t.a = t.c - 10",
+                "SELECT * FROM t WHERE t.a = t.c - 10 + 1",
+                "SELECT * FROM t WHERE t.a = t.c - 10 - 1",
+                "SELECT * FROM t WHERE t.a IS NULL",
+                "SELECT * FROM t WHERE t.c IS NULL"
         );
     }
 
@@ -463,13 +463,13 @@ class ConditionTest {
      */
     @Test
     void testNumericBinaryExpressionRightSideConvertedOnly() {
-        verify("SELECT * FROM t1 WHERE t1.c1 + 7 > t1.c2 - 8",
+        verify("SELECT * FROM t WHERE t.a + 7 > t.c - 8",
 
-                null, "SELECT * FROM t1 WHERE t1.c1 + 7 = t1.c2 - 8",
-                "SELECT * FROM t1 WHERE t1.c1 + 7 = t1.c2 - 8 + 1",
-                "SELECT * FROM t1 WHERE t1.c1 + 7 = t1.c2 - 8 - 1",
-                "SELECT * FROM t1 WHERE t1.c2 IS NULL",
-                "SELECT * FROM t1 WHERE t1.c1 IS NULL"
+                makeSchema(), "SELECT * FROM t WHERE t.a + 7 = t.c - 8",
+                "SELECT * FROM t WHERE t.a + 7 = t.c - 8 + 1",
+                "SELECT * FROM t WHERE t.a + 7 = t.c - 8 - 1",
+                "SELECT * FROM t WHERE t.c IS NULL",
+                "SELECT * FROM t WHERE t.a IS NULL"
         );
     }
 
@@ -479,13 +479,13 @@ class ConditionTest {
      */
     @Test
     void testSignedBinaryExpressionToAdditionAndSubtraction() {
-        verify("SELECT * FROM t1 WHERE t1.c1 = -(5 + t1.c2)",
+        verify("SELECT * FROM t WHERE t.a = -(5 + c)",
 
-                null, "SELECT * FROM t1 WHERE t1.c1 = -(5 + t1.c2) + 1",
-                "SELECT * FROM t1 WHERE t1.c1 = -(5 + t1.c2) - 1",
-                "SELECT * FROM t1 WHERE t1.c1 = -(5 + t1.c2)",
-                "SELECT * FROM t1 WHERE t1.c2 IS NULL",
-                "SELECT * FROM t1 WHERE t1.c1 IS NULL"
+                makeSchema(), "SELECT * FROM t WHERE t.a = -(5 + c) + 1",
+                "SELECT * FROM t WHERE t.a = -(5 + c) - 1",
+                "SELECT * FROM t WHERE t.a = -(5 + c)",
+                "SELECT * FROM t WHERE c IS NULL",
+                "SELECT * FROM t WHERE t.a IS NULL"
         );
     }
 }
