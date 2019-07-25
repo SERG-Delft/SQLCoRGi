@@ -23,6 +23,10 @@ public class TableStructure {
         return tableStack;
     }
 
+    public Schema getSchema() {
+        return schema;
+    }
+
     @Override
     public String toString() {
         return tableStack.toString();

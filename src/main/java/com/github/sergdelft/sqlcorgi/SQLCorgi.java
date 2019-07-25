@@ -4,6 +4,7 @@ import com.github.sergdelft.sqlcorgi.exceptions.CannotBeNullException;
 import com.github.sergdelft.sqlcorgi.exceptions.CannotBeParsedException;
 import com.github.sergdelft.sqlcorgi.exceptions.UnsupportedInputException;
 import com.github.sergdelft.sqlcorgi.schema.Schema;
+import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.visitors.SelectStatementVisitor;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -54,7 +55,9 @@ public final class SQLCorgi {
 
         SelectBody selectBody = ((Select) statement).getSelectBody();
 
-        SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(schema, result);
+        TableStructure tableStructure = new TableStructure();
+        tableStructure.setSchema(schema);
+        SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(tableStructure, result);
         selectBody.accept(selectStatementVisitor);
 
         return result;

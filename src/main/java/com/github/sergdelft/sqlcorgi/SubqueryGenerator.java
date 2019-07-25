@@ -1,6 +1,8 @@
 package com.github.sergdelft.sqlcorgi;
 
 import com.github.sergdelft.sqlcorgi.exceptions.CannotBeParsedException;
+import com.github.sergdelft.sqlcorgi.schema.Schema;
+import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.util.cloner.SelectCloner;
 import com.github.sergdelft.sqlcorgi.visitors.SelectStatementVisitor;
 import com.github.sergdelft.sqlcorgi.visitors.subqueries.SubqueryFinder;
@@ -30,14 +32,15 @@ public final class SubqueryGenerator {
      * Generates coverage rules for subqueries in the given {@link PlainSelect}.
      *
      * @param plainSelect the plainSelect to cover.
+     * @param tableStructure the {@code TableStructure} obtained from the main query.
      * @return a set of coverage rules in string form.
      */
-    public static Set<String> coverSubqueries(PlainSelect plainSelect) {
+    public static Set<String> coverSubqueries(PlainSelect plainSelect, TableStructure tableStructure) {
 
         Set<String> rules = new HashSet<>();
 
-        coverFromSubqueries(plainSelect, rules);
-        coverSelectOperatorSubqueries(plainSelect, rules);
+        coverFromSubqueries(plainSelect, tableStructure.getSchema(), rules);
+        coverSelectOperatorSubqueries(plainSelect, tableStructure, rules);
 
         return rules;
     }
@@ -45,11 +48,11 @@ public final class SubqueryGenerator {
     /**
      * Generates coverage targets for subqueries found in the WHERE and HAVING clauses of a query. Rules that are
      * generated will be added to the provided set.
-     *
      * @param plainSelect the query to cover.
+     * @param tableStructure the table structure that provides the context of the main query.
      * @param rules a set in which all generated rules should be stored.
      */
-    private static void coverSelectOperatorSubqueries(PlainSelect plainSelect, Set<String> rules) {
+    private static void coverSelectOperatorSubqueries(PlainSelect plainSelect, TableStructure tableStructure, Set<String> rules) {
 
         Map<String, SubSelect> whereSubs = obtainSubqueries(plainSelect.getWhere());
         Map<String, SubSelect> havingSubs = obtainSubqueries(plainSelect.getHaving());
@@ -71,8 +74,8 @@ public final class SubqueryGenerator {
             removeSubquery(subquery, selectCopy, isWhereSub, isHavingSub);
 
             HashSet<String> mutations = new HashSet<>();
-            // TODO: pass along the schema
-            SelectStatementVisitor selectVisitor = new SelectStatementVisitor(null, mutations);
+
+            SelectStatementVisitor selectVisitor = new SelectStatementVisitor(tableStructure, mutations);
             subCopy.getSelectBody().accept(selectVisitor);
 
             for (String mutation : mutations) {
@@ -157,11 +160,11 @@ public final class SubqueryGenerator {
     /**
      * Generates coverage targets for subqueries found in the FROM clause of a query. Rules that are generated will
      * be added to the provided set.
-     *
-     * @param plainSelect the SELECT to cover.
+     *  @param plainSelect the SELECT to cover.
+     * @param schema the schema used for the query.
      * @param rules a set in which all generated rules should be stored.
      */
-    private static void coverFromSubqueries(PlainSelect plainSelect, Set<String> rules) {
+    private static void coverFromSubqueries(PlainSelect plainSelect, Schema schema, Set<String> rules) {
 
         List<SubSelect> fromSubSelects = new LinkedList<>(extractSubqueriesFromFromItem(plainSelect.getFromItem()));
 
@@ -172,8 +175,9 @@ public final class SubqueryGenerator {
 
         for (SubSelect subSelect : fromSubSelects) {
             Set<String> subRules = new HashSet<>();
-            // TODO: pass along the schema and the intermediate table structure
-            SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(null, subRules);
+            TableStructure tableStructure = new TableStructure();
+            tableStructure.setSchema(schema);
+            SelectStatementVisitor selectStatementVisitor = new SelectStatementVisitor(tableStructure, subRules);
             subSelect.getSelectBody().accept(selectStatementVisitor);
             rules.addAll(subRules);
         }

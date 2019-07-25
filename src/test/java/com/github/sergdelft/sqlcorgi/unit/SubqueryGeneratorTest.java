@@ -2,6 +2,7 @@ package com.github.sergdelft.sqlcorgi.unit;
 
 import com.github.sergdelft.sqlcorgi.SubqueryGenerator;
 import com.github.sergdelft.sqlcorgi.exceptions.CannotBeParsedException;
+import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.visitors.SelectStatementVisitor;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.NullValue;
@@ -63,19 +64,19 @@ class SubqueryGeneratorTest {
     }
 
     /**
-     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect)} generates no coverage targets if the
-     * provided query contains no subqueries.
+     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect, TableStructure)} generates no coverage targets
+     * if the provided query contains no subqueries.
      */
     @Test
     void testCoverQueryWithoutSubqueries() {
 
-        Set<String> rules = SubqueryGenerator.coverSubqueries(select);
+        Set<String> rules = SubqueryGenerator.coverSubqueries(select, new TableStructure());
         assertThat(rules).isEmpty();
     }
 
     /**
-     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect)} generates coverage targets for subqueries
-     * found in the FROM clause.
+     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect, TableStructure)} generates coverage targets for
+     * subqueries found in the FROM clause.
      */
     @Test
     void testCoverQueryFromSubquery() {
@@ -105,13 +106,13 @@ class SubqueryGeneratorTest {
         select.setFromItem(table);
         select.setJoins(joinList);
 
-        SubqueryGenerator.coverSubqueries(select);
+        SubqueryGenerator.coverSubqueries(select, new TableStructure());
         verify(selectBody).accept(isA(SelectStatementVisitor.class));
     }
 
     /**
-     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect)} generates coverage targets if the
-     * WHERE clause of the provided query contains a subquery.
+     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect, TableStructure)} generates coverage targets if
+     * the WHERE clause of the provided query contains a subquery.
      */
     @Test
     void testCoverQueryWhereContainsSubquery() {
@@ -122,7 +123,7 @@ class SubqueryGeneratorTest {
         OrExpression orExpression = new OrExpression(new NullValue(), andExpression);
 
         select.setWhere(orExpression);
-        Set<String> result = SubqueryGenerator.coverSubqueries(select);
+        Set<String> result = SubqueryGenerator.coverSubqueries(select, new TableStructure());
 
         Set<String> expected = new HashSet<>(Arrays.asList(
                 "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE a = 'b') AND NULL OR NULL",
@@ -134,8 +135,8 @@ class SubqueryGeneratorTest {
     }
 
     /**
-     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect)} generates coverage targets if the
-     * HAVING clause of the provided query contains a subquery.
+     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect, TableStructure)} generates coverage targets if
+     * the HAVING clause of the provided query contains a subquery.
      */
     @Test
     void testCoverQueryHavingContainsSubquery() {
@@ -146,7 +147,7 @@ class SubqueryGeneratorTest {
         AndExpression andExpression = new AndExpression(orExpression, new NullValue());
 
         select.setHaving(andExpression);
-        Set<String> result = SubqueryGenerator.coverSubqueries(select);
+        Set<String> result = SubqueryGenerator.coverSubqueries(select, new TableStructure());
 
         Set<String> expected = new HashSet<>(Arrays.asList(
                 "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE a = 'b') AND NULL AND NULL",
@@ -158,14 +159,14 @@ class SubqueryGeneratorTest {
     }
 
     /**
-     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect)} generates coverage targets if the
-     * WHERE clause of the provided query consists only of the subquery.
+     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect, TableStructure)} generates coverage targets if
+     * the WHERE clause of the provided query consists only of the subquery.
      */
     @Test
     void testCoverQueryWhereOnlySubquery() {
 
         select.setWhere(createSimpleSubquery());
-        Set<String> result = SubqueryGenerator.coverSubqueries(select);
+        Set<String> result = SubqueryGenerator.coverSubqueries(select, new TableStructure());
 
         Set<String> expected = new HashSet<>(Arrays.asList(
                 "SELECT * FROM t WHERE EXISTS (SELECT * FROM t WHERE a = 'b')",
@@ -177,14 +178,14 @@ class SubqueryGeneratorTest {
     }
 
     /**
-     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect)} generates coverage targets if the
-     * HAVING clause of the provided query consists only of the subquery.
+     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect, TableStructure)} generates coverage targets if
+     * the HAVING clause of the provided query consists only of the subquery.
      */
     @Test
     void testCoverQueryHavingOnlySubquery() {
 
         select.setHaving(createSimpleSubquery());
-        Set<String> result = SubqueryGenerator.coverSubqueries(select);
+        Set<String> result = SubqueryGenerator.coverSubqueries(select, new TableStructure());
 
         Set<String> expected = new HashSet<>(Arrays.asList(
                 "SELECT * FROM t HAVING EXISTS (SELECT * FROM t WHERE a = 'b')",
@@ -196,8 +197,8 @@ class SubqueryGeneratorTest {
     }
 
     /**
-     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect)} generates coverage targets if the
-     * WHERE or HAVING clause of the provided query contains an invalid subquery.
+     * Checks that {@link SubqueryGenerator#coverSubqueries(PlainSelect, TableStructure)} generates coverage targets if
+     * the WHERE or HAVING clause of the provided query contains an invalid subquery.
      */
     @Test
     void testCoverQuerySelectOpInvalidSubquery() {
@@ -217,7 +218,8 @@ class SubqueryGeneratorTest {
         subSelect.setSelectBody(plainSelect);
         select.setWhere(subSelect);
 
-        assertThatThrownBy(() -> SubqueryGenerator.coverSubqueries(select)).isInstanceOf(CannotBeParsedException.class);
+        assertThatThrownBy(() -> SubqueryGenerator.coverSubqueries(select, new TableStructure()))
+                .isInstanceOf(CannotBeParsedException.class);
     }
 
     /**

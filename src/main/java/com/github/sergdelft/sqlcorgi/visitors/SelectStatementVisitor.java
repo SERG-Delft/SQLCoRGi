@@ -25,7 +25,6 @@ import static com.github.sergdelft.sqlcorgi.util.cloner.SelectCloner.copy;
  */
 public class SelectStatementVisitor extends SelectVisitorAdapter {
 
-    private Schema schema;
     private TableStructure tableStructure;
 
     private Set<String> output;
@@ -35,33 +34,34 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * Creates a new visitor which can be used to generate coverage rules for queries.
      * Any rules that are generated will be written to {@code output}.
      *
-     * @param schema the schema to be used when generating rules. If null is provided, all attributes are assumed to
-     *               be nullable.
+     * @param tableStructure the table structure to be used when generating rules. If its schema is set to null, all
+     *                       attributes are assumed to not be nullable. It must not be null.
      * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
      */
-    public SelectStatementVisitor(Schema schema, Set<String> output) {
+    public SelectStatementVisitor(TableStructure tableStructure, Set<String> output) {
         if (output == null || !output.isEmpty()) {
             throw new IllegalArgumentException(
                 "A SelectStatementVisitor requires an empty, non-null set to which it can output generated rules."
             );
         }
 
-        this.schema = schema;
+        if (tableStructure == null) {
+            throw new IllegalArgumentException("The table structure must not be null.");
+        }
 
+        this.tableStructure = tableStructure;
         this.output = output;
         this.statements = new ArrayList<>();
     }
 
     @Override
     public void visit(PlainSelect plainSelect) {
-        plainSelect = handleJoins(plainSelect);
 
-        if (schema != null) {
-            tableStructure = new TableStructure();
-            tableStructure.setSchema(schema);
+        if (tableStructure.getSchema() != null) {
             tableStructure.addLayer(plainSelect.getFromItem(), plainSelect.getJoins());
         }
 
+        plainSelect = handleJoins(plainSelect);
         handleWhere(plainSelect);
         handleAggregators(plainSelect);
         handleGroupBy(plainSelect);
@@ -74,7 +74,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             this.output.add(select.toString());
         }
 
-        if (schema != null) {
+        if (tableStructure.getSchema() != null) {
             tableStructure.removeLayer();
         }
     }
@@ -92,7 +92,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * @param plainSelect the plainSelect that needs to be covered.
      */
     private void handleSubqueries(PlainSelect plainSelect) {
-        this.output.addAll(coverSubqueries((PlainSelect) copy(plainSelect)));
+        this.output.addAll(coverSubqueries((PlainSelect) copy(plainSelect), tableStructure));
     }
 
     /**
