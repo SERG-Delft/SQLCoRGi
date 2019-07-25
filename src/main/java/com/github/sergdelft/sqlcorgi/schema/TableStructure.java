@@ -62,8 +62,22 @@ public class TableStructure {
         return null; // TODO
     }
 
+    /**
+     * Returns the {@link Table} associated with the {@code tableName}.
+     * @param tableName a string referring to a {@code Table}.
+     *
+     * @return a {@code Table} if one is found, throws an {@link UnknownTableException} otherwise.
+     */
     public Table getTable(String tableName) {
-        return null; // TODO
+
+        for (Map<String, Table> tableMap : tableStack) {
+            Table table = tableMap.get(tableName);
+            if (table != null) {
+                return table;
+            }
+        }
+
+        throw new UnknownTableException("The following table could not be found: " + tableName);
     }
 
     public Table getFromTable() {
