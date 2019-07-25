@@ -100,8 +100,8 @@ public class TableStructure {
     public Column getColumn(net.sf.jsqlparser.schema.Column column)
             throws AmbiguousColumnException, UnknownColumnException {
 
-        net.sf.jsqlparser.schema.Table table = column.getTable();
-        String tableName = table == null ? null : table.getName();
+        net.sf.jsqlparser.schema.Table jsqlTable = column.getTable();
+        String tableName = jsqlTable == null ? null : jsqlTable.getName();
         String colName = column.getColumnName();
 
         Column result = null;
@@ -110,23 +110,34 @@ public class TableStructure {
             if (tableName != null) {
                 for (Column temp : tableMap.get(tableName).getColumns()) {
                     if (colName.equals(temp.getName())) {
+                        if (result != null) {
+                            throw new AmbiguousColumnException(colName);
+                        }
                         result = temp;
-                        break;
                     }
                 }
             } else {
-                for (Map.Entry<String, Table> tables : tableMap.entrySet()) {
+                Table foundTable = null;
+                for (Map.Entry<String, Table> table : tableMap.entrySet()) {
 
                     Column found = null;
-                    for (Column temp : tables.getValue().getColumns()) {
+                    for (Column temp : table.getValue().getColumns()) {
                         if (colName.equals(temp.getName())) {
+                            if (found != null) {
+                                throw new AmbiguousColumnException(colName);
+                            }
                             found = temp;
-                            break;
                         }
                     }
 
                     if (result != null && found != null) {
-                        throw new AmbiguousColumnException("The following column reference is ambiguous: " + colName);
+                        if (foundTable != null) {
+                            if (foundTable != table.getValue()) {
+                                throw new AmbiguousColumnException(colName);
+                            }
+                        } else {
+                            foundTable = table.getValue();
+                        }
                     }
                     result = found;
                 }
@@ -189,6 +200,10 @@ public class TableStructure {
         if (fromItem instanceof net.sf.jsqlparser.schema.Table) {
             String name = ((net.sf.jsqlparser.schema.Table) fromItem).getName();
             Table table = schema.getTable(name);
+
+            if (table == null) {
+                throw new UnknownTableException("The following table cannot be found in the schema: " + name);
+            }
 
             if (storeTable) {
                 Alias alias = fromItem.getAlias();

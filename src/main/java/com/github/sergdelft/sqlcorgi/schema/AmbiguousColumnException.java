@@ -5,13 +5,15 @@ package com.github.sergdelft.sqlcorgi.schema;
  */
 public class AmbiguousColumnException extends RuntimeException {
 
+    private static final String DEFAULT_MESSAGE = "The following column reference is ambiguous: ";
+
     /**
      * Creates a new instance of this exception with a message.
      *
-     * @param message a message describing why this exception is thrown.
+     * @param column the name of the column that is ambiguously referenced.
      */
-    public AmbiguousColumnException(String message) {
-        super(message);
+    public AmbiguousColumnException(String column) {
+        super(DEFAULT_MESSAGE + column);
     }
 
 }

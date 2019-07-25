@@ -179,17 +179,15 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      * @return A list of rules with is null cases for the columns.
      */
     private List<Expression> generateIsNullCases(Expression expression) {
-        List<Expression> output = new ArrayList<>();
+
         ColumnExtractor columnExtractor = new ColumnExtractor();
         expression.accept(columnExtractor);
 
-        Set<Column> columns = new HashSet<>(columnExtractor.getColumns());
-
-        // TODO: check schema for nullable
-        for (Column c : columns) {
-            if (tableStructure.getColumn(c).isNullable()) {
+        List<Expression> output = new ArrayList<>();
+        for (Column column : columnExtractor.getColumns()) {
+            if (tableStructure.isNullable(column)) {
                 IsNullExpression isNullExpression = new IsNullExpression();
-                isNullExpression.setLeftExpression(copy(c));
+                isNullExpression.setLeftExpression(copy(column));
                 output.add(isNullExpression);
             }
         }
@@ -346,9 +344,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         betweenFlipped.setNot(true);
         output.add(betweenFlipped);
 
-        IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(copy(left));
-        output.add(isNullExpression);
+        generateIsNullCases(between);
     }
 
     /**
@@ -365,9 +361,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         inExpressionFlipped.setNot(!inExpressionFlipped.isNot());
         output.add(inExpressionFlipped);
 
-        IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(copy(inExpression.getLeftExpression()));
-        output.add(isNullExpression);
+        generateIsNullCases(inExpression);
     }
 
     /**
@@ -386,9 +380,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         notLikeExpression.setNot(true);
         output.add(notLikeExpression);
 
-        IsNullExpression isNullExpressionOut = new IsNullExpression();
-        isNullExpressionOut.setLeftExpression(copy(likeExpression.getLeftExpression()));
-        output.add(isNullExpressionOut);
+        generateIsNullCases(likeExpression);
     }
 
     @Override
@@ -405,6 +397,8 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         IsNullExpression isNullExpressionOut = new IsNullExpression();
         isNullExpressionOut.setLeftExpression(copy(similarToExpression.getLeftExpression()));
         output.add(isNullExpressionOut);
+
+        generateIsNullCases(similarToExpression);
     }
 
     @Override

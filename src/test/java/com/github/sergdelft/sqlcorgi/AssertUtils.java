@@ -30,7 +30,7 @@ public final class AssertUtils {
      * @param expected the expected output of the generator.
      */
     public static void verify(String query, Schema schema, String... expected) {
-        Set<String> resultSet = SQLCorgi.generateRules(query, null);
+        Set<String> resultSet = SQLCorgi.generateRules(query, schema);
         Set<String> expectedSet = new TreeSet<>(Arrays.asList(expected));
 
         assertThat(resultSet).isEqualTo(expectedSet);
