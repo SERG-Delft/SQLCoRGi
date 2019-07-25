@@ -62,6 +62,33 @@ public class TableStructure {
         tableStack.pop();
     }
 
+    public boolean isNullable(net.sf.jsqlparser.schema.Column column) {
+
+        if (schema != null) {
+            return getColumn(column).isNullable();
+        }
+
+        return false;
+    }
+
+    public boolean isKey(net.sf.jsqlparser.schema.Column column) {
+
+        if (schema != null) {
+            return getColumn(column).isKey();
+        }
+
+        return false;
+    }
+
+    public Column.DataType getDataType(net.sf.jsqlparser.schema.Column column) {
+
+        if (schema != null) {
+            return getColumn(column).getDataType();
+        }
+
+        return Column.DataType.STRING;
+    }
+
     /**
      * Returns the {@link Column} associated with the {@code column}.
      * @param column a {@link net.sf.jsqlparser.schema.Column} referring to a {@code Column}.
