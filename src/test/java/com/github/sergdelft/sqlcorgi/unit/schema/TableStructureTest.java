@@ -20,14 +20,14 @@ class TableStructureTest {
     private static Schema makeSchema() {
 
         List<Column> columns1 = new ArrayList<>();
-        columns1.add(new Column("a", true, false, Column.DataType.INTEGER));
-        columns1.add(new Column("b", true, false, Column.DataType.INTEGER));
-        columns1.add(new Column("c", false, false, Column.DataType.INTEGER));
+        columns1.add(new Column("a", true, false, Column.DataType.NUM));
+        columns1.add(new Column("b", true, false, Column.DataType.NUM));
+        columns1.add(new Column("c", false, false, Column.DataType.NUM));
 
         List<Column> columns2 = new ArrayList<>();
-        columns2.add(new Column("a", true, false, Column.DataType.INTEGER));
-        columns2.add(new Column("x", false, false, Column.DataType.INTEGER));
-        columns2.add(new Column("y", false, false, Column.DataType.INTEGER));
+        columns2.add(new Column("a", true, false, Column.DataType.NUM));
+        columns2.add(new Column("x", false, false, Column.DataType.NUM));
+        columns2.add(new Column("y", false, false, Column.DataType.NUM));
 
         Map<String, Table> tables = new HashMap<>();
         tables.put("t1", new Table("t1", columns1));

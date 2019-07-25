@@ -14,7 +14,9 @@ public class Column {
      * Contains all supported data types.
      */
     public enum DataType {
-        NUM, STRING
+        NUM,
+        STRING,
+        NULL,
     }
 
     /**

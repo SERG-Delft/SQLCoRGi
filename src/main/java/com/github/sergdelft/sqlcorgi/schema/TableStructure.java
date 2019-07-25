@@ -52,6 +52,34 @@ public class TableStructure {
     }
 
     /**
+     * Removes the most recently added layer of tables from the structure.
+     */
+    public void removeLayer() {
+        tableStack.pop();
+    }
+
+    public Column getColumn(net.sf.jsqlparser.schema.Column column) {
+        return null; // TODO
+    }
+
+    public Table getTable(String tableName) {
+        return null; // TODO
+    }
+
+    public Table getFromTable() {
+
+        if (tableStack.isEmpty()) {
+            return null;
+        }
+
+        return tableStack.peek().get("");
+    }
+
+    public void setSchema(Schema schema) {
+        this.schema = schema;
+    }
+
+    /**
      * Returns the {@link Table} derived from the given {@link FromItem}. If the {@code FromItem} has an
      * {@link Alias} and {@code storeTable} is {@code true}, it will be added to the collection of {@code Table}s.
      *
@@ -194,8 +222,7 @@ public class TableStructure {
                         derivedTable.addColumn(column);
                     }
                 } else if (selectItem instanceof SelectExpressionItem) {
-                    // add column to new table
-                    // TODO
+                    // TODO get type of expression using TypeChecker
                 }
             }
             tableStructure.removeLayer();
@@ -213,25 +240,4 @@ public class TableStructure {
 
         throw new UnsupportedOperationException("To be implemented");
     }
-
-    public Table getFromTable() {
-
-        if (tableStack.isEmpty()) {
-            return null;
-        }
-
-        return tableStack.peek().get("");
-    }
-
-    /**
-     * Removes the most recently added layer of tables from the structure.
-     */
-    public void removeLayer() {
-        tableStack.pop();
-    }
-
-    public void setSchema(Schema schema) {
-        this.schema = schema;
-    }
-
 }
