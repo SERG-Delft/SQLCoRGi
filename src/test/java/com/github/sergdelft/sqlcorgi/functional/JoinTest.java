@@ -344,8 +344,8 @@ class JoinTest {
                     + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE acl_roles"
                     + ".deleted IS NULL",
                 "SELECT acl_roles.* FROM acl_roles INNER JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
-                    + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE acl_roles"
-                    + ".deleted <> '0'",
+                    + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE NOT (acl_roles"
+                    + ".deleted = '0')",
                 "SELECT acl_roles.* FROM acl_roles LEFT JOIN acl_roles_users ON acl_roles_users.user_id = '1' AND "
                     + "acl_roles_users.role_id = acl_roles.id AND acl_roles_users.deleted = '0' WHERE ("
                     + "(acl_roles_users.user_id IS NULL) AND (acl_roles_users.role_id IS NULL) AND "
