@@ -3,6 +3,7 @@ package com.github.sergdelft.sqlcorgi;
 import com.github.sergdelft.sqlcorgi.query.JoinWhereItem;
 import com.github.sergdelft.sqlcorgi.query.OuterIncrementRelation;
 import com.github.sergdelft.sqlcorgi.schema.Schema;
+import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.visitors.ExpressionTraverserVisitor;
 import com.github.sergdelft.sqlcorgi.visitors.join.ImplicitInnerJoinDeducer;
 import com.github.sergdelft.sqlcorgi.visitors.join.OnExpressionVisitor;
@@ -49,17 +50,19 @@ public class JoinRulesGenerator {
     private PlainSelect plainSelect;
     private Set<String> simple;
     private PlainSelect sanitized;
+    private TableStructure tableStructure;
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
      *
      * @param plainSelect The statement for which the joins have to be mutated.
-     * @param schema The schema related to the input query.
+     * @param tableStructure The table structure related to the input query.
      * @return A set of mutated queries in string format.
      */
-    public Set<String> generate(PlainSelect plainSelect, Schema schema) {
+    public Set<String> generate(PlainSelect plainSelect, TableStructure tableStructure) {
         List<Join> joins = plainSelect.getJoins();
 
+        this.tableStructure = tableStructure;
         Set<String> result = new TreeSet<>();
         simple = new HashSet<>();
         fromItem = plainSelect.getFromItem();
@@ -68,7 +71,6 @@ public class JoinRulesGenerator {
         if (joins == null || joins.isEmpty()) {
             return new HashSet<>();
         }
-
 
         for (Join j : joins) {
             if (j.isSimple()) {
@@ -243,10 +245,25 @@ public class JoinRulesGenerator {
             Expression loiNull = getLeftOuterIncrement(oir, true);
 
             out.add(new JoinWhereItem(tJoinsLoi, concatenate(loi, reducedWhereLoi, true)));
-            out.add(new JoinWhereItem(tJoinsLoi, concatenate(loiNull, reducedWhereLoiNull, true)));
+
+            if (!getNullableColumns(oir.getLoiRelColumns()).isEmpty()) {
+                out.add(new JoinWhereItem(tJoinsLoi, concatenate(loiNull, reducedWhereLoiNull, true)));
+            }
+
         }
 
         return out;
+    }
+
+    private List<Column> getNullableColumns(List<Column> columns) {
+        List<Column> res = new ArrayList<>();
+        for (Column c : columns) {
+            if (tableStructure.getColumn(c).isNullable()) {
+                res.add(c);
+            }
+        }
+
+        return res;
     }
 
     /**
@@ -287,7 +304,11 @@ public class JoinRulesGenerator {
             Expression roiNull = getRightOuterIncrement(oir, true);
 
             out.add(new JoinWhereItem(tJoinsRoi, concatenate(roi, reducedWhereRoi, true)));
-            out.add(new JoinWhereItem(tJoinsRoi, concatenate(roiNull, reducedWhereRoiNull, true)));
+
+            // TODO check if key columns are nullable.
+            if (!getNullableColumns(oir.getRoiRelColumns()).isEmpty()) {
+                out.add(new JoinWhereItem(tJoinsRoi, concatenate(roiNull, reducedWhereRoiNull, true)));
+            }
         }
 
         return out;
@@ -342,6 +363,7 @@ public class JoinRulesGenerator {
      * @param nullable True if the outer increment relations are nullable, false otherwise.
      * @return The reduced expression.
      */
+
     private Expression nullReduction(Expression expression, JoinType joinType, OuterIncrementRelation oir,
                                             List<OuterIncrementRelation> oirs, boolean nullable) {
         if (expression != null) {
@@ -368,8 +390,10 @@ public class JoinRulesGenerator {
             traverserVisitor.setTables(includeTables);
             traverserVisitor.setOnColumns(columns);
 
+
             if (nullable) {
-                traverserVisitor.setNullColumns(columns);
+                // TODO: Check if handled correctly
+                traverserVisitor.setNullColumns(getNullableColumns(columns));
             }
 
             expression.accept(traverserVisitor);
@@ -387,10 +411,15 @@ public class JoinRulesGenerator {
      * @param nullable True if the right outer increment relations are nullable, false otherwise.
      * @return The left outer increment.
      */
+    // TODO: check if nullable handled correctly
     private Expression getLeftOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
         List<Column> loiColumns = oiRel.getLoiRelColumns();
-        List<Column> roiColumns = oiRel.getRoiRelColumns();
-
+        List<Column> roiColumns;
+        if (nullable) {
+            roiColumns = getNullableColumns(oiRel.getRoiRelColumns());
+        } else {
+            roiColumns = oiRel.getRoiRelColumns();
+        }
         return concatenate(
                 createIsNullExpressions(loiColumns, true),
                 createIsNullExpressions(roiColumns, nullable), false);
@@ -403,11 +432,18 @@ public class JoinRulesGenerator {
      * @param nullable True if the left outer increment relations are nullable, false otherwise.
      * @return The right outer increment.
      */
+    // TODO: check if nullable handled correctly.
     private Expression getRightOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
-        List<Column> loiColumns = oiRel.getLoiRelColumns();
+        List<Column> loiColumns;
         List<Column> roiColumns = oiRel.getRoiRelColumns();
+
+        if (nullable) {
+            loiColumns = getNullableColumns(oiRel.getLoiRelColumns());
+        } else {
+            loiColumns = oiRel.getLoiRelColumns();
+        }
         return concatenate(
-                createIsNullExpressions(roiColumns, true),
+                createIsNullExpressions(getNullableColumns(roiColumns), true),
                 createIsNullExpressions(loiColumns, nullable), false);
     }
 
