@@ -52,12 +52,10 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      * @param comparisonOperator the relational operator to be mutated.
      */
     private void generateRelationalMutations(ComparisonOperator comparisonOperator) {
-        Set<Expression> output = new HashSet<>();
 
-        output.addAll(generateIsNullCases(comparisonOperator));
+        Set<Expression> output = new HashSet<>(generateIsNullCases(comparisonOperator));
 
         com.github.sergdelft.sqlcorgi.schema.Column.DataType type = checkTypes(comparisonOperator.getRightExpression());
-
         switch (type) {
             case NUM: output.addAll(generateNumericCases(comparisonOperator));
                 break;
@@ -390,6 +388,22 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
         IsNullExpression isNullExpressionOut = new IsNullExpression();
         isNullExpressionOut.setLeftExpression(copy(likeExpression.getLeftExpression()));
+        output.add(isNullExpressionOut);
+    }
+
+    @Override
+    public void visit(SimilarToExpression similarToExpression) {
+
+        SimilarToExpression similarToExpressionCopy = (SimilarToExpression) copy(similarToExpression);
+        similarToExpressionCopy.setNot(false);
+        output.add(similarToExpressionCopy);
+
+        SimilarToExpression notSimilarToExpression = (SimilarToExpression) copy(similarToExpression);
+        notSimilarToExpression.setNot(true);
+        output.add(notSimilarToExpression);
+
+        IsNullExpression isNullExpressionOut = new IsNullExpression();
+        isNullExpressionOut.setLeftExpression(copy(similarToExpression.getLeftExpression()));
         output.add(isNullExpressionOut);
     }
 
