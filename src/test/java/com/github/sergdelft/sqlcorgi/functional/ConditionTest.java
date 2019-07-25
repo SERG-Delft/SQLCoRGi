@@ -1,15 +1,10 @@
 package com.github.sergdelft.sqlcorgi.functional;
 
-import com.github.sergdelft.sqlcorgi.schema.Column;
-import com.github.sergdelft.sqlcorgi.schema.Schema;
-import com.github.sergdelft.sqlcorgi.schema.Table;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import static com.github.sergdelft.sqlcorgi.AssertUtils.containsAtLeast;
 import static com.github.sergdelft.sqlcorgi.AssertUtils.verify;
+import static com.github.sergdelft.sqlcorgi.AssertUtils.makeSchema;
 
 /**
  * This class tests if the coverage targets for queries with WHERE clauses are generated correctly.
@@ -18,29 +13,6 @@ import static com.github.sergdelft.sqlcorgi.AssertUtils.verify;
  */
 @SuppressWarnings("checkstyle:multipleStringLiterals")
 class ConditionTest {
-
-    private Schema makeSchema() {
-
-
-        ArrayList<Column> moviesColumns = new ArrayList<>();
-        moviesColumns.add(new Column("year", true, false, Column.DataType.NUM));
-
-        Table moviesTable = new Table("Movies", moviesColumns);
-
-
-        ArrayList<Column> tColumns = new ArrayList<>();
-        tColumns.add(new Column("a", true, false, Column.DataType.NUM));
-        tColumns.add(new Column("b", true, false, Column.DataType.STRING));
-        tColumns.add(new Column("c", true, false, Column.DataType.NUM));
-
-        Table tTable = new Table("t", tColumns);
-
-        HashMap<String, Table> tables = new HashMap<>();
-        tables.put(moviesTable.getName(), moviesTable);
-        tables.put(tTable.getName(), tTable);
-
-        return new Schema(tables);
-    }
 
     /**
      * A test case for a simple query containing only one condition with = as operator.

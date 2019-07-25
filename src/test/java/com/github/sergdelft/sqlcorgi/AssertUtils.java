@@ -1,11 +1,10 @@
 package com.github.sergdelft.sqlcorgi;
 
+import com.github.sergdelft.sqlcorgi.schema.Column;
 import com.github.sergdelft.sqlcorgi.schema.Schema;
+import com.github.sergdelft.sqlcorgi.schema.Table;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,6 +12,28 @@ import static org.assertj.core.api.Assertions.assertThat;
  * This class contains the functionality needed to verify correctness of the generated coverage targets.
  */
 public final class AssertUtils {
+
+    public static Schema makeSchema() {
+
+        ArrayList<Column> moviesColumns = new ArrayList<>();
+        moviesColumns.add(new Column("year", true, false, Column.DataType.NUM));
+
+        Table moviesTable = new Table("Movies", moviesColumns);
+
+
+        ArrayList<Column> tColumns = new ArrayList<>();
+        tColumns.add(new Column("a", true, false, Column.DataType.NUM));
+        tColumns.add(new Column("b", true, false, Column.DataType.STRING));
+        tColumns.add(new Column("c", true, false, Column.DataType.NUM));
+
+        Table tTable = new Table("t", tColumns);
+
+        HashMap<String, Table> tables = new HashMap<>();
+        tables.put(moviesTable.getName(), moviesTable);
+        tables.put(tTable.getName(), tTable);
+
+        return new Schema(tables);
+    }
 
     /**
      * Prevents instantiation of {@link AssertUtils}.
