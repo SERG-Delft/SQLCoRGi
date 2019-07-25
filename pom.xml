@@ -15,9 +15,10 @@
 
         <clean.plugin.version>3.1.0</clean.plugin.version>
         <compiler.plugin.version>3.8.1</compiler.plugin.version>
-        <deploy.plugin.version>2.8.2</deploy.plugin.version>
+        <deploy.plugin.version>3.0.0-M1</deploy.plugin.version>
         <enforcer.plugin.version>3.0.0-M2</enforcer.plugin.version>
-        <install.plugin.version>2.5.2</install.plugin.version>
+        <gpg.plugin.version>1.6</gpg.plugin.version>
+        <install.plugin.version>3.0.0-M1</install.plugin.version>
         <jar.plugin.version>3.1.0</jar.plugin.version>
         <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
         <jxr.plugin.version>3.0.0</jxr.plugin.version>
@@ -35,9 +36,9 @@
 
         <jsqlparser.version>2.1</jsqlparser.version>
 
-        <junit.jupiter.api.version>5.5.0</junit.jupiter.api.version>
-        <junit.jupiter.engine.version>5.5.0</junit.jupiter.engine.version>
-        <junit.jupiter.params.version>5.5.0</junit.jupiter.params.version>
+        <junit.jupiter.api.version>5.5.1</junit.jupiter.api.version>
+        <junit.jupiter.engine.version>5.5.1</junit.jupiter.engine.version>
+        <junit.jupiter.params.version>5.5.1</junit.jupiter.params.version>
 
         <assertj.core.version>3.12.2</assertj.core.version>
 
@@ -50,8 +51,8 @@
         <spotbugs.annotations.version>3.1.12</spotbugs.annotations.version>
         <spotbugs.plugin.version>3.1.11</spotbugs.plugin.version>
 
-        <systems.manifold.version>2019.1.7</systems.manifold.version>
-        <systems.manifold.ext.version>2019.1.7</systems.manifold.ext.version>
+        <systems.manifold.version>2019.1.8</systems.manifold.version>
+        <systems.manifold.ext.version>2019.1.8</systems.manifold.ext.version>
     </properties>
 
 
@@ -481,6 +482,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${gpg.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
