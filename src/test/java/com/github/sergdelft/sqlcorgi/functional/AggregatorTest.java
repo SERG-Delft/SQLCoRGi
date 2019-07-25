@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import static com.github.sergdelft.sqlcorgi.AssertUtils.makeSchema;
 import static com.github.sergdelft.sqlcorgi.AssertUtils.verify;
 
 /**
@@ -31,13 +32,13 @@ class AggregatorTest {
      */
     @Test
     void testCountOnColumnWithWhere() {
-        verify("SELECT COUNT(id) FROM Movies WHERE length_minutes < 100",
+        verify("SELECT COUNT(id) FROM Movies WHERE year < 100",
 
-                null, "SELECT COUNT(id) FROM Movies WHERE length_minutes = 101",
-            "SELECT COUNT(id) FROM Movies WHERE length_minutes = 100",
-            "SELECT COUNT(id) FROM Movies WHERE length_minutes = 99",
-            "SELECT COUNT(id) FROM Movies WHERE length_minutes IS NULL",
-            "SELECT COUNT(id) FROM Movies WHERE length_minutes < 100 "
+            makeSchema(), "SELECT COUNT(id) FROM Movies WHERE year = 101",
+            "SELECT COUNT(id) FROM Movies WHERE year = 100",
+            "SELECT COUNT(id) FROM Movies WHERE year = 99",
+            "SELECT COUNT(id) FROM Movies WHERE year IS NULL",
+            "SELECT COUNT(id) FROM Movies WHERE year < 100 "
                 + "HAVING COUNT(id) > COUNT(DISTINCT id) AND COUNT(DISTINCT id) > 1");
     }
 
@@ -47,12 +48,12 @@ class AggregatorTest {
      */
     @Test
     void testCountAllWithWhere() {
-        verify("SELECT COUNT(*) FROM Movies WHERE length_minutes < 100",
+        verify("SELECT COUNT(*) FROM Movies WHERE year < 100",
 
-                null, "SELECT COUNT(*) FROM Movies WHERE length_minutes = 101",
-            "SELECT COUNT(*) FROM Movies WHERE length_minutes = 100",
-            "SELECT COUNT(*) FROM Movies WHERE length_minutes = 99",
-            "SELECT COUNT(*) FROM Movies WHERE length_minutes IS NULL");
+            makeSchema(), "SELECT COUNT(*) FROM Movies WHERE year = 101",
+            "SELECT COUNT(*) FROM Movies WHERE year = 100",
+            "SELECT COUNT(*) FROM Movies WHERE year = 99",
+            "SELECT COUNT(*) FROM Movies WHERE year IS NULL");
     }
 
     /**
@@ -185,9 +186,8 @@ class AggregatorTest {
         verify("SELECT Director FROM Movies WHERE title = 'Finding Nemo' GROUP BY Director",
 
                 // Where clause
-                null, "SELECT Director FROM Movies WHERE NOT (title = 'Finding Nemo') GROUP BY Director",
+                makeSchema(), "SELECT Director FROM Movies WHERE NOT (title = 'Finding Nemo') GROUP BY Director",
                 "SELECT Director FROM Movies WHERE title = 'Finding Nemo' GROUP BY Director",
-                "SELECT Director FROM Movies WHERE title IS NULL GROUP BY Director",
                 // Group By
                 "SELECT Director FROM Movies WHERE title = 'Finding Nemo' GROUP BY Director HAVING COUNT(*) > 1",
                 "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' HAVING COUNT(DISTINCT Director) > 1");
@@ -202,7 +202,7 @@ class AggregatorTest {
         verify("SELECT Director FROM Movies GROUP BY Director HAVING Director LIKE 'B%'",
 
                 // HAVING clause
-                null, "SELECT Director FROM Movies GROUP BY Director HAVING Director NOT LIKE 'B%'",
+                makeSchema(), "SELECT Director FROM Movies GROUP BY Director HAVING Director NOT LIKE 'B%'",
                 "SELECT Director FROM Movies GROUP BY Director HAVING Director LIKE 'B%'",
                 "SELECT Director FROM Movies GROUP BY Director HAVING Director IS NULL",
                 // Group By clause
@@ -226,8 +226,6 @@ class AggregatorTest {
                 //  WHERE
                 "SELECT Director FROM Movies WHERE NOT (title = 'Finding Nemo') "
                     + "GROUP BY Director HAVING Director LIKE 'A%'",
-                "SELECT Director FROM Movies WHERE title IS NULL "
-                    + "GROUP BY Director HAVING Director LIKE 'A%'",
 
                 // GROUP BY
                 "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
@@ -235,8 +233,6 @@ class AggregatorTest {
                 "SELECT COUNT(*) FROM Movies WHERE title = 'Finding Nemo' "
                     + "HAVING COUNT(DISTINCT Director) > 1 AND Director LIKE 'A%'",
                 // HAVING
-                "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
-                    + "GROUP BY Director HAVING Director IS NULL",
                 "SELECT Director FROM Movies WHERE title = 'Finding Nemo' "
                     + "GROUP BY Director HAVING Director NOT LIKE 'A%'");
     }

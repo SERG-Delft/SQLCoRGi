@@ -24,7 +24,7 @@ public final class AssertUtils {
 
     /**
      * Creates a schema which can be used in tests. Consists of two tables:
-     * 'Movies' => (name => STRING NULL, year NUMERIC NULL)
+     * 'Movies' => (title => STRING, Director => STRING NULL, year NUMERIC NULL)
      * 't' => (a NUMERIC NULL, b STRING NULL, c NUMERIC NULL)
      *
      * @return the schema as described above.
@@ -32,6 +32,8 @@ public final class AssertUtils {
     public static Schema makeSchema() {
 
         ArrayList<Column> moviesColumns = new ArrayList<>();
+        moviesColumns.add(new Column("title", false, false, Column.DataType.STRING));
+        moviesColumns.add(new Column("Director", true, false, Column.DataType.STRING));
         moviesColumns.add(new Column("year", true, false, Column.DataType.NUM));
 
         Table moviesTable = new Table("Movies", moviesColumns);
