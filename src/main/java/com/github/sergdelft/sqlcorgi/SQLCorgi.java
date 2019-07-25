@@ -61,9 +61,6 @@ public final class SQLCorgi {
     }
 
     public static void main(String[] args) {
-        for (String s : generateRules("SELECT * FROM t1 WHERE t1.c1 + 7 > t1.c2 - 8", null)) {
-            System.out.println("\"" + s + "\",");
-        }
-        System.out.println();
+        Set r = generateRules("SELECT * FROM t1 INNER JOIN t2 ON t1.c1 = t2.c1 WHERE t1.c2 = 50 OR t2.c2 = 50", null);
     }
 }

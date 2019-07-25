@@ -243,6 +243,7 @@ public class JoinRulesGenerator {
             Expression loiNull = getLeftOuterIncrement(oir, true);
 
             out.add(new JoinWhereItem(tJoinsLoi, concatenate(loi, reducedWhereLoi, true)));
+            // TODO check if key columns are nullable.
             out.add(new JoinWhereItem(tJoinsLoi, concatenate(loiNull, reducedWhereLoiNull, true)));
         }
 
@@ -287,6 +288,7 @@ public class JoinRulesGenerator {
             Expression roiNull = getRightOuterIncrement(oir, true);
 
             out.add(new JoinWhereItem(tJoinsRoi, concatenate(roi, reducedWhereRoi, true)));
+            // TODO check if key columns are nullable.
             out.add(new JoinWhereItem(tJoinsRoi, concatenate(roiNull, reducedWhereRoiNull, true)));
         }
 
@@ -342,6 +344,7 @@ public class JoinRulesGenerator {
      * @param nullable True if the outer increment relations are nullable, false otherwise.
      * @return The reduced expression.
      */
+
     private Expression nullReduction(Expression expression, JoinType joinType, OuterIncrementRelation oir,
                                             List<OuterIncrementRelation> oirs, boolean nullable) {
         if (expression != null) {
@@ -368,6 +371,7 @@ public class JoinRulesGenerator {
             traverserVisitor.setTables(includeTables);
             traverserVisitor.setOnColumns(columns);
 
+            // TODO: boolean nullable is redundant. Check schema for all null columns
             if (nullable) {
                 traverserVisitor.setNullColumns(columns);
             }
@@ -387,6 +391,7 @@ public class JoinRulesGenerator {
      * @param nullable True if the right outer increment relations are nullable, false otherwise.
      * @return The left outer increment.
      */
+    // TODO: boolean nullable should only be replaced by the nullable columns in the roicolumns.
     private Expression getLeftOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
         List<Column> loiColumns = oiRel.getLoiRelColumns();
         List<Column> roiColumns = oiRel.getRoiRelColumns();
@@ -403,6 +408,7 @@ public class JoinRulesGenerator {
      * @param nullable True if the left outer increment relations are nullable, false otherwise.
      * @return The right outer increment.
      */
+    // TODO: boolean nullable should only be replaced by the nullable columns in the loicolumns.
     private Expression getRightOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
         List<Column> loiColumns = oiRel.getLoiRelColumns();
         List<Column> roiColumns = oiRel.getRoiRelColumns();
