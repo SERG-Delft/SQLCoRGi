@@ -4,6 +4,7 @@ import com.github.sergdelft.sqlcorgi.AggregateFunctionsGenerator;
 import com.github.sergdelft.sqlcorgi.GroupByGenerator;
 import com.github.sergdelft.sqlcorgi.JoinRulesGenerator;
 import com.github.sergdelft.sqlcorgi.schema.Schema;
+import com.github.sergdelft.sqlcorgi.schema.Table;
 import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.visitors.select.NullAttributeFinder;
 import com.github.sergdelft.sqlcorgi.visitors.select.NullReducer;
@@ -47,14 +48,13 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
         }
 
         this.schema = schema;
-
+        this.schema = new Schema()
         this.output = output;
         this.statements = new ArrayList<>();
     }
 
     @Override
     public void visit(PlainSelect plainSelect) {
-        plainSelect = handleJoins(plainSelect);
 
         if (schema != null) {
             tableStructure = new TableStructure();
@@ -62,6 +62,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             tableStructure.addLayer(plainSelect.getFromItem(), plainSelect.getJoins());
         }
 
+        plainSelect = handleJoins(plainSelect);
         handleWhere(plainSelect);
         handleAggregators(plainSelect);
         handleGroupBy(plainSelect);
@@ -157,7 +158,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             }
 
             List<Expression> expressions = new ArrayList<>();
-            SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions);
+            SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions, tableStructure);
 
             where.accept(selectExpressionVisitor);
             copy.setWhere(null);
@@ -225,7 +226,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             copy.setHaving(null);
 
             List<Expression> expressions = new ArrayList<>();
-            SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions);
+            SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions, tableStructure);
 
             having.accept(selectExpressionVisitor);
             for (Expression expression : expressions) {
@@ -246,7 +247,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      */
     private PlainSelect handleJoins(PlainSelect plainSelect) {
         JoinRulesGenerator joinRulesGenerator = new JoinRulesGenerator();
-        Set<String> out = joinRulesGenerator.generate((PlainSelect) copy(plainSelect), null);
+        Set<String> out = joinRulesGenerator.generate((PlainSelect) copy(plainSelect), tableStructure);
         output.addAll(out);
 
         if (joinRulesGenerator.getSanitized() != null) {

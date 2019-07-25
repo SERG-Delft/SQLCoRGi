@@ -4,6 +4,7 @@ import com.github.sergdelft.sqlcorgi.AssertUtils;
 import com.github.sergdelft.sqlcorgi.query.NumericDoubleValue;
 import com.github.sergdelft.sqlcorgi.query.NumericLongValue;
 import com.github.sergdelft.sqlcorgi.query.NumericValue;
+import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.visitors.select.SelectExpressionVisitor;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.relational.*;
@@ -31,7 +32,7 @@ class SelectExpressionVisitorTest {
     @BeforeEach
     void setUpSelectExpressionVisitor() {
         output = new ArrayList<>();
-        selectExpressionVisitor = new SelectExpressionVisitor(output);
+        selectExpressionVisitor = new SelectExpressionVisitor(output, new TableStructure());
     }
 
     /**
@@ -40,7 +41,7 @@ class SelectExpressionVisitorTest {
     @Test
     void constructorNullOutputTest() {
         assertThatThrownBy(() -> {
-            new SelectExpressionVisitor(null);
+            new SelectExpressionVisitor(null, null);
         }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining(EXCEPTION_MESSAGE);
     }
 
@@ -54,7 +55,7 @@ class SelectExpressionVisitorTest {
         output.add(new GreaterThan());
 
         assertThatThrownBy(() -> {
-            new SelectExpressionVisitor(output);
+            new SelectExpressionVisitor(output, new TableStructure());
         }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining(EXCEPTION_MESSAGE);
     }
 

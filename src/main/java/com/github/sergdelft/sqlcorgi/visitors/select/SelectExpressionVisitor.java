@@ -35,8 +35,8 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      *
      * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
      */
-    public SelectExpressionVisitor(List<Expression> output) {
-        tableStructure = new TableStructure();
+    public SelectExpressionVisitor(List<Expression> output, TableStructure tableStructure) {
+        this.tableStructure = tableStructure;
         if (output == null || !output.isEmpty()) {
             throw new IllegalArgumentException(
                 "A SelectExpressionVisitor requires an empty, non-null set to which it can write generated expressions."

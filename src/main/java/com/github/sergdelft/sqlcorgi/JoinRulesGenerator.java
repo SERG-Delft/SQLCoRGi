@@ -56,14 +56,13 @@ public class JoinRulesGenerator {
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
      *
      * @param plainSelect The statement for which the joins have to be mutated.
-     * @param schema The schema related to the input query.
+     * @param tableStructure The table structure related to the input query.
      * @return A set of mutated queries in string format.
      */
-    public Set<String> generate(PlainSelect plainSelect, Schema schema) {
+    public Set<String> generate(PlainSelect plainSelect, TableStructure tableStructure) {
         List<Join> joins = plainSelect.getJoins();
 
-        // TODO: pass tablestructure
-        tableStructure = new TableStructure();
+        this.tableStructure = tableStructure;
         Set<String> result = new TreeSet<>();
         simple = new HashSet<>();
         fromItem = plainSelect.getFromItem();
@@ -72,7 +71,6 @@ public class JoinRulesGenerator {
         if (joins == null || joins.isEmpty()) {
             return new HashSet<>();
         }
-
 
         for (Join j : joins) {
             if (j.isSimple()) {
