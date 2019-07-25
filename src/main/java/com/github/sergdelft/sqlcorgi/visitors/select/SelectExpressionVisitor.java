@@ -34,6 +34,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      * generated will be written to {@code output}.
      *
      * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
+     * @param tableStructure the table structure to use for the query that is being visited.
      */
     public SelectExpressionVisitor(List<Expression> output, TableStructure tableStructure) {
         this.tableStructure = tableStructure;

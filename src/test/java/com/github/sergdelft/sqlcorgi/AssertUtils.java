@@ -13,6 +13,22 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public final class AssertUtils {
 
+    /**
+     * Prevents instantiation of {@link AssertUtils}.
+     *
+     * @throws UnsupportedOperationException always
+     */
+    protected AssertUtils() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Creates a schema which can be used in tests. Consists of two tables:
+     * 'Movies' => (name => STRING NULL, year NUMERIC NULL)
+     * 't' => (a NUMERIC NULL, b STRING NULL, c NUMERIC NULL)
+     *
+     * @return the schema as described above.
+     */
     public static Schema makeSchema() {
 
         ArrayList<Column> moviesColumns = new ArrayList<>();
@@ -33,15 +49,6 @@ public final class AssertUtils {
         tables.put(tTable.getName(), tTable);
 
         return new Schema(tables);
-    }
-
-    /**
-     * Prevents instantiation of {@link AssertUtils}.
-     *
-     * @throws UnsupportedOperationException always
-     */
-    protected AssertUtils() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -86,6 +93,7 @@ public final class AssertUtils {
      * @param inputList The list of arguments that should be compared
      * @param expected The expected outputs that the inputList should be compared with
      */
+    @SafeVarargs
     @SuppressWarnings("checkstyle:NoWhiteSpaceBefore")
     public static <T> void compareFieldByField(List<T> inputList, T... expected) {
         List<T> expectedList = Arrays.asList(expected);

@@ -2,7 +2,6 @@ package com.github.sergdelft.sqlcorgi;
 
 import com.github.sergdelft.sqlcorgi.query.JoinWhereItem;
 import com.github.sergdelft.sqlcorgi.query.OuterIncrementRelation;
-import com.github.sergdelft.sqlcorgi.schema.Schema;
 import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.visitors.ExpressionTraverserVisitor;
 import com.github.sergdelft.sqlcorgi.visitors.join.ImplicitInnerJoinDeducer;
@@ -18,17 +17,7 @@ import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeSet;
+import java.util.*;
 
 import static com.github.sergdelft.sqlcorgi.util.cloner.SelectCloner.copy;
 
@@ -257,9 +246,9 @@ public class JoinRulesGenerator {
 
     private List<Column> getNullableColumns(List<Column> columns) {
         List<Column> res = new ArrayList<>();
-        for (Column c : columns) {
-            if (tableStructure.getColumn(c).isNullable()) {
-                res.add(c);
+        for (Column column : columns) {
+            if (tableStructure.isNullable(column)) {
+                res.add(column);
             }
         }
 
@@ -367,10 +356,9 @@ public class JoinRulesGenerator {
     private Expression nullReduction(Expression expression, JoinType joinType, OuterIncrementRelation oir,
                                             List<OuterIncrementRelation> oirs, boolean nullable) {
         if (expression != null) {
-            Set<String> includeTables = new HashSet<>();
             List<Column> columns = new ArrayList<>();
 
-            includeTables.addAll(simple);
+            Set<String> includeTables = new HashSet<>(simple);
             for (OuterIncrementRelation o : oirs) {
                 includeTables.addAll(o.getLoiRelations());
                 includeTables.addAll(o.getRoiRelations());
@@ -666,7 +654,7 @@ public class JoinRulesGenerator {
      * @param join The join that should be copied.
      * @return A generic shallow copy of join.
      */
-    public static Join genericCopyOfJoin(Join join) {
+    private static Join genericCopyOfJoin(Join join) {
         Join outJoin = new Join();
         outJoin.setRightItem(join.getRightItem());
         outJoin.setOnExpression(join.getOnExpression());

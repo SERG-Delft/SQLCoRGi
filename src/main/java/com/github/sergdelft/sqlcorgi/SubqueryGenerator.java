@@ -52,7 +52,8 @@ public final class SubqueryGenerator {
      * @param tableStructure the table structure that provides the context of the main query.
      * @param rules a set in which all generated rules should be stored.
      */
-    private static void coverSelectOperatorSubqueries(PlainSelect plainSelect, TableStructure tableStructure, Set<String> rules) {
+    private static void coverSelectOperatorSubqueries(PlainSelect plainSelect, TableStructure tableStructure,
+                                                      Set<String> rules) {
 
         Map<String, SubSelect> whereSubs = obtainSubqueries(plainSelect.getWhere());
         Map<String, SubSelect> havingSubs = obtainSubqueries(plainSelect.getHaving());
