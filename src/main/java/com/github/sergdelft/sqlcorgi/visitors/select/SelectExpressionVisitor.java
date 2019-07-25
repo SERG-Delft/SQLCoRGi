@@ -209,8 +209,11 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
     private com.github.sergdelft.sqlcorgi.schema.Column.DataType checkTypes(Expression expression) {
         TypeChecker typeChecker = new TypeChecker(new TableStructure());
         expression.accept(typeChecker);
-
-        return typeChecker.getType();
+        com.github.sergdelft.sqlcorgi.schema.Column.DataType dataType = typeChecker.getType();
+        if (dataType == null) {
+            return com.github.sergdelft.sqlcorgi.schema.Column.DataType.STRING;
+        }
+        return dataType;
     }
 
     /**
