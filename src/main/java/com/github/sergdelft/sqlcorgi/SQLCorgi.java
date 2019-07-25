@@ -64,6 +64,6 @@ public final class SQLCorgi {
     }
 
     public static void main(String[] args) {
-        Set r = generateRules("SELECT * FROM t2 WHERE t2.c2 > ANY (SELECT * FROM t2)", null);
+        generateRules("SELECT * FROM t2 WHERE t2.c2 > ANY (SELECT * FROM t2)", null);
     }
 }

@@ -27,6 +27,7 @@
         <exclude name="JUnitUseExpected"/>
         <exclude name="PreserveStackTrace"/>
         <exclude name="SystemPrintln"/>
+        <exclude name="UnusedImports" />
         <exclude name="UnusedPrivateMethod" />
         <exclude name="UseVarargs" />
     </rule>
