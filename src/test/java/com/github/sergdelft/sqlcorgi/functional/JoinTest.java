@@ -327,23 +327,6 @@ class JoinTest {
     }
 
     /**
-     * A test for verifying that no targets are generated and an exception is thrown for queries with a simple join,
-     * with an additional where and having clause.
-     */
-    @Test
-    void testJoinNoOnConditionSimpleJoinWithWhereClause() {
-        verify("SELECT * FROM a, b WHERE a.id = b.id HAVING a.length > 50",
-
-                null, "SELECT * FROM a, b WHERE a.id = b.id HAVING a.length = 50",
-                "SELECT * FROM a, b WHERE a.id = b.id HAVING a.length = 51",
-                "SELECT * FROM a, b WHERE a.id = b.id HAVING a.length = 49",
-               "SELECT * FROM a, b WHERE a.id = b.id HAVING a.length IS NULL");
-    }
-
-
-
-
-    /**
      * Tests whether the {@code JoinWhereExpressionGenerator} supports {@code ON} clauses that contain more than two
      * different columns from the same table.
      */

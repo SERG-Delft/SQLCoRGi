@@ -7,7 +7,6 @@ import com.github.sergdelft.sqlcorgi.query.NumericValue;
 import com.github.sergdelft.sqlcorgi.visitors.select.SelectExpressionVisitor;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.relational.*;
-import net.sf.jsqlparser.schema.Column;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -57,32 +56,6 @@ class SelectExpressionVisitorTest {
         assertThatThrownBy(() -> {
             new SelectExpressionVisitor(output);
         }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining(EXCEPTION_MESSAGE);
-    }
-
-    /**
-     * Assert that the {@code visit} method for an {@link EqualsTo} generates the correct output.
-     */
-    @Test
-    void visitEqualsToTest() {
-        EqualsTo equalsTo = new EqualsTo();
-        Column leftValue = new Column("something");
-        equalsTo.setLeftExpression(leftValue);
-        equalsTo.setRightExpression(new NumericDoubleValue("42.0"));
-
-        EqualsTo minusOne = new EqualsTo();
-        minusOne.setLeftExpression(leftValue);
-        minusOne.setRightExpression(new NumericDoubleValue("41.0"));
-
-        EqualsTo plusOne = new EqualsTo();
-        plusOne.setLeftExpression(leftValue);
-        plusOne.setRightExpression(new NumericDoubleValue("43.0"));
-
-        IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(leftValue);
-
-        selectExpressionVisitor.visit(equalsTo);
-
-        AssertUtils.compareFieldByField(output, minusOne, equalsTo, plusOne, isNullExpression);
     }
 
     /**

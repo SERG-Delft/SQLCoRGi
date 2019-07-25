@@ -12,6 +12,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
 
 import java.util.HashSet;
+
 import java.util.Set;
 
 /**
@@ -57,5 +58,12 @@ public final class SQLCorgi {
         selectBody.accept(selectStatementVisitor);
 
         return result;
+    }
+
+    public static void main(String[] args) {
+        for (String s : generateRules("SELECT * FROM t1 WHERE t1.c1 + 7 > t1.c2 - 8", null)) {
+            System.out.println("\"" + s + "\",");
+        }
+        System.out.println();
     }
 }

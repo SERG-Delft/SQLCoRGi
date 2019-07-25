@@ -86,5 +86,4 @@ public class SelectValueVisitor extends ExpressionVisitorAdapter {
         isNullExpression.setLeftExpression(copy(column));
         output.add(isNullExpression);
     }
-
 }

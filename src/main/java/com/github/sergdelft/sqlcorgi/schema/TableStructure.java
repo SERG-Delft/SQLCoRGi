@@ -2,7 +2,6 @@ package com.github.sergdelft.sqlcorgi.schema;
 
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.statement.select.*;
-import net.sf.jsqlparser.statement.values.ValuesStatement;
 
 import java.util.*;
 
@@ -234,4 +233,5 @@ public class TableStructure {
     public void setSchema(Schema schema) {
         this.schema = schema;
     }
+
 }
