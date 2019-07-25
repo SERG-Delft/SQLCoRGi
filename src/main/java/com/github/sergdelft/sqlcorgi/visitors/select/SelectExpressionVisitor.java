@@ -313,7 +313,6 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         Expression end = between.getBetweenExpressionEnd();
 
         output.add(createEqualsTo(left, start));
-
         output.add(createEqualsTo(left, end));
 
         if (start instanceof LongValue) {
@@ -344,7 +343,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         betweenFlipped.setNot(true);
         output.add(betweenFlipped);
 
-        generateIsNullCases(between);
+        output.addAll(generateIsNullCases(between));
     }
 
     @Override
@@ -371,7 +370,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         inExpressionFlipped.setNot(!inExpressionFlipped.isNot());
         output.add(inExpressionFlipped);
 
-        generateIsNullCases(inExpression);
+        output.addAll(generateIsNullCases(inExpression));
     }
 
     /**
@@ -390,7 +389,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         notLikeExpression.setNot(true);
         output.add(notLikeExpression);
 
-        generateIsNullCases(likeExpression);
+        output.addAll(generateIsNullCases(likeExpression));
     }
 
     @Override
@@ -408,7 +407,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         isNullExpressionOut.setLeftExpression(copy(similarToExpression.getLeftExpression()));
         output.add(isNullExpressionOut);
 
-        generateIsNullCases(similarToExpression);
+        output.addAll(generateIsNullCases(similarToExpression));
     }
 
     @Override

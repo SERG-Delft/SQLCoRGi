@@ -135,10 +135,9 @@ public class TableStructure {
                             if (foundTable != table.getValue()) {
                                 throw new AmbiguousColumnException(colName);
                             }
-                        } else {
-                            foundTable = table.getValue();
                         }
                     }
+                    foundTable = table.getValue();
                     result = found;
                 }
             }

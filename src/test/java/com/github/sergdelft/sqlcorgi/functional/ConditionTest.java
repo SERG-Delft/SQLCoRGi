@@ -265,8 +265,7 @@ class ConditionTest {
         verify("SELECT * FROM Table1 WHERE x IN (30, 38)",
 
                 null, "SELECT * FROM Table1 WHERE x IN (30, 38)",
-                "SELECT * FROM Table1 WHERE x NOT IN (30, 38)",
-                "SELECT * FROM Table1 WHERE x IS NULL"
+                "SELECT * FROM Table1 WHERE x NOT IN (30, 38)"
         );
     }
 
@@ -275,11 +274,11 @@ class ConditionTest {
      */
     @Test
     void testInConditionNegated() {
-        verify("SELECT * FROM Table1 WHERE x NOT IN (30, 38)",
+        verify("SELECT * FROM t WHERE a NOT IN (30, 38)",
 
-                null, "SELECT * FROM Table1 WHERE x IN (30, 38)",
-                "SELECT * FROM Table1 WHERE x NOT IN (30, 38)",
-                "SELECT * FROM Table1 WHERE x IS NULL"
+                makeSchema(), "SELECT * FROM t WHERE a IN (30, 38)",
+                "SELECT * FROM t WHERE a NOT IN (30, 38)",
+                "SELECT * FROM t WHERE a IS NULL"
         );
     }
 
@@ -288,13 +287,11 @@ class ConditionTest {
      */
     @Test
     void testLikeCondition() {
-        verify("SELECT * FROM Table1 WHERE name LIKE 'John%'",
+        verify("SELECT * FROM t WHERE b LIKE 'John%'",
 
-                null, "SELECT * FROM Table1 WHERE name LIKE 'John%'",
-                // JSQLParser generates "NOT name LIKE" instead of "name NOT LIKE", they are however identical in
-                // behavior, therefore we stick with the behavior used in JSQLParser
-                "SELECT * FROM Table1 WHERE name NOT LIKE 'John%'",
-                "SELECT * FROM Table1 WHERE name IS NULL"
+                makeSchema(), "SELECT * FROM t WHERE b LIKE 'John%'",
+                "SELECT * FROM t WHERE b NOT LIKE 'John%'",
+                "SELECT * FROM t WHERE b IS NULL"
         );
     }
 
