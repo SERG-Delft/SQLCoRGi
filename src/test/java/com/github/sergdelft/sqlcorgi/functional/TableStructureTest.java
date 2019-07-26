@@ -213,8 +213,12 @@ class TableStructureTest {
         verify("SELECT * FROM t1 WHERE EXISTS (SELECT * FROM t2 WHERE a > b)",
 
                 schema,
-                "SELECT * FROM (t1 INNER JOIN t2)  t3 WHERE t3.d = 'a'",
-                "SELECT * FROM (t1 INNER JOIN t2)  t3 WHERE NOT (t3.d = 'a')"
+                "SELECT * FROM t1 WHERE EXISTS (SELECT * FROM t2 WHERE a > b)",
+                "SELECT * FROM t1 WHERE NOT EXISTS (SELECT * FROM t2 WHERE a > b)",
+                "SELECT * FROM t1 WHERE EXISTS (SELECT * FROM t2 WHERE a = b - 1)",
+                "SELECT * FROM t1 WHERE EXISTS (SELECT * FROM t2 WHERE a = b)",
+                "SELECT * FROM t1 WHERE EXISTS (SELECT * FROM t2 WHERE a = b + 1)",
+                "SELECT * FROM t1 WHERE EXISTS (SELECT * FROM t2 WHERE a IS NULL)"
         );
     }
 
