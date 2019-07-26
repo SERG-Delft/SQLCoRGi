@@ -90,9 +90,10 @@ public class TableStructure {
      * @return a {@code Column} if one is found.
      * @throws AmbiguousColumnException if {@code column} references multiple {@code Column}s.
      * @throws UnknownColumnException if no {@code Column} is found.
+     * @throws UnknownColumnException if the table.column notation is used, but the table cannot be found.
      */
     public Column getColumn(net.sf.jsqlparser.schema.Column column)
-            throws AmbiguousColumnException, UnknownColumnException {
+            throws AmbiguousColumnException, UnknownColumnException, UnknownTableException {
 
         net.sf.jsqlparser.schema.Table jsqlTable = column.getTable();
         String tableName = jsqlTable == null ? null : jsqlTable.getName();
@@ -102,7 +103,11 @@ public class TableStructure {
         for (Map<String, Table> tableMap : tableStack) {
 
             if (tableName != null) {
-                for (Column temp : tableMap.get(tableName).getColumns()) {
+                Table table = tableMap.get(tableName);
+                if (table == null) {
+                    throw new UnknownTableException("Could not find the following table: " + tableName);
+                }
+                for (Column temp : table.getColumns()) {
                     if (colName.equals(temp.getName())) {
                         if (result != null) {
                             throw new AmbiguousColumnException(colName);
