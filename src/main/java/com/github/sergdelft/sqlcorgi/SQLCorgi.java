@@ -62,8 +62,4 @@ public final class SQLCorgi {
 
         return result;
     }
-
-    public static void main(String[] args) {
-        generateRules("SELECT * FROM t2 WHERE t2.c2 > ANY (SELECT * FROM t2)", null);
-    }
 }
