@@ -87,8 +87,8 @@ public class TableStructure {
 
     /**
      * Returns the {@link Column} associated with the {@code column}.
-     * @param column a {@link net.sf.jsqlparser.schema.Column} referring to a {@code Column}.
      *
+     * @param column a {@link net.sf.jsqlparser.schema.Column} referring to a {@code Column}.
      * @return a {@code Column} if one is found.
      * @throws AmbiguousColumnException if {@code column} references multiple {@code Column}s.
      * @throws UnknownColumnException if no {@code Column} is found.
@@ -156,7 +156,7 @@ public class TableStructure {
      *
      * @param name a table or column name, possibly surrounded by a pair of delimiters.
      * @return if the original string was surrounded by delimiters, returns the name without delimiters, otherwise
-     * the original string is returned.
+     *         the original string is returned.
      */
     private String getIdentifier(String name) {
 
@@ -182,8 +182,8 @@ public class TableStructure {
 
     /**
      * Returns the {@link Table} associated with the {@code tableName}.
-     * @param tableName a string referring to a {@code Table}.
      *
+     * @param tableName a string referring to a {@code Table}.
      * @return a {@code Table} if one is found.
      * @throws UnknownTableException if no {@code Table} is found.
      */
