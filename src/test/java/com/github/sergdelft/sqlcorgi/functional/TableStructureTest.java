@@ -104,6 +104,37 @@ class TableStructureTest {
     }
 
     /**
+     * Tests whether a subquery in the FROM clause can be aliased and referred to.
+     */
+    @Test
+    void testDerivedTable() {
+        verify("SELECT * FROM (SELECT t1.*, AVG(t2.b) avg FROM t1, t2) t3 WHERE t3.avg + b > 10",
+
+                schema,
+                "SELECT t1.*, AVG(t2.b) avg FROM t1, t2"
+                        + " HAVING COUNT(t2.b) > COUNT(DISTINCT t2.b) AND COUNT(DISTINCT t2.b) > 1",
+                "SELECT t1.*, AVG(t2.b) avg FROM t1, t2 HAVING COUNT(*) > COUNT(t2.b) AND COUNT(DISTINCT t2.b) > 1",
+                "SELECT * FROM (SELECT t1.*, AVG(t2.b) avg FROM t1, t2) t3 WHERE t3.avg + b = 9",
+                "SELECT * FROM (SELECT t1.*, AVG(t2.b) avg FROM t1, t2) t3 WHERE t3.avg + b = 10",
+                "SELECT * FROM (SELECT t1.*, AVG(t2.b) avg FROM t1, t2) t3 WHERE t3.avg + b = 11"
+        );
+    }
+
+    /**
+     * Tests whether a UNION of subqueries in the FROM clause can be aliased and referred to.
+     */
+    @Test
+    void testDerivedTableUnion() {
+        verify("SELECT * FROM (SELECT 1 AS a FROM t1 UNION SELECT 2 AS a FROM t1) num WHERE num.a = 2",
+
+                schema,
+                "SELECT * FROM (SELECT 1 AS a FROM t1 UNION SELECT 2 AS a FROM t1) num WHERE num.a = 1",
+                "SELECT * FROM (SELECT 1 AS a FROM t1 UNION SELECT 2 AS a FROM t1) num WHERE num.a = 2",
+                "SELECT * FROM (SELECT 1 AS a FROM t1 UNION SELECT 2 AS a FROM t1) num WHERE num.a = 3"
+        );
+    }
+
+    /**
      * Tests whether a JOIN in the FROM clause can be aliased and referred to.
      */
     @Test
@@ -154,6 +185,37 @@ class TableStructureTest {
     void testSimpleJoinAmbiguousColumnSingleTable() {
         assertThatThrownBy(() -> SQLCorgi.generateRules("SELECT * FROM t1 WHERE amb = 0", schema))
                 .isInstanceOf(AmbiguousColumnException.class);
+    }
+
+    /**
+     * Tests whether a subquery in the WHERE clause can refer to columns of the main query.
+     */
+    @Test
+    void testSubqueryUsesContext() {
+        verify("SELECT * FROM t1 WHERE a > ANY (SELECT a FROM t2 WHERE d = x)",
+
+                schema,
+                "SELECT * FROM t1 WHERE a > ANY (SELECT a FROM t2 WHERE d = x)",
+                "SELECT * FROM t1 WHERE NOT (a > ANY (SELECT a FROM t2 WHERE d = x))",
+                "SELECT * FROM t1 WHERE a IS NULL",
+                "SELECT * FROM t1 WHERE EXISTS (SELECT a FROM t2 WHERE d = x)",
+                "SELECT * FROM t1 WHERE EXISTS (SELECT a FROM t2 WHERE NOT (d = x))",
+                "SELECT * FROM t1 WHERE EXISTS (SELECT a FROM t2 WHERE x IS NULL)"
+        );
+    }
+
+    /**
+     * Tests whether a subquery in the WHERE clause can unambiguously refer to its own columns, even if they have the
+     * same names as columns in the main query.
+     */
+    @Test
+    void testSubqueryShadowsContext() {
+        verify("SELECT * FROM t1 WHERE EXISTS (SELECT * FROM t2 WHERE a > b)",
+
+                schema,
+                "SELECT * FROM (t1 INNER JOIN t2)  t3 WHERE t3.d = 'a'",
+                "SELECT * FROM (t1 INNER JOIN t2)  t3 WHERE NOT (t3.d = 'a')"
+        );
     }
 
 }
