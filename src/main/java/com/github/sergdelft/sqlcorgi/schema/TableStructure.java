@@ -5,8 +5,6 @@ import net.sf.jsqlparser.statement.select.*;
 
 import java.util.*;
 
-// TODO: Finish this class and write documentation
-
 /**
  * This class represents the collection of tables that can be referenced from within a query. In order to use it,
  * create an instance, provide it with a schema, and add a new layer. Each layer represents the collection of tables
@@ -165,12 +163,8 @@ public class TableStructure {
         throw new UnknownTableException("The following table could not be found: " + tableName);
     }
 
-    public Table getFromTable() {
-
-        if (tableStack.isEmpty()) {
-            return null;
-        }
-
+    private Table getFromTable() {
+        assert !tableStack.isEmpty();
         return tableStack.peek().get("");
     }
 
