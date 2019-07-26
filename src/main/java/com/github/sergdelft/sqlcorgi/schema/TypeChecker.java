@@ -203,7 +203,7 @@ public class TypeChecker implements ExpressionVisitor {
 
     @Override
     public void visit(net.sf.jsqlparser.schema.Column column) {
-        setType(tableStructure.getColumn(column).getDataType());
+        setType(tableStructure.getDataType(column));
     }
 
     @Override

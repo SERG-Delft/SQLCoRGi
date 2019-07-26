@@ -19,10 +19,6 @@ public class TableStructure {
     private Schema schema;
     private Deque<Map<String, Table>> tableStack = new LinkedList<>();
 
-    public Deque<Map<String, Table>> getTableStack() {
-        return tableStack;
-    }
-
     public Schema getSchema() {
         return schema;
     }
