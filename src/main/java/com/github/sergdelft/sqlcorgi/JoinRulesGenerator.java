@@ -234,7 +234,7 @@ public class JoinRulesGenerator {
 
             out.add(new JoinWhereItem(tJoinsLoi, concatenate(loi, reducedWhereLoi, true)));
 
-            if (!getNullableColumns(oir.getLoiRelColumns(), true).isEmpty()) {
+            if (!getNullableColumns(oir.getRoiRelColumns(), true).isEmpty()) {
                 out.add(new JoinWhereItem(tJoinsLoi, concatenate(loiNull, reducedWhereLoiNull, true)));
             }
 
@@ -299,7 +299,7 @@ public class JoinRulesGenerator {
 
             out.add(new JoinWhereItem(tJoinsRoi, concatenate(roi, reducedWhereRoi, true)));
 
-            if (!getNullableColumns(oir.getRoiRelColumns(), true).isEmpty()) {
+            if (!getNullableColumns(oir.getLoiRelColumns(), true).isEmpty()) {
                 out.add(new JoinWhereItem(tJoinsRoi, concatenate(roiNull, reducedWhereRoiNull, true)));
             }
         }
@@ -384,7 +384,6 @@ public class JoinRulesGenerator {
 
 
             if (nullable) {
-                // TODO: Check if handled correctly
                 traverserVisitor.setNullColumns(getNullableColumns(columns, true));
             }
 
