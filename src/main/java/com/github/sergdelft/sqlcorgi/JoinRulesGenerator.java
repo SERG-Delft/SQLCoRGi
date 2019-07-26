@@ -125,7 +125,6 @@ public class JoinRulesGenerator {
 
             plainSelect.setWhere(expression);
             plainSelect.setJoins(orderedJoins);
-
         }
     }
 
@@ -244,6 +243,12 @@ public class JoinRulesGenerator {
         return out;
     }
 
+    /**
+     * Filters the given list of columns such that it only the (non) nullable columns remain.
+     * @param columns The columns from which the (non) nullable columns should be retrieved.
+     * @param isNull True if the nullable columns should be retrieved, false for the non nullable columns.
+     * @return A list containing only (non) nullable columns.
+     */
     private List<Column> getNullableColumns(List<Column> columns, boolean isNull) {
         List<Column> res = new ArrayList<>();
         for (Column column : columns) {
@@ -294,7 +299,6 @@ public class JoinRulesGenerator {
 
             out.add(new JoinWhereItem(tJoinsRoi, concatenate(roi, reducedWhereRoi, true)));
 
-            // TODO check if key columns are nullable.
             if (!getNullableColumns(oir.getRoiRelColumns(), true).isEmpty()) {
                 out.add(new JoinWhereItem(tJoinsRoi, concatenate(roiNull, reducedWhereRoiNull, true)));
             }
@@ -399,7 +403,6 @@ public class JoinRulesGenerator {
      * @param nullable True if the right outer increment relations are nullable, false otherwise.
      * @return The left outer increment.
      */
-    // TODO: check if nullable handled correctly
     private Expression getLeftOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
         List<Column> loiColumns = oiRel.getLoiRelColumns();
         Expression rightExpression;
@@ -424,7 +427,6 @@ public class JoinRulesGenerator {
      * @param nullable True if the left outer increment relations are nullable, false otherwise.
      * @return The right outer increment.
      */
-    // TODO: check if nullable handled correctly.
     private Expression getRightOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
         List<Column> roiColumns = oiRel.getRoiRelColumns();
         Expression rightExpression;
