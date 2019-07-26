@@ -6,13 +6,6 @@ package com.github.sergdelft.sqlcorgi.exceptions;
 public class CannotBeNullException extends RuntimeException {
 
     /**
-     * Parameterless Constructor for the CannotBeNullException class.
-     */
-    public CannotBeNullException() {
-       // Parameterless Constructor for the CannotBeNullException class.
-    }
-
-    /**
      * Constructor that accepts a message.
      *
      * @param message - Message to pass along to the Exception
