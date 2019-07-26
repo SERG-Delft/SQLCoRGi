@@ -417,6 +417,10 @@ class JoinTest {
         );
     }
 
+    /**
+     * This test verifies whether the is null expression are generated such that the non nullable columns are not set to
+     * null.
+     */
     @Test
     void testJoinWithNullableAndNonNullableColumnsInOnCondition() {
         containsAtLeast("SELECT * FROM Movies INNER JOIN t ON Movies.title = t.c OR Movies.year = t.b",
@@ -436,4 +440,64 @@ class JoinTest {
                         + "WHERE (Movies.title IS NULL) AND (Movies.year IS NULL) AND (t.c IS NULL) AND (t.b IS NULL)");
     }
 
+    /**
+     * This test verifies whether the is null expression are generated such that the non nullable columns are not set to
+     * null. The null reduction should still be performed correctly such that the non nullable columns are not excluded.
+     */
+    @Test
+    void testJoinWithNullableAndNonNullableColumnsInOnConditionNullReduction() {
+        containsAtLeast("SELECT * FROM Movies INNER JOIN t ON Movies.title = t.c OR Movies.year = t.b "
+                        + "WHERE Movies.title LIKE 'A%' AND t.b = 70 AND Movies.year < 2010",
+                AssertUtils.makeSchema(),
+
+                "SELECT * FROM Movies RIGHT JOIN t ON Movies.title = t.c OR Movies.year = t.b "
+                        + "WHERE (Movies.title IS NULL) AND (Movies.year IS NULL) AND (t.c IS NULL) AND (t.b IS NULL)",
+                "SELECT * FROM Movies RIGHT JOIN t ON Movies.title = t.c OR Movies.year = t.b "
+                        + "WHERE ((Movies.title IS NULL) AND (Movies.year IS NULL) "
+                        + "AND (t.c IS NOT NULL) AND (t.b IS NOT NULL)) AND (t.b = 70)",
+                "SELECT * FROM Movies LEFT JOIN t ON Movies.title = t.c OR Movies.year = t.b "
+                        + "WHERE ((t.c IS NULL) AND (t.b IS NULL) AND (Movies.year IS NULL) "
+                        + "AND (Movies.title IS NOT NULL)) AND (Movies.title LIKE 'A%')",
+                "SELECT * FROM Movies LEFT JOIN t ON Movies.title = t.c OR Movies.year = t.b "
+                        + "WHERE ((t.c IS NULL) AND (t.b IS NULL) AND (Movies.title IS NOT NULL) "
+                        + "AND (Movies.year IS NOT NULL)) AND (Movies.title LIKE 'A%' AND Movies.year < 2010)"
+
+        );
+    }
+
+    /**
+     * This test verifies whether no rules are added for generated LEFT JOINs when the right outer increment has no
+     * nullable columns.
+     */
+    @Test
+    void testJoinWithNoNullableRightOuterIncrementColumns() {
+        containsAtLeast("SELECT * FROM Movies INNER JOIN t ON Movies.title = t.b", AssertUtils.makeSchema(),
+
+                "SELECT * FROM Movies INNER JOIN t ON Movies.title = t.b",
+                "SELECT * FROM Movies RIGHT JOIN t ON Movies.title = t.b "
+                        + "WHERE (Movies.title IS NULL) AND (t.b IS NULL)",
+                "SELECT * FROM Movies RIGHT JOIN t ON Movies.title = t.b "
+                        + "WHERE (Movies.title IS NULL) AND (t.b IS NOT NULL)",
+                "SELECT * FROM Movies LEFT JOIN t ON Movies.title = t.b "
+                        + "WHERE (t.b IS NULL) AND (Movies.title IS NOT NULL)"
+        );
+    }
+
+    /**
+     * This test verifies whether no rules are added for generated RIGHT JOINs when the left outer increment has no
+     * nullable columns.
+     */
+    @Test
+    void testJoinWithNoNullableLeftOuterIncrementColumns() {
+        containsAtLeast("SELECT * FROM t INNER JOIN Movies ON Movies.title = t.b", AssertUtils.makeSchema(),
+
+                "SELECT * FROM t INNER JOIN Movies ON Movies.title = t.b",
+                "SELECT * FROM t LEFT JOIN Movies ON Movies.title = t.b "
+                        + "WHERE (Movies.title IS NULL) AND (t.b IS NULL)",
+                "SELECT * FROM t LEFT JOIN Movies ON Movies.title = t.b "
+                        + "WHERE (Movies.title IS NULL) AND (t.b IS NOT NULL)",
+                "SELECT * FROM t RIGHT JOIN Movies ON Movies.title = t.b "
+                        + "WHERE (t.b IS NULL) AND (Movies.title IS NOT NULL)"
+        );
+    }
 }
