@@ -90,7 +90,7 @@ public class TableStructure {
      * @return a {@code Column} if one is found.
      * @throws AmbiguousColumnException if {@code column} references multiple {@code Column}s.
      * @throws UnknownColumnException if no {@code Column} is found.
-     * @throws UnknownColumnException if the table.column notation is used, but the table cannot be found.
+     * @throws UnknownTableException if the table.column notation is used, but the table cannot be found.
      */
     public Column getColumn(net.sf.jsqlparser.schema.Column column)
             throws AmbiguousColumnException, UnknownColumnException, UnknownTableException {
