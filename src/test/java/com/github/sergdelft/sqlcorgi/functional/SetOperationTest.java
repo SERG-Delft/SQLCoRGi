@@ -2,6 +2,7 @@ package com.github.sergdelft.sqlcorgi.functional;
 
 import org.junit.jupiter.api.Test;
 
+import static com.github.sergdelft.sqlcorgi.AssertUtils.makeSchema;
 import static com.github.sergdelft.sqlcorgi.AssertUtils.verify;
 
 /**
@@ -17,13 +18,13 @@ class SetOperationTest {
      */
     @Test
     void testUnion() {
-        verify("SELECT * FROM t WHERE a = 'left' UNION SELECT * FROM t WHERE a = 'right'",
+        verify("SELECT * FROM t WHERE b = 'left' UNION SELECT * FROM t WHERE b = 'right'",
 
-                "SELECT * FROM t WHERE a = 'left'",
-                "SELECT * FROM t WHERE a <> 'left'",
-                "SELECT * FROM t WHERE a = 'right'",
-                "SELECT * FROM t WHERE a <> 'right'",
-                "SELECT * FROM t WHERE a IS NULL"
+                makeSchema(), "SELECT * FROM t WHERE b = 'left'",
+                "SELECT * FROM t WHERE NOT (b = 'left')",
+                "SELECT * FROM t WHERE b = 'right'",
+                "SELECT * FROM t WHERE NOT (b = 'right')",
+                "SELECT * FROM t WHERE b IS NULL"
         );
     }
 
@@ -32,13 +33,13 @@ class SetOperationTest {
      */
     @Test
     void testIntersect() {
-        verify("SELECT * FROM t WHERE a = 'left' INTERSECT SELECT * FROM t WHERE a = 'right'",
+        verify("SELECT * FROM t WHERE b = 'left' INTERSECT SELECT * FROM t WHERE b = 'right'",
 
-                "SELECT * FROM t WHERE a = 'left'",
-                "SELECT * FROM t WHERE a <> 'left'",
-                "SELECT * FROM t WHERE a = 'right'",
-                "SELECT * FROM t WHERE a <> 'right'",
-                "SELECT * FROM t WHERE a IS NULL"
+                makeSchema(), "SELECT * FROM t WHERE b = 'left'",
+                "SELECT * FROM t WHERE NOT (b = 'left')",
+                "SELECT * FROM t WHERE b = 'right'",
+                "SELECT * FROM t WHERE NOT (b = 'right')",
+                "SELECT * FROM t WHERE b IS NULL"
         );
     }
 
@@ -49,11 +50,10 @@ class SetOperationTest {
     void testMinus() {
         verify("SELECT * FROM t WHERE a = 'left' MINUS SELECT * FROM t WHERE a = 'right'",
 
-                "SELECT * FROM t WHERE a = 'left'",
-                "SELECT * FROM t WHERE a <> 'left'",
+                null, "SELECT * FROM t WHERE a = 'left'",
+                "SELECT * FROM t WHERE NOT (a = 'left')",
                 "SELECT * FROM t WHERE a = 'right'",
-                "SELECT * FROM t WHERE a <> 'right'",
-                "SELECT * FROM t WHERE a IS NULL"
+                "SELECT * FROM t WHERE NOT (a = 'right')"
         );
     }
 
@@ -64,11 +64,10 @@ class SetOperationTest {
     void testExcept() {
         verify("SELECT * FROM t WHERE a = 'left' EXCEPT SELECT * FROM t WHERE a = 'right'",
 
-                "SELECT * FROM t WHERE a = 'left'",
-                "SELECT * FROM t WHERE a <> 'left'",
+                null, "SELECT * FROM t WHERE a = 'left'",
+                "SELECT * FROM t WHERE NOT (a = 'left')",
                 "SELECT * FROM t WHERE a = 'right'",
-                "SELECT * FROM t WHERE a <> 'right'",
-                "SELECT * FROM t WHERE a IS NULL"
+                "SELECT * FROM t WHERE NOT (a = 'right')"
         );
     }
 

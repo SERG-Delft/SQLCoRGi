@@ -1,13 +1,14 @@
 package com.github.sergdelft.sqlcorgi.visitors;
 
+import com.github.sergdelft.sqlcorgi.AggregateFunctionsGenerator;
+import com.github.sergdelft.sqlcorgi.GroupByGenerator;
+import com.github.sergdelft.sqlcorgi.JoinRulesGenerator;
+import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.visitors.select.NullAttributeFinder;
 import com.github.sergdelft.sqlcorgi.visitors.select.NullReducer;
 import com.github.sergdelft.sqlcorgi.visitors.select.SelectExpressionVisitor;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.*;
-import com.github.sergdelft.sqlcorgi.AggregateFunctionsGenerator;
-import com.github.sergdelft.sqlcorgi.GroupByGenerator;
-import com.github.sergdelft.sqlcorgi.JoinRulesGenerator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,6 +24,8 @@ import static com.github.sergdelft.sqlcorgi.util.cloner.SelectCloner.copy;
  */
 public class SelectStatementVisitor extends SelectVisitorAdapter {
 
+    private TableStructure tableStructure;
+
     private Set<String> output;
     private List<PlainSelect> statements;
 
@@ -30,15 +33,22 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * Creates a new visitor which can be used to generate coverage rules for queries.
      * Any rules that are generated will be written to {@code output}.
      *
+     * @param tableStructure the table structure to be used when generating rules. If its schema is set to null, all
+     *                       attributes are assumed to not be nullable. It must not be null.
      * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
      */
-    public SelectStatementVisitor(Set<String> output) {
+    public SelectStatementVisitor(TableStructure tableStructure, Set<String> output) {
         if (output == null || !output.isEmpty()) {
             throw new IllegalArgumentException(
                 "A SelectStatementVisitor requires an empty, non-null set to which it can output generated rules."
             );
         }
 
+        if (tableStructure == null) {
+            throw new IllegalArgumentException("The table structure must not be null.");
+        }
+
+        this.tableStructure = tableStructure;
         this.output = output;
         this.statements = new ArrayList<>();
     }
@@ -46,16 +56,25 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
     @Override
     public void visit(PlainSelect plainSelect) {
 
+        if (tableStructure.getSchema() != null) {
+            tableStructure.addLayer(plainSelect.getFromItem(), plainSelect.getJoins());
+        }
+
+        plainSelect = handleJoins(plainSelect);
         handleWhere(plainSelect);
         handleAggregators(plainSelect);
         handleGroupBy(plainSelect);
         handleHaving(plainSelect);
-        handleJoins(plainSelect);
+
         handleSubqueries(plainSelect);
 
         for (PlainSelect select : this.statements) {
             applyNullReduction(select);
             this.output.add(select.toString());
+        }
+
+        if (tableStructure.getSchema() != null) {
+            tableStructure.removeLayer();
         }
     }
 
@@ -72,7 +91,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * @param plainSelect the plainSelect that needs to be covered.
      */
     private void handleSubqueries(PlainSelect plainSelect) {
-        this.output.addAll(coverSubqueries((PlainSelect) copy(plainSelect)));
+        this.output.addAll(coverSubqueries((PlainSelect) copy(plainSelect), tableStructure));
     }
 
     /**
@@ -137,7 +156,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             }
 
             List<Expression> expressions = new ArrayList<>();
-            SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions);
+            SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions, tableStructure);
 
             where.accept(selectExpressionVisitor);
             copy.setWhere(null);
@@ -205,7 +224,7 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
             copy.setHaving(null);
 
             List<Expression> expressions = new ArrayList<>();
-            SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions);
+            SelectExpressionVisitor selectExpressionVisitor = new SelectExpressionVisitor(expressions, tableStructure);
 
             having.accept(selectExpressionVisitor);
             for (Expression expression : expressions) {
@@ -222,12 +241,18 @@ public class SelectStatementVisitor extends SelectVisitorAdapter {
      * The generated rules are stored in the {@code output} set.
      *
      * @param plainSelect the {@code PlainSelect} for which coverage targets need to be generated.
+     * @return The sanitized plainselect.
      */
-    private void handleJoins(PlainSelect plainSelect) {
+    private PlainSelect handleJoins(PlainSelect plainSelect) {
         JoinRulesGenerator joinRulesGenerator = new JoinRulesGenerator();
-        Set<String> out = joinRulesGenerator.generate((PlainSelect) copy(plainSelect));
-
+        Set<String> out = joinRulesGenerator.generate((PlainSelect) copy(plainSelect), tableStructure);
         output.addAll(out);
+
+        if (joinRulesGenerator.getSanitized() != null) {
+            return (PlainSelect) copy(joinRulesGenerator.getSanitized());
+        } else {
+            return plainSelect;
+        }
     }
 
 }

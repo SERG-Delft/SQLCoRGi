@@ -1,6 +1,11 @@
 package com.github.sergdelft.sqlcorgi.visitors.select;
 
+import com.github.sergdelft.sqlcorgi.query.NumericValue;
+import com.github.sergdelft.sqlcorgi.schema.TableStructure;
+import com.github.sergdelft.sqlcorgi.schema.TypeChecker;
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
+import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
@@ -10,7 +15,9 @@ import com.github.sergdelft.sqlcorgi.query.NumericDoubleValue;
 import com.github.sergdelft.sqlcorgi.query.NumericLongValue;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.github.sergdelft.sqlcorgi.util.Expressions.createEqualsTo;
 import static com.github.sergdelft.sqlcorgi.util.cloner.ExpressionCloner.copy;
@@ -19,16 +26,18 @@ import static com.github.sergdelft.sqlcorgi.util.cloner.ExpressionCloner.copy;
  * A visitor for select expressions, i.e. {@code WHERE} and {@code HAVING} clauses in {@code SELECT} statements.
  */
 public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
-
     private List<Expression> output;
+    private TableStructure tableStructure;
 
     /**
      * Creates a new visitor which can be used to generate mutations of select operators. Any rules that are
      * generated will be written to {@code output}.
      *
      * @param output the set to which generated rules should be written. This set must not be null, and must be empty.
+     * @param tableStructure the table structure to use for the query that is being visited.
      */
-    public SelectExpressionVisitor(List<Expression> output) {
+    public SelectExpressionVisitor(List<Expression> output, TableStructure tableStructure) {
+        this.tableStructure = tableStructure;
         if (output == null || !output.isEmpty()) {
             throw new IllegalArgumentException(
                 "A SelectExpressionVisitor requires an empty, non-null set to which it can write generated expressions."
@@ -45,13 +54,163 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
      */
     private void generateRelationalMutations(ComparisonOperator comparisonOperator) {
 
-        ArrayList<Expression> cases = new ArrayList<>();
-        Column column = (Column) comparisonOperator.getLeftExpression();
-        SelectValueVisitor valueVisitor = new SelectValueVisitor(column, cases);
+        Set<Expression> output = new HashSet<>(generateIsNullCases(comparisonOperator));
 
-        comparisonOperator.getRightExpression().accept(valueVisitor);
+        com.github.sergdelft.sqlcorgi.schema.Column.DataType type = checkTypes(comparisonOperator.getRightExpression());
+        switch (type) {
+            case NUM: output.addAll(generateNumericCases(comparisonOperator));
+                break;
+            case STRING: output.addAll(generateStringCases(comparisonOperator));
+                break;
+            default: break;
+        }
 
-        output.addAll(cases);
+        this.output.addAll(output);
+    }
+
+    /**
+     * Generates the numeric cases for the given expression. The off by one rules and the input rule are added to the
+     * output as well as a null case, if applicable.
+     * @param binaryExpression The expression for which the cases have to be generated.
+     * @return The list of rules for the given expression.
+     */
+    private List<Expression> generateNumericCases(BinaryExpression binaryExpression) {
+        Expression right = binaryExpression.getRightExpression();
+        Expression left = binaryExpression.getLeftExpression();
+
+        List<Expression> rightExpressions = new ArrayList<>();
+        List<Expression> output = new ArrayList<>();
+
+        Expression e = right;
+        boolean signed = false;
+        if (right instanceof SignedExpression) {
+            signed = true;
+            e = ((SignedExpression) right).getExpression();
+        }
+
+        NumericValue numValue = convertToNumericValue(e);
+        if (numValue != null) {
+            for (int i = -1; i <= 1; i++) {
+                if (!signed) {
+                    rightExpressions.add(numValue.add(i));
+                } else {
+                    rightExpressions.add(new SignedExpression('-', numValue.add(i)));
+                }
+            }
+        } else {
+            rightExpressions.add(copy(right));
+            rightExpressions.add(generateAddOffByOne(right));
+            rightExpressions.add(generateSubOffByOne(right));
+        }
+
+        for (Expression expression : rightExpressions) {
+            EqualsTo eq = new EqualsTo();
+            eq.setLeftExpression(left);
+            eq.setRightExpression(expression);
+            output.add(eq);
+        }
+
+        return output;
+    }
+
+
+    /**
+     * Converts the given expression to a numeric value if possible.
+     * @param expression The expression to be converted.
+     * @return The numeric value if the conversion could be done, null otherwise.
+     */
+    private NumericValue convertToNumericValue(Expression expression) {
+        if (expression instanceof LongValue) {
+            return new NumericLongValue(Long.toString(((LongValue) expression).getValue()));
+        } else if (expression instanceof DoubleValue) {
+            return new NumericDoubleValue(Double.toString(((DoubleValue) expression).getValue()));
+        }
+
+        return null;
+    }
+
+    /**
+     * Generates the off by one case for the given expression, where one is added.
+     *
+     * @param expression The expression from which one is to be added.
+     * @return The addition expression.
+     */
+    // This warning is suppressed, as "1" should indeed occur multiple times in the class.
+    @SuppressWarnings("MultipleStringLiterals")
+    private Expression generateAddOffByOne(Expression expression) {
+        Addition addition = new Addition();
+        addition.setLeftExpression(copy(expression));
+        addition.setRightExpression(new NumericLongValue("1"));
+
+        return addition;
+    }
+
+    /**
+     * Generates the off by one case for the given expression, where one is subtracted.
+     *
+     * @param expression The expression from which one is to be subtracted.
+     * @return The subtraction expression.
+     */
+    private Expression generateSubOffByOne(Expression expression) {
+        Subtraction subtraction = new Subtraction();
+        subtraction.setLeftExpression(copy(expression));
+        subtraction.setRightExpression(new NumericLongValue("1"));
+
+        return subtraction;
+    }
+
+    /**
+     * Generates the rules in case strings are used.
+     *
+     * @param expression The expression for which the string cases have to be generated.
+     * @return A list of rules for the expression.
+     */
+    private List<Expression> generateStringCases(BinaryExpression expression) {
+        List<Expression> output = new ArrayList<>();
+        output.add(new NotExpression(new Parenthesis(copy(expression))));
+        output.add(copy(expression));
+
+        return output;
+    }
+
+    /**
+     * Generates the is null cases for all columns used in the expression.
+     *
+     * @param expression The expression for which the rules have to be generated.
+     * @return A list of rules with is null cases for the columns.
+     */
+    private List<Expression> generateIsNullCases(Expression expression) {
+
+        ColumnExtractor columnExtractor = new ColumnExtractor();
+        expression.accept(columnExtractor);
+
+        List<Expression> output = new ArrayList<>();
+        for (Column column : columnExtractor.getColumns()) {
+            if (tableStructure.isNullable(column)) {
+                IsNullExpression isNullExpression = new IsNullExpression();
+                isNullExpression.setLeftExpression(copy(column));
+                output.add(isNullExpression);
+            }
+        }
+
+        return output;
+    }
+
+    /**
+     * Returns the data type of the expression, if all the attributes' types are the same.
+     * The checker throws an exception otherwise.
+     *
+     * @param expression The expression to check.
+     * @return The type of the expression.
+     */
+    private com.github.sergdelft.sqlcorgi.schema.Column.DataType checkTypes(Expression expression) {
+        TypeChecker typeChecker = new TypeChecker(tableStructure);
+        expression.accept(typeChecker);
+        com.github.sergdelft.sqlcorgi.schema.Column.DataType dataType = typeChecker.getType();
+        if (dataType == null) {
+            return com.github.sergdelft.sqlcorgi.schema.Column.DataType.STRING;
+        }
+        return dataType;
     }
 
     /**
@@ -120,7 +279,6 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
-
         output.add(copy(isNullExpression));
 
         IsNullExpression isNullExpressionToggled = (IsNullExpression) copy(isNullExpression);
@@ -156,7 +314,6 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         Expression end = between.getBetweenExpressionEnd();
 
         output.add(createEqualsTo(left, start));
-
         output.add(createEqualsTo(left, end));
 
         if (start instanceof LongValue) {
@@ -187,9 +344,17 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         betweenFlipped.setNot(true);
         output.add(betweenFlipped);
 
-        IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(copy(left));
-        output.add(isNullExpression);
+        output.addAll(generateIsNullCases(between));
+    }
+
+    @Override
+    public void visit(ExistsExpression existsExpression) {
+
+        output.add(copy(existsExpression));
+
+        ExistsExpression flippedExists = (ExistsExpression) copy(existsExpression);
+        flippedExists.setNot(!flippedExists.isNot());
+        output.add(flippedExists);
     }
 
     /**
@@ -206,9 +371,7 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         inExpressionFlipped.setNot(!inExpressionFlipped.isNot());
         output.add(inExpressionFlipped);
 
-        IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(copy(inExpression.getLeftExpression()));
-        output.add(isNullExpression);
+        output.addAll(generateIsNullCases(inExpression));
     }
 
     /**
@@ -227,9 +390,25 @@ public class SelectExpressionVisitor extends ExpressionVisitorAdapter {
         notLikeExpression.setNot(true);
         output.add(notLikeExpression);
 
+        output.addAll(generateIsNullCases(likeExpression));
+    }
+
+    @Override
+    public void visit(SimilarToExpression similarToExpression) {
+
+        SimilarToExpression similarToExpressionCopy = (SimilarToExpression) copy(similarToExpression);
+        similarToExpressionCopy.setNot(false);
+        output.add(similarToExpressionCopy);
+
+        SimilarToExpression notSimilarToExpression = (SimilarToExpression) copy(similarToExpression);
+        notSimilarToExpression.setNot(true);
+        output.add(notSimilarToExpression);
+
         IsNullExpression isNullExpressionOut = new IsNullExpression();
-        isNullExpressionOut.setLeftExpression(copy(likeExpression.getLeftExpression()));
+        isNullExpressionOut.setLeftExpression(copy(similarToExpression.getLeftExpression()));
         output.add(isNullExpressionOut);
+
+        output.addAll(generateIsNullCases(similarToExpression));
     }
 
     @Override

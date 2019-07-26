@@ -1,7 +1,6 @@
 package com.github.sergdelft.sqlcorgi.visitors.subqueries;
 
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
+import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
 import java.util.HashMap;
@@ -17,6 +16,16 @@ public class SubqueryFinder extends ExpressionVisitorAdapter {
     @Override
     public void visit(SubSelect subSelect) {
         subqueries.put(subSelect.toString(), subSelect);
+    }
+
+    @Override
+    public void visit(AllComparisonExpression expr) {
+        expr.getSubSelect().accept((ExpressionVisitor) this);
+    }
+
+    @Override
+    public void visit(AnyComparisonExpression expr) {
+        expr.getSubSelect().accept((ExpressionVisitor) this);
     }
 
     public Map<String, SubSelect> getSubqueries() {

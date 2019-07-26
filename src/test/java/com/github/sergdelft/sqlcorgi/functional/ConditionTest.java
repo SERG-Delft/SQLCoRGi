@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.github.sergdelft.sqlcorgi.AssertUtils.containsAtLeast;
 import static com.github.sergdelft.sqlcorgi.AssertUtils.verify;
+import static com.github.sergdelft.sqlcorgi.AssertUtils.makeSchema;
 
 /**
  * This class tests if the coverage targets for queries with WHERE clauses are generated correctly.
@@ -20,10 +21,11 @@ class ConditionTest {
     void testEqualsInteger() {
         verify("SELECT * FROM Movies WHERE year = 2003",
 
-                "SELECT * FROM Movies WHERE year = 2004",
+                makeSchema(), "SELECT * FROM Movies WHERE year = 2004",
                 "SELECT * FROM Movies WHERE year = 2003",
                 "SELECT * FROM Movies WHERE year = 2002",
-                "SELECT * FROM Movies WHERE year IS NULL");
+                "SELECT * FROM Movies WHERE year IS NULL"
+        );
     }
 
     /**
@@ -31,12 +33,13 @@ class ConditionTest {
      */
     @Test
     void testLessThanInteger() {
-        verify("SELECT * FROM table WHERE a < 100",
+        verify("SELECT * FROM Movies WHERE year < 100",
 
-                "SELECT * FROM table WHERE a = 99",
-                "SELECT * FROM table WHERE a = 100",
-                "SELECT * FROM table WHERE a = 101",
-                "SELECT * FROM table WHERE a IS NULL");
+                makeSchema(), "SELECT * FROM Movies WHERE year = 99",
+                "SELECT * FROM Movies WHERE year = 100",
+                "SELECT * FROM Movies WHERE year = 101",
+                "SELECT * FROM Movies WHERE year IS NULL"
+        );
     }
 
     /**
@@ -44,12 +47,13 @@ class ConditionTest {
      */
     @Test
     void testLessThanEqualsInteger() {
-        verify("SELECT * FROM table WHERE a <= 100",
+        verify("SELECT * FROM Movies WHERE year <= 100",
 
-                "SELECT * FROM table WHERE a = 99",
-                "SELECT * FROM table WHERE a = 100",
-                "SELECT * FROM table WHERE a = 101",
-                "SELECT * FROM table WHERE a IS NULL");
+                makeSchema(), "SELECT * FROM Movies WHERE year = 99",
+                "SELECT * FROM Movies WHERE year = 100",
+                "SELECT * FROM Movies WHERE year = 101",
+                "SELECT * FROM Movies WHERE year IS NULL"
+        );
     }
 
     /**
@@ -57,12 +61,13 @@ class ConditionTest {
      */
     @Test
     void testGreaterThanInteger() {
-        verify("SELECT * FROM Table WHERE x > 28",
+        verify("SELECT * FROM Movies WHERE year > 28",
 
-                "SELECT * FROM Table WHERE x = 27",
-                "SELECT * FROM Table WHERE x = 28",
-                "SELECT * FROM Table WHERE x = 29",
-                "SELECT * FROM Table WHERE x IS NULL");
+                makeSchema(), "SELECT * FROM Movies WHERE year = 27",
+                "SELECT * FROM Movies WHERE year = 28",
+                "SELECT * FROM Movies WHERE year = 29",
+                "SELECT * FROM Movies WHERE year IS NULL"
+        );
     }
 
     /**
@@ -70,12 +75,12 @@ class ConditionTest {
      */
     @Test
     void testGreaterThanEqualsInteger() {
-        verify("SELECT * FROM Table WHERE x >= 37",
+        verify("SELECT * FROM Movies WHERE year >= 37",
 
-                "SELECT * FROM Table WHERE x = 36",
-                "SELECT * FROM Table WHERE x = 37",
-                "SELECT * FROM Table WHERE x = 38",
-                "SELECT * FROM Table WHERE x IS NULL");
+                null, "SELECT * FROM Movies WHERE year = 36",
+                "SELECT * FROM Movies WHERE year = 37",
+                "SELECT * FROM Movies WHERE year = 38"
+        );
     }
 
     /**
@@ -85,10 +90,10 @@ class ConditionTest {
     void testNotEqualToFloat() {
         verify("SELECT * FROM table WHERE a <> 0.0",
 
-                "SELECT * FROM table WHERE a = -1.0",
+                null, "SELECT * FROM table WHERE a = -1.0",
                 "SELECT * FROM table WHERE a = 0.0",
-                "SELECT * FROM table WHERE a = 1.0",
-                "SELECT * FROM table WHERE a IS NULL");
+                "SELECT * FROM table WHERE a = 1.0"
+        );
     }
 
     /**
@@ -98,9 +103,9 @@ class ConditionTest {
     void testEqualToString() {
         verify("SELECT * FROM table WHERE a = 'qwerty'",
 
-                "SELECT * FROM table WHERE a = 'qwerty'",
-                "SELECT * FROM table WHERE a <> 'qwerty'",
-                "SELECT * FROM table WHERE a IS NULL");
+                null, "SELECT * FROM table WHERE a = 'qwerty'",
+                "SELECT * FROM table WHERE NOT (a = 'qwerty')"
+        );
     }
 
     /**
@@ -110,8 +115,9 @@ class ConditionTest {
     void testIsNull() {
         verify("SELECT * FROM table WHERE a IS NULL",
 
-                "SELECT * FROM table WHERE a IS NOT NULL",
-                "SELECT * FROM table WHERE a IS NULL");
+                null, "SELECT * FROM table WHERE a IS NOT NULL",
+                "SELECT * FROM table WHERE a IS NULL"
+        );
     }
 
     /**
@@ -121,8 +127,9 @@ class ConditionTest {
     void testIsNotNull() {
         verify("SELECT * FROM table WHERE a IS NOT NULL",
 
-                "SELECT * FROM table WHERE a IS NULL",
-                "SELECT * FROM table WHERE a IS NOT NULL");
+                null, "SELECT * FROM table WHERE a IS NULL",
+                "SELECT * FROM table WHERE a IS NOT NULL"
+        );
     }
 
     /**
@@ -132,13 +139,13 @@ class ConditionTest {
     void testTwoConditionsWithAND() {
         verify("SELECT * FROM Movies WHERE year > 1950 AND year < 2000",
 
-                "SELECT * FROM Movies WHERE (year = 1949) AND (year < 2000)",
+                null, "SELECT * FROM Movies WHERE (year = 1949) AND (year < 2000)",
                 "SELECT * FROM Movies WHERE (year = 1950) AND (year < 2000)",
                 "SELECT * FROM Movies WHERE (year = 1951) AND (year < 2000)",
                 "SELECT * FROM Movies WHERE (year > 1950) AND (year = 1999)",
                 "SELECT * FROM Movies WHERE (year > 1950) AND (year = 2000)",
-                "SELECT * FROM Movies WHERE (year > 1950) AND (year = 2001)",
-                "SELECT * FROM Movies WHERE (year IS NULL)");
+                "SELECT * FROM Movies WHERE (year > 1950) AND (year = 2001)"
+        );
     }
 
     /**
@@ -148,13 +155,13 @@ class ConditionTest {
     void testTwoConditionsWithOR() {
         verify("SELECT * FROM Movies WHERE year < 2004 OR year > 2010",
 
-                "SELECT * FROM Movies WHERE (year = 2003) AND NOT (year > 2010)",
+                null, "SELECT * FROM Movies WHERE (year = 2003) AND NOT (year > 2010)",
                 "SELECT * FROM Movies WHERE (year = 2004) AND NOT (year > 2010)",
                 "SELECT * FROM Movies WHERE (year = 2005) AND NOT (year > 2010)",
                 "SELECT * FROM Movies WHERE NOT (year < 2004) AND (year = 2009)",
                 "SELECT * FROM Movies WHERE NOT (year < 2004) AND (year = 2010)",
-                "SELECT * FROM Movies WHERE NOT (year < 2004) AND (year = 2011)",
-                "SELECT * FROM Movies WHERE (year IS NULL)");
+                "SELECT * FROM Movies WHERE NOT (year < 2004) AND (year = 2011)"
+        );
     }
 
     /**
@@ -164,13 +171,13 @@ class ConditionTest {
     void testTwoParenthesisedConditionsWithOR() {
         verify("SELECT * FROM Movies WHERE (year = 1996) OR (year = 2019)",
 
-                "SELECT * FROM Movies WHERE (year = 1995) AND NOT (year = 2019)",
+                null, "SELECT * FROM Movies WHERE (year = 1995) AND NOT (year = 2019)",
                 "SELECT * FROM Movies WHERE (year = 1996) AND NOT (year = 2019)",
                 "SELECT * FROM Movies WHERE (year = 1997) AND NOT (year = 2019)",
                 "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2018)",
                 "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2019)",
-                "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2020)",
-                "SELECT * FROM Movies WHERE (year IS NULL)");
+                "SELECT * FROM Movies WHERE NOT (year = 1996) AND (year = 2020)"
+        );
     }
 
     /**
@@ -180,17 +187,15 @@ class ConditionTest {
     void testThreeConditionsAndOr() {
         verify("SELECT * FROM Table1 WHERE a1 = 11 OR a2 = 22 AND a3 = 33",
 
-                "SELECT * FROM Table1 WHERE (a1 = 10) AND NOT (a2 = 22 AND a3 = 33)",
+                null, "SELECT * FROM Table1 WHERE (a1 = 10) AND NOT (a2 = 22 AND a3 = 33)",
                 "SELECT * FROM Table1 WHERE (a1 = 11) AND NOT (a2 = 22 AND a3 = 33)",
                 "SELECT * FROM Table1 WHERE (a1 = 12) AND NOT (a2 = 22 AND a3 = 33)",
-                "SELECT * FROM Table1 WHERE (a1 IS NULL) AND NOT (a2 = 22 AND a3 = 33)",
                 "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 21) AND (a3 = 33))",
                 "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 22) AND (a3 = 33))",
                 "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 23) AND (a3 = 33))",
-                "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 IS NULL) AND (a3 = 33))",
                 "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 22) AND (a3 = 32))",
-                "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 22) AND (a3 = 34))",
-                "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 22) AND (a3 IS NULL))");
+                "SELECT * FROM Table1 WHERE NOT (a1 = 11) AND ((a2 = 22) AND (a3 = 34))"
+        );
     }
 
     /**
@@ -200,18 +205,16 @@ class ConditionTest {
     void testThreeConditionsAndOr2() {
         verify("SELECT * FROM Movies WHERE year < 2004 AND length_minutes > 100 OR year > 2005",
 
-                "SELECT * FROM Movies WHERE ((year < 2004) AND (length_minutes = 99)) AND NOT (year > 2005)",
+                null, "SELECT * FROM Movies WHERE ((year < 2004) AND (length_minutes = 99)) AND NOT (year > 2005)",
                 "SELECT * FROM Movies WHERE ((year < 2004) AND (length_minutes = 100)) AND NOT (year > 2005)",
                 "SELECT * FROM Movies WHERE ((year < 2004) AND (length_minutes = 101)) AND NOT (year > 2005)",
-                "SELECT * FROM Movies WHERE ((year < 2004) AND (length_minutes IS NULL)) AND NOT (year > 2005)",
                 "SELECT * FROM Movies WHERE NOT (year < 2004 AND length_minutes > 100) AND (year = 2004)",
                 "SELECT * FROM Movies WHERE NOT (year < 2004 AND length_minutes > 100) AND (year = 2005)",
                 "SELECT * FROM Movies WHERE NOT (year < 2004 AND length_minutes > 100) AND (year = 2006)",
-                "SELECT * FROM Movies WHERE NOT length_minutes > 100 AND (year IS NULL)",
                 "SELECT * FROM Movies WHERE ((year = 2003) AND (length_minutes > 100)) AND NOT (year > 2005)",
                 "SELECT * FROM Movies WHERE ((year = 2004) AND (length_minutes > 100)) AND NOT (year > 2005)",
-                "SELECT * FROM Movies WHERE ((year = 2005) AND (length_minutes > 100)) AND NOT (year > 2005)",
-                "SELECT * FROM Movies WHERE ((year IS NULL) AND (length_minutes > 100))");
+                "SELECT * FROM Movies WHERE ((year = 2005) AND (length_minutes > 100)) AND NOT (year > 2005)"
+        );
     }
 
     /**
@@ -221,10 +224,10 @@ class ConditionTest {
     void testAliasing() {
         verify("SELECT * FROM Movies AS M WHERE M.id = 8",
 
-                "SELECT * FROM Movies AS M WHERE M.id = 9",
+                null, "SELECT * FROM Movies AS M WHERE M.id = 9",
                 "SELECT * FROM Movies AS M WHERE M.id = 8",
-                "SELECT * FROM Movies AS M WHERE M.id = 7",
-                "SELECT * FROM Movies AS M WHERE M.id IS NULL");
+                "SELECT * FROM Movies AS M WHERE M.id = 7"
+        );
     }
 
     /**
@@ -234,9 +237,9 @@ class ConditionTest {
     void testInCondition() {
         verify("SELECT * FROM Table1 WHERE x IN (30, 38)",
 
-                "SELECT * FROM Table1 WHERE x IN (30, 38)",
-                "SELECT * FROM Table1 WHERE x NOT IN (30, 38)",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                null, "SELECT * FROM Table1 WHERE x IN (30, 38)",
+                "SELECT * FROM Table1 WHERE x NOT IN (30, 38)"
+        );
     }
 
     /**
@@ -244,11 +247,12 @@ class ConditionTest {
      */
     @Test
     void testInConditionNegated() {
-        verify("SELECT * FROM Table1 WHERE x NOT IN (30, 38)",
+        verify("SELECT * FROM t WHERE a NOT IN (30, 38)",
 
-                "SELECT * FROM Table1 WHERE x IN (30, 38)",
-                "SELECT * FROM Table1 WHERE x NOT IN (30, 38)",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                makeSchema(), "SELECT * FROM t WHERE a IN (30, 38)",
+                "SELECT * FROM t WHERE a NOT IN (30, 38)",
+                "SELECT * FROM t WHERE a IS NULL"
+        );
     }
 
     /**
@@ -256,27 +260,24 @@ class ConditionTest {
      */
     @Test
     void testLikeCondition() {
-        verify("SELECT * FROM Table1 WHERE name LIKE 'John%'",
+        verify("SELECT * FROM t WHERE b LIKE 'John%'",
 
-                "SELECT * FROM Table1 WHERE name LIKE 'John%'",
-                // JSQLParser generates "NOT name LIKE" instead of "name NOT LIKE", they are however identical in
-                // behavior, therefore we stick with the behavior used in JSQLParser
-                "SELECT * FROM Table1 WHERE name NOT LIKE 'John%'",
-                "SELECT * FROM Table1 WHERE name IS NULL");
+                makeSchema(), "SELECT * FROM t WHERE b LIKE 'John%'",
+                "SELECT * FROM t WHERE b NOT LIKE 'John%'",
+                "SELECT * FROM t WHERE b IS NULL"
+        );
     }
 
     /**
      * A test case with an ILIKE condition.
      */
     @Test
-    void testIlikeCondition() {
+    void testILikeCondition() {
         verify("SELECT * FROM Table1 WHERE name ILIKE 'john%'",
 
-                "SELECT * FROM Table1 WHERE name ILIKE 'john%'",
-                // JSQLParser generates "NOT name LIKE" instead of "name NOT LIKE", they are however identical in
-                // behavior, therefore we stick with the behavior used in JSQLParser
-                "SELECT * FROM Table1 WHERE name NOT ILIKE 'john%'",
-                "SELECT * FROM Table1 WHERE name IS NULL");
+                null, "SELECT * FROM Table1 WHERE name ILIKE 'john%'",
+                "SELECT * FROM Table1 WHERE name NOT ILIKE 'john%'"
+        );
     }
 
     /**
@@ -286,11 +287,9 @@ class ConditionTest {
     void testLikeConditionNegated() {
         verify("SELECT * FROM Table1 WHERE name NOT LIKE 'John%'",
 
-                "SELECT * FROM Table1 WHERE name LIKE 'John%'",
-                // JSQLParser generates "NOT name LIKE" instead of "name NOT LIKE", they are however identical in
-                // behavior, therefore we stick with the behavior used in JSQLParser
-                "SELECT * FROM Table1 WHERE name NOT LIKE 'John%'",
-                "SELECT * FROM Table1 WHERE name IS NULL");
+                null, "SELECT * FROM Table1 WHERE name LIKE 'John%'",
+                "SELECT * FROM Table1 WHERE name NOT LIKE 'John%'"
+        );
     }
 
     /**
@@ -300,13 +299,13 @@ class ConditionTest {
     void testLongBetweenCondition() {
         verify("SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
 
-                "SELECT * FROM Table1 WHERE x = 27",
+                null, "SELECT * FROM Table1 WHERE x = 27",
                 "SELECT * FROM Table1 WHERE x = 28",
                 "SELECT * FROM Table1 WHERE x = 37",
                 "SELECT * FROM Table1 WHERE x = 38",
                 "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37"
+        );
     }
 
     /**
@@ -314,15 +313,16 @@ class ConditionTest {
      */
     @Test
     void testLongBetweenConditionNegated() {
-        verify("SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
+        verify("SELECT * FROM t WHERE a NOT BETWEEN 28 AND 37",
 
-                "SELECT * FROM Table1 WHERE x = 27",
-                "SELECT * FROM Table1 WHERE x = 28",
-                "SELECT * FROM Table1 WHERE x = 37",
-                "SELECT * FROM Table1 WHERE x = 38",
-                "SELECT * FROM Table1 WHERE x BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 28 AND 37",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                makeSchema(), "SELECT * FROM t WHERE a = 27",
+                "SELECT * FROM t WHERE a = 28",
+                "SELECT * FROM t WHERE a = 37",
+                "SELECT * FROM t WHERE a = 38",
+                "SELECT * FROM t WHERE a BETWEEN 28 AND 37",
+                "SELECT * FROM t WHERE a NOT BETWEEN 28 AND 37",
+                "SELECT * FROM t WHERE a IS NULL"
+        );
     }
 
     /**
@@ -330,15 +330,16 @@ class ConditionTest {
      */
     @Test
     void testDoubleBetweenCondition() {
-        verify("SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
+        verify("SELECT * FROM t WHERE a BETWEEN 14.3 AND 32.2",
 
-                "SELECT * FROM Table1 WHERE x = 13.3",
-                "SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
-                "SELECT * FROM Table1 WHERE x = 14.3",
-                "SELECT * FROM Table1 WHERE x = 32.2",
-                "SELECT * FROM Table1 WHERE x = 33.2",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                makeSchema(), "SELECT * FROM t WHERE a = 13.3",
+                "SELECT * FROM t WHERE a BETWEEN 14.3 AND 32.2",
+                "SELECT * FROM t WHERE a NOT BETWEEN 14.3 AND 32.2",
+                "SELECT * FROM t WHERE a = 14.3",
+                "SELECT * FROM t WHERE a = 32.2",
+                "SELECT * FROM t WHERE a = 33.2",
+                "SELECT * FROM t WHERE a IS NULL"
+        );
     }
 
     /**
@@ -348,13 +349,13 @@ class ConditionTest {
     void testDoubleBetweenConditionNegated() {
         verify("SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
 
-                "SELECT * FROM Table1 WHERE x = 13.3",
+                null, "SELECT * FROM Table1 WHERE x = 13.3",
                 "SELECT * FROM Table1 WHERE x = 14.3",
                 "SELECT * FROM Table1 WHERE x = 32.2",
                 "SELECT * FROM Table1 WHERE x = 33.2",
                 "SELECT * FROM Table1 WHERE x BETWEEN 14.3 AND 32.2",
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                "SELECT * FROM Table1 WHERE x NOT BETWEEN 14.3 AND 32.2"
+        );
     }
 
     /**
@@ -362,13 +363,14 @@ class ConditionTest {
      */
     @Test
     void testStringBetweenCondition() {
-        verify("SELECT * FROM Table1 WHERE x BETWEEN 'hello' AND 'world'",
+        verify("SELECT * FROM t WHERE b BETWEEN 'hello' AND 'world'",
 
-                "SELECT * FROM Table1 WHERE x NOT BETWEEN 'hello' AND 'world'",
-                "SELECT * FROM Table1 WHERE x BETWEEN 'hello' AND 'world'",
-                "SELECT * FROM Table1 WHERE x = 'hello'",
-                "SELECT * FROM Table1 WHERE x = 'world'",
-                "SELECT * FROM Table1 WHERE x IS NULL");
+                makeSchema(), "SELECT * FROM t WHERE b NOT BETWEEN 'hello' AND 'world'",
+                "SELECT * FROM t WHERE b BETWEEN 'hello' AND 'world'",
+                "SELECT * FROM t WHERE b = 'hello'",
+                "SELECT * FROM t WHERE b = 'world'",
+                "SELECT * FROM t WHERE b IS NULL"
+        );
     }
 
     /**
@@ -378,16 +380,17 @@ class ConditionTest {
     void testMultipleConditionsOnSameAttribute() {
         verify("SELECT * FROM t WHERE a > 3 AND a < 20 OR a = -10",
 
-                "SELECT * FROM t WHERE ((a = 2) AND (a < 20)) AND NOT (a = -10)",
+                makeSchema(), "SELECT * FROM t WHERE ((a = 2) AND (a < 20)) AND NOT (a = -10)",
                 "SELECT * FROM t WHERE ((a = 3) AND (a < 20)) AND NOT (a = -10)",
                 "SELECT * FROM t WHERE ((a = 4) AND (a < 20)) AND NOT (a = -10)",
                 "SELECT * FROM t WHERE (a IS NULL)",
                 "SELECT * FROM t WHERE ((a > 3) AND (a = 19)) AND NOT (a = -10)",
                 "SELECT * FROM t WHERE ((a > 3) AND (a = 20)) AND NOT (a = -10)",
                 "SELECT * FROM t WHERE ((a > 3) AND (a = 21)) AND NOT (a = -10)",
-                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = 9)",
-                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = 10)",
-                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = 11)");
+                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = -9)",
+                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = -10)",
+                "SELECT * FROM t WHERE NOT (a > 3 AND a < 20) AND (a = -11)"
+        );
     }
 
     /**
@@ -395,18 +398,66 @@ class ConditionTest {
      */
     @Test
     void testMultipleConditionsOnMultipleAttribute() {
-        containsAtLeast("SELECT * FROM t WHERE a > 3 AND b < 20 AND a <> 15",
+        containsAtLeast("SELECT * FROM t WHERE a > 3 AND c < 20 AND a <> 15",
 
-                "SELECT * FROM t WHERE ((a = 2) AND (b < 20)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a = 3) AND (b < 20)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a = 4) AND (b < 20)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a IS NULL) AND (b < 20))",
-                "SELECT * FROM t WHERE (a > 3 AND b < 20) AND (a = 14)",
-                "SELECT * FROM t WHERE (a > 3 AND b < 20) AND (a = 15)",
-                "SELECT * FROM t WHERE (a > 3 AND b < 20) AND (a = 16)",
-                "SELECT * FROM t WHERE ((a > 3) AND (b = 19)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a > 3) AND (b = 20)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a > 3) AND (b = 21)) AND (a <> 15)",
-                "SELECT * FROM t WHERE ((a > 3) AND (b IS NULL)) AND (a <> 15)");
+                makeSchema(), "SELECT * FROM t WHERE ((a = 2) AND (c < 20)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a = 3) AND (c < 20)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a = 4) AND (c < 20)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a IS NULL) AND (c < 20))",
+                "SELECT * FROM t WHERE (a > 3 AND c < 20) AND (a = 14)",
+                "SELECT * FROM t WHERE (a > 3 AND c < 20) AND (a = 15)",
+                "SELECT * FROM t WHERE (a > 3 AND c < 20) AND (a = 16)",
+                "SELECT * FROM t WHERE ((a > 3) AND (c = 19)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a > 3) AND (c = 20)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a > 3) AND (c = 21)) AND (a <> 15)",
+                "SELECT * FROM t WHERE ((a > 3) AND (c IS NULL)) AND (a <> 15)"
+        );
+    }
+
+    /**
+     * This test verifies whether the binary expression is converted to an off by one addition and subtraction.
+     */
+    @Test
+    void testNumericBinaryExpressionToAdditionAndSubtraction() {
+        verify("SELECT * FROM t WHERE t.a = t.c - 10",
+
+                makeSchema(), "SELECT * FROM t WHERE t.a = t.c - 10",
+                "SELECT * FROM t WHERE t.a = t.c - 10 + 1",
+                "SELECT * FROM t WHERE t.a = t.c - 10 - 1",
+                "SELECT * FROM t WHERE t.a IS NULL",
+                "SELECT * FROM t WHERE t.c IS NULL"
+        );
+    }
+
+    /**
+     * This test verifies whether the binary expression is converted to an off by addition and subtraction on the
+     * right side only.
+     */
+    @Test
+    void testNumericBinaryExpressionRightSideConvertedOnly() {
+        verify("SELECT * FROM t WHERE t.a + 7 > t.c - 8",
+
+                makeSchema(), "SELECT * FROM t WHERE t.a + 7 = t.c - 8",
+                "SELECT * FROM t WHERE t.a + 7 = t.c - 8 + 1",
+                "SELECT * FROM t WHERE t.a + 7 = t.c - 8 - 1",
+                "SELECT * FROM t WHERE t.c IS NULL",
+                "SELECT * FROM t WHERE t.a IS NULL"
+        );
+    }
+
+    /**
+     * This test verifies whether the signed expression is converted correctly such that one is added and subtracted
+     * in the generated rules. The columns in the signed expression must also be checked for null.
+     */
+    @Test
+    void testSignedBinaryExpressionToAdditionAndSubtraction() {
+        verify("SELECT * FROM t WHERE t.a = -(5 + c)",
+
+                makeSchema(), "SELECT * FROM t WHERE t.a = -(5 + c) + 1",
+                "SELECT * FROM t WHERE t.a = -(5 + c) - 1",
+                "SELECT * FROM t WHERE t.a = -(5 + c)",
+                "SELECT * FROM t WHERE c IS NULL",
+                "SELECT * FROM t WHERE t.a IS NULL"
+        );
     }
 }

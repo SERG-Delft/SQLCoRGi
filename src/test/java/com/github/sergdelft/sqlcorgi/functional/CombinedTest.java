@@ -1,5 +1,9 @@
 package com.github.sergdelft.sqlcorgi.functional;
 
+import com.github.sergdelft.sqlcorgi.schema.Column;
+import com.github.sergdelft.sqlcorgi.schema.Schema;
+import com.github.sergdelft.sqlcorgi.schema.Table;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static com.github.sergdelft.sqlcorgi.AssertUtils.verify;
@@ -13,6 +17,27 @@ import static com.github.sergdelft.sqlcorgi.AssertUtils.verify;
 @SuppressWarnings("checkstyle:multipleStringLiterals")
 class CombinedTest {
 
+    private static Schema schema;
+
+    /**
+     * Creates a schema with tables 'a', 'b', 'c' and 'd'.
+     */
+    @BeforeAll
+    static void makeSchema() {
+
+        schema = new Schema();
+
+        Table tableA = new Table("a");
+        tableA.addColumn(new Column("id", true, true, Column.DataType.NUM));
+        tableA.addColumn(new Column("length", false, false, Column.DataType.NUM));
+        schema.addTable(tableA);
+
+        Table tableB = new Table("b");
+        tableB.addColumn(new Column("id", true, true, Column.DataType.NUM));
+        tableB.addColumn(new Column("length", false, false, Column.DataType.NUM));
+        schema.addTable(tableB);
+    }
+
     /**
      * A test case with WHERE, JOIN and AGGREGATE parts.
      */
@@ -21,7 +46,7 @@ class CombinedTest {
         verify("SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id < 10 GROUP BY b.id",
 
                 // WHERE RESULTS
-                "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id = 9 GROUP BY b.id",
+                schema, "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id = 9 GROUP BY b.id",
                 "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id = 11 GROUP BY b.id",
                 "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id = 10 GROUP BY b.id",
                 "SELECT AVG(b.id) FROM a INNER JOIN b ON a.id = b.id WHERE a.id IS NULL GROUP BY b.id",
@@ -58,16 +83,13 @@ class CombinedTest {
     void testJoinWithWhereNonIdsIncludedInWhereExpression() {
         verify("SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE a.length < 50 OR b.length > 70",
 
-                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 69)",
+                schema, "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 69)",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 71)",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length = 70)",
 
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length = 49) AND NOT (b.length > 70)",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length = 50) AND NOT (b.length > 70)",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length = 51) AND NOT (b.length > 70)",
-
-                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE NOT (a.length < 50) AND (b.length IS NULL)",
-                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length IS NULL) AND NOT (b.length > 70)",
 
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.length < 50 OR b.length > 70)",
                 "SELECT * FROM a LEFT JOIN b ON a.id = b.id "
@@ -89,7 +111,7 @@ class CombinedTest {
     void testJoinWithWhereIdsExcludedInWhereExpressionWhenIsNull() {
         verify("SELECT * FROM a RIGHT JOIN b ON a.id = b.id WHERE a.id <= 50 AND b.id >= 70",
 
-                "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id = 49) AND (b.id >= 70)",
+                schema, "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id = 49) AND (b.id >= 70)",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id = 50) AND (b.id >= 70)",
                 "SELECT * FROM a INNER JOIN b ON a.id = b.id WHERE (a.id = 51) AND (b.id >= 70)",
 
@@ -117,6 +139,6 @@ class CombinedTest {
      */
     @Test
     void testQueryOnlySelectAndFrom() {
-        verify("SELECT * FROM TableA");
+        verify("SELECT * FROM TableA", null);
     }
 }
