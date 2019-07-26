@@ -13,7 +13,6 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectBody;
 
 import java.util.HashSet;
-
 import java.util.Set;
 
 /**

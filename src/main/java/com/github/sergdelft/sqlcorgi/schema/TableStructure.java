@@ -4,6 +4,8 @@ import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.statement.select.*;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class represents the collection of tables that can be referenced from within a query. In order to use it,
@@ -96,8 +98,8 @@ public class TableStructure {
             throws AmbiguousColumnException, UnknownColumnException, UnknownTableException {
 
         net.sf.jsqlparser.schema.Table jsqlTable = column.getTable();
-        String tableName = jsqlTable == null ? null : jsqlTable.getName();
-        String colName = column.getColumnName();
+        String tableName = jsqlTable == null ? null : getIdentifier(jsqlTable.getName());
+        String colName = getIdentifier(column.getColumnName());
 
         Column result = null;
         for (Map<String, Table> tableMap : tableStack) {
@@ -150,6 +152,35 @@ public class TableStructure {
     }
 
     /**
+     * Extracts the identifier from the given name. Supported delimiters are: {@code [ ]}, {@code ` `} and {@code " "}.
+     *
+     * @param name a table or column name, possibly surrounded by a pair of delimiters.
+     * @return if the original string was surrounded by delimiters, returns the name without delimiters, otherwise
+     * the original string is returned.
+     */
+    private String getIdentifier(String name) {
+
+        Pattern doubleQuotes = Pattern.compile("\"(.*)\"");
+        Pattern backTicks = Pattern.compile("`(.*)`");
+        Pattern brackets = Pattern.compile("\\[(.*)]");
+
+        Matcher mDoubleQuotes = doubleQuotes.matcher(name);
+        Matcher mBrackets = brackets.matcher(name);
+        Matcher mBackTicks = backTicks.matcher(name);
+
+        if (mDoubleQuotes.find()) {
+            return mDoubleQuotes.group(1);
+        }
+        if (mBackTicks.find()) {
+            return mBackTicks.group(1);
+        }
+        if (mBrackets.find()) {
+            return mBrackets.group(1);
+        }
+        return name;
+    }
+
+    /**
      * Returns the {@link Table} associated with the {@code tableName}.
      * @param tableName a string referring to a {@code Table}.
      *
@@ -158,8 +189,9 @@ public class TableStructure {
      */
     public Table getTable(String tableName) throws UnknownTableException {
 
+        String tableId = getIdentifier(tableName);
         for (Map<String, Table> tableMap : tableStack) {
-            Table table = tableMap.get(tableName);
+            Table table = tableMap.get(tableId);
             if (table != null) {
                 return table;
             }
@@ -192,7 +224,7 @@ public class TableStructure {
         assert tables != null;
 
         if (fromItem instanceof net.sf.jsqlparser.schema.Table) {
-            String name = ((net.sf.jsqlparser.schema.Table) fromItem).getName();
+            String name = getIdentifier(((net.sf.jsqlparser.schema.Table) fromItem).getName());
             Table table = schema.getTable(name);
 
             if (table == null) {
@@ -204,7 +236,7 @@ public class TableStructure {
                 if (alias == null) {
                     tables.put(name, table);
                 } else {
-                    tables.put(alias.getName(), table);
+                    tables.put(getIdentifier(alias.getName()), table);
                 }
             }
 
@@ -216,7 +248,7 @@ public class TableStructure {
             Table table = deriveFromItem(((ParenthesisFromItem) fromItem).getFromItem(), storeTable && alias == null);
 
             if (storeTable && alias != null) {
-                tables.put(alias.getName(), table);
+                tables.put(getIdentifier(alias.getName()), table);
             }
             return table;
         }
@@ -246,7 +278,7 @@ public class TableStructure {
             Map<String, Table> tables = tableStack.peek();
             assert tables != null;
 
-            tables.put(alias.getName(), joinTable);
+            tables.put(getIdentifier(alias.getName()), joinTable);
         }
 
         return joinTable;
@@ -315,7 +347,7 @@ public class TableStructure {
             Map<String, Table> tables = tableStack.peek();
             assert tables != null;
 
-            tables.put(alias.getName(), derivedTable);
+            tables.put(getIdentifier(alias.getName()), derivedTable);
         }
 
         return derivedTable;
@@ -352,7 +384,7 @@ public class TableStructure {
                 selectExpressionItem.getExpression().accept(typeChecker);
 
                 Alias alias = selectExpressionItem.getAlias();
-                String columnName = alias != null ? alias.getName() : "";
+                String columnName = alias != null ? getIdentifier(alias.getName()) : "";
                 derivedTable.addColumn(new Column(columnName, false, false, typeChecker.getType()));
             }
         }
