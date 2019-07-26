@@ -1,5 +1,6 @@
 package com.github.sergdelft.sqlcorgi.functional;
 
+import com.github.sergdelft.sqlcorgi.AssertUtils;
 import com.github.sergdelft.sqlcorgi.schema.Column;
 import com.github.sergdelft.sqlcorgi.schema.Schema;
 import com.github.sergdelft.sqlcorgi.schema.Table;
@@ -414,6 +415,25 @@ class JoinTest {
                     + ".id IS NULL) AND (acl_roles_users.user_id IS NOT NULL) AND (acl_roles_users.role_id IS NOT"
                     + " NULL) AND (acl_roles_users.deleted IS NOT NULL)"
         );
+    }
+
+    @Test
+    void testJoinWithNullableAndNonNullableColumnsInOnCondition() {
+        containsAtLeast("SELECT * FROM Movies INNER JOIN t ON Movies.title = t.c OR Movies.year = t.b",
+                AssertUtils.makeSchema(),
+
+                "SELECT * FROM Movies INNER JOIN t ON Movies.title = t.c OR Movies.year = t.b",
+                "SELECT * FROM Movies LEFT JOIN t ON Movies.title = t.c OR Movies.year = t.b "
+                        + "WHERE (t.c IS NULL) AND (t.b IS NULL) AND (Movies.title IS NOT NULL) "
+                        + "AND (Movies.year IS NOT NULL)",
+                "SELECT * FROM Movies LEFT JOIN t ON Movies.title = t.c OR Movies.year = t.b "
+                        + "WHERE (t.c IS NULL) AND (t.b IS NULL) "
+                        + "AND (Movies.year IS NULL) AND (Movies.title IS NOT NULL)",
+                "SELECT * FROM Movies RIGHT JOIN t ON Movies.title = t.c OR Movies.year = t.b "
+                        + "WHERE (Movies.title IS NULL) AND (Movies.year IS NULL) AND (t.c IS NOT NULL) "
+                        + "AND (t.b IS NOT NULL)",
+                "SELECT * FROM Movies RIGHT JOIN t ON Movies.title = t.c OR Movies.year = t.b "
+                        + "WHERE (Movies.title IS NULL) AND (Movies.year IS NULL) AND (t.c IS NULL) AND (t.b IS NULL)");
     }
 
 }
