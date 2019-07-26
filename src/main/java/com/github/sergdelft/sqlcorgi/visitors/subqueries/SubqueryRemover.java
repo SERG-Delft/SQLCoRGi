@@ -1,8 +1,6 @@
 package com.github.sergdelft.sqlcorgi.visitors.subqueries;
 
-import net.sf.jsqlparser.expression.BinaryExpression;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
+import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.statement.select.SubSelect;
@@ -80,6 +78,16 @@ public class SubqueryRemover extends ExpressionVisitorAdapter {
     @Override
     public void visit(OrExpression orExpression) {
         visitLogicalOperator(orExpression);
+    }
+
+    @Override
+    public void visit(AllComparisonExpression expr) {
+        expr.getSubSelect().accept((ExpressionVisitor) this);
+    }
+
+    @Override
+    public void visit(AnyComparisonExpression expr) {
+        expr.getSubSelect().accept((ExpressionVisitor) this);
     }
 
     public Expression getChild() {

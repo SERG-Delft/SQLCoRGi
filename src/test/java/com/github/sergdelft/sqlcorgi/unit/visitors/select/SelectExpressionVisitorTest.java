@@ -4,6 +4,7 @@ import com.github.sergdelft.sqlcorgi.AssertUtils;
 import com.github.sergdelft.sqlcorgi.query.NumericDoubleValue;
 import com.github.sergdelft.sqlcorgi.query.NumericLongValue;
 import com.github.sergdelft.sqlcorgi.query.NumericValue;
+import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.visitors.select.SelectExpressionVisitor;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.relational.*;
@@ -15,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link SelectExpressionVisitor}.
@@ -25,6 +29,7 @@ class SelectExpressionVisitorTest {
 
     private List<Expression> output;
     private SelectExpressionVisitor selectExpressionVisitor;
+    private TableStructure tableStructure;
 
     /**
      * Set-up a {@link SelectExpressionVisitor} with an empty {@link ArrayList}.
@@ -32,7 +37,8 @@ class SelectExpressionVisitorTest {
     @BeforeEach
     void setUpSelectExpressionVisitor() {
         output = new ArrayList<>();
-        selectExpressionVisitor = new SelectExpressionVisitor(output);
+        tableStructure = mock(TableStructure.class);
+        selectExpressionVisitor = new SelectExpressionVisitor(output, tableStructure);
     }
 
     /**
@@ -41,7 +47,7 @@ class SelectExpressionVisitorTest {
     @Test
     void constructorNullOutputTest() {
         assertThatThrownBy(() -> {
-            new SelectExpressionVisitor(null);
+            new SelectExpressionVisitor(null, null);
         }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining(EXCEPTION_MESSAGE);
     }
 
@@ -55,34 +61,8 @@ class SelectExpressionVisitorTest {
         output.add(new GreaterThan());
 
         assertThatThrownBy(() -> {
-            new SelectExpressionVisitor(output);
+            new SelectExpressionVisitor(output, new TableStructure());
         }).isInstanceOf(IllegalArgumentException.class).hasMessageContaining(EXCEPTION_MESSAGE);
-    }
-
-    /**
-     * Assert that the {@code visit} method for an {@link EqualsTo} generates the correct output.
-     */
-    @Test
-    void visitEqualsToTest() {
-        EqualsTo equalsTo = new EqualsTo();
-        Column leftValue = new Column("something");
-        equalsTo.setLeftExpression(leftValue);
-        equalsTo.setRightExpression(new NumericDoubleValue("42.0"));
-
-        EqualsTo minusOne = new EqualsTo();
-        minusOne.setLeftExpression(leftValue);
-        minusOne.setRightExpression(new NumericDoubleValue("41.0"));
-
-        EqualsTo plusOne = new EqualsTo();
-        plusOne.setLeftExpression(leftValue);
-        plusOne.setRightExpression(new NumericDoubleValue("43.0"));
-
-        IsNullExpression isNullExpression = new IsNullExpression();
-        isNullExpression.setLeftExpression(leftValue);
-
-        selectExpressionVisitor.visit(equalsTo);
-
-        AssertUtils.compareFieldByField(output, minusOne, equalsTo, plusOne, isNullExpression);
     }
 
     /**
@@ -91,7 +71,7 @@ class SelectExpressionVisitorTest {
     @Test
     void visitNullExpressionTest() {
         IsNullExpression isNullExpression = new IsNullExpression();
-        StringValue stringValue = new StringValue("context");
+        Column stringValue = new Column("context");
         isNullExpression.setLeftExpression(stringValue);
 
         IsNullExpression isNotNullExpression = new IsNullExpression();
@@ -109,10 +89,11 @@ class SelectExpressionVisitorTest {
      */
     @Test
     void visitBetweenWithDoubleValueTest() {
-        StringValue left = new StringValue("double");
+        Column left = new Column("double");
         NumericDoubleValue start = new NumericDoubleValue("2");
         NumericDoubleValue end = new NumericDoubleValue("24");
 
+        when(tableStructure.isNullable(any())).thenReturn(true);
         betweenAssert(left, start, end, true);
     }
 
@@ -122,10 +103,11 @@ class SelectExpressionVisitorTest {
      */
     @Test
     void visitBetweenWithLongValueTest() {
-        StringValue left = new StringValue("long");
+        Column left = new Column("long");
         NumericLongValue start = new NumericLongValue("1");
         NumericLongValue end = new NumericLongValue("12");
 
+        when(tableStructure.isNullable(any())).thenReturn(true);
         betweenAssert(left, start, end, true);
     }
 
@@ -135,10 +117,11 @@ class SelectExpressionVisitorTest {
      */
     @Test
     void visitBetweenWithStringValueTest() {
-        StringValue left = new StringValue("string");
+        Column left = new Column("string");
         StringValue start = new StringValue("aaa");
         StringValue end = new StringValue("azz");
 
+        when(tableStructure.isNullable(any())).thenReturn(true);
         betweenAssert(left, start, end, false);
     }
 
@@ -211,7 +194,7 @@ class SelectExpressionVisitorTest {
     @Test
     void visitInExpressionTest() {
         InExpression inExpression = new InExpression();
-        StringValue left = new StringValue("number");
+        Column left = new Column("number");
         ExpressionList right = new ExpressionList();
         List<Expression> itemList = new ArrayList<>();
         DoubleValue item = new DoubleValue("28");
@@ -229,6 +212,7 @@ class SelectExpressionVisitorTest {
         IsNullExpression isNullExpression = new IsNullExpression();
         isNullExpression.setLeftExpression(left);
 
+        when(tableStructure.isNullable(any())).thenReturn(true);
         selectExpressionVisitor.visit(inExpression);
 
         AssertUtils.compareFieldByField(output, inExpression, notInExpression, isNullExpression);
@@ -240,7 +224,7 @@ class SelectExpressionVisitorTest {
     @Test
     void visitLikeExpressionTest() {
         LikeExpression likeExpression = new LikeExpression();
-        StringValue leftValue = new StringValue("x");
+        Column leftValue = new Column("x");
         StringValue rightValue = new StringValue("project");
         likeExpression.setLeftExpression(leftValue);
         likeExpression.setRightExpression(rightValue);
@@ -253,6 +237,7 @@ class SelectExpressionVisitorTest {
         IsNullExpression isNullExpression = new IsNullExpression();
         isNullExpression.setLeftExpression(leftValue);
 
+        when(tableStructure.isNullable(any())).thenReturn(true);
         selectExpressionVisitor.visit(likeExpression);
 
         AssertUtils.compareFieldByField(output, likeExpression, notLikeExpression, isNullExpression);
@@ -279,8 +264,9 @@ class SelectExpressionVisitorTest {
         IsNullExpression isNullExpression = new IsNullExpression();
         isNullExpression.setLeftExpression(leftValue);
 
+        when(tableStructure.isNullable(any())).thenReturn(false);
         selectExpressionVisitor.visit(likeExpression);
 
-        AssertUtils.compareFieldByField(output, likeExpression, notLikeExpression, isNullExpression);
+        AssertUtils.compareFieldByField(output, likeExpression, notLikeExpression);
     }
 }

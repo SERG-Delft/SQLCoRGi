@@ -2,7 +2,7 @@ package com.github.sergdelft.sqlcorgi;
 
 import com.github.sergdelft.sqlcorgi.query.JoinWhereItem;
 import com.github.sergdelft.sqlcorgi.query.OuterIncrementRelation;
-import com.github.sergdelft.sqlcorgi.schema.Schema;
+import com.github.sergdelft.sqlcorgi.schema.TableStructure;
 import com.github.sergdelft.sqlcorgi.visitors.ExpressionTraverserVisitor;
 import com.github.sergdelft.sqlcorgi.visitors.join.ImplicitInnerJoinDeducer;
 import com.github.sergdelft.sqlcorgi.visitors.join.OnExpressionVisitor;
@@ -17,17 +17,7 @@ import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeSet;
+import java.util.*;
 
 import static com.github.sergdelft.sqlcorgi.util.cloner.SelectCloner.copy;
 
@@ -49,17 +39,19 @@ public class JoinRulesGenerator {
     private PlainSelect plainSelect;
     private Set<String> simple;
     private PlainSelect sanitized;
+    private TableStructure tableStructure;
 
     /**
      * Takes in a statement and mutates the joins. Each join will have its own set of mutations added to the results.
      *
      * @param plainSelect The statement for which the joins have to be mutated.
-     * @param schema The schema related to the input query.
+     * @param tableStructure The table structure related to the input query.
      * @return A set of mutated queries in string format.
      */
-    public Set<String> generate(PlainSelect plainSelect, Schema schema) {
+    public Set<String> generate(PlainSelect plainSelect, TableStructure tableStructure) {
         List<Join> joins = plainSelect.getJoins();
 
+        this.tableStructure = tableStructure;
         Set<String> result = new TreeSet<>();
         simple = new HashSet<>();
         fromItem = plainSelect.getFromItem();
@@ -68,7 +60,6 @@ public class JoinRulesGenerator {
         if (joins == null || joins.isEmpty()) {
             return new HashSet<>();
         }
-
 
         for (Join j : joins) {
             if (j.isSimple()) {
@@ -134,7 +125,6 @@ public class JoinRulesGenerator {
 
             plainSelect.setWhere(expression);
             plainSelect.setJoins(orderedJoins);
-
         }
     }
 
@@ -243,10 +233,31 @@ public class JoinRulesGenerator {
             Expression loiNull = getLeftOuterIncrement(oir, true);
 
             out.add(new JoinWhereItem(tJoinsLoi, concatenate(loi, reducedWhereLoi, true)));
-            out.add(new JoinWhereItem(tJoinsLoi, concatenate(loiNull, reducedWhereLoiNull, true)));
+
+            if (!getNullableColumns(oir.getRoiRelColumns(), true).isEmpty()) {
+                out.add(new JoinWhereItem(tJoinsLoi, concatenate(loiNull, reducedWhereLoiNull, true)));
+            }
+
         }
 
         return out;
+    }
+
+    /**
+     * Filters the given list of columns such that it only the (non) nullable columns remain.
+     * @param columns The columns from which the (non) nullable columns should be retrieved.
+     * @param isNull True if the nullable columns should be retrieved, false for the non nullable columns.
+     * @return A list containing only (non) nullable columns.
+     */
+    private List<Column> getNullableColumns(List<Column> columns, boolean isNull) {
+        List<Column> res = new ArrayList<>();
+        for (Column column : columns) {
+            if (tableStructure.isNullable(column) == isNull) {
+                res.add(column);
+            }
+        }
+
+        return res;
     }
 
     /**
@@ -287,7 +298,10 @@ public class JoinRulesGenerator {
             Expression roiNull = getRightOuterIncrement(oir, true);
 
             out.add(new JoinWhereItem(tJoinsRoi, concatenate(roi, reducedWhereRoi, true)));
-            out.add(new JoinWhereItem(tJoinsRoi, concatenate(roiNull, reducedWhereRoiNull, true)));
+
+            if (!getNullableColumns(oir.getLoiRelColumns(), true).isEmpty()) {
+                out.add(new JoinWhereItem(tJoinsRoi, concatenate(roiNull, reducedWhereRoiNull, true)));
+            }
         }
 
         return out;
@@ -342,13 +356,13 @@ public class JoinRulesGenerator {
      * @param nullable True if the outer increment relations are nullable, false otherwise.
      * @return The reduced expression.
      */
+
     private Expression nullReduction(Expression expression, JoinType joinType, OuterIncrementRelation oir,
                                             List<OuterIncrementRelation> oirs, boolean nullable) {
         if (expression != null) {
-            Set<String> includeTables = new HashSet<>();
             List<Column> columns = new ArrayList<>();
 
-            includeTables.addAll(simple);
+            Set<String> includeTables = new HashSet<>(simple);
             for (OuterIncrementRelation o : oirs) {
                 includeTables.addAll(o.getLoiRelations());
                 includeTables.addAll(o.getRoiRelations());
@@ -368,8 +382,9 @@ public class JoinRulesGenerator {
             traverserVisitor.setTables(includeTables);
             traverserVisitor.setOnColumns(columns);
 
+
             if (nullable) {
-                traverserVisitor.setNullColumns(columns);
+                traverserVisitor.setNullColumns(getNullableColumns(columns, true));
             }
 
             expression.accept(traverserVisitor);
@@ -389,11 +404,19 @@ public class JoinRulesGenerator {
      */
     private Expression getLeftOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
         List<Column> loiColumns = oiRel.getLoiRelColumns();
-        List<Column> roiColumns = oiRel.getRoiRelColumns();
+        Expression rightExpression;
+        if (nullable) {
+            List<Column> nullables = getNullableColumns(oiRel.getRoiRelColumns(), true);
+            List<Column> nonNullables = getNullableColumns(oiRel.getRoiRelColumns(), false);
 
+            rightExpression = concatenate(createIsNullExpressions(nullables, true),
+                    createIsNullExpressions(nonNullables, false), false);
+        } else {
+            rightExpression = createIsNullExpressions(oiRel.getRoiRelColumns(), false);
+        }
         return concatenate(
                 createIsNullExpressions(loiColumns, true),
-                createIsNullExpressions(roiColumns, nullable), false);
+                rightExpression, false);
     }
 
     /**
@@ -404,11 +427,21 @@ public class JoinRulesGenerator {
      * @return The right outer increment.
      */
     private Expression getRightOuterIncrement(OuterIncrementRelation oiRel, boolean nullable) {
-        List<Column> loiColumns = oiRel.getLoiRelColumns();
         List<Column> roiColumns = oiRel.getRoiRelColumns();
+        Expression rightExpression;
+
+        if (nullable) {
+            List<Column> nullables = getNullableColumns(oiRel.getLoiRelColumns(), true);
+            List<Column> nonNullables = getNullableColumns(oiRel.getLoiRelColumns(), false);
+
+            rightExpression = concatenate(createIsNullExpressions(nullables, true),
+                    createIsNullExpressions(nonNullables, false), false);
+        } else {
+            rightExpression = createIsNullExpressions(oiRel.getLoiRelColumns(), false);
+        }
         return concatenate(
                 createIsNullExpressions(roiColumns, true),
-                createIsNullExpressions(loiColumns, nullable), false);
+                rightExpression, false);
     }
 
     /**
@@ -630,7 +663,7 @@ public class JoinRulesGenerator {
      * @param join The join that should be copied.
      * @return A generic shallow copy of join.
      */
-    public static Join genericCopyOfJoin(Join join) {
+    private static Join genericCopyOfJoin(Join join) {
         Join outJoin = new Join();
         outJoin.setRightItem(join.getRightItem());
         outJoin.setOnExpression(join.getOnExpression());
