@@ -29,7 +29,7 @@
         <site.plugin.version>3.7.1</site.plugin.version>
         <surefire.plugin.version>3.0.0-M3</surefire.plugin.version>
 
-        <checkstyle.version>8.22</checkstyle.version>
+        <checkstyle.version>8.29</checkstyle.version>
         <checkstyle.plugin.version>3.0.0</checkstyle.plugin.version>
 
         <clover.version>4.3.1</clover.version>
